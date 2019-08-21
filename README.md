@@ -24,16 +24,16 @@ Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protrac
 
 ## Publish to Github page
 
-```sh
-npm run deploy
-```
-
-Deploy based on branch
+Deploy based on branch master
 
 ```sh
 ngh --message="Commit message"
-ngh --branch=production
+ngh --branch=master
 ngh --dry-run
+```
+
+```sh
+npm run deploy
 ```
 
 ## Further help
