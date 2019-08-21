@@ -1,11 +1,11 @@
 {
-  "name": "app",
-  "version": "0.0.0",
+  "name": "dalenguyen",
+  "version": "1.0.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --open --ssl --aot true",
     "build": "ng build --prod --base-href 'https://dalenguyen.github.io/' --aot --output-hashing=all",
-    "deploy": "ngh",
+    "deploy": "npm run build && ngh --branch=master && ngh",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
