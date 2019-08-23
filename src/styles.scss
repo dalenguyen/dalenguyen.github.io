@@ -2,3 +2,8 @@
 @import "~@angular/material/prebuilt-themes/indigo-pink.css";
 @import 'variables';
 @import "~@fortawesome/fontawesome-free/css/all.css";
+
+.image.avatar48 img {
+    width: 48px;
+    height: 48px;
+}
