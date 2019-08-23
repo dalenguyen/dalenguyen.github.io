@@ -1,3 +1,16 @@
-<button mat-button>Click me!</button>
-
-<router-outlet></router-outlet>
+<div class="main-content" [class.is-mobile]="mobileQuery.matches">  
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav #snav 
+      [opened]="mobileQuery.matches ? false : true" 
+      [mode]="mobileQuery.matches ? 'over' : 'side'" 
+      [fixedInViewport]="mobileQuery.matches">
+      <app-nav></app-nav>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="hamburger">
+        <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
+      </div>      
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  </mat-sidenav-container>  
+</div>
