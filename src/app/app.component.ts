@@ -1,5 +1,6 @@
 import {MediaMatcher} from '@angular/cdk/layout';
 import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { MatIconRegistry } from '@angular/material/icon';
 
 @Component({
   selector: 'app-root',
@@ -11,10 +12,13 @@ export class AppComponent implements OnDestroy {
   // tslint:disable-next-line:variable-name
   private _mobileQueryListener: () => void;
 
-  constructor(cdf: ChangeDetectorRef, media: MediaMatcher) {
+  constructor(cdf: ChangeDetectorRef, media: MediaMatcher, matIconRegistry: MatIconRegistry) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => cdf.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
+
+    // Add custom material icons
+    matIconRegistry.registerFontClassAlias('fa');
   }
 
   ngOnDestroy(): void {
