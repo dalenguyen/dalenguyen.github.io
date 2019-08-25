@@ -19,6 +19,7 @@ export class AppComponent implements OnDestroy {
 
     // Add custom material icons
     matIconRegistry.registerFontClassAlias('fa');
+    matIconRegistry.registerFontClassAlias('fab');
   }
 
   ngOnDestroy(): void {

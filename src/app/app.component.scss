@@ -1,3 +1,5 @@
+@import '../variables';
+
 .main-content {
     display: flex;
     flex-direction: column;
@@ -25,3 +27,12 @@
        `<body>` to be our scrolling element for mobile layouts. */
     flex: 1 0 auto;
 }
+
+mat-sidenav {
+    width: 250px;    
+    background: $shark url('/assets/images/overlay.png');
+}
+
+// mat-sidenav-content {
+//     margin-left: 250px !important;
+// }
