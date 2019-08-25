@@ -1,0 +1,16 @@
+@import '../../../variables';
+
+#intro {
+    background-image: url(/assets/images/home/intro.jpg);
+    background-size: cover;
+    background-position: center center;
+    padding: 4em 2em;
+    text-align: center;
+    color: $light_gray;
+    h2 {
+        font-size: 2em;
+    }
+    mat-icon {
+        vertical-align: baseline;
+    }
+}
