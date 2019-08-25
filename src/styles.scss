@@ -3,7 +3,12 @@
 @import 'variables';
 @import "~@fortawesome/fontawesome-free/css/all.css";
 
+h2 {
+    font-size: 2em;
+}
+
 a {
     text-decoration: none;
     color: $gray;
 }
+

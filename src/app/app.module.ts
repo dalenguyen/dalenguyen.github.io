@@ -9,13 +9,15 @@ import { MaterialModule } from './shared/modules/material.module';
 import { NavComponent } from './nav/nav.component';
 import { HomeComponent } from './home/home.component';
 import { IntroComponent } from './home/intro/intro.component';
+import { PortfolioComponent } from './home/portfolio/portfolio.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     NavComponent,
     HomeComponent,
-    IntroComponent
+    IntroComponent,
+    PortfolioComponent
   ],
   imports: [
     BrowserModule,
