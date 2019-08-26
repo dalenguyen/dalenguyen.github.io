@@ -5,7 +5,7 @@
     "ng": "ng",
     "start": "ng serve --open --open --ssl --aot true",
     "build": "ng build --prod --base-href 'https://dalenguyen.github.io/' --aot --output-hashing=all",
-    "deploy": "npm run build && && ngh --branch=master",
+    "deploy": "npm run build && ngh --branch=master",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e"
