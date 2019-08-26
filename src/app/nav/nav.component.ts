@@ -14,8 +14,8 @@ export class NavComponent implements OnInit {
 
   scroll(id: string) {
     console.log(`scrolling to ${id}`);
-    let el = document.getElementById(id);
-    el.scrollIntoView({behavior:"smooth"});
+    const el = document.getElementById(id);
+    el.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
   }
 
 }
