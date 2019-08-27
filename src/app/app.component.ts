@@ -32,7 +32,8 @@ export class AppComponent implements OnDestroy {
   closeSideNav() {
     console.log('closing', this.mobileQuery.matches);
     if (this.mobileQuery.matches) { // mobile
-      this.snav.toggle();
+      console.log('close on mobile');
+      this.snav.close();
     }
   }
 }

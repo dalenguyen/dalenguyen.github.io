@@ -21,7 +21,7 @@ export class NavComponent implements OnInit {
 
     setTimeout(() => {
       this.scrolled.emit(null);
-    }, 500);
+    }, 1000);
   }
 
 }
