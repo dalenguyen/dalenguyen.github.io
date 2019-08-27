@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 
 @Component({
   selector: 'app-nav',
@@ -6,6 +6,8 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit {
+
+  @Output() scrolled = new EventEmitter();
 
   constructor() { }
 
@@ -16,6 +18,10 @@ export class NavComponent implements OnInit {
     console.log(`scrolling to ${id}`);
     const el = document.getElementById(id);
     el.scrollIntoView({behavior: 'smooth', block: 'start', inline: 'nearest'});
+
+    setTimeout(() => {
+      this.scrolled.emit(null);
+    }, 500);
   }
 
 }

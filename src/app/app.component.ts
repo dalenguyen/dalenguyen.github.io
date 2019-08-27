@@ -1,6 +1,7 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import { Component, ChangeDetectorRef, OnDestroy } from '@angular/core';
+import { Component, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
 import { MatIconRegistry } from '@angular/material/icon';
+import { MatSidenav } from '@angular/material/sidenav';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +9,8 @@ import { MatIconRegistry } from '@angular/material/icon';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnDestroy {
+  @ViewChild('snav', {static: false}) snav: MatSidenav;
+
   mobileQuery: MediaQueryList;
   // tslint:disable-next-line:variable-name
   private _mobileQueryListener: () => void;
@@ -24,5 +27,12 @@ export class AppComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.mobileQuery.removeListener(this._mobileQueryListener);
+  }
+
+  closeSideNav() {
+    console.log('closing', this.mobileQuery.matches);
+    if (this.mobileQuery.matches) { // mobile
+      this.snav.toggle();
+    }
   }
 }
