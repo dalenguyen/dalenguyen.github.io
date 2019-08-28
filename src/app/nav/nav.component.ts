@@ -1,4 +1,5 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { NavService } from '../shared/services/nav.service';
 
 @Component({
   selector: 'app-nav',
@@ -7,30 +8,22 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 })
 export class NavComponent implements OnInit {
 
-  @Output() scrolled = new EventEmitter();
-
   activeEl = 'intro';
 
-  constructor() { }
+  constructor(private navService: NavService) { }
 
   ngOnInit() {
+    this.navService.target.subscribe(id => {
+      // Set active nav element
+      this.activeEl = id as string;
+    });
   }
 
   scroll(id: string) {
-    console.log(`scrolling to ${id}`);
-    const el = document.getElementById(id);
-    el.scrollIntoView({behavior: 'smooth'});
-
-    // Set active nav element
-    this.activeEl = id;
-
-    setTimeout(() => {
-      this.scrolled.emit(null);
-    }, 1000);
+    this.navService.target.next(id);
   }
 
   isActive(id: string) {
     if (id === this.activeEl) { return 'active'; }
   }
-
 }

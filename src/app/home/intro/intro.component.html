@@ -5,7 +5,9 @@
         </header>
     
         <div>
-            <button mat-raised-button color="primary"><mat-icon fontSet="fa" fontIcon="fa-arrow-circle-down"></mat-icon>Let's meet</button>
+            <button mat-raised-button color="primary" (click)="navService.target.next('contact')">
+                <mat-icon fontSet="fa" fontIcon="fa-arrow-circle-down"></mat-icon>Let's meet
+            </button>
         </div>
     </div>
 </section>

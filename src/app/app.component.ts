@@ -1,7 +1,8 @@
 import {MediaMatcher} from '@angular/cdk/layout';
-import { Component, ChangeDetectorRef, OnDestroy, ViewChild, ElementRef } from '@angular/core';
-import { MatIconRegistry } from '@angular/material/icon';
 import { MatSidenav } from '@angular/material/sidenav';
+import { MatIconRegistry } from '@angular/material/icon';
+import { NavService } from './shared/services/nav.service';
+import { Component, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core';
 
 @Component({
   selector: 'app-root',
@@ -15,7 +16,7 @@ export class AppComponent implements OnDestroy {
   // tslint:disable-next-line:variable-name
   private _mobileQueryListener: () => void;
 
-  constructor(cdf: ChangeDetectorRef, media: MediaMatcher, matIconRegistry: MatIconRegistry) {
+  constructor(cdf: ChangeDetectorRef, media: MediaMatcher, matIconRegistry: MatIconRegistry, private navService: NavService) {
     this.mobileQuery = media.matchMedia('(max-width: 600px)');
     this._mobileQueryListener = () => cdf.detectChanges();
     this.mobileQuery.addListener(this._mobileQueryListener);
@@ -23,6 +24,12 @@ export class AppComponent implements OnDestroy {
     // Add custom material icons
     matIconRegistry.registerFontClassAlias('fa');
     matIconRegistry.registerFontClassAlias('fab');
+
+    this.navService.target.subscribe(data => {
+      setTimeout(() => {
+        this.closeSideNav();
+      }, 1000);
+    });
   }
 
   ngOnDestroy(): void {
@@ -30,9 +37,7 @@ export class AppComponent implements OnDestroy {
   }
 
   closeSideNav() {
-    console.log('closing', this.mobileQuery.matches);
     if (this.mobileQuery.matches) { // mobile
-      console.log('close on mobile');
       this.snav.close();
     }
   }
