@@ -9,6 +9,8 @@ export class NavComponent implements OnInit {
 
   @Output() scrolled = new EventEmitter();
 
+  activeEl = 'intro';
+
   constructor() { }
 
   ngOnInit() {
@@ -19,9 +21,16 @@ export class NavComponent implements OnInit {
     const el = document.getElementById(id);
     el.scrollIntoView({behavior: 'smooth'});
 
+    // Set active nav element
+    this.activeEl = id;
+
     setTimeout(() => {
       this.scrolled.emit(null);
     }, 1000);
+  }
+
+  isActive(id: string) {
+    if (id === this.activeEl) { return 'active'; }
   }
 
 }

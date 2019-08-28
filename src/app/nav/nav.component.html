@@ -16,38 +16,38 @@
     <div class="navigate">
         <!-- Nav -->
         <nav id="nav">
-        <ul>
-            <li>
-                <div (click)="scroll('intro')" id="top-link" class="nav">
-                    <mat-icon fontSet="fa" fontIcon="fa-home"></mat-icon>
-                    Architectural Philosophy
-                </div>
-            </li>
-            <!-- <li>
-                <div (click)="scroll('blog')" id="blog-link" class="nav">
-                    <mat-icon fontSet="fa" fontIcon="fa-book"></mat-icon>
-                    Thoughts
-                </div>
-            </li> -->
-            <li>
-                <div (click)="scroll('portfolio')" id="portfolio-link" class="nav">
-                    <mat-icon fontSet="fa" fontIcon="fa-th"></mat-icon>
-                    Digital Portfolio
-                </div>
-            </li>        
-            <li>
-                <div (click)="scroll('about')" id="about-link" class="nav">
-                    <mat-icon fontSet="fa" fontIcon="fa-user"></mat-icon>
-                    Biography
-                </div>
-            </li>
-            <li>
-                <div (click)="scroll('contact')" id="contact-link" class="nav">
-                    <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>                
-                    Contact
-                </div>
-            </li>
-        </ul>
+            <ul>
+                <li [ngClass]="isActive('intro')">
+                    <div (click)="scroll('intro')" id="top-link" class="nav">
+                        <mat-icon fontSet="fa" fontIcon="fa-home"></mat-icon>
+                        Architectural Philosophy
+                    </div>
+                </li>
+                <!-- <li [ngClass]="isActive('blog')">
+                    <div (click)="scroll('blog')" id="blog-link" class="nav">
+                        <mat-icon fontSet="fa" fontIcon="fa-book"></mat-icon>
+                        Thoughts
+                    </div>
+                </li> -->
+                <li [ngClass]="isActive('portfolio')">
+                    <div (click)="scroll('portfolio')" id="portfolio-link" class="nav">
+                        <mat-icon fontSet="fa" fontIcon="fa-th"></mat-icon>
+                        Digital Portfolio
+                    </div>
+                </li>        
+                <li [ngClass]="isActive('about')">
+                    <div (click)="scroll('about')" id="about-link" class="nav">
+                        <mat-icon fontSet="fa" fontIcon="fa-user"></mat-icon>
+                        Biography
+                    </div>
+                </li>
+                <li [ngClass]="isActive('contact')">
+                    <div (click)="scroll('contact')" id="contact-link" class="nav">
+                        <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>                
+                        Contact
+                    </div>
+                </li>
+            </ul>
         </nav>
     </div>
 
