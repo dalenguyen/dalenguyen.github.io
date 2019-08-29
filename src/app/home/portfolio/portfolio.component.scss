@@ -5,4 +5,10 @@
             width: 100%;
         }
     }
+    mat-card {
+        text-align: left;
+        span {
+            padding-right: 10px;
+        }
+    }
 }

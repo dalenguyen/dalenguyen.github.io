@@ -2,6 +2,8 @@ import { Component, OnInit, ViewChild, AfterContentInit, OnDestroy } from '@angu
 import { MatGridList } from '@angular/material/grid-list';
 import { MediaChange, MediaObserver } from '@angular/flex-layout';
 import { Subscription } from 'rxjs';
+import { PortfolioService } from 'src/app/shared/services/portfolio.service';
+import { GitProject } from 'src/app/shared/models/git.project';
 
 @Component({
   selector: 'app-portfolio',
@@ -13,16 +15,20 @@ export class PortfolioComponent implements OnDestroy, AfterContentInit, OnInit {
   watcher: Subscription;
 
   gridByBreakpoint = {
-    xl: 4,
-    lg: 4,
-    md: 4,
-    sm: 2,
+    xl: 3,
+    lg: 3,
+    md: 2,
+    sm: 1,
     xs: 1
   };
 
+  portfolios: GitProject[] = [];
+
   @ViewChild('grid', {static: false}) grid: MatGridList;
 
-  constructor(private mediaObserver: MediaObserver) {}
+  constructor(private mediaObserver: MediaObserver, private portfolioService: PortfolioService) {
+    this.portfolioService.projects.then(projects => this.portfolios = projects);
+  }
 
   ngOnInit(): void {
   }

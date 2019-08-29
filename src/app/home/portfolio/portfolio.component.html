@@ -7,12 +7,17 @@
         <p>In addition to cutting edge code, I bring a solid background in SEO, Branding and Online Marketing.</p>
 
         <mat-grid-list #grid cols="4" rowHeight="2:1">
-            <mat-grid-tile>
-                <a href="https://nodei.co/npm/firestore-export-import/"><img src="https://nodei.co/npm/firestore-export-import.png?downloads=true&downloadRank=true&stars=true"></a>
-            </mat-grid-tile>
-            <mat-grid-tile>
-                <a href="https://nodei.co/npm/firebase-functions-helper/"><img src="https://nodei.co/npm/firebase-functions-helper.png?downloads=true&downloadRank=true&stars=true"></a>
-            </mat-grid-tile>            
+            <mat-grid-tile *ngFor="let p of portfolios">
+                <mat-card>
+                    <a href="{{p.url}}">{{ p.title }}</a>
+                    <p>{{ p.description }}</p>
+                    <div>
+                        <span><mat-icon fontSet="fa" fontIcon="fa-code"></mat-icon> {{ p.language }}</span> 
+                        <span><mat-icon fontSet="fa" fontIcon="fa-star"></mat-icon> {{ p.star }}</span> 
+                        <span><mat-icon fontSet="fa" fontIcon="fa-code-branch"></mat-icon> {{ p.fork }}</span>
+                    </div>
+                </mat-card>                
+            </mat-grid-tile>                
         </mat-grid-list>
     </div>
 </section>
