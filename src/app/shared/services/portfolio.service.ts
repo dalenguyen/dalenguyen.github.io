@@ -21,25 +21,26 @@ export class PortfolioService {
     // 'angular-store-locator'
   ];
 
-  gitBaseUrl = 'https://api.github.com/repos/dalenguyen/';
+  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100';
 
   constructor(private http: HttpClient) {}
 
   async getGitProjects() {
-    const projects = [];
-    for (const element of this.gitProjects) {
-      const project = await this.http.get(this.gitBaseUrl + element).toPromise() as any;
-      const mappedProject: GitProject = {
-        title: project.name,
-        description: project.description,
-        url: project.html_url,
-        language: project.language,
-        star: project.stargazers_count,
-        fork: project.forks
-      };
-      projects.push(mappedProject);
+    const projects = await this.http.get(this.gitBaseUrl).toPromise() as GitProject[];
+    const filteredProjects = [];
+    for (const project of projects) {
+      if (this.gitProjects.includes(project.name)) {
+          const mappedProject: GitProject = {
+            name: project.name,
+            description: project.description,
+            html_url: project.html_url,
+            language: project.language,
+            stargazers_count: project.stargazers_count,
+            forks: project.forks
+          };
+          filteredProjects.push(mappedProject);
+      }
     }
-
-    return projects;
+    return filteredProjects;
   }
 }

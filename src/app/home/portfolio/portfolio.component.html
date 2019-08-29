@@ -9,12 +9,12 @@
         <mat-grid-list #grid cols="4" rowHeight="2:1">
             <mat-grid-tile *ngFor="let p of portfolios">
                 <mat-card>
-                    <a href="{{p.url}}">{{ p.title }}</a>
+                    <a href="{{p.html_url}}" target="_blank">{{ p.name }}</a>
                     <p>{{ p.description }}</p>
                     <div>
                         <span><mat-icon fontSet="fa" fontIcon="fa-code"></mat-icon> {{ p.language }}</span> 
-                        <span><mat-icon fontSet="fa" fontIcon="fa-star"></mat-icon> {{ p.star }}</span> 
-                        <span><mat-icon fontSet="fa" fontIcon="fa-code-branch"></mat-icon> {{ p.fork }}</span>
+                        <span><mat-icon fontSet="fa" fontIcon="fa-star"></mat-icon> {{ p.stargazers_count }}</span> 
+                        <span><mat-icon fontSet="fa" fontIcon="fa-code-branch"></mat-icon> {{ p.forks }}</span>
                     </div>
                 </mat-card>                
             </mat-grid-tile>                

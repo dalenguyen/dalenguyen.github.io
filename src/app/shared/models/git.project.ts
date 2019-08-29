@@ -1,8 +1,8 @@
 export interface GitProject {
-    title: string;
+    name: string;
     description: string;
-    url: string;
+    html_url: string;
     language: string;
-    star: number;
-    fork: number;
+    stargazers_count: number;
+    forks: number;
 }
