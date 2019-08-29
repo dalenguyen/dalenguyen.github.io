@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { of } from 'rxjs/internal/observable/of';
 import { GitProject } from '../models/git.project';
 
@@ -9,6 +9,8 @@ import { GitProject } from '../models/git.project';
 export class PortfolioService {
 
   get projects() {return this.getGitProjects(); }
+
+  // eTag = '';
 
   gitProjects = [
     'rest-api-node-typescript',
@@ -26,6 +28,18 @@ export class PortfolioService {
   constructor(private http: HttpClient) {}
 
   async getGitProjects() {
+    // @TODO save eTag to cache or storage for reduce the rate limit
+    // console.log('cached', this.eTag);
+    // const resp = await this.http.get(this.gitBaseUrl, {observe: 'response'}).toPromise();
+    // this.eTag = resp.headers.get('Etag').split('\"')[1];
+    // console.log(resp.status);
+    // const httpOptions = {
+    //   headers: new HttpHeaders({
+    //     'If-None-Match': this.eTag,
+    //   })
+    // };
+    // console.log(httpOptions);
+
     const projects = await this.http.get(this.gitBaseUrl).toPromise() as GitProject[];
     const filteredProjects = [];
     for (const project of projects) {
