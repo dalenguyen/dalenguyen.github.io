@@ -1,0 +1,233 @@
+@import '../../variables';
+
+/*  Reset
+----------------------------------------------------*/
+section, article, header, p {
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    margin: 0 auto;
+}
+
+.space {
+    margin: 10px
+}
+
+article {
+    margin-bottom: 20px;
+}
+
+ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+
+/*  Typography
+----------------------------------------------------*/
+
+h1 {
+    font-size: 90px;
+    font-weight: 700;
+}
+
+h2 {
+    font-size: 30px;
+    font-weight: 400;
+}
+
+h3 {
+    font-size: 26px;
+}
+
+h4 {
+    font-size: 20px;
+}
+
+p {
+    font-size: 18px;
+    line-height: 1.5;
+    color: $shark;
+}
+
+a {
+    color: $shark;
+}
+
+.email {
+    color: $white;
+}
+
+/*  Icons
+----------------------------------------------------*/
+
+.green-dot {
+    color: $green;
+    font-size: 1.5rem;
+}
+
+.gray-dot {
+    color: $light_gray;
+    font-size: 1.5rem;
+}
+
+.square {
+    content: "";
+    display: inline-block;
+    width: 23px;
+    height: 40px;
+    margin-right: 5px;
+    background: $green;
+    float: left;
+    margin-top: -4px;
+    margin-right: 20px;
+}
+
+.triangle {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 20px;
+    border-color: transparent transparent transparent $green;
+    display: inline-block;
+    margin-bottom: 25px;
+    margin-right: 30px;
+}
+
+/*  Top Header
+----------------------------------------------------*/
+.top-header{
+    background-color: $green;
+    text-align: center;
+
+    ul, strong {
+        list-style-type: none;
+        color: white;
+    }
+
+    li {
+        display: inline-block;
+        padding: 20px 50px;
+    }
+}
+
+/*  Header
+----------------------------------------------------*/
+header {
+    text-align: center;
+    padding: 50px 0;
+}
+
+/*  Below Header
+----------------------------------------------------*/
+.below-header {
+    background-color: $gray;
+    text-align: center;
+
+    ul {
+        list-style-type: none;
+
+        li {
+            display: inline-block;
+            padding: 20px 40px;
+        }
+    }
+}
+
+/*  Experience
+----------------------------------------------------*/
+.experience {
+    max-width: 980px;
+    // margin: 50px auto;
+    margin: 0 auto;
+}
+
+.work-title h2 {
+    border-bottom: 2px solid $green;
+}
+
+.work-detail {
+    margin-top: 20px;
+    border-left: 1px solid $green;
+    padding-left: 40px;
+}
+
+/*  Education
+----------------------------------------------------*/
+.education-title {
+    margin-top: 40px;
+    h2 {
+        border-bottom: 2px solid $green;
+    }
+}
+
+.edu-detail {
+    margin-top: 20px;
+    .edu-info {
+        display: inline-block;
+        width: 90%;
+    }
+}
+
+
+
+/*  Skills & objectives
+----------------------------------------------------*/
+.skills {
+    background-color: $gray;
+    padding: 10px 20px 20px 20px;
+    // margin-left: 10px;
+    .objectives {
+        margin-bottom: 20px;
+    }
+    mat-icon {
+        margin-right: 20px;
+    }
+}
+
+.professional-skills {
+    display: flex;
+}
+
+.professional-skills > * {
+    margin: 0;
+    align-self: center;  /* 1 */
+}
+
+.professional-skills > p {
+    margin-right: auto;  /* 2 */
+}
+
+/* Media Queries
+---------------------------------------------------------------------------------------------------- */
+
+@media only screen and (max-width: 768px) {
+    .top-header li, .below-header ul li {
+        padding: 0 10px;
+    }
+        .experience {
+        padding: 20px;
+        .skills {
+        margin-top: 20px;
+        }
+    }
+
+    .edu-detail .edu-info {
+        width: 80%;
+    }
+
+    h1 {
+        font-size: 70px;
+    }
+
+    h3 {
+        font-size: 20px;
+    }
+
+    h4 {
+        font-size: 18px;
+    }
+}

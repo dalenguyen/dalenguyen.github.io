@@ -14,6 +14,7 @@ import { BiographyComponent } from './home/biography/biography.component';
 import { ContactComponent } from './home/contact/contact.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { HttpClientModule } from '@angular/common/http';
+import { ResumeComponent } from './resume/resume.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import { HttpClientModule } from '@angular/common/http';
     PortfolioComponent,
     BiographyComponent,
     ContactComponent,
-    FooterComponent
+    FooterComponent,
+    ResumeComponent
   ],
   imports: [
     BrowserModule,
