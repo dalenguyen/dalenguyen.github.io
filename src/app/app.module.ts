@@ -1,5 +1,5 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, Injectable, ErrorHandler } from '@angular/core';
 
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 
@@ -15,6 +15,21 @@ import { ContactComponent } from './home/contact/contact.component';
 import { FooterComponent } from './shared/components/footer/footer.component';
 import { HttpClientModule } from '@angular/common/http';
 import { ResumeComponent } from './resume/resume.component';
+
+import * as Sentry from '@sentry/browser';
+
+Sentry.init({
+  dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223'
+});
+
+@Injectable()
+export class SentryErrorHandler implements ErrorHandler {
+  constructor() {}
+  handleError(error) {
+    const eventId = Sentry.captureException(error.originalError || error);
+    Sentry.showReportDialog({ eventId });
+  }
+}
 
 @NgModule({
   declarations: [
@@ -35,7 +50,8 @@ import { ResumeComponent } from './resume/resume.component';
     MaterialModule,
     HttpClientModule
   ],
-  providers: [],
+  providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   bootstrap: [AppComponent]
 })
+
 export class AppModule { }
