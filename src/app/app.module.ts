@@ -17,9 +17,14 @@ import { HttpClientModule } from '@angular/common/http';
 import { ResumeComponent } from './resume/resume.component';
 
 import * as Sentry from '@sentry/browser';
+import { RewriteFrames } from '@sentry/integrations';
+
+import { environment } from 'src/environments/environment';
 
 Sentry.init({
-  dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223'
+  dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
+  release: `dalenguyen-me@${environment.version}`,
+  integrations: [new RewriteFrames()]
 });
 
 @Injectable()

@@ -40,6 +40,8 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+.env
+sentry-release.sh
 
 # System Files
 .DS_Store

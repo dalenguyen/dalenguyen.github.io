@@ -10,6 +10,7 @@ export class ResumeComponent implements OnInit {
   constructor() { }
 
   ngOnInit() {
+    // throw new Error('test');
   }
 
 }
