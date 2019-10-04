@@ -1,0 +1,8 @@
+<div id="blog">
+  <h1>Blog</h1>
+  <section *ngIf="articles.length > 0">
+    <article *ngFor="let article of articles">
+      <h2>{{ article.title }} </h2>
+    </article>
+  </section>
+</div>

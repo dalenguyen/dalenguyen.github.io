@@ -23,18 +23,18 @@
                         Architectural Philosophy
                     </div>
                 </li>
-                <!-- <li [ngClass]="isActive('blog')">
-                    <div (click)="scroll('blog')" id="blog-link" class="nav">
+                <li [ngClass]="isActive('blog')">
+                    <div (click)="navigateTo('blog')" id="blog-link" class="nav">
                         <mat-icon fontSet="fa" fontIcon="fa-book"></mat-icon>
                         Thoughts
                     </div>
-                </li> -->
+                </li>
                 <li [ngClass]="isActive('portfolio')">
                     <div (click)="scroll('portfolio')" id="portfolio-link" class="nav">
                         <mat-icon fontSet="fa" fontIcon="fa-th"></mat-icon>
                         Digital Portfolio
                     </div>
-                </li>        
+                </li>
                 <li [ngClass]="isActive('about')">
                     <div (click)="scroll('about')" id="about-link" class="nav">
                         <mat-icon fontSet="fa" fontIcon="fa-user"></mat-icon>
@@ -43,7 +43,7 @@
                 </li>
                 <li [ngClass]="isActive('contact')">
                     <div (click)="scroll('contact')" id="contact-link" class="nav">
-                        <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>                
+                        <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>
                         Contact
                     </div>
                 </li>

@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { Component, OnInit } from '@angular/core';
 import { NavService } from '../shared/services/nav.service';
 
@@ -10,7 +11,7 @@ export class NavComponent implements OnInit {
 
   activeEl = 'intro';
 
-  constructor(private navService: NavService) { }
+  constructor(private navService: NavService, private router: Router) { }
 
   ngOnInit() {
     this.navService.target.subscribe(id => {
@@ -20,7 +21,19 @@ export class NavComponent implements OnInit {
   }
 
   scroll(id: string) {
-    this.navService.target.next(id);
+    console.log(this.router.url)
+    if (this.router.url !== '/') {
+      this.router.navigate(['']);
+      setTimeout(() => {
+        this.navService.target.next(id);
+      }, 1000);
+    } else {
+      this.navService.target.next(id);
+    }
+  }
+
+  navigateTo(path: string) {
+    this.router.navigate([path]);
   }
 
   isActive(id: string) {

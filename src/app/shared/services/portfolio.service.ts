@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { of } from 'rxjs/internal/observable/of';
+import { captureException } from '@sentry/core';
+import { HttpClient } from '@angular/common/http';
 import { GitProject } from '../models/git.project';
 
 @Injectable({
@@ -8,7 +8,7 @@ import { GitProject } from '../models/git.project';
 })
 export class PortfolioService {
 
-  get projects() {return this.getGitProjects(); }
+  get projects() { return this.getGitProjects(); }
 
   // eTag = '';
 
@@ -25,7 +25,7 @@ export class PortfolioService {
 
   gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   async getGitProjects() {
     // @TODO save eTag to cache or storage for reduce the rate limit
@@ -39,11 +39,11 @@ export class PortfolioService {
     //   })
     // };
     // console.log(httpOptions);
-
-    const projects = await this.http.get(this.gitBaseUrl).toPromise() as GitProject[];
     const filteredProjects = [];
-    for (const project of projects) {
-      if (this.gitProjects.includes(project.name)) {
+    try {
+      const projects = await this.http.get(this.gitBaseUrl).toPromise() as GitProject[];
+      for (const project of projects) {
+        if (this.gitProjects.includes(project.name)) {
           const mappedProject: GitProject = {
             name: project.name,
             description: project.description,
@@ -53,8 +53,13 @@ export class PortfolioService {
             forks: project.forks
           };
           filteredProjects.push(mappedProject);
+        }
       }
+    } catch (error) {
+      captureException(error)
+      console.error(error);
     }
+
     return filteredProjects;
   }
 }
