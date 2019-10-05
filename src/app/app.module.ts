@@ -21,6 +21,7 @@ import { RewriteFrames } from '@sentry/integrations';
 
 import { environment } from 'src/environments/environment';
 import { BlogComponent } from './blog/blog.component';
+import { PostComponent } from './blog/post/post.component';
 
 Sentry.init({
   dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
@@ -32,7 +33,7 @@ Sentry.init({
 export class SentryErrorHandler implements ErrorHandler {
   constructor() {}
   handleError(error) {
-    const eventId = Sentry.captureException(error.originalError || error);
+    // const eventId = Sentry.captureException(error.originalError || error);
     console.error(error)
     // Sentry.showReportDialog({ eventId });
   }
@@ -49,7 +50,8 @@ export class SentryErrorHandler implements ErrorHandler {
     ContactComponent,
     FooterComponent,
     ResumeComponent,
-    BlogComponent
+    BlogComponent,
+    PostComponent
   ],
   imports: [
     BrowserModule,

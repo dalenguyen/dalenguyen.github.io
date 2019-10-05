@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { BlogService } from './blog.service';
+import { Component, OnInit } from '@angular/core';
+import { PostService } from './post/post.service';
 
 @Component({
   selector: 'app-blog',
@@ -10,11 +12,15 @@ export class BlogComponent implements OnInit {
 
   articles: any = [];
 
-  constructor(private blogService: BlogService) {
+  constructor(private blogService: BlogService, private router: Router) {
     this.blogService.articles.then(articles => this.articles = articles)
   }
 
   ngOnInit() {
+  }
+
+  openPost(article) {
+    this.router.navigate(['/blog', article.slug, {id: article.id}])
   }
 
 }

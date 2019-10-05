@@ -11,7 +11,9 @@ export class BlogService {
 
   get articles() { return this.getDevArticles(); }
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+
+  }
 
   async getDevArticles() {
     let articles: any = [];
@@ -24,6 +26,4 @@ export class BlogService {
 
     return articles;
   }
-
-
 }

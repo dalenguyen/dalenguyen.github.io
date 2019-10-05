@@ -11,29 +11,45 @@ export class NavComponent implements OnInit {
 
   activeEl = 'intro';
 
-  constructor(private navService: NavService, private router: Router) { }
+  constructor(private navService: NavService, private router: Router) {
+
+  }
 
   ngOnInit() {
-    this.navService.target.subscribe(id => {
-      // Set active nav element
-      this.activeEl = id as string;
-    });
+    console.log(this.router.url)
+    // this.navService.target.subscribe(id => {
+    //   // Set active nav element
+    //   this.activeEl = id as string;
+    // });
   }
 
   scroll(id: string) {
-    console.log(this.router.url)
+    // this.activeEl = id
+    // if (this.router.url !== '/') {
+    //   this.router.navigate(['']);
+    //   setTimeout(() => {
+    //     this.navService.target.next(id);
+    //   }, 1000);
+    // } else {
+    //   this.navService.target.next(id);
+    // }
+    // TODO: figured out how to navigate on mobile
+    this.activeEl = id
     if (this.router.url !== '/') {
       this.router.navigate(['']);
       setTimeout(() => {
-        this.navService.target.next(id);
-      }, 1000);
+        this.navService.scroll(id);
+      }, 500);
     } else {
-      this.navService.target.next(id);
+      this.navService.scroll(id);
     }
+    this.navService.target.next(null);
   }
 
   navigateTo(path: string) {
+    this.activeEl = 'blog'
     this.router.navigate([path]);
+    this.navService.target.next(null);
   }
 
   isActive(id: string) {

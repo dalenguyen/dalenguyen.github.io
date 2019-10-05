@@ -1,0 +1,14 @@
+<div id="blogNav">
+  <a [routerLink]="[ '/blog']">Blog</a> / <span>{{ article?.slug}}</span>
+</div>
+
+<div id="post" *ngIf="article !== null">
+  <header>
+    <h1>{{ article.title }}</h1>
+    <p>Written by {{ article.user.name }}</p>
+    <p> {{ article.published_at | date }}</p>
+  </header>
+
+  <article [innerHTML]="article.body_html">
+  </article>
+</div>
