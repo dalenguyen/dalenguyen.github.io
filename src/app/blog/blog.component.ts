@@ -19,8 +19,9 @@ export class BlogComponent implements OnInit {
   ngOnInit() {
   }
 
-  openPost(article) {
-    this.router.navigate(['/blog', article.slug, {id: article.id}])
+  // TODO: add model for Article
+  openPost(article: any) {
+    this.router.navigate(['/blog', article.slug], { queryParams: { id: article.id }})
   }
 
 }
