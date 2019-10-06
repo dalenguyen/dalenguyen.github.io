@@ -28,7 +28,7 @@ export class PostComponent implements OnInit {
   }
 
   private cleanArticleContent(html: string): string {
-    return html.replace('https://dev.to/dalenguyen', 'https://dalenguyen.me/blog')
+    return html.replace(/https:\/\/dev.to\/dalenguyen/g, 'https://dalenguyen.me/blog')
   }
 
 }
