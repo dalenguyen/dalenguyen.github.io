@@ -20,6 +20,7 @@ export class PostComponent implements OnInit {
       this.postService.getDevArticle(articleId).then(article => {
         this.article = article
         this.articleBody = this.cleanArticleContent(this.article.body_html)
+        // console.log(this.articleBody);
       })
     }
   }
