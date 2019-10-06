@@ -20,7 +20,6 @@ export class PostComponent implements OnInit {
       this.postService.getDevArticle(articleId).then(article => {
         this.article = article
         this.articleBody = this.cleanArticleContent(this.article.body_html)
-        // console.log(this.articleBody);
       })
     }
   }
@@ -29,7 +28,7 @@ export class PostComponent implements OnInit {
   }
 
   private cleanArticleContent(html: string): string {
-    return html.replace('https://dev.to/dalenguyen', 'https://dalenguyen.me/blog')
+    return html.replace(/https:\/\/dev.to\/dalenguyen/g, 'https://dalenguyen.me/blog')
   }
 
 }
