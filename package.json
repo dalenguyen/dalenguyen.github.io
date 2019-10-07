@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --open --ssl --aot true",
-    "build": "ng build --prod --base-href 'https://dalenguyen.me' --aot --output-hashing=all && cp src/CNAME dist",
+    "prebuild": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts",
+    "build": "npm run prebuild && ng build --prod --base-href 'https://dalenguyen.me' --aot --output-hashing=all && cp src/CNAME dist",
     "deploy": "ngh --branch=master",
     "test": "ng test",
     "lint": "ng lint",
