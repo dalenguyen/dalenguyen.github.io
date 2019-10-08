@@ -25,7 +25,7 @@ import { PostComponent } from './blog/post/post.component';
 
 Sentry.init({
   dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
-  release: `dalenguyen-me@${environment.version}`,
+  release: `dalenguyen-me@${environment.gitHash}`,
   integrations: [new RewriteFrames()]
 });
 
@@ -33,7 +33,7 @@ Sentry.init({
 export class SentryErrorHandler implements ErrorHandler {
   constructor() {}
   handleError(error) {
-    // const eventId = Sentry.captureException(error.originalError || error);
+    const eventId = Sentry.captureException(error.originalError || error);
     console.error(error)
     // Sentry.showReportDialog({ eventId });
   }
