@@ -15,7 +15,7 @@ export class PostService {
     let article = null;
     try {
       article = await this.http.get(`${this.devBaseUrl}/${articleId}`).toPromise()
-      console.log('article', article)
+      // console.log('article', article)
     } catch (error) {
       captureException(error)
       console.error(error)

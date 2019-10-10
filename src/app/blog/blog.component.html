@@ -4,9 +4,7 @@
   <section id="articles" *ngIf="articles.length > 0">
     <mat-card class="example-card" *ngFor="let article of articles">
       <mat-card-header>
-        <div mat-card-avatar class="example-header-image"></div>
         <mat-card-title>{{ article.title }}</mat-card-title>
-        <!-- <mat-card-subtitle>Dog Breed</mat-card-subtitle> -->
       </mat-card-header>
       <img mat-card-image src="{{ article.cover_image }}" alt="{{ article.title }}">
       <mat-card-content>
