@@ -9,9 +9,12 @@ export class NavService {
   target = new Subject();
 
   constructor() {
-    // this.target.subscribe( id => {
-    //   this.scroll(id as string);
-    // });
+    // for navigating from Let's meet in the intro part
+    this.target.subscribe( id => {
+      if (id != null) {
+        this.scroll(id as string);
+      }
+    });
   }
 
   public scroll(id: string) {

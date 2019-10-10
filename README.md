@@ -13,3 +13,6 @@ Deploy based on branch master
 ```sh
 npm run deploy
 ```
+## Contribution 
+
+Any contribution to this project are welcome. Please read the [contribution guideline](https://github.com/dalenguyen/dalenguyen.github.io/blob/dev/CONTRIBUTING.md)

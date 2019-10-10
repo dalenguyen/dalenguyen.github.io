@@ -19,4 +19,12 @@ a {
 
 pre {
   overflow-x: scroll;
+  background: lightgray;
+  padding: 10px 0;
+}
+
+blockquote {
+  border-left: calc(0.2vw + 2px) solid #333;
+  padding: 0.1% 6% 0.1% 4%;
+  margin: 1.6em 1vw;
 }

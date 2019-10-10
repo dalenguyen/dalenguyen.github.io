@@ -25,6 +25,7 @@ export class AppComponent implements OnDestroy {
     matIconRegistry.registerFontClassAlias('fa');
     matIconRegistry.registerFontClassAlias('fab');
 
+    // close nav on mobile
     this.navService.target.subscribe(data => {
       setTimeout(() => {
         this.closeSideNav();
