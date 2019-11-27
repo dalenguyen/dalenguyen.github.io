@@ -2,15 +2,15 @@ import { Injectable } from '@angular/core';
 import { captureException } from '@sentry/core';
 import { HttpClient } from '@angular/common/http';
 import { GitProject } from '../models/git.project';
+import { Observable } from 'rxjs';
+import { map, publishReplay, refCount, catchError } from 'rxjs/operators';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioService {
 
-  get projects() { return this.getGitProjects(); }
-
-  // eTag = '';
+  projects$: Observable<GitProject[]>
 
   gitProjects = [
     'rest-api-node-typescript',
@@ -25,41 +25,23 @@ export class PortfolioService {
 
   gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {
+    this.getGitProjects()
+  }
 
-  async getGitProjects() {
-    // @TODO save eTag to cache or storage for reduce the rate limit
-    // console.log('cached', this.eTag);
-    // const resp = await this.http.get(this.gitBaseUrl, {observe: 'response'}).toPromise();
-    // this.eTag = resp.headers.get('Etag').split('\"')[1];
-    // console.log(resp.status);
-    // const httpOptions = {
-    //   headers: new HttpHeaders({
-    //     'If-None-Match': this.eTag,
-    //   })
-    // };
-    // console.log(httpOptions);
-    const filteredProjects = [];
-    try {
-      const projects = await this.http.get(this.gitBaseUrl).toPromise() as GitProject[];
-      for (const project of projects) {
-        if (this.gitProjects.includes(project.name)) {
-          const mappedProject: GitProject = {
-            name: project.name,
-            description: project.description,
-            html_url: project.html_url,
-            language: project.language,
-            stargazers_count: project.stargazers_count,
-            forks: project.forks
-          };
-          filteredProjects.push(mappedProject);
-        }
-      }
-    } catch (error) {
-      captureException(error)
-      console.error(error);
+  getGitProjects(): Observable<GitProject[]> {
+    if (!this.projects$) {
+      this.projects$ = this.http.get(this.gitBaseUrl).pipe(
+        map((projects: GitProject[]) => projects.filter(project => this.gitProjects.includes(project.name))),
+        publishReplay(1),
+        refCount(),
+        catchError(error => captureException(error))
+      ) as Observable<GitProject[]>
     }
+    return this.projects$;
+  }
 
-    return filteredProjects;
+  clearCache() {
+    this.projects$ = null;
   }
 }

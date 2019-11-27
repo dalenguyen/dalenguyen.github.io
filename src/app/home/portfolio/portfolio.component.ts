@@ -22,13 +22,9 @@ export class PortfolioComponent implements OnDestroy, AfterContentInit, OnInit {
     xs: 1
   };
 
-  portfolios: GitProject[] = [];
+  @ViewChild('grid', { static: false }) grid: MatGridList;
 
-  @ViewChild('grid', {static: false}) grid: MatGridList;
-
-  constructor(private mediaObserver: MediaObserver, private portfolioService: PortfolioService) {
-    this.portfolioService.projects.then(projects => this.portfolios = projects);
-  }
+  constructor(private mediaObserver: MediaObserver, private portfolioService: PortfolioService) { }
 
   ngOnInit(): void {
   }
