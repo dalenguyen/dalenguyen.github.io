@@ -8,7 +8,7 @@ export const environment = {
   production: false,
   version: pkg.version,
   gitHash: versions.revision,
-  butterCMS: '10de8a1782f01676902398495c4062893956ac9c'
+  butterCMSToken: '10de8a1782f01676902398495c4062893956ac9c'
 }
 
 /*
