@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v1
 
       - name: install angular-cli-ghpages
         run: npm install -g angular-cli-ghpages
