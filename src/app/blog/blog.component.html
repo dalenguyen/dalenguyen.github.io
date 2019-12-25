@@ -1,15 +1,19 @@
 <div id="blog">
   <h1>Blog</h1>
 
-  <section id="articles" *ngIf="articles.length > 0">
-    <mat-card class="example-card" *ngFor="let article of articles">
+  <section id="articles" *ngIf="articles$ | async">
+    <mat-card class="example-card" *ngFor="let article of articles$ | async">
       <mat-card-header>
         <mat-card-title>{{ article.title }}</mat-card-title>
       </mat-card-header>
-      <img mat-card-image src="{{ article.cover_image }}" alt="{{ article.title }}">
+      <img
+        mat-card-image
+        src="{{ article.featured_image }}"
+        alt="{{ article.title }}"
+      />
       <mat-card-content>
         <p>
-          {{ article.description }}
+          {{ article.summary }}
         </p>
       </mat-card-content>
       <mat-card-actions>
@@ -18,4 +22,3 @@
     </mat-card>
   </section>
 </div>
-

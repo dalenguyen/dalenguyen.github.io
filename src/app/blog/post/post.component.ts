@@ -1,6 +1,6 @@
-import { PostService } from './post.service';
-import { ActivatedRoute } from '@angular/router';
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Observable } from 'rxjs'
+import { BlogService } from '../blog.service'
+import { Component, OnInit, ViewEncapsulation } from '@angular/core'
 
 @Component({
   selector: 'app-post',
@@ -9,26 +9,19 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
   encapsulation: ViewEncapsulation.None
 })
 export class PostComponent implements OnInit {
+  article$: Observable<any>
 
-  article = null
-  articleBody = null
-
-  constructor(private postService: PostService, private route: ActivatedRoute) {
-    if (this.article === null) {
-      const articleId = this.route.snapshot.queryParams.id
-      // console.log('Get article from id', articleId)
-      this.postService.getDevArticle(articleId).then(article => {
-        this.article = article
-        this.articleBody = this.cleanArticleContent(this.article.body_html)
-      })
-    }
+  constructor(private blogService: BlogService) {
+    const slug = window.location.pathname.split('/')[2]
+    this.article$ = this.blogService.getButterArticle(slug)
   }
 
-  ngOnInit() {
-  }
+  ngOnInit() {}
 
-  private cleanArticleContent(html: string): string {
-    return html.replace(/https:\/\/dev.to\/dalenguyen/g, 'https://dalenguyen.me/blog')
-  }
-
+  // private cleanArticleContent(html: string): string {
+  //   return html.replace(
+  //     /https:\/\/dev.to\/dalenguyen/g,
+  //     'https://dalenguyen.me/blog'
+  //   )
+  // }
 }
