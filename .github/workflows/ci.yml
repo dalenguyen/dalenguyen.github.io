@@ -1,0 +1,26 @@
+name: Pull request to Dev Branch
+
+on: pull_request
+  branches:
+    - dev
+
+jobs:
+  build:
+    name: Deploy website and sentry
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/setup-node@v1
+
+      - name: install angular-cli-ghpages
+        run: npm install -g angular-cli-ghpages
+
+      - name: deploy to web
+        run: |
+          npm install
+          npm run deploy:web
+
+      - name: deploy sentry
+        evn:
+          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
+        run: npm run deploy:sentry

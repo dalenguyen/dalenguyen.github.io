@@ -1,12 +1,13 @@
 {
   "name": "dalenguyen",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "scripts": {
     "ng": "ng",
     "start": "ng serve --open --open --ssl --aot true",
     "prebuild": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts",
     "build": "npm run prebuild && ng build --prod --base-href 'https://dalenguyen.me' --aot --output-hashing=all && cp src/CNAME dist",
-    "deploy": "ngh --branch=master",
+    "deploy:web": "npm run build && ngh --branch=master",
+    "deploy:sentry": "sh sentry.sh",
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
