@@ -11,21 +11,35 @@ on:
 
 jobs:
   build:
+    timeout-minutes: 30
     name: Deploy website and sentry
     runs-on: ubuntu-latest
+    env:
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
 
     steps:
       - uses: actions/checkout@v1
 
       - name: install angular-cli-ghpages
-        run: npm install -g angular-cli-ghpages
+        run: sudo npm install -g angular-cli-ghpages
 
       - name: deploy to web
         run: |
-          npm install
-          npm run deploy:web
+          sudo npm install
+          sudo npm run build
+          sudo ngh --branch=master --repo=https://${{ secrets.GH_TOKEN }}@github.com/dalenguyen/dalenguyen.github.io.git --no-silent
 
       - name: deploy sentry
-        evn:
-          SENTRY_TOKEN: ${{ secrets.SENTRY_TOKEN }}
-        run: npm run deploy:sentry
+        run: |
+          sudo npm install -g @sentry/cli --unsafe-perm
+          # sudo npm run deploy:sentry
+          # Version from git
+          REVISION=$(git rev-parse --short HEAD)
+          sentry-cli releases new "$SENTRY_PROJECT@$REVISION" -p $SENTRY_PROJECT
+          sentry-cli releases set-commits "$SENTRY_PROJECT@$REVISION" --auto
+          sentry-cli releases files "$SENTRY_PROJECT@$REVISION" upload-sourcemaps ./dist --rewrite
+          # Finalize
+          sentry-cli releases set-commits "$SENTRY_PROJECT@$REVISION" --auto
+          sentry-cli releases files "$SENTRY_PROJECT@$REVISION" upload-sourcemaps ./dist --rewrite
