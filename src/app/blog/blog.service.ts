@@ -1,8 +1,11 @@
-import { Observable } from 'rxjs'
-import * as Butter from 'buttercms'
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
+
+import * as Butter from 'buttercms'
+
 import { captureException } from '@sentry/core'
+
+import { Article } from '../shared/models/article'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
@@ -32,7 +35,7 @@ export class BlogService {
     return articles
   }
 
-  getButterArticles(): Observable<any> {
+  getButterArticles(): Promise<Article[]> {
     return this.butterService.post
       .list({
         page: 1,
@@ -50,7 +53,7 @@ export class BlogService {
       })
   }
 
-  getButterArticle(slug): Observable<any> {
+  getButterArticle(slug): Promise<Article> {
     return this.butterService.post
       .retrieve(slug, { locale: 'en' })
       .then(res => {

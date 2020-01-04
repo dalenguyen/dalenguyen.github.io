@@ -1,7 +1,7 @@
 import { Router } from '@angular/router'
 import { BlogService } from './blog.service'
 import { Component, OnInit } from '@angular/core'
-import { Observable } from 'rxjs'
+import { Article } from '../shared/models/article'
 
 @Component({
   selector: 'app-blog',
@@ -9,16 +9,14 @@ import { Observable } from 'rxjs'
   styleUrls: ['./blog.component.scss']
 })
 export class BlogComponent implements OnInit {
-  articles$: Observable<any>
+  articles$: Promise<Article[]>
 
   constructor(private blogService: BlogService, private router: Router) {
     this.articles$ = this.blogService.getButterArticles()
   }
 
   ngOnInit() {}
-
-  // TODO: add model for Article
-  openPost(article: any) {
+  openPost(article: Article) {
     this.router.navigate(['/blog', article.slug])
   }
 }
