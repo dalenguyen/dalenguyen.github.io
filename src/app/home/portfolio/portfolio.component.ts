@@ -9,7 +9,7 @@ import { MatGridList } from '@angular/material/grid-list'
 import { MediaChange, MediaObserver } from '@angular/flex-layout'
 import { Subscription } from 'rxjs'
 import { PortfolioService } from 'src/app/shared/services/portfolio.service'
-import { GitProject } from 'src/app/shared/models/git.project'
+// import { GitProject } from 'src/app/shared/models/git.project'
 
 @Component({
   selector: 'app-portfolio',
@@ -27,7 +27,7 @@ export class PortfolioComponent implements OnDestroy, AfterContentInit, OnInit {
     xs: 1
   }
 
-  @ViewChild('grid', { static: false }) grid: MatGridList
+  @ViewChild('grid') grid: MatGridList
 
   constructor(
     private mediaObserver: MediaObserver,
