@@ -1,22 +1,16 @@
 <div id="blogNav">
   <a [routerLink]="['/blog']">Blog</a> /
-  <span>{{
-    (article$ | async) ? (article$ | async)?.slug : 'article-not-found'
-  }}</span>
+  <span>{{ article ? article?.slug : 'article-not-found' }}</span>
 </div>
 
-<div id="post" *ngIf="article$ | async">
+<div id="post" *ngIf="article">
   <header>
-    <h1>{{ (article$ | async)?.title }}</h1>
+    <h1>{{ article.title }}</h1>
     <p>
-      {{
-        (article$ | async)
-          ? 'Written by ' + (article$ | async)?.author.first_name
-          : ''
-      }}
+      {{ article ? 'Written by ' + article?.author.first_name : '' }}
     </p>
-    <p>{{ (article$ | async)?.published | date }}</p>
+    <p>{{ article?.published | date }}</p>
   </header>
 
-  <article [innerHTML]="(article$ | async)?.body"></article>
+  <article [innerHTML]="article?.body"></article>
 </div>

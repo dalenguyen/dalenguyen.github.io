@@ -11,7 +11,7 @@ import { Article } from 'src/app/shared/models/article'
   encapsulation: ViewEncapsulation.None
 })
 export class PostComponent implements OnInit {
-  article$: Promise<any>
+  article: Article
 
   constructor(
     private blogService: BlogService,
@@ -21,23 +21,22 @@ export class PostComponent implements OnInit {
 
   ngOnInit() {
     const slug = window.location.pathname.split('/')[2]
-    this.article$ = this.blogService.getButterArticle(slug)
+    this.article = this.blogService.currentArticle
 
-    this.blogService.getButterArticle(slug).then((article: Article) => {
-      this.title.setTitle(`${article.seo_title} | Dale Nguyen`)
-      this.meta.addTags([
-        { name: 'og:title', content: article.seo_title },
-        { name: 'og:description', content: article.summary },
-        { name: 'og:url', content: article.url },
-        { name: 'og:image', content: article.featured_image },
-        {
-          name: 'keywords',
-          content: article.categories.reduce(
-            (acc, curr) => curr.name + ',' + acc,
-            ''
-          )
-        }
-      ])
-    })
+    // Set meta tags
+    this.title.setTitle(`${this.article.seo_title} | Dale Nguyen`)
+    this.meta.addTags([
+      { name: 'og:title', content: this.article.seo_title },
+      { name: 'og:description', content: this.article.summary },
+      { name: 'og:url', content: this.article.url },
+      { name: 'og:image', content: this.article.featured_image },
+      {
+        name: 'keywords',
+        content: this.article.categories.reduce(
+          (acc, curr) => curr.name + ',' + acc,
+          ''
+        )
+      }
+    ])
   }
 }

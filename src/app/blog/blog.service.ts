@@ -15,6 +15,8 @@ export class BlogService {
   devBaseUrl = 'https://dev.to/api/articles?username=dalenguyen'
   butterService
 
+  currentArticle: Article
+
   get articles() {
     return this.getDevArticles()
   }
