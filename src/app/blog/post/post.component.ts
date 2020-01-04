@@ -24,7 +24,7 @@ export class PostComponent implements OnInit {
     this.article$ = this.blogService.getButterArticle(slug)
 
     this.blogService.getButterArticle(slug).then((article: Article) => {
-      this.title.setTitle(article.seo_title)
+      this.title.setTitle(`${article.seo_title} | Dale Nguyen`)
       this.meta.addTags([
         { name: 'og:title', content: article.seo_title },
         { name: 'og:description', content: article.summary },

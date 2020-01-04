@@ -1,10 +1,10 @@
 name: Pull request or push to Dev Branch
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - dev
+  # pull_request:
+  #   types: [closed]
+  #   branches:
+  #     - dev
   push:
     branches:
       - dev
