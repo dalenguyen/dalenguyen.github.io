@@ -8,6 +8,7 @@ import {
   OnDestroy,
   ViewChild
 } from '@angular/core'
+import { Meta, Title } from '@angular/platform-browser'
 
 @Component({
   selector: 'app-root',
@@ -25,8 +26,26 @@ export class AppComponent implements OnDestroy {
     cdf: ChangeDetectorRef,
     media: MediaMatcher,
     matIconRegistry: MatIconRegistry,
-    private navService: NavService
+    private navService: NavService,
+    private meta: Meta,
+    private title: Title
   ) {
+    // Meta tags
+    this.title.setTitle('Home | Dale Nguyen')
+    this.meta.addTags([
+      { name: 'og:title', content: 'Home | Dale Nguyen' },
+      {
+        name: 'og:description',
+        content: `Just a normal person who tries to explore the world and find his purpose.`
+      },
+      { name: 'og:url', content: 'https://dalenguyen.me' },
+      {
+        name: 'og:image',
+        content: 'https://dalenguyen.me/assets/images/dale-nguyen-avatar.jpeg'
+      },
+      { name: 'type', content: 'website' }
+    ])
+
     this.mobileQuery = media.matchMedia('(max-width: 600px)')
     this._mobileQueryListener = () => cdf.detectChanges()
     this.mobileQuery.addListener(this._mobileQueryListener)
