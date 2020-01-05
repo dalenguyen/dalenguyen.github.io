@@ -20,7 +20,7 @@ export class PostComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    const slug = window.location.pathname.split('/')[2]
+    // const slug = window.location.pathname.split('/')[2]
     this.article = this.blogService.currentArticle
 
     // Set meta tags
@@ -30,6 +30,7 @@ export class PostComponent implements OnInit {
       { name: 'og:description', content: this.article.summary },
       { name: 'og:url', content: this.article.url },
       { name: 'og:image', content: this.article.featured_image },
+      { name: 'type', content: 'article' },
       {
         name: 'keywords',
         content: this.article.categories.reduce(

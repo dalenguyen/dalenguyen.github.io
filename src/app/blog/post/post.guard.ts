@@ -15,18 +15,22 @@ export class PostGuard implements CanActivate {
     state: RouterStateSnapshot
   ): Promise<boolean> {
     const slug = state.url.split('/')[2]
-    if (slug) {
+    if (
+      this.blogService.currentArticle &&
+      this.blogService.currentArticle.slug === slug
+    ) {
+      console.log(`Get article from cache...`)
+      return Promise.resolve(true)
+    } else {
+      console.log(`Get article from api...`)
       return this.blogService.getButterArticle(slug).then(article => {
         if (article) {
-          console.log('article', article)
           this.blogService.currentArticle = article
           return true
         } else {
           return false
         }
       })
-    } else {
-      return Promise.resolve(false)
     }
   }
 }
