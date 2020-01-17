@@ -1,15 +1,14 @@
-import { Injectable } from '@angular/core';
-import { captureException } from '@sentry/core';
-import { HttpClient } from '@angular/common/http';
-import { GitProject } from '../models/git.project';
-import { Observable } from 'rxjs';
-import { map, publishReplay, refCount, catchError } from 'rxjs/operators';
+import { Injectable } from '@angular/core'
+import { captureException } from '@sentry/core'
+import { HttpClient } from '@angular/common/http'
+import { GitProject } from '../models/git.project'
+import { Observable, of } from 'rxjs'
+import { map, publishReplay, refCount, catchError } from 'rxjs/operators'
 
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioService {
-
   projects$: Observable<GitProject[]>
 
   gitProjects = [
@@ -18,30 +17,32 @@ export class PortfolioService {
     'firebase-wordpress-plugin',
     'serverless-rest-api',
     'firebase-functions-helper',
-    'stockai',
+    'stockai'
     // 'WebdriverIO-TypeScript-Boilerplate',
     // 'angular-store-locator'
-  ];
+  ]
 
-  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100';
+  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100'
 
   constructor(private http: HttpClient) {
-    this.getGitProjects()
+    this.projects$ = this.getGitProjects()
   }
 
   getGitProjects(): Observable<GitProject[]> {
     if (!this.projects$) {
-      this.projects$ = this.http.get(this.gitBaseUrl).pipe(
-        map((projects: GitProject[]) => projects.filter(project => this.gitProjects.includes(project.name))),
+      this.projects$ = this.http.get<GitProject[]>(this.gitBaseUrl).pipe(
+        map(projects =>
+          projects.filter(project => this.gitProjects.includes(project.name))
+        ),
         publishReplay(1),
         refCount(),
         catchError(error => captureException(error))
       ) as Observable<GitProject[]>
     }
-    return this.projects$;
+    return this.projects$
   }
 
   clearCache() {
-    this.projects$ = null;
+    this.projects$ = of([])
   }
 }

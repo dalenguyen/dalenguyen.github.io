@@ -1,24 +1,25 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { Injectable } from '@angular/core'
+import { Subject } from 'rxjs'
 
 @Injectable({
   providedIn: 'root'
 })
 export class NavService {
-
-  target = new Subject();
+  target = new Subject()
 
   constructor() {
     // for navigating from Let's meet in the intro part
-    this.target.subscribe( id => {
+    this.target.subscribe(id => {
       if (id != null) {
-        this.scroll(id as string);
+        this.scroll(id as string)
       }
-    });
+    })
   }
 
   public scroll(id: string) {
-    const el = document.getElementById(id);
-    el.scrollIntoView({behavior: 'smooth'});
+    const el = document.getElementById(id)
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth' })
+    }
   }
 }
