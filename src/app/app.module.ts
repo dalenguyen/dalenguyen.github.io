@@ -1,5 +1,12 @@
 import { BrowserModule } from '@angular/platform-browser'
-import { NgModule, Injectable, ErrorHandler } from '@angular/core'
+import {
+  NgModule,
+  Injectable,
+  ErrorHandler,
+  Inject,
+  PLATFORM_ID,
+  APP_ID
+} from '@angular/core'
 
 import { HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module'
@@ -24,6 +31,7 @@ import { PortfolioComponent } from './home/portfolio/portfolio.component'
 import { FooterComponent } from './shared/components/footer/footer.component'
 
 import { PostGuard } from './blog/post/post.guard'
+import { isPlatformBrowser } from '@angular/common'
 
 Sentry.init({
   dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
@@ -35,7 +43,7 @@ Sentry.init({
 export class SentryErrorHandler implements ErrorHandler {
   constructor() {}
   handleError(error) {
-    // const eventId = Sentry.captureException(error.originalError || error)
+    const eventId = Sentry.captureException(error.originalError || error)
     console.error(error)
     // Sentry.showReportDialog({ eventId });
   }
@@ -68,4 +76,14 @@ export class SentryErrorHandler implements ErrorHandler {
   ],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule {
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: Object,
+    @Inject(APP_ID) private appId: string
+  ) {
+    const platform = isPlatformBrowser(platformId)
+      ? 'in the browser'
+      : 'on the server'
+    console.log(`Running ${platform} with appId=${appId}`)
+  }
+}
