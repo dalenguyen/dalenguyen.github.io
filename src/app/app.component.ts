@@ -16,7 +16,7 @@ import { Meta, Title } from '@angular/platform-browser'
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnDestroy {
-  @ViewChild('snav', { static: false }) snav: MatSidenav
+  @ViewChild('snav') snav: MatSidenav
 
   mobileQuery: MediaQueryList
   // tslint:disable-next-line:variable-name
