@@ -6,7 +6,7 @@
     "dev": "ng serve --ssl",
     "start:ssr": "npm run build:ssr && npm run serve:ssr",
     "prebuild": "ts-node -O '{\"module\": \"commonjs\"}' git.version.ts",
-    "build": "npm run prebuild && ng build --prod --base-href 'https://dalenguyen.me' --aot --output-hashing=all && cp src/CNAME dist",
+    "build:github": "npm run prebuild && ng build --prod --base-href 'https://dalenguyen.me' --aot --output-hashing=all && cp src/CNAME dist",
     "deploy:web": "npm run build && ngh --branch=master",
     "deploy:sentry": "sh sentry.sh",
     "test": "ng test",
