@@ -16,7 +16,7 @@
     "update:check": "ncu",
     "update:install": "ncu -u && npm i",
     "dev:ssr": "ng run app:serve-ssr",
-    "serve:ssr": "node dist/server/main.js",
+    "serve:ssr": "node ./dist/server/main.js",
     "build:ssr": "ng build --prod && ng run app:server",
     "prerender": "ng run app:prerender",
     "build": "npm run build:ssr",
