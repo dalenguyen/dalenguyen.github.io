@@ -1,6 +1,6 @@
-import { Router } from '@angular/router';
-import { Component, OnInit } from '@angular/core';
-import { NavService } from '../shared/services/nav.service';
+import { Router } from '@angular/router'
+import { Component, OnInit } from '@angular/core'
+import { NavService } from '../shared/services/nav.service'
 
 @Component({
   selector: 'app-nav',
@@ -8,10 +8,9 @@ import { NavService } from '../shared/services/nav.service';
   styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit {
+  activeEl = 'intro'
 
-  activeEl = 'intro';
-
-  constructor(private navService: NavService, private router: Router) { }
+  constructor(private navService: NavService, private router: Router) {}
 
   ngOnInit() {
     // Set active nav by path
@@ -25,24 +24,26 @@ export class NavComponent implements OnInit {
     // TODO: figured out how to navigate on mobile
     this.activeEl = id
     if (this.router.url !== '/') {
-      this.router.navigate(['']);
+      this.router.navigate([''])
       setTimeout(() => {
-        this.navService.scroll(id);
-        this.navService.target.next(null);
-      }, 1000);
+        this.navService.scroll(id)
+        this.navService.target.next(null)
+      }, 1000)
     } else {
-      this.navService.scroll(id);
-      this.navService.target.next(null);
+      this.navService.scroll(id)
+      this.navService.target.next(null)
     }
   }
 
   navigateTo(path: string) {
     this.activeEl = 'blog'
-    this.router.navigate([path]);
-    this.navService.target.next(null);
+    this.router.navigate([path])
+    this.navService.target.next(null)
   }
 
   isActive(id: string) {
-    if (id === this.activeEl) { return 'active'; }
+    if (id === this.activeEl) {
+      return 'active'
+    }
   }
 }
