@@ -11,7 +11,7 @@ Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The ap
 Deploy based on branch master
 
 ```sh
-npm run deploy
+npm run deploy:web
 ```
 
 ## Update sentry
@@ -27,7 +27,7 @@ sh sentry-release.sh
 For Development
 
 ```sh
-npm run webpack:server
+npm run dev:ssr
 ```
 
 For Production
