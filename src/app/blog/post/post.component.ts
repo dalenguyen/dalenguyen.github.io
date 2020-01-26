@@ -25,19 +25,23 @@ export class PostComponent implements OnInit {
 
     // Set meta tags
     this.title.setTitle(`${this.article.seo_title} | Dale Nguyen`)
-    this.meta.addTags([
-      { name: 'og:title', content: this.article.seo_title },
-      { name: 'og:description', content: this.article.summary },
-      { name: 'og:url', content: this.article.url },
-      { name: 'og:image', content: this.article.featured_image },
-      { name: 'type', content: 'article' },
-      {
-        name: 'keywords',
-        content: this.article.categories.reduce(
-          (acc, curr) => curr.name + ',' + acc,
-          ''
-        )
-      }
-    ])
+    this.meta.updateTag({ name: 'og:title', content: this.article.seo_title })
+    this.meta.updateTag({
+      name: 'og:description',
+      content: this.article.summary
+    })
+    this.meta.updateTag({ name: 'og:url', content: this.article.url })
+    this.meta.updateTag({
+      name: 'og:image',
+      content: this.article.featured_image
+    })
+    this.meta.updateTag({ name: 'type', content: 'article' })
+    this.meta.updateTag({
+      name: 'keywords',
+      content: this.article.categories.reduce(
+        (acc, curr) => curr.name + ',' + acc,
+        ''
+      )
+    })
   }
 }
