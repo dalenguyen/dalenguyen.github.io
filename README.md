@@ -2,6 +2,11 @@
 
 This project was generated with Angular 8 and published to Github Pages.
 
+This project will host on two places:
+
+- Github Pages: https://dalenguyen.github.io
+- Heroku: https://dalenguyen.me (Server Side Rendering & SEO support)
+
 ## Development server
 
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
