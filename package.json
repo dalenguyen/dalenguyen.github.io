@@ -16,12 +16,11 @@
     "update:check": "ncu",
     "update:install": "ncu -u && npm i",
     "dev:ssr": "ng run app:serve-ssr",
-    "serve:ssr": "node ./dist/server/main.js",
-    "build:ssr": "ng build --prod && ng run app:server",
+    "serve:ssr": "node dist/server/main.js",
+    "build:ssr": "ng build --prod && ng run app:server && cp -a .well-known dist",
     "prerender": "ng run app:prerender",
     "build": "npm run build:ssr",
-    "start": "npm run serve:ssr",
-    "heroku-postbuild": "cp -a ./.well-known ./dist"
+    "start": "npm run serve:ssr"
   },
   "private": true,
   "dependencies": {
