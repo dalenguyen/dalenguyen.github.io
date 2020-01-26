@@ -5,7 +5,7 @@ This project was generated with Angular 8 and published to Github Pages.
 This project will host on two places:
 
 - Github Pages: https://dalenguyen.github.io
-- Heroku: https://dalenguyen.me (Server Side Rendering & SEO support)
+- Heroku: http://dalenguyen.me (Server Side Rendering & SEO support)
 
 ## Development server
 
