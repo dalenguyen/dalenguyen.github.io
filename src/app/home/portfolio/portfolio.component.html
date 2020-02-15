@@ -13,9 +13,9 @@
       #grid
       [cols]="cols"
       rowHeight="2:1"
-      *ngIf="portfolioService.projects$ | async"
+      *ngIf="portfolioService.projects$ | async as projects"
     >
-      <mat-grid-tile *ngFor="let p of portfolioService.projects$ | async">
+      <mat-grid-tile *ngFor="let p of projects">
         <mat-card>
           <a href="{{ p.html_url }}" target="_blank">{{ p.name }}</a>
           <p>{{ p.description }}</p>

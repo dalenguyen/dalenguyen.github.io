@@ -3,7 +3,13 @@ import { HttpClient } from '@angular/common/http'
 
 import { Observable } from 'rxjs'
 import { captureException } from '@sentry/core'
-import { map, publishReplay, refCount, catchError } from 'rxjs/operators'
+import {
+  map,
+  // publishReplay,
+  // refCount,
+  catchError,
+  shareReplay
+} from 'rxjs/operators'
 
 import { GitProject } from '../models/git.project'
 
@@ -35,8 +41,9 @@ export class PortfolioService {
       map(projects =>
         projects.filter(project => this.gitProjects.includes(project.name))
       ),
-      publishReplay(1),
-      refCount(),
+      // publishReplay(1),
+      // refCount(),
+      shareReplay({ bufferSize: 1, refCount: true }),
       catchError(error => captureException(error))
     ) as Observable<GitProject[]>
   }
