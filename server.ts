@@ -16,7 +16,7 @@ global['document'] = win.document
 
 // The Express app is exported so that it can be used by serverless Functions.
 export function app() {
-  const server = express()
+  const server = express.default()
   const distFolder = join(process.cwd(), 'dist')
   const indexHtml = existsSync(join(distFolder, 'index.original.html'))
     ? 'index.original.html'
@@ -26,7 +26,7 @@ export function app() {
   server.engine(
     'html',
     ngExpressEngine({
-      bootstrap: AppServerModule
+      bootstrap: AppServerModule,
     })
   )
 
@@ -39,7 +39,7 @@ export function app() {
   server.get(
     '*.*',
     express.static(distFolder, {
-      maxAge: '1y'
+      maxAge: '1y',
     })
   )
 
@@ -47,7 +47,7 @@ export function app() {
   server.get('*', (req, res) => {
     res.render(indexHtml, {
       req,
-      providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }]
+      providers: [{ provide: APP_BASE_HREF, useValue: req.baseUrl }],
     })
   })
 
