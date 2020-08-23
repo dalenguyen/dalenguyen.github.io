@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
 
-import * as Butter from 'buttercms'
+import Butter from 'buttercms'
 
 import { captureException } from '@sentry/core'
 
@@ -9,7 +9,7 @@ import { Article } from '../shared/models/article'
 import { environment } from 'src/environments/environment'
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class BlogService {
   devBaseUrl = 'https://dev.to/api/articles?username=dalenguyen'
@@ -42,13 +42,13 @@ export class BlogService {
       .list({
         page: 1,
         page_size: 10,
-        exclude_body: true
+        exclude_body: true,
       })
-      .then(res => {
+      .then((res) => {
         console.log('Content from ButterCMS')
         return res.data.data
       })
-      .catch(error => {
+      .catch((error) => {
         captureException(error)
         console.error(error)
         return []
@@ -58,10 +58,10 @@ export class BlogService {
   getButterArticle(slug): Promise<Article> {
     return this.butterService.post
       .retrieve(slug, { locale: 'en' })
-      .then(res => {
+      .then((res) => {
         return res.data.data
       })
-      .catch(error => {
+      .catch((error) => {
         captureException(error)
         return null
       })
