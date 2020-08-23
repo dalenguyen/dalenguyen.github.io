@@ -11,6 +11,12 @@ This project will host on two places:
 
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
+## Analyze code bundle
+
+```sh
+npm run analyze
+```
+
 ## Publish to Github page
 
 Deploy based on branch master
