@@ -11,6 +11,7 @@ const routes: Routes = [
   { path: 'resume', component: ResumeComponent },
   { path: 'blog', component: BlogComponent },
   { path: 'blog/:slug', canActivate: [PostGuard], component: PostComponent },
+  { path: 'projects', loadChildren: () => import('./features/projects/projects.module').then(m => m.ProjectsModule)},
   { path: '**', redirectTo: '' }
 ]
 
