@@ -44,6 +44,7 @@
     "@sentry/integrations": "^6.0.2",
     "buttercms": "^1.2.6",
     "express": "^4.17.1",
+    "mapbox-gl": "^2.0.1",
     "rxjs": "~6.6.3",
     "smoothscroll-polyfill": "^0.4.4",
     "tslib": "^2.1.0",

@@ -1,0 +1,10 @@
+:host {
+  // #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  width: 100%;
+  height: 400px;
+  display: block;
+  .match-parent {
+    width: 100%;
+    height: 100%;
+  }
+}
