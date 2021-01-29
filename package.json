@@ -64,6 +64,7 @@
     "@types/express": "^4.17.11",
     "@types/jasmine": "~3.6.3",
     "@types/jasminewd2": "~2.0.8",
+    "@types/mapbox-gl": "^2.0.3",
     "@types/node": "^14.14.22",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "codelyzer": "^6.0.1",

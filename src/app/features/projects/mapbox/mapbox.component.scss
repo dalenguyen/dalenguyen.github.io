@@ -1,10 +1,36 @@
-:host {
-  // #map { position: absolute; top: 0; bottom: 0; width: 100%; }
-  width: 100%;
-  height: 400px;
-  display: block;
-  .match-parent {
-    width: 100%;
-    height: 100%;
+// :host {
+  // width: 100%;
+  // // height: 400px;
+  // position: relative;
+  // height: 100vh;
+  // display: block;
+  #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  .marker {
+    display: block;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    padding: 0;
   }
-}
+  #map .mapboxgl-popup-content {
+    padding: 10px;
+    max-width: 300px;
+    padding-top: 20px;
+  }
+  #map .mapboxgl-popup-content ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    float: left;
+  }
+
+  #map .mapboxgl-popup-content ul h3 {
+    margin: 0 0 10px 0;
+  }
+
+  #map .mapboxgl-popup-content img {
+    float:left;
+    width: 30px;
+    margin-right: 10px;
+  }
+// }
