@@ -143,61 +143,61 @@ export class MapboxComponent implements OnInit {
     // }, 2000);
 
     let count = 0
-    setInterval(() => {
-      count += 0.01;
-        (<any>this.map.getSource('national-park'))?.setData({
-          "type": "FeatureCollection",
-          "features": [
-            {
-              "type": "Feature",
-              "properties": {},
-              "geometry": {
-                "type": "Polygon",
-                "coordinates": [
-                  [
-                    [
-                      -124.76074218749999 + count,
-                      43.100982876188546 + count
-                    ],
-                    [
-                      -124.71679687499999 + count,
-                      40.245991504199026 + count
-                    ],
-                    [
-                      -121.81640624999999 + count,
-                      39.470125122358176 + count
-                    ],
-                    [
-                      -116.103515625 + count,
-                      41.57436130598913 + count
-                    ],
-                    [
-                      -116.103515625 + count,
-                      44.276671273775186 + count
-                    ],
-                    [
-                      -117.24609374999999 + count,
-                      46.01222384063236 + count
-                    ],
-                    [
-                      -120.89355468749999 + count,
-                      47.60616304386874 + count
-                    ],
-                    [
-                      -123.8818359375 + count,
-                      46.619261036171515 + count
-                    ],
-                    [
-                      -124.76074218749999 + count,
-                      43.100982876188546 + count
-                    ]
-                  ]
-                ]
-              }
-            }
-          ]
-        })
-    }, 0.01)
+    // setInterval(() => {
+    //   count += 0.01;
+    //     (<any>this.map.getSource('national-park'))?.setData({
+    //       "type": "FeatureCollection",
+    //       "features": [
+    //         {
+    //           "type": "Feature",
+    //           "properties": {},
+    //           "geometry": {
+    //             "type": "Polygon",
+    //             "coordinates": [
+    //               [
+    //                 [
+    //                   -124.76074218749999 + count,
+    //                   43.100982876188546 + count
+    //                 ],
+    //                 [
+    //                   -124.71679687499999 + count,
+    //                   40.245991504199026 + count
+    //                 ],
+    //                 [
+    //                   -121.81640624999999 + count,
+    //                   39.470125122358176 + count
+    //                 ],
+    //                 [
+    //                   -116.103515625 + count,
+    //                   41.57436130598913 + count
+    //                 ],
+    //                 [
+    //                   -116.103515625 + count,
+    //                   44.276671273775186 + count
+    //                 ],
+    //                 [
+    //                   -117.24609374999999 + count,
+    //                   46.01222384063236 + count
+    //                 ],
+    //                 [
+    //                   -120.89355468749999 + count,
+    //                   47.60616304386874 + count
+    //                 ],
+    //                 [
+    //                   -123.8818359375 + count,
+    //                   46.619261036171515 + count
+    //                 ],
+    //                 [
+    //                   -124.76074218749999 + count,
+    //                   43.100982876188546 + count
+    //                 ]
+    //               ]
+    //             ]
+    //           }
+    //         }
+    //       ]
+    //     })
+    // }, 0.01)
 
     this.map.on('mousedown', 'state-label-lg', e => {
       console.log(e)
@@ -323,64 +323,68 @@ export class MapboxComponent implements OnInit {
       });
 
       // Countries
-      // this.map.addSource('countries', {
-      //   'type': 'geojson',
-      //   data: countries['default']
-      // });
-
-      // this.map.addLayer({
-      //   'id': 'countries',
-      //   'type': 'fill',
-      //   'source': 'countries',
-      //   'paint': {
-      //     'fill-color': '#52489C',
-      //     'fill-outline-color': '#52489C',
-      //     // 'fill-opacity': 0.6
-      //   },
-      //   'filter': ['==', '$type', 'Polygon']
-      // });
+      this.map.addSource('countries', {
+        'type': 'geojson',
+        data: countries['default']
+      });
 
       this.map.addLayer({
-        //here we are adding a layer containing the tileset we just uploaded
-        id: 'countries', //this is the name of our layer, which we will need later
-        source: {
-          type: 'vector',
-          url: 'mapbox://dalenguyen.1msxx4kw', // <--- Add the Map ID you copied here
-        },
-        'source-layer': 'ne_10m_admin_0_countries_lake-2t7lm9', // <--- Add the source layer name you copied here
-        type: 'fill',
-        paint: {
-          'fill-color': '#52489C',
-          'fill-outline-color': '#F2F2F2',
+        'id': 'countries',
+        'type': 'fill',
+        'source': 'countries',
+        'paint': {
+          'fill-color': {
+            type: 'categorical',
+            property: 'ISO_A3',
+            stops: [['CAN', 'red'], ['USA', 'blue']]
+          },
+          'fill-outline-color': '#52489C',
           'fill-opacity': 0.6
         },
+        'filter': ['==', '$type', 'Polygon']
       });
 
-      this.map.setFilter('countries', ['in', 'ADM0_A3_IS'].concat(['USA', 'AUS', 'NGA']));
+      // this.map.addLayer({
+      //   //here we are adding a layer containing the tileset we just uploaded
+      //   id: 'countries', //this is the name of our layer, which we will need later
+      //   source: {
+      //     type: 'vector',
+      //     url: 'mapbox://dalenguyen.1msxx4kw', // <--- Add the Map ID you copied here
+      //   },
+      //   'source-layer': 'ne_10m_admin_0_countries_lake-2t7lm9', // <--- Add the source layer name you copied here
+      //   type: 'fill',
+      //   paint: {
+      //     'fill-color': '#52489C',
+      //     'fill-outline-color': '#F2F2F2',
+      //     'fill-opacity': 0.6
+      //   },
+      // });
 
-      this.map.on('click', 'countries', (mapElement) => {
-        const countryCode = mapElement.features[0].properties.ADM0_A3_IS; // Grab the country code from the map properties.
+      // this.map.setFilter('countries', ['in', 'ADM0_A3_IS'].concat(['USA', 'AUS', 'NGA']));
 
-        fetch(`https://restcountries.eu/rest/v2/alpha/${countryCode}`) // Using tempalate tags to create the API request
-          .then((data) => data.json()) //fetch returns an object with a .json() method, which returns a promise
-          .then((country) => { //country contains the data from the API request
-            // Let's build our HTML in a template tag
-            const html = `
-            <ul>
-                <img src='${country.flag}' />
-                <li><h3>${country.name}</h3></li>
-                <li><strong>Currencies:</strong> ${country.currencies.map((c) => c.code).join(', ')}</li>
-                <li><strong>Capital:</strong> ${country.capital}</li>
-                <li><strong>Population:</strong> ${country.population}</li>
-                <li><strong>Demonym:</strong> ${country.demonym}</li>
-              </ul>
-            `; // Now we have a good looking popup HTML segment.
-            new mapboxgl.Popup() //Create a new popup
-              .setLngLat(mapElement.lngLat) // Set where we want it to appear (where we clicked)
-              .setHTML(html) // Add the HTML we just made to the popup
-              .addTo(this.map); // Add the popup to the map
-          });
-      });
+      // this.map.on('click', 'countries', (mapElement) => {
+      //   const countryCode = mapElement.features[0].properties.ADM0_A3_IS; // Grab the country code from the map properties.
+
+      //   fetch(`https://restcountries.eu/rest/v2/alpha/${countryCode}`) // Using tempalate tags to create the API request
+      //     .then((data) => data.json()) //fetch returns an object with a .json() method, which returns a promise
+      //     .then((country) => { //country contains the data from the API request
+      //       // Let's build our HTML in a template tag
+      //       const html = `
+      //       <ul>
+      //           <img src='${country.flag}' />
+      //           <li><h3>${country.name}</h3></li>
+      //           <li><strong>Currencies:</strong> ${country.currencies.map((c) => c.code).join(', ')}</li>
+      //           <li><strong>Capital:</strong> ${country.capital}</li>
+      //           <li><strong>Population:</strong> ${country.population}</li>
+      //           <li><strong>Demonym:</strong> ${country.demonym}</li>
+      //         </ul>
+      //       `; // Now we have a good looking popup HTML segment.
+      //       new mapboxgl.Popup() //Create a new popup
+      //         .setLngLat(mapElement.lngLat) // Set where we want it to appear (where we clicked)
+      //         .setHTML(html) // Add the HTML we just made to the popup
+      //         .addTo(this.map); // Add the popup to the map
+      //     });
+      // });
 
       // color
       // Color only few countries
