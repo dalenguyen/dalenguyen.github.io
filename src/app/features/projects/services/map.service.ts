@@ -10,8 +10,6 @@ export enum Colors {
   yellow = '#ffc107',
   gray = '#ababab',
 }
-
-
 @Injectable({
   providedIn: 'root'
 })
@@ -19,7 +17,7 @@ export class MapService {
 
   map: mapboxgl.Map
   // style = 'mapbox://styles/mapbox/streets-v11'
-  style = 'mapbox://styles/mapbox/light-v9'
+  style = 'mapbox://styles/mapbox/light-v10'
   // style = 'mapbox://styles/dalenguyen/ckkg85yqv04h917sc6tfli16n'
   // style = 'mapbox://styles/dalenguyen/ckkh262co0n8c17p0zxoawiae' // New Course
   lat = 37.75
@@ -87,34 +85,14 @@ export class MapService {
     this.map.on('load', () => {
       // this.addMarker()
 
-      // Countries
-      this._addCountriesSource()
+      this._addCountryBoundaries()
+      // this._addCountryBoudariesFromFile()
 
-      const layerData: mapboxgl.AnyLayer = {
-        id: 'countries',
-        type: 'fill',
-        source: 'countries',
-        paint: {
-          'fill-color': {
-            default: 'transparent',
-            type: 'categorical',
-            property: 'ISO_A3',
-            // TODO: Loop through countries and create an array of color
-            stops: [['CAN', 'red'], ['USA', 'blue'], ['XXX', 'white']],
-          },
-          // 'fill-outline-color': '#52489C',
-          'fill-opacity': 0.6,
-        },
-        filter: ['==', '$type', 'Polygon'],
-      }
-
-      this.addLayer(layerData, 'countries')
-
-      // Add map event
-      // this._addClickEvents()
+      // // Add map event
+      // // this._addClickEvents()
       this._addHoverEvents()
 
-      // initialize first country data
+      // // initialize first country data
       this._getCountryInfo('CAN')
     })
   }
@@ -169,17 +147,17 @@ export class MapService {
 
   private _addHoverEvents() {
     this.map.on('mouseover', 'countries', mapElement => {
-      const countryCode = mapElement.features[0].properties.ISO_A3
-      console.log({countryCode});
+      // const countryCode = mapElement.features[0].properties.ISO_A3
+      const countryCode = mapElement.features[0].properties.iso_3166_1_alpha_3
       this._getCountryInfo(countryCode)
-      });
+    });
   }
 
   private _getCountryInfo(countryCode: string) {
     fetch(`https://restcountries.eu/rest/v2/alpha/${countryCode}`)
-        .then((data) => data.json())
-        .then((country) => {
-          const html = `
+      .then((data) => data.json())
+      .then((country) => {
+        const html = `
             <img src='${country.flag}' />
             <ul>
               <li><h3>${country.name}</h3></li>
@@ -189,7 +167,71 @@ export class MapService {
               <li><strong>Demonym:</strong> ${country.demonym}</li>
             </ul>
           `;
-          this.countryDetail$.next(html)
-        });
+        this.countryDetail$.next(html)
+      });
+  }
+
+  private _addCountryBoundaries() {
+    // https://docs.mapbox.com/mapbox-gl-js/example/data-join/ color codes
+
+    this.map.addSource('countries', {
+      type: 'vector',
+      url: 'mapbox://mapbox.country-boundaries-v1'
+    });
+
+    // Build a GL match expression that defines the color for every vector tile feature
+    // Use the ISO 3166-1 alpha 3 code as the lookup key for the country shape
+    const matchExpression = ['match', ['get', 'iso_3166_1_alpha_3']] as mapboxgl.Expression
+
+    // Calculate color values for each country based on 'hdi' value
+    countries['default'].features.forEach( country => {
+      // Convert the range of data values to a suitable color
+      const countryCode = country.properties.ISO_A3
+      if (countryCode != -99) {
+        const randomIndex = Math.floor(Math.random() * Object.keys(Colors).length)
+        matchExpression.push(countryCode, Object.keys(Colors)[randomIndex]);
+      }
+    });
+
+    // Last value is the default, used where there is no data
+    matchExpression.push('rgba(0, 0, 0, 0)');
+
+    // Add layer from the vector tile source to create the choropleth
+    // Insert it below the 'admin-1-boundary-bg' layer in the style
+    this.map.addLayer({
+      'id': 'countries',
+      'type': 'fill',
+      'source': 'countries',
+      'source-layer': 'country_boundaries',
+      'paint': {
+        'fill-color': matchExpression,
+        'fill-opacity': 0.6
+      }
+    }, 'admin-1-boundary-bg');
+  }
+
+  private _addCountryBoudariesFromFile() {
+      // Countries
+      this._addCountriesSource()
+
+      const layerData: mapboxgl.AnyLayer = {
+        id: 'countries',
+        type: 'fill',
+        source: 'countries',
+        paint: {
+          'fill-color': {
+            default: 'transparent',
+            type: 'categorical',
+            property: 'ISO_A3',
+            // TODO: Loop through countries and create an array of color
+            stops: [['CAN', 'red'], ['USA', 'blue'], ['XXX', 'white']],
+          },
+          // 'fill-outline-color': '#52489C',
+          'fill-opacity': 0.6,
+        },
+        filter: ['==', '$type', 'Polygon'],
+      }
+
+      this.addLayer(layerData, 'countries')
   }
 }
