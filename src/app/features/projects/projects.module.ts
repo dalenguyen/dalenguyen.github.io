@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MapboxComponent } from './mapbox/mapbox.component';
 import { ProjectsRoutingModule } from './projects-routing.module';
 import { LeafletComponent } from './leaflet/leaflet.component'
+import { MapService } from './services/map.service';
 
 
 @NgModule({
@@ -10,6 +11,7 @@ import { LeafletComponent } from './leaflet/leaflet.component'
   imports: [
     CommonModule,
     ProjectsRoutingModule,
-  ]
+  ],
+  providers: [MapService]
 })
 export class ProjectsModule { }

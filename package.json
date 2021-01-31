@@ -3,7 +3,7 @@
   "version": "1.2.2",
   "scripts": {
     "ng": "ng",
-    "dev": "ng serve --ssl --hmr",
+    "dev": "node --max_old_space_size=8048 ./node_modules/@angular/cli/bin/ng serve --ssl --hmr",
     "format:test": "prettier \"src/**/*.{ts,html,md,scss,json}\" --list-different",
     "format:write": "prettier \"src/**/*.{ts,html,md,scss,json}\" --write",
     "analyze": "ng build --prod --stats-json && webpack-bundle-analyzer ./dist/stats.json",
