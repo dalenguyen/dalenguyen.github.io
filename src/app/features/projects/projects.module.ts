@@ -1,13 +1,14 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MapboxComponent } from './mapbox/mapbox.component';
 import { ProjectsRoutingModule } from './projects-routing.module';
-import { LeafletComponent } from './leaflet/leaflet.component'
 import { MapService } from './services/map.service';
+import { MapboxComponent } from './containers/mapbox/mapbox.component';
+import { LeafletComponent } from './containers/leaflet/leaflet.component';
+import { CountryDetailComponent } from './components/country-detail/country-detail.component';
 
 
 @NgModule({
-  declarations: [MapboxComponent, LeafletComponent],
+  declarations: [MapboxComponent, LeafletComponent, CountryDetailComponent],
   imports: [
     CommonModule,
     ProjectsRoutingModule,

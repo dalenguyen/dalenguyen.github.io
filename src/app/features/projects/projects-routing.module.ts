@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
-import { LeafletComponent } from './leaflet/leaflet.component'
-import { MapboxComponent } from './mapbox/mapbox.component'
+import { LeafletComponent } from './containers/leaflet/leaflet.component'
+import { MapboxComponent } from './containers/mapbox/mapbox.component'
 
 const routes: Routes = [
   {

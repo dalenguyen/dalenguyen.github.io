@@ -1,5 +1,7 @@
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
-import { MapService } from '../services/map.service';
+import { Observable } from 'rxjs';
+import { MapService } from '../../services/map.service';
+
 @Component({
   selector: 'app-mapbox',
   templateUrl: './mapbox.component.html',
@@ -8,10 +10,13 @@ import { MapService } from '../services/map.service';
 })
 export class MapboxComponent implements OnInit {
 
+  content$: Observable<string>
+
   constructor(private mapService: MapService) { }
 
   ngOnInit(): void {
     this.mapService.initializeMap()
+    this.content$ = this.mapService.countryDetail$
   }
 
 }

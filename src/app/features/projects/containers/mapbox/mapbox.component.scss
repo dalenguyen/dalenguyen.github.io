@@ -34,3 +34,20 @@
     margin-right: 10px;
   }
 // }
+
+app-country-detail {
+  top: 0;
+  position: absolute;
+  margin-top: 5px;
+  margin-left: 5px;
+  padding: 5px;
+  width: 30%;
+  border-radius: 3px;
+  img {
+    width: 50px;
+  }
+  ul {
+    padding: 0;
+    list-style: none;
+  }
+}

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import * as countries from '../data/countries.json'
 import mapboxgl, { LngLatLike } from 'mapbox-gl'
 import { environment } from 'src/environments/environment';
+import { Subject } from 'rxjs';
 
 export enum Colors {
   red = '#e91e63',
@@ -63,6 +64,8 @@ export class MapService {
     ]
   };
 
+  countryDetail$ = new Subject<string>()
+
   constructor() { }
 
   initializeMap() {
@@ -82,29 +85,37 @@ export class MapService {
     this.map.addControl(new mapboxgl.NavigationControl())
 
     this.map.on('load', () => {
-      this.addMarker()
+      // this.addMarker()
 
       // Countries
       this._addCountriesSource()
 
-      const layerData = {
+      const layerData: mapboxgl.AnyLayer = {
         id: 'countries',
         type: 'fill',
         source: 'countries',
         paint: {
           'fill-color': {
+            default: 'transparent',
             type: 'categorical',
             property: 'ISO_A3',
             // TODO: Loop through countries and create an array of color
-            stops: [['CAN', 'red'], ['USA', 'blue']],
+            stops: [['CAN', 'red'], ['USA', 'blue'], ['XXX', 'white']],
           },
-          'fill-outline-color': '#52489C',
+          // 'fill-outline-color': '#52489C',
           'fill-opacity': 0.6,
         },
         filter: ['==', '$type', 'Polygon'],
       }
 
       this.addLayer(layerData, 'countries')
+
+      // Add map event
+      // this._addClickEvents()
+      this._addHoverEvents()
+
+      // initialize first country data
+      this._getCountryInfo('CAN')
     })
   }
 
@@ -148,5 +159,37 @@ export class MapService {
         .setLngLat(marker.geometry.coordinates as LngLatLike)
         .addTo(this.map);
     });
+  }
+
+  private _addClickEvents() {
+    this.map.on('click', 'countries', mapElement => {
+      console.log(mapElement.features[0].properties.ISO_A3);
+    })
+  }
+
+  private _addHoverEvents() {
+    this.map.on('mouseover', 'countries', mapElement => {
+      const countryCode = mapElement.features[0].properties.ISO_A3
+      console.log({countryCode});
+      this._getCountryInfo(countryCode)
+      });
+  }
+
+  private _getCountryInfo(countryCode: string) {
+    fetch(`https://restcountries.eu/rest/v2/alpha/${countryCode}`)
+        .then((data) => data.json())
+        .then((country) => {
+          const html = `
+            <img src='${country.flag}' />
+            <ul>
+              <li><h3>${country.name}</h3></li>
+              <li><strong>Currencies:</strong> ${country.currencies.map((c) => c.code).join(', ')}</li>
+              <li><strong>Capital:</strong> ${country.capital}</li>
+              <li><strong>Population:</strong> ${country.population}</li>
+              <li><strong>Demonym:</strong> ${country.demonym}</li>
+            </ul>
+          `;
+          this.countryDetail$.next(html)
+        });
   }
 }
