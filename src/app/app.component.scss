@@ -1,42 +1,42 @@
 @import '../variables';
 
 .main-content {
-    display: flex;
-    flex-direction: column;
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }
 
 .hamburger {
-    position: fixed;
-    /* Make sure the toolbar will stay on top of the content as it scrolls past. */
-    z-index: 2;
-    background: rgba(128, 136, 144, 0.5);
-    border-radius: 0.35em;
-    top: 10px;
-    left: 10px;
+  position: fixed;
+  /* Make sure the toolbar will stay on top of the content as it scrolls past. */
+  z-index: 2;
+  background: rgba(128, 136, 144, 0.5);
+  border-radius: 0.35em;
+  top: 10px;
+  left: 10px;
 }
 
 .sidenav-container {
-    /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
+  /* When the sidenav is not fixed, stretch the sidenav container to fill the available space. This
         causes `<mat-sidenav-content>` to act as our scrolling element for desktop layouts. */
-    flex: 1;
+  flex: 1;
 }
 
 .is-mobile .sidenav-container {
-    /* When the sidenav is fixed, don't constrain the height of the sidenav container. This allows the
+  /* When the sidenav is fixed, don't constrain the height of the sidenav container. This allows the
        `<body>` to be our scrolling element for mobile layouts. */
-    flex: 1 0 auto;
+  flex: 1 0 auto;
 }
 
 mat-sidenav {
-    width: 250px;    
-    background: $shark url('/assets/images/overlay.png');
+  width: 250px;
+  background: $shark url('/assets/images/overlay.png');
 }
 
-// mat-sidenav-content {
-//     margin-left: 250px !important;
-// }
+mat-sidenav-content {
+  min-height: 100vh;
+}
