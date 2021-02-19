@@ -25,7 +25,7 @@ jobs:
 
       - name: deploy to github pages
         run: |
-          sudo npm install
+          sudo npm install --unsafe-perm
           sudo npm run build:github
           sudo ngh --branch=master --repo=https://${{ secrets.GH_TOKEN }}@github.com/dalenguyen/dalenguyen.github.io.git --no-silent
 
