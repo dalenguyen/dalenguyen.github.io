@@ -42,6 +42,10 @@ jobs:
       - name: Build
         run: yarn build:portfolio
 
+      - name: Generate 404 files
+        run: |
+          cat "./dist/apps/portfolio/index.html" >> "./dist/apps/portfolio/404.html"
+
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
