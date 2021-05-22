@@ -30,17 +30,17 @@ jobs:
         with:
           node-version: '14.x'
 
-      - uses: actions/cache@v1
+      - uses: actions/cache@v2
         with:
-          path: ~/.npm
-          key: ${{ runner.os }}-node-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          path: '**/node_modules'
+          key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
+
+      - name: Install dependencies
+        if: steps.yarn-cache.outputs.cache-hit != 'true'
+        run: yarn install
 
       - name: Build
-        run: |
-          yarn install
-          yarn build:portfolio
+        run: yarn build:portfolio
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
