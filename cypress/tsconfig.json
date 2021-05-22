@@ -1,7 +1,0 @@
-{
-  "include": ["integration/*.ts", "../node_modules/cypress"],
-  "compilerOptions": {
-    "experimentalDecorators": true,
-    "skipLibCheck": true
-  }
-}
