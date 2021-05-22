@@ -47,6 +47,10 @@ For Production
 npm run start:ssr
 ```
 
+## TODO
+
+- Using NX Cloud for Building with Github Actions
+
 ## Contribution
 
 Any contribution to this project are welcome. Please read the [contribution guideline](https://github.com/dalenguyen/dalenguyen.github.io/blob/dev/CONTRIBUTING.md)
