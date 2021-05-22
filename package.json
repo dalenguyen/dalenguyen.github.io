@@ -8,7 +8,7 @@
     "nx": "nx",
     "start": "ng serve",
     "build": "ng build",
-    "build:portfolio": "ng build --project portfolio",
+    "build:portfolio": "ng build --project portfolio --base-href=/",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
