@@ -40,7 +40,7 @@ jobs:
       - name: Build
         run: |
           yarn install
-          yarn build:github
+          yarn build:portfolio
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
