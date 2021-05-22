@@ -44,6 +44,13 @@ jobs:
 
       - name: Generate 404 files
         run: |
+          404_STRING=$(cat << EOF
+          ---
+          permalink: /404.html
+          ---
+          EOF
+          )
+          echo "MY_STRING<<EOF" > "./dist/apps/portfolio/404.html"
           cat "./dist/apps/portfolio/index.html" >> "./dist/apps/portfolio/404.html"
 
       - name: Deploy
