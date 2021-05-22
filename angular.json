@@ -49,6 +49,7 @@
             "inlineStyleLanguage": "scss",
             "assets": [
               "apps/portfolio/src/favicon.ico",
+              "apps/portfolio/src/404.html",
               "apps/portfolio/src/assets",
               {
                 "glob": "**/*",
