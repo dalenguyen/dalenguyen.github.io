@@ -1,6 +1,6 @@
 # Dale Nguyen Portfolio Website
 
-This project was generated with Angular 8 and published to Github Pages.
+This Monorepo project was generated with Angular 12, Nx Workspace and published to Github Pages.
 
 This project will host on two places:
 
@@ -11,18 +11,10 @@ This project will host on two places:
 
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
 
-## Analyze code bundle
+## Generate a new library
 
-```sh
-npm run analyze
 ```
-
-## Publish to Github page
-
-Deploy based on branch master
-
-```sh
-npm run deploy:web
+nx generate @nrwl/angular:library mylibrary
 ```
 
 ## Update sentry

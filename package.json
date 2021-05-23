@@ -3,18 +3,18 @@
   "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "ng": "nx",
     "postinstall": "node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main",
-    "nx": "nx",
+    "nx": "node --max-old-space-size=8192 ./node_modules/.bin/nx",
+    "ng": "node --max-old-space-size=8192 ./node_modules/.bin/ng",
     "start": "ng serve",
     "build": "ng build",
-    "build:portfolio": "ng build --project portfolio --base-href=/",
+    "build:portfolio": "ng build --project portfolio --base-href=/ --parallel",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
     "affected:apps": "nx affected:apps",
     "affected:libs": "nx affected:libs",
-    "affected:build": "nx affected:build",
+    "affected:build": "nx affected:build --base=origin/dev --parallel",
     "affected:e2e": "nx affected:e2e",
     "affected:test": "nx affected:test",
     "affected:lint": "nx affected:lint",
@@ -84,5 +84,8 @@
     "ts-jest": "26.5.5",
     "ts-node": "~9.1.1",
     "typescript": "~4.2.4"
+  },
+  "engines": {
+    "node": ">=14"
   }
 }

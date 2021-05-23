@@ -17,7 +17,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@dalenguyen/portfolio/*": ["apps/porfolio/*"]
+      "@dalenguyen/portfolio/*": ["apps/porfolio/*"],
+      "@dalenguyen/material": ["libs/material/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

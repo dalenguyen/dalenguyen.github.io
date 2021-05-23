@@ -3,11 +3,12 @@ import { NgModule, Injectable, ErrorHandler, Inject, PLATFORM_ID, APP_ID } from 
 
 import { HttpClientModule } from '@angular/common/http'
 import { AppRoutingModule } from './app-routing.module'
-import { MaterialModule } from './shared/modules/material.module'
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 
 import * as Sentry from '@sentry/browser'
 import { RewriteFrames } from '@sentry/integrations'
+
+import { MaterialModule } from '@dalenguyen/material'
 
 import { AppComponent } from './app.component'
 import { HomeComponent } from './home/home.component'

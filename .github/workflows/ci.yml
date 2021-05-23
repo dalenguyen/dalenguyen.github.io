@@ -41,6 +41,7 @@ jobs:
 
       - name: Build
         run: yarn build:portfolio
+        # run: yarn affected:build
 
       - name: Generate 404 files
         run: |

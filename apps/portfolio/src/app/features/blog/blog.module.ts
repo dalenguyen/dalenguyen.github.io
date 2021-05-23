@@ -7,8 +7,7 @@ import { BlogComponent } from './blog.component'
 import { PostComponent } from './post/post.component'
 import { BlogService, PostService } from './shared/services'
 import { PostGuard } from './shared/guards'
-import { MaterialModule } from '../../shared/modules/material.module'
-
+import { MaterialModule } from '@dalenguyen/material'
 @NgModule({
   declarations: [BlogComponent, PostComponent],
   imports: [CommonModule, RouterModule, BlogRoutingModule, MaterialModule],
