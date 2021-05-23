@@ -1,27 +1,22 @@
 import { Router } from '@angular/router'
-import { BlogService } from './blog.service'
-import { Component, OnInit } from '@angular/core'
-import { Article } from '../shared/models/article'
+import { Component } from '@angular/core'
 import { Title } from '@angular/platform-browser'
+import { Article } from './shared/models'
+import { BlogService } from './shared/services'
 
 @Component({
   selector: 'app-blog',
   templateUrl: './blog.component.html',
-  styleUrls: ['./blog.component.scss']
+  styleUrls: ['./blog.component.scss'],
 })
-export class BlogComponent implements OnInit {
+export class BlogComponent {
   articles$: Promise<Article[]>
 
-  constructor(
-    private blogService: BlogService,
-    private router: Router,
-    private title: Title
-  ) {
+  constructor(private blogService: BlogService, private router: Router, private title: Title) {
     this.title.setTitle(`Blog | Dale Nguyen`)
     this.articles$ = this.blogService.getButterArticles()
   }
 
-  ngOnInit() {}
   openPost(article: Article) {
     this.router.navigate(['/blog', article.slug])
   }

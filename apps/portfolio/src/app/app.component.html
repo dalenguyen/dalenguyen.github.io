@@ -1,17 +1,21 @@
-<div class="main-content" [class.is-mobile]="mobileQuery.matches">  
+<div class="main-content" [class.is-mobile]="mobileQuery.matches">
   <mat-sidenav-container class="sidenav-container">
-    <mat-sidenav #snav 
-      [opened]="mobileQuery.matches ? false : true" 
-      [mode]="mobileQuery.matches ? 'over' : 'side'" 
-      [fixedInViewport]="mobileQuery.matches">
+    <mat-sidenav
+      #snav
+      [opened]="mobileQuery.matches ? false : true"
+      [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery.matches"
+    >
       <app-nav></app-nav>
     </mat-sidenav>
     <mat-sidenav-content>
       <div class="hamburger">
-        <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>        
-      </div>      
-      <router-outlet></router-outlet>
-      <app-footer></app-footer>
+        <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
+      </div>
+      <main>
+        <router-outlet></router-outlet>
+        <app-footer></app-footer>
+      </main>
     </mat-sidenav-content>
-  </mat-sidenav-container>  
+  </mat-sidenav-container>
 </div>

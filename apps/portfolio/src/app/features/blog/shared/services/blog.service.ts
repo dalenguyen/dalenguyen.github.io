@@ -4,9 +4,8 @@ import { HttpClient } from '@angular/common/http'
 import Butter from 'buttercms'
 
 import { captureException } from '@sentry/core'
-
-import { Article } from '../shared/models/article'
-import { environment } from '../../environments/environment'
+import { Article } from '../models'
+import { environment } from 'apps/portfolio/src/environments/environment'
 
 @Injectable({
   providedIn: 'root',

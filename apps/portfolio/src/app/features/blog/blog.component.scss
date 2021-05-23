@@ -1,0 +1,19 @@
+:host {
+  #blog {
+    margin: 20px;
+    #articles {
+      mat-card {
+        margin: 20px 0;
+        mat-card-header {
+          .mat-card-header-text {
+            margin: 0;
+          }
+        }
+        img {
+          max-width: 100%;
+          padding: 1rem 0;
+        }
+      }
+    }
+  }
+}

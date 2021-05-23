@@ -1,8 +1,7 @@
 import { Title, Meta } from '@angular/platform-browser'
 import { Component, OnInit, ViewEncapsulation } from '@angular/core'
-
-import { BlogService } from '../blog.service'
-import { Article } from '../../shared/models/article'
+import { Article } from '../shared/models'
+import { BlogService } from '../shared/services'
 
 @Component({
   selector: 'app-post',

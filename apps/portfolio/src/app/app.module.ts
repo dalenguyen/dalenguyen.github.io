@@ -11,8 +11,6 @@ import { RewriteFrames } from '@sentry/integrations'
 
 import { AppComponent } from './app.component'
 import { HomeComponent } from './home/home.component'
-import { BlogComponent } from './blog/blog.component'
-import { PostComponent } from './blog/post/post.component'
 import { ResumeComponent } from './resume/resume.component'
 import { IntroComponent } from './home/intro/intro.component'
 import { ContactComponent } from './home/contact/contact.component'
@@ -20,7 +18,6 @@ import { BiographyComponent } from './home/biography/biography.component'
 import { PortfolioComponent } from './home/portfolio/portfolio.component'
 import { FooterComponent } from './shared/components/footer/footer.component'
 
-import { PostGuard } from './blog/post/post.guard'
 import { isPlatformBrowser } from '@angular/common'
 import { NavComponent } from './shared/components/nav/nav.component'
 import { environment } from '../environments/environment'
@@ -35,9 +32,8 @@ Sentry.init({
 export class SentryErrorHandler implements ErrorHandler {
   constructor() {}
   handleError(error) {
-    const eventId = Sentry.captureException(error.originalError || error)
+    Sentry.captureException(error.originalError || error)
     console.error(error)
-    // Sentry.showReportDialog({ eventId });
   }
 }
 
@@ -52,11 +48,9 @@ export class SentryErrorHandler implements ErrorHandler {
     FooterComponent,
     NavComponent,
     ResumeComponent,
-    BlogComponent,
-    PostComponent,
   ],
   imports: [BrowserModule, BrowserAnimationsModule, AppRoutingModule, MaterialModule, HttpClientModule],
-  providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }, PostGuard],
+  providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   bootstrap: [AppComponent],
 })
 export class AppModule {
