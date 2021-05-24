@@ -31,6 +31,13 @@
     },
     "material": {
       "tags": []
+    },
+    "saas": {
+      "tags": []
+    },
+    "saas-e2e": {
+      "tags": [],
+      "implicitDependencies": ["saas"]
     }
   }
 }
