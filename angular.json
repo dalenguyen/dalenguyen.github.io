@@ -285,6 +285,43 @@
           }
         }
       }
+    },
+    "saas-libs": {
+      "projectType": "library",
+      "root": "libs/saas-libs",
+      "sourceRoot": "libs/saas-libs/src",
+      "prefix": "dalenguyen",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/angular:package",
+          "options": {
+            "project": "libs/saas-libs/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "libs/saas-libs/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "libs/saas-libs/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/saas-libs"],
+          "options": {
+            "jestConfig": "libs/saas-libs/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/saas-libs/src/**/*.ts", "libs/saas-libs/src/**/*.html"]
+          }
+        }
+      }
     }
   }
 }

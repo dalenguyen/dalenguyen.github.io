@@ -18,7 +18,8 @@
     "baseUrl": ".",
     "paths": {
       "@dalenguyen/portfolio/*": ["apps/porfolio/*"],
-      "@dalenguyen/material": ["libs/material/src/index.ts"]
+      "@dalenguyen/material": ["libs/material/src/index.ts"],
+      "@dalenguyen/saas-libs": ["libs/saas-libs/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

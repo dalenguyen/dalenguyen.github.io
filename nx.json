@@ -38,6 +38,9 @@
     "saas-e2e": {
       "tags": [],
       "implicitDependencies": ["saas"]
+    },
+    "saas-libs": {
+      "tags": ["npm", "lib"]
     }
   }
 }
