@@ -12,7 +12,6 @@
     "build:portfolio": "ng build --project portfolio --base-href=/ --parallel",
     "libs:saas": "-------------------",
     "build:saas-libs": "nx build saas-libs",
-    "publish:saas-libs": "cd cd dist/libs/saas-libs && npm publish",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
