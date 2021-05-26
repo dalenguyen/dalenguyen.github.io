@@ -1,6 +1,8 @@
-# Angular SAAS Libs
+# Angular SAAS Libs (>= Angular v12)
 
 Components for building your Angular SaaS application.
+
+Demo: https://angular-saas.stackblitz.io
 
 ## Installing
 
@@ -22,7 +24,7 @@ export class AppModule {}
 
 ```
 
-## Using the table sample
+## Pricing Table Component
 
 ```javascript
 // app.component.html
@@ -65,3 +67,7 @@ onSelectedPlan($event: unknown) {
   console.log($event)
 }
 ```
+
+## Notes
+
+- This is an ongoing project. If you have any requests to create any SAAS components, feel free to create a ticket.

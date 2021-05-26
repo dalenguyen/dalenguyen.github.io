@@ -1,11 +1,26 @@
 {
   "name": "@dalenguyen/saas-libs",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "peerDependencies": {
     "@angular/common": "^12.0.1",
     "@angular/core": "^12.0.1"
   },
   "dependencies": {
     "tslib": "^2.1.0"
-  }
+  },
+  "keywords": [
+    "Angular",
+    "SaaS",
+    "Library"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dalenguyen/dalenguyen.github.io/issues"
+  },
+  "author": "Dale Nguyen <dale@dalenguyen.me> (http://dalenguyen.me)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dalenguyen/dalenguyen.github.io/issues"
+  },
+  "homepage": "https://github.com/dalenguyen/dalenguyen.github.io/tree/dev/libs/saas-libs#readme"
 }
