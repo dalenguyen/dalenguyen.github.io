@@ -3,12 +3,11 @@ import { BrowserModule } from '@angular/platform-browser'
 
 import { AppComponent } from './app.component'
 import { RouterModule } from '@angular/router'
-
-import { SaasLibsModule } from '@dalenguyen/saas-libs'
+import { SaasModule } from './shared/modules/saas.module'
 
 @NgModule({
   declarations: [AppComponent],
-  imports: [BrowserModule, SaasLibsModule, RouterModule.forRoot([], { initialNavigation: 'enabled' })],
+  imports: [BrowserModule, SaasModule, RouterModule.forRoot([], { initialNavigation: 'enabled' })],
   providers: [],
   bootstrap: [AppComponent],
 })
