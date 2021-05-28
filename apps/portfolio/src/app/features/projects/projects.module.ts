@@ -5,10 +5,11 @@ import { MapService } from './services/map.service';
 import { MapboxComponent } from './containers/mapbox/mapbox.component';
 import { LeafletComponent } from './containers/leaflet/leaflet.component';
 import { CountryDetailComponent } from './components/country-detail/country-detail.component';
+import { ProjectsComponent } from './containers/projects/projects.component';
 
 
 @NgModule({
-  declarations: [MapboxComponent, LeafletComponent, CountryDetailComponent],
+  declarations: [MapboxComponent, LeafletComponent, CountryDetailComponent, ProjectsComponent],
   imports: [
     CommonModule,
     ProjectsRoutingModule,
