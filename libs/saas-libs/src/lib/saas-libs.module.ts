@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core'
 import { CommonModule } from '@angular/common'
-import { PricingTableComponent } from './shared/components'
+import { PricingTableModule } from './shared/components/'
 
-const COMPONENTS = [PricingTableComponent]
+const MODULES = [PricingTableModule]
 @NgModule({
   imports: [CommonModule],
-  declarations: [...COMPONENTS],
-  exports: [...COMPONENTS],
+  declarations: [],
+  exports: [...MODULES],
 })
 export class SaasLibsModule {}

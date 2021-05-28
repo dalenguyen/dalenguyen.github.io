@@ -4,25 +4,22 @@ Components for building your Angular SaaS application.
 
 Demo: https://angular-saas.stackblitz.io
 
+## Architecture
+
+Here are some principles when building the library
+
+- Each component should be pure / presentation component - no side effects
+- SCAM (Single Component Angular Module) - only import the component / module that you need
+
 ## Installing
 
 ```
 npm i @dalenguyen/saas-libs
 ```
 
-## Import Saas Libs Module
+## List of modules
 
-```
-import { SaasLibsModule } from '@dalenguyen/saas-libs'
-
-@NgModule({
-  declarations: [AppComponent],
-  imports: [BrowserModule, SaasLibsModule],
-  bootstrap: [AppComponent],
-})
-export class AppModule {}
-
-```
+- PricingTableModule
 
 ## Pricing Table Component
 
