@@ -8,6 +8,7 @@
     "ng": "node --max-old-space-size=8192 ./node_modules/.bin/ng",
     "start": "ng serve",
     "start:saas": "ng serve --project saas",
+    "start:chat": "ng serve --project chat",
     "build": "ng build",
     "build:portfolio": "ng build --project portfolio --base-href=/ --parallel",
     "libs:saas": "-------------------",

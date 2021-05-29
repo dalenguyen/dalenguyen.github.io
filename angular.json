@@ -322,6 +322,118 @@
           }
         }
       }
+    },
+    "chat": {
+      "projectType": "application",
+      "root": "apps/chat",
+      "sourceRoot": "apps/chat/src",
+      "prefix": "dalenguyen",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/apps/chat",
+            "index": "apps/chat/src/index.html",
+            "main": "apps/chat/src/main.ts",
+            "polyfills": "apps/chat/src/polyfills.ts",
+            "tsConfig": "apps/chat/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": ["apps/chat/src/favicon.ico", "apps/chat/src/assets"],
+            "styles": ["apps/chat/src/styles.scss"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/chat/src/environments/environment.ts",
+                  "with": "apps/chat/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "chat:build:production"
+            },
+            "development": {
+              "browserTarget": "chat:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "chat:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/chat/src/**/*.ts", "apps/chat/src/**/*.html"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/chat"],
+          "options": {
+            "jestConfig": "apps/chat/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "chat-e2e": {
+      "root": "apps/chat-e2e",
+      "sourceRoot": "apps/chat-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/chat-e2e/cypress.json",
+            "tsConfig": "apps/chat-e2e/tsconfig.e2e.json",
+            "devServerTarget": "chat:serve:development"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "chat:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/chat-e2e/**/*.{js,ts}"]
+          }
+        }
+      }
     }
   }
 }

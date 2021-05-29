@@ -41,6 +41,13 @@
     },
     "saas-libs": {
       "tags": ["npm", "lib"]
+    },
+    "chat": {
+      "tags": []
+    },
+    "chat-e2e": {
+      "tags": [],
+      "implicitDependencies": ["chat"]
     }
   }
 }
