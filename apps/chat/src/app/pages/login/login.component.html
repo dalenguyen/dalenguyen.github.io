@@ -1,0 +1,11 @@
+<div class="container">
+  <div class="form-wrapper">
+    <h2>Login</h2>
+    <form [formGroup]="loginForm" (submit)="submit()" novalidate>
+      <input type="email" name="email" id="email-input" formControlName="email" placeholder="" />
+      <input type="password" name="password" id="password-input" formControlName="password" placeholder="" />
+      <button type="submit" [disabled]="!loginForm.valid">Login</button>
+    </form>
+    <small><a routerLink="/signup">Need an Account?</a></small>
+  </div>
+</div>
