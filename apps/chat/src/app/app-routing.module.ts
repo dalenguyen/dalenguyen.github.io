@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core'
 import { RouterModule, Routes } from '@angular/router'
 import { LoginComponent } from './pages/login/login.component'
+import { SignupComponent } from './pages/signup/signup.component'
 
 const routes: Routes = [
   { path: '', pathMatch: 'full', redirectTo: '/login' },
@@ -10,7 +11,7 @@ const routes: Routes = [
   },
   {
     path: 'signup',
-    component: LoginComponent,
+    component: SignupComponent,
   },
   {
     path: '**',
