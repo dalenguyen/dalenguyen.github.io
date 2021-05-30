@@ -1,1 +1,10 @@
-<p>chat-input works!</p>
+<div class="new-message-wrapper">
+  <input
+    type="text"
+    [(ngModel)]="newMessageText"
+    placeholder="Enter new message"
+    (keyup.enter)="onSubmit(newMessage.value)"
+    #newMessage
+  />
+  <button type="submit" (click)="onSubmit(newMessage.value)" [disabled]="newMessage.value === ''">Submit</button>
+</div>
