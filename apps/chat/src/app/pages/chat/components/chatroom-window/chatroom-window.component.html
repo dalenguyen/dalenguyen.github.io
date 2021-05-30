@@ -1,1 +1,9 @@
-<p>chatroom-window works!</p>
+<div class="chat-window">
+  <dalenguyen-chatroom-title-bar [title]="'Cat Facts'"></dalenguyen-chatroom-title-bar>
+  <div class="message-wrapper">
+    <ng-container *ngFor="let message of dummyData">
+      <dalenguyen-chat-message [message]="message"></dalenguyen-chat-message>
+    </ng-container>
+  </div>
+  <dalenguyen-chat-input></dalenguyen-chat-input>
+</div>
