@@ -1,6 +1,6 @@
 <div class="container">
   <div class="form-wrapper">
-    <h2>Signup</h2>
+    <h2>Sign Up</h2>
     <form [formGroup]="signupForm" (submit)="submit()" novalidate>
       <div class="name-wrapper">
         <input type="text" id="first-name-input" placeholder="First Name" formControlName="firstName" />
@@ -9,7 +9,7 @@
       <input type="email" id="email-input" formControlName="email" placeholder="Enter Email" />
       <input type="password" id="password-input" formControlName="password" placeholder="Enter password" />
       <br />
-      <button type="submit" [disabled]="!signupForm.valid">Signup</button>
+      <button type="submit" [disabled]="!signupForm.valid">Submit</button>
     </form>
     <small><a routerLink="/login">Already have an Account?</a></small>
   </div>

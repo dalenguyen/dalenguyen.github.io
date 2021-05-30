@@ -1,0 +1,18 @@
+<nav class="navbar">
+  <div class="container">
+    <span>ChatApp</span>
+    <div class="page-links">
+      <ul *ngIf="false; else loggedOut">
+        <li><a routerLink="/chat" routerLinkActive="active">Chat rooms</a></li>
+        <li><a routerLink="/login">Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<ng-template #loggedOut>
+  <ul>
+    <li><a routerLink="/login" routerLinkActive="active">Log In</a></li>
+    <li><a routerLink="/signup">Sign Up</a></li>
+  </ul>
+</ng-template>
