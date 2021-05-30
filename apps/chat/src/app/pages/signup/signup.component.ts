@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
+import { Alert } from '../../classes'
+import { AlertType } from '../../enums'
+import { AlertService } from '../../services'
 
 @Component({
   selector: 'dalenguyen-signup',
@@ -14,14 +17,19 @@ export class SignupComponent implements OnInit {
     password: ['', [Validators.required, Validators.minLength(8)]],
   })
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private alertService: AlertService) {}
 
   ngOnInit(): void {}
 
   submit() {
     // TODO: call the auth service
-    const { firstName, lastName, email, password } = this.signupForm.value
+    if (this.signupForm.valid) {
+      const { firstName, lastName, email, password } = this.signupForm.value
 
-    console.table({ firstName, lastName, email, password })
+      console.table({ firstName, lastName, email, password })
+    } else {
+      const failedSignedUpAlert = new Alert('Please enter a valid name, email & password, try again', AlertType.Danger)
+      this.alertService.alerts.next(failedSignedUpAlert)
+    }
   }
 }

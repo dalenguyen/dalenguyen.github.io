@@ -1,2 +1,7 @@
 <dalenguyen-navbar></dalenguyen-navbar>
+<div class="alert-wrapper">
+  <dalenguyen-alert *ngFor="let alert of alerts" [type]="alert.type" [dismissOnTimeout]="5000">
+    {{ alert.text }}
+  </dalenguyen-alert>
+</div>
 <router-outlet></router-outlet>

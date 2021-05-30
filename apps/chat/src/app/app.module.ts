@@ -13,6 +13,8 @@ import { ChatroomListComponent } from './pages/chat/components/chatroom-list/cha
 import { ChatroomTitleBarComponent } from './pages/chat/components/chatroom-title-bar/chatroom-title-bar.component'
 import { ChatroomWindowComponent } from './pages/chat/components/chatroom-window/chatroom-window.component'
 import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-message.component'
+import { AlertService } from './services';
+import { AlertComponent } from './components/alert/alert.component'
 
 @NgModule({
   declarations: [
@@ -26,9 +28,10 @@ import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-
     ChatroomTitleBarComponent,
     ChatroomWindowComponent,
     ChatMessageComponent,
+    AlertComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule],
-  providers: [],
+  providers: [AlertService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
