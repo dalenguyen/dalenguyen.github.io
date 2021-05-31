@@ -16,6 +16,10 @@ import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-
 import { AlertService } from './services'
 import { AlertComponent } from './components/alert/alert.component'
 import { AuthGuard } from './guards/auth.guard'
+import { environment } from '../environments/environment'
+import { AngularFireModule } from '@angular/fire'
+import { AngularFirestoreModule } from '@angular/fire/firestore'
+import { AngularFireStorageModule } from '@angular/fire/storage'
 
 @NgModule({
   declarations: [
@@ -31,7 +35,16 @@ import { AuthGuard } from './guards/auth.guard'
     ChatMessageComponent,
     AlertComponent,
   ],
-  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    FormsModule,
+    AngularFireModule.initializeApp(environment.firebase),
+    // AngularFirestoreModule,
+    // AngularFireStorageModule,
+    // AngularFireAuthModule
+  ],
   providers: [AlertService, AuthGuard],
   bootstrap: [AppComponent],
 })
