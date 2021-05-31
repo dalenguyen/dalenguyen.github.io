@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { FormBuilder, Validators } from '@angular/forms'
 import { Alert } from '../../classes'
 import { AlertType } from '../../enums'
-import { AlertService } from '../../services'
+import { AlertService, LoadingService } from '../../services'
 
 @Component({
   selector: 'dalenguyen-login',
@@ -15,18 +15,23 @@ export class LoginComponent implements OnInit {
     password: ['', [Validators.required, Validators.minLength(8)]],
   })
 
-  constructor(private fb: FormBuilder, private alertService: AlertService) {}
+  constructor(private fb: FormBuilder, private alertService: AlertService, private loadingService: LoadingService) {}
 
   ngOnInit(): void {}
 
   submit() {
+    this.loadingService.isLoading.next(true)
     // TODO: call the auth service
     if (this.loginForm.valid) {
       const { email, password } = this.loginForm.value
       console.table({ email, password })
+      this.loadingService.isLoading.next(false)
     } else {
       const failedLoginAlert = new Alert('Your email or password were invalid, try again', AlertType.Danger)
-      this.alertService.alerts.next(failedLoginAlert)
+      setTimeout(() => {
+        this.alertService.alerts.next(failedLoginAlert)
+        this.loadingService.isLoading.next(false)
+      }, 2000)
     }
   }
 }

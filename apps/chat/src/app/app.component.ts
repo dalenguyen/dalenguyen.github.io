@@ -1,20 +1,38 @@
-import { Component, OnInit } from '@angular/core'
+import { Component, OnDestroy, OnInit } from '@angular/core'
+import { Subscription } from 'rxjs'
 import { Alert } from './classes'
-import { AlertService } from './services'
+import { AlertService, LoadingService } from './services'
 
 @Component({
   selector: 'dalenguyen-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   alerts: Alert[] = []
+  loading = false
 
-  constructor(private alertService: AlertService) {}
+  protected subscriptions: Subscription[] = []
+
+  constructor(private alertService: AlertService, private loadingService: LoadingService) {}
 
   ngOnInit(): void {
-    this.alertService.alerts.subscribe((alert) => {
-      this.alerts.push(alert)
-    })
+    this.subscriptions.push(
+      this.alertService.alerts.subscribe((alert) => {
+        this.alerts.push(alert)
+      }),
+    )
+
+    this.subscriptions.push(
+      this.loadingService.isLoading.subscribe((isLoading) => {
+        console.log({ isLoading })
+
+        this.loading = isLoading
+      }),
+    )
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.forEach((sub) => sub.unsubscribe())
   }
 }
