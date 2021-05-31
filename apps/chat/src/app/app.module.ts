@@ -13,8 +13,9 @@ import { ChatroomListComponent } from './pages/chat/components/chatroom-list/cha
 import { ChatroomTitleBarComponent } from './pages/chat/components/chatroom-title-bar/chatroom-title-bar.component'
 import { ChatroomWindowComponent } from './pages/chat/components/chatroom-window/chatroom-window.component'
 import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-message.component'
-import { AlertService } from './services';
+import { AlertService } from './services'
 import { AlertComponent } from './components/alert/alert.component'
+import { AuthGuard } from './guards/auth.guard'
 
 @NgModule({
   declarations: [
@@ -31,7 +32,7 @@ import { AlertComponent } from './components/alert/alert.component'
     AlertComponent,
   ],
   imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule],
-  providers: [AlertService],
+  providers: [AlertService, AuthGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
