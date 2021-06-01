@@ -19,6 +19,8 @@ export class AuthGuard implements CanActivate {
       take(1),
       map((currentUser) => !!currentUser),
       tap((loggedIn) => {
+        console.log({ loggedIn })
+
         if (!loggedIn) {
           this.alertService.alerts.next(new Alert('You must login to access this page.', AlertType.Danger))
           this.router.navigate(['/login'], { queryParams: { returnUrl: state.url } })

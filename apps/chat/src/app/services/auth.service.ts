@@ -62,8 +62,12 @@ export class AuthService {
   }
 
   login(email: string, password: string): Observable<boolean> {
-    // TODO call firebase login function
-    return of(true)
+    return from(
+      this.afAuth
+        .signInWithEmailAndPassword(email, password)
+        .then((result) => true)
+        .catch((err) => false),
+    )
   }
 
   logOut(): void {
