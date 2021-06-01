@@ -13,7 +13,7 @@ import { ChatroomListComponent } from './pages/chat/components/chatroom-list/cha
 import { ChatroomTitleBarComponent } from './pages/chat/components/chatroom-title-bar/chatroom-title-bar.component'
 import { ChatroomWindowComponent } from './pages/chat/components/chatroom-window/chatroom-window.component'
 import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-message.component'
-import { AlertService } from './services'
+import { AlertService, ChatroomService } from './services'
 import { AlertComponent } from './components/alert/alert.component'
 import { AuthGuard } from './guards/auth.guard'
 import { environment } from '../environments/environment'
@@ -45,7 +45,7 @@ import { AngularFireStorageModule } from '@angular/fire/storage'
     // AngularFireStorageModule,
     // AngularFireAuthModule
   ],
-  providers: [AlertService, AuthGuard],
+  providers: [AlertService, AuthGuard, ChatroomService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

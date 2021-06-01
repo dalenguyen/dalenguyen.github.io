@@ -1,5 +1,7 @@
 <div class="chatroom-list">
-  <ng-container *ngFor="let room of [1, 2]">
-    <div class="chatroom-list__item">Chat room # {{ room }}</div>
+  <ng-container *ngFor="let chatroom of chatroomService.chatrooms$ | async">
+    <div class="chatroom-list__item">
+      <a [routerLink]="['/chat', chatroom.id]">{{ chatroom.name }}</a>
+    </div>
   </ng-container>
 </div>

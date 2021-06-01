@@ -1,9 +1,17 @@
 <div class="chat-window">
-  <dalenguyen-chatroom-title-bar [title]="'Cat Facts'"></dalenguyen-chatroom-title-bar>
+  <ng-container *ngIf="!chatroom; else chatMessages">
+    <div class="select-room">
+      <div class="select-room__message">Select a Room</div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #chatMessages>
+  <dalenguyen-chatroom-title-bar [title]="chatroom.name"></dalenguyen-chatroom-title-bar>
   <div class="message-wrapper">
     <ng-container *ngFor="let message of dummyData">
       <dalenguyen-chat-message [message]="message"></dalenguyen-chat-message>
     </ng-container>
   </div>
   <dalenguyen-chat-input></dalenguyen-chat-input>
-</div>
+</ng-template>
