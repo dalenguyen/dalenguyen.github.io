@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core'
 import { AngularFirestore } from '@angular/fire/firestore'
 import { BehaviorSubject, Observable, of } from 'rxjs'
 import { switchMap } from 'rxjs/operators'
-import { Chatroom } from '../classes'
+import { Chatroom, Message } from '../classes'
 import { LoadingService } from './loading.service'
 
 @Injectable({
@@ -13,7 +13,7 @@ export class ChatroomService {
 
   changeChatroom$: BehaviorSubject<string> = new BehaviorSubject('')
   selectedChatroom$: Observable<Chatroom | null | undefined>
-  selectedChatroomMessages$!: Observable<any>
+  selectedChatroomMessages$!: Observable<Message[]>
 
   constructor(private db: AngularFirestore, private loadingService: LoadingService) {
     this.selectedChatroom$ = this.changeChatroom$.pipe(
@@ -23,6 +23,16 @@ export class ChatroomService {
           return db.doc<Chatroom>(`chatrooms/${chatroomId}`).valueChanges()
         }
         return of(null)
+      }),
+    )
+
+    this.selectedChatroomMessages$ = this.changeChatroom$.pipe(
+      switchMap((chatroomId) => {
+        if (chatroomId !== '') {
+          this.loadingService.isLoading.next(true)
+          return db.collection<Message>(`chatrooms/${chatroomId}/messages`).valueChanges()
+        }
+        return of([])
       }),
     )
   }

@@ -10,7 +10,7 @@ import { AlertService, LoadingService } from './services'
 })
 export class AppComponent implements OnInit, OnDestroy {
   alerts: Alert[] = []
-  loading = false
+  loading$ = this.loadingService.isLoading
 
   protected subscriptions: Subscription[] = []
 
@@ -20,14 +20,6 @@ export class AppComponent implements OnInit, OnDestroy {
     this.subscriptions.push(
       this.alertService.alerts.subscribe((alert) => {
         this.alerts.push(alert)
-      }),
-    )
-
-    this.subscriptions.push(
-      this.loadingService.isLoading.subscribe((isLoading) => {
-        console.log({ isLoading })
-
-        this.loading = isLoading
       }),
     )
   }

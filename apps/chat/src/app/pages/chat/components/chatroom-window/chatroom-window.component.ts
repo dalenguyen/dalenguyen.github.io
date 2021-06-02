@@ -3,27 +3,16 @@ import { ActivatedRoute } from '@angular/router'
 import { Chatroom } from 'apps/chat/src/app/classes'
 import { ChatroomService, LoadingService } from 'apps/chat/src/app/services'
 import { Subscription } from 'rxjs'
-import { Message } from '../../../../classes/message'
+
 @Component({
   selector: 'dalenguyen-chatroom-window',
   templateUrl: './chatroom-window.component.html',
   styleUrls: ['./chatroom-window.component.scss'],
 })
 export class ChatroomWindowComponent implements OnInit, OnDestroy {
-  // TODO: replace with firebase data
   chatroom!: Chatroom
 
-  dummyData: Message[] = [
-    {
-      message: 'asdf',
-      createdAt: new Date().toDateString(),
-      sender: {
-        firstName: 'steve',
-        lastName: 'smith',
-        photoUrl: 'https://via.placeholder.com/150x150',
-      },
-    },
-  ]
+  messages$ = this.chatroomService.selectedChatroomMessages$
 
   protected subscriptions: Subscription[] = []
   constructor(

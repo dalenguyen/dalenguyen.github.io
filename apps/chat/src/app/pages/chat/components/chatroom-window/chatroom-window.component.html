@@ -9,7 +9,7 @@
 <ng-template #chatMessages>
   <dalenguyen-chatroom-title-bar [title]="chatroom.name"></dalenguyen-chatroom-title-bar>
   <div class="message-wrapper">
-    <ng-container *ngFor="let message of dummyData">
+    <ng-container *ngFor="let message of messages$ | async">
       <dalenguyen-chat-message [message]="message"></dalenguyen-chat-message>
     </ng-container>
   </div>

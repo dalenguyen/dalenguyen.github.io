@@ -4,5 +4,5 @@
     {{ alert.text }}
   </dalenguyen-alert>
 </div>
-<div class="loading" *ngIf="loading">Loading...</div>
+<div class="loading" *ngIf="loading$ | async">Loading...</div>
 <router-outlet></router-outlet>
