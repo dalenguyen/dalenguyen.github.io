@@ -4,7 +4,7 @@ import { from, Observable, of } from 'rxjs'
 import { Alert, User } from '../classes'
 import { AlertService } from './alert.service'
 import { AngularFireAuth } from '@angular/fire/auth'
-import { AngularFirestore, AngularFirestoreDocument, AngularFirestoreCollection } from '@angular/fire/firestore'
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
 import { switchMap } from 'rxjs/operators'
 
 @Injectable({
@@ -12,6 +12,7 @@ import { switchMap } from 'rxjs/operators'
 })
 export class AuthService {
   currentUser$: Observable<User | null | undefined>
+  currentUserSnapshot: User | null | undefined
 
   constructor(
     private router: Router,
@@ -19,7 +20,6 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private db: AngularFirestore,
   ) {
-    // TODO: fetch the user from Firebase
     this.currentUser$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
@@ -31,6 +31,8 @@ export class AuthService {
         return of(null)
       }),
     )
+
+    this.setCurrentUserSnapshot()
   }
 
   signUp(firstName: string, lastName: string, email: string, password: string): Observable<boolean> {
@@ -75,5 +77,9 @@ export class AuthService {
       this.router.navigate(['/login'])
       this.alertService.alerts.next(new Alert('You have been signed out.'))
     })
+  }
+
+  setCurrentUserSnapshot() {
+    this.currentUser$.subscribe((user) => (this.currentUserSnapshot = user))
   }
 }
