@@ -47,13 +47,15 @@ export class AuthService {
           if (result?.user) {
             const userRef: AngularFirestoreDocument<User> = this.db.doc(`users/${result.user.uid}`)
             const updatedUser = {
-              id: result.user?.uid,
-              email: result.user?.email,
+              id: result.user.uid,
+              email: result.user.email as string,
               firstName,
               lastName,
               photoUrl:
                 'https://firebasestorage.googleapis.com/v0/b/dn-demo-chat.appspot.com/o/default-profile-pic.jpg?alt=media&token=6146f6e4-f65c-4af8-8c7c-2c76d7444b43',
-            }
+              quote: 'Life is a box of  chocolates',
+              bio: 'Bio is under construction',
+            } as User
             userRef.set(updatedUser, { merge: true })
             return true
           }

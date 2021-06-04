@@ -2,8 +2,9 @@
   <div class="container">
     <span>ChatApp</span>
     <div class="page-links">
-      <ul *ngIf="auth.currentUser$ | async; else loggedOut">
+      <ul *ngIf="auth.currentUser$ | async as currentUser; else loggedOut">
         <li><a routerLink="/chat" routerLinkActive="active">Chat rooms</a></li>
+        <li><a [routerLink]="'/profile/' + currentUser.id" routerLinkActive="active">Profile</a></li>
         <li><a (click)="auth.logOut()">Logout</a></li>
       </ul>
     </div>

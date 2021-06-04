@@ -1,0 +1,23 @@
+<div class="profile">
+  <div *ngIf="user; else noPhoto" class="profile__picture">
+    <img [src]="user?.photoUrl" alt="profile-pic" />
+  </div>
+  <div class="name">{{ user?.firstName }} {{ user?.lastName }}</div>
+  <div class="quote">
+    <blockquote>"{{ user?.quote }}"</blockquote>
+  </div>
+  <div class="bio">
+    {{ user?.bio }}
+  </div>
+  <ng-container *ngIf="currentUser$ | async as currentUser">
+    <div *ngIf="user?.id === currentUser?.id">
+      <div class="edit">
+        <button [routerLink]="'/profile/' + currentUser?.id + '/edit'">Edit Profile</button>
+      </div>
+    </div>
+  </ng-container>
+</div>
+
+<ng-template #noPhoto>
+  <div class="no-photo">No Photo</div>
+</ng-template>
