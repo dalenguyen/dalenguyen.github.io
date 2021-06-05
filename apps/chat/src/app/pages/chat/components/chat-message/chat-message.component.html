@@ -1,5 +1,7 @@
 <div class="chat-message">
-  <img [src]="message.sender.photoUrl" alt="Avatar" />
+  <div class="image-wraper" [routerLink]="'/profile/' + message.sender.id">
+    <img [src]="message.sender.photoUrl" alt="Avatar" />
+  </div>
   <div>
     <div class="name">{{ message.sender.firstName }} {{ message.sender.lastName }}</div>
     <small class="timestamp">{{ message.createdAt | date: 'medium' }}</small>
