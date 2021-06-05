@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { ChatroomService } from 'apps/chat/src/app/services'
+import { ChatroomService } from 'apps/chat/src/app/core/services'
 
 @Component({
   selector: 'dalenguyen-chat-input',

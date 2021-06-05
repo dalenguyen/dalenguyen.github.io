@@ -7,6 +7,7 @@ export const environment = {
   firebase: {
     apiKey: 'AIzaSyCksJsXSN6lLgphLmy5bCKzMnODdhXuij0',
     authDomain: 'dn-demo-chat.firebaseapp.com',
+    // databaseURL: 'https://dn-demo-chat.firebaseio.com',
     projectId: 'dn-demo-chat',
     storageBucket: 'dn-demo-chat.appspot.com',
     messagingSenderId: '742571455480',

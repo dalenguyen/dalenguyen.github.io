@@ -3,8 +3,8 @@ import { FormBuilder, Validators } from '@angular/forms'
 import { ActivatedRoute, Router } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { Alert } from '../../classes'
+import { AlertService, AuthService, LoadingService } from '../../core/services'
 import { AlertType } from '../../enums'
-import { AlertService, AuthService, LoadingService } from '../../services'
 
 @Component({
   selector: 'dalenguyen-login',

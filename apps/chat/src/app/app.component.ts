@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core'
 import { Subscription } from 'rxjs'
 import { Alert } from './classes'
-import { AlertService, LoadingService } from './services'
+import { AlertService, LoadingService } from './core/services'
 
 @Component({
   selector: 'dalenguyen-root',

@@ -5,9 +5,9 @@ import { ActivatedRoute } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { Alert, User } from '../../classes'
 import { AlertType } from '../../enums'
-import { AlertService, AuthService, LoadingService } from '../../services'
 import { Location } from '@angular/common'
 import { finalize, switchMap } from 'rxjs/operators'
+import { AlertService, AuthService, LoadingService } from '../../core/services'
 
 @Component({
   selector: 'dalenguyen-edit-profile',

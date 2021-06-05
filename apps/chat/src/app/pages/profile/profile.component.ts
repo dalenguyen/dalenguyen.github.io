@@ -3,7 +3,7 @@ import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firest
 import { ActivatedRoute } from '@angular/router'
 import { Subscription } from 'rxjs'
 import { User } from '../../classes'
-import { AuthService, LoadingService } from '../../services'
+import { AuthService, LoadingService } from '../../core/services'
 
 @Component({
   selector: 'dalenguyen-profile',

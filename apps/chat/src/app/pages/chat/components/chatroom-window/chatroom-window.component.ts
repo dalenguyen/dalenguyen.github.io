@@ -1,7 +1,8 @@
 import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core'
+import { AngularFirestore } from '@angular/fire/firestore'
 import { ActivatedRoute } from '@angular/router'
 import { Chatroom } from 'apps/chat/src/app/classes'
-import { ChatroomService } from 'apps/chat/src/app/services'
+import { ChatroomService } from 'apps/chat/src/app/core/services'
 import { Subscription } from 'rxjs'
 
 @Component({
@@ -17,7 +18,7 @@ export class ChatroomWindowComponent implements OnInit, OnDestroy, AfterViewChec
 
   protected subscriptions: Subscription[] = []
 
-  constructor(private route: ActivatedRoute, private chatroomService: ChatroomService) {
+  constructor(private route: ActivatedRoute, private chatroomService: ChatroomService, private db: AngularFirestore) {
     this.subscriptions.push(
       this.chatroomService.selectedChatroom$.subscribe((chatroom) => {
         this.chatroom = chatroom as Chatroom
@@ -34,6 +35,13 @@ export class ChatroomWindowComponent implements OnInit, OnDestroy, AfterViewChec
 
   ngOnInit(): void {
     this.scrollToBottom()
+
+    this.db
+      .doc(`users/I3GmCns8QeMK9THhCZ03dgsiXfP2`)
+      .valueChanges()
+      .subscribe((test) => {
+        console.log(test)
+      })
   }
 
   ngAfterViewChecked(): void {

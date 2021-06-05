@@ -1,11 +1,11 @@
 import { Injectable } from '@angular/core'
 import { Router } from '@angular/router'
 import { from, Observable, of } from 'rxjs'
-import { Alert, User } from '../classes'
 import { AlertService } from './alert.service'
 import { AngularFireAuth } from '@angular/fire/auth'
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore'
-import { switchMap } from 'rxjs/operators'
+import { catchError, exhaustMap, mergeMap, switchMap } from 'rxjs/operators'
+import { Alert, User } from '../../classes'
 
 @Injectable({
   providedIn: 'root',
@@ -20,17 +20,35 @@ export class AuthService {
     private afAuth: AngularFireAuth,
     private db: AngularFirestore,
   ) {
+    // this.currentUser$ = this.afAuth.user.pipe(
+    //   switchMap((user) => {
+    //     if (user) {
+    //       console.log(user)
+    //       console.log(`users/${user.uid}`)
+    //       // force token to be refresh
+    //       user.getIdToken(true)
+    //       return this.db.doc<User>(`users/${user.uid}`).valueChanges()
+    //     }
+    //     return of(null)
+    //   }),
+    //   // mergeMap((u) => (u ? this.db.doc<User>(`users/${u.uid}`).valueChanges() : of(null))),
+    // )
+
     this.currentUser$ = this.afAuth.authState.pipe(
       switchMap((user) => {
         if (user) {
-          console.log(user)
-          console.log(`users/${user.uid}`)
-
+          // force token to be refresh
+          user.getIdToken(true)
           return this.db.doc<User>(`users/${user.uid}`).valueChanges()
+        } else {
+          return of(null)
         }
-        return of(null)
       }),
     )
+
+    // firebase.auth.onAuthStateChanged((user) => {
+    //   console.log(user)
+    // })
 
     this.setCurrentUserSnapshot()
   }

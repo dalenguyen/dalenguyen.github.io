@@ -3,8 +3,8 @@ import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTr
 import { Observable } from 'rxjs'
 import { Alert } from '../classes'
 import { AlertType } from '../enums'
-import { AlertService, AuthService } from '../services'
 import { map, tap, take } from 'rxjs/operators'
+import { AlertService, AuthService } from '../core/services'
 
 @Injectable({
   providedIn: 'root',

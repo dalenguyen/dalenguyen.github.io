@@ -3,7 +3,7 @@ import { AngularFireAuth } from '@angular/fire/auth'
 import { AngularFirestore } from '@angular/fire/firestore'
 import { BehaviorSubject, Observable, of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
-import { Chatroom, Message } from '../classes'
+import { Chatroom, Message } from '../../classes'
 import { AuthService } from './auth.service'
 
 @Injectable({

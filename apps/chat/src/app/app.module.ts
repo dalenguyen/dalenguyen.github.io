@@ -13,15 +13,11 @@ import { ChatroomListComponent } from './pages/chat/components/chatroom-list/cha
 import { ChatroomTitleBarComponent } from './pages/chat/components/chatroom-title-bar/chatroom-title-bar.component'
 import { ChatroomWindowComponent } from './pages/chat/components/chatroom-window/chatroom-window.component'
 import { ChatMessageComponent } from './pages/chat/components/chat-message/chat-message.component'
-import { AlertService, ChatroomService } from './services'
 import { AlertComponent } from './components/alert/alert.component'
 import { AuthGuard } from './guards/auth.guard'
-import { environment } from '../environments/environment'
-import { AngularFireModule } from '@angular/fire'
-import { AngularFirestoreModule } from '@angular/fire/firestore'
-import { AngularFireStorageModule } from '@angular/fire/storage'
 import { ProfileComponent } from './pages/profile/profile.component'
 import { EditProfileComponent } from './pages/edit-profile/edit-profile.component'
+import { CoreModule } from './core/core.module'
 
 @NgModule({
   declarations: [
@@ -39,17 +35,8 @@ import { EditProfileComponent } from './pages/edit-profile/edit-profile.componen
     ProfileComponent,
     EditProfileComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    ReactiveFormsModule,
-    FormsModule,
-    AngularFireModule.initializeApp(environment.firebase),
-    // AngularFirestoreModule,
-    // AngularFireStorageModule,
-    // AngularFireAuthModule
-  ],
-  providers: [AlertService, AuthGuard, ChatroomService],
+  imports: [BrowserModule, AppRoutingModule, ReactiveFormsModule, FormsModule, CoreModule],
+  providers: [AuthGuard],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

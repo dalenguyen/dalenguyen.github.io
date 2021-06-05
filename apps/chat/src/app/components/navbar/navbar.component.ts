@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core'
-import { AuthService } from '../../services'
+import { AuthService } from '../../core/services'
 
 @Component({
   selector: 'dalenguyen-navbar',
