@@ -19,8 +19,9 @@ import { AuthGuard } from './guards/auth.guard'
 import { environment } from '../environments/environment'
 import { AngularFireModule } from '@angular/fire'
 import { AngularFirestoreModule } from '@angular/fire/firestore'
-import { AngularFireStorageModule } from '@angular/fire/storage';
+import { AngularFireStorageModule } from '@angular/fire/storage'
 import { ProfileComponent } from './pages/profile/profile.component'
+import { EditProfileComponent } from './pages/edit-profile/edit-profile.component'
 
 @NgModule({
   declarations: [
@@ -36,6 +37,7 @@ import { ProfileComponent } from './pages/profile/profile.component'
     ChatMessageComponent,
     AlertComponent,
     ProfileComponent,
+    EditProfileComponent,
   ],
   imports: [
     BrowserModule,

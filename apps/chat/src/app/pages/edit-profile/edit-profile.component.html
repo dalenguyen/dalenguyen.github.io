@@ -1,0 +1,30 @@
+<div class="container">
+  <div *ngIf="currentUser; else noPhoto">
+    <img *ngIf="!downloadUrl" [src]="currentUser.photoUrl" alt="profile-pic" class="profile-pic" />
+    <img *ngIf="downloadUrl && downloadUrl.length > 0" [src]="downloadUrl" alt="profile-pic" class="profile-pic" />
+  </div>
+  <div *ngIf="currentUser">
+    <div>
+      <input type="file" name="photo" (change)="uploadFile($event)" />
+    </div>
+    <div>
+      <input type="text" [(ngModel)]="currentUser.firstName" />
+    </div>
+    <div>
+      <input type="text" [(ngModel)]="currentUser.lastName" />
+    </div>
+    <div class="quote">
+      <input type="text" [(ngModel)]="currentUser.quote" />
+    </div>
+    <div class="bio">
+      <textarea rows="5" [(ngModel)]="currentUser.bio"></textarea>
+    </div>
+    <div>
+      <button type="submit" (click)="save()">Save</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #noPhoto>
+  <div class="no-photo">No Photo</div>
+</ng-template>
