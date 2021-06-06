@@ -1,8 +1,8 @@
-<nav class="navbar">
-  <div class="container">
+<nav class="navbar bg-gray-800 py-4 px-2 w-full">
+  <div class="text-white flex items-center justify-between">
     <span>ChatApp</span>
     <div class="page-links">
-      <ul *ngIf="auth.currentUser$ | async as currentUser; else loggedOut">
+      <ul *ngIf="auth.currentUser$ | async as currentUser; else loggedOut" class="flex items-center space-x-4">
         <li><a routerLink="/chat" routerLinkActive="active">Chat rooms</a></li>
         <li><a [routerLink]="'/profile/' + currentUser.id" routerLinkActive="active">Profile</a></li>
         <li><a (click)="auth.logOut()">Logout</a></li>
