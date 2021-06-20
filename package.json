@@ -49,7 +49,7 @@
     "@sentry/browser": "^6.4.1",
     "@sentry/integrations": "^6.4.1",
     "buttercms": "^1.2.7",
-    "firebase": "^8.6.3",
+    "firebase": "8.6.1",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.2.0",
     "rxjs": "~6.6.0",

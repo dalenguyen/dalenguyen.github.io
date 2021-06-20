@@ -35,13 +35,6 @@ export class ChatroomWindowComponent implements OnInit, OnDestroy, AfterViewChec
 
   ngOnInit(): void {
     this.scrollToBottom()
-
-    this.db
-      .doc(`users/I3GmCns8QeMK9THhCZ03dgsiXfP2`)
-      .valueChanges()
-      .subscribe((test) => {
-        console.log(test)
-      })
   }
 
   ngAfterViewChecked(): void {
@@ -55,6 +48,8 @@ export class ChatroomWindowComponent implements OnInit, OnDestroy, AfterViewChec
   private scrollToBottom(): void {
     try {
       this.scrollContainer.nativeElement.scrollTop = this.scrollContainer.nativeElement.scrollHeight
-    } catch (error) {}
+    } catch (error) {
+      // console.log(error)
+    }
   }
 }
