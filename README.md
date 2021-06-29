@@ -16,6 +16,7 @@ Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The ap
 ```
 nx generate @nrwl/angular:app myApp
 nx generate @nrwl/angular:library mylibrary
+nx generate @nrwl/express:application <express-app>
 ```
 
 ## Update sentry

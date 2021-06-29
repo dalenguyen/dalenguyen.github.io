@@ -22,15 +22,25 @@
     }
   },
   "projects": {
+    "api-products": {
+      "tags": []
+    },
+    "chat": {
+      "tags": []
+    },
+    "chat-e2e": {
+      "tags": [],
+      "implicitDependencies": ["chat"]
+    },
+    "material": {
+      "tags": []
+    },
     "portfolio": {
       "tags": []
     },
     "portfolio-e2e": {
       "tags": [],
       "implicitDependencies": ["portfolio"]
-    },
-    "material": {
-      "tags": []
     },
     "saas": {
       "tags": []
@@ -41,13 +51,6 @@
     },
     "saas-libs": {
       "tags": ["npm", "lib"]
-    },
-    "chat": {
-      "tags": []
-    },
-    "chat-e2e": {
-      "tags": [],
-      "implicitDependencies": ["chat"]
     }
   }
 }
