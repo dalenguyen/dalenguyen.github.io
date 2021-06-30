@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@dalenguyen/material": ["libs/material/src/index.ts"],
+      "@dalenguyen/openai": ["libs/openai/src/index.ts"],
       "@dalenguyen/portfolio/*": ["apps/porfolio/*"],
       "@dalenguyen/saas-libs": ["libs/saas-libs/src/index.ts"]
     }

@@ -216,6 +216,38 @@
         }
       }
     },
+    "openai": {
+      "root": "libs/openai",
+      "sourceRoot": "libs/openai/src",
+      "projectType": "library",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["libs/openai/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/openai"],
+          "options": {
+            "jestConfig": "libs/openai/jest.config.js",
+            "passWithNoTests": true
+          }
+        },
+        "build": {
+          "builder": "@nrwl/node:package",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/libs/openai",
+            "tsConfig": "libs/openai/tsconfig.lib.json",
+            "packageJson": "libs/openai/package.json",
+            "main": "libs/openai/src/index.ts",
+            "assets": ["libs/openai/*.md"]
+          }
+        }
+      }
+    },
     "portfolio": {
       "projectType": "application",
       "root": "apps/portfolio",
