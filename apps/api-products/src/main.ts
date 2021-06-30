@@ -4,11 +4,24 @@
  */
 
 import * as express from 'express'
+import {OpenAI} from '@dalenguyen/openai'
+import { environment } from './environments/environment';
 
 const app = express()
 
-app.get('/api', (req, res) => {
-  res.send({ message: 'Welcome to api-products!!' })
+app.get('/api', async (req, res) => {
+  try {
+    console.log(`Get API`);
+
+    const openAI = new OpenAI(environment.openAIKey)
+    const list = await openAI.engines()
+    console.log(list);
+
+    res.send(list)
+  } catch (error) {
+    console.log(error)
+    res.send(error)
+  }
 })
 
 const port = process.env.port || 8080
