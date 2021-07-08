@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ListEngine, AnswerResponse, AnswerRequest } from '../models'
+import { ListEngine, AnswerResponse, AnswerRequest, ListFile } from '../models'
 
 export class OpenAI {
   protected apiKey: string
@@ -15,18 +15,16 @@ export class OpenAI {
         method,
         url,
         headers: {
-          'Authorization': `Bearer ${this.apiKey}`,
+          Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        data: data || ''
+        data: data || '',
       }
 
       const response = await axios(options)
 
       return response.data
     } catch (error) {
-      // console.log(`EWRRRO----`, error.response.status);
-      // console.log(`EWRRRO----`, error.response.data);
       throw new Error(error?.response?.data?.error?.message || error?.message || 'Something wrong happened!')
     }
   }
@@ -37,5 +35,9 @@ export class OpenAI {
 
   createAnswer(data: AnswerRequest): Promise<AnswerResponse> {
     return this.request<AnswerResponse>(`${this.baseUrl}/answers`, 'POST', data)
+  }
+
+  listFiles(): Promise<ListFile> {
+    return this.request<ListFile>(`${this.baseUrl}/files`, 'GET')
   }
 }

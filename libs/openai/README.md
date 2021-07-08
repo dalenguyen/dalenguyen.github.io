@@ -4,7 +4,7 @@ TypesScript library for OpenAI
 
 ## Getting started
 
-```
+```bash
 npm i @dalenguyen/openai
 
 OR
@@ -14,25 +14,26 @@ yarn add @dalenguyen/openai
 
 ## Usages
 
-```
+```javascript
 import { OpenAI } from '@dalenguyen/openai'
 const openAI = new OpenAI('OPENAI_API_KEY')
 ```
 
 ## Get Engines
 
-```
-openAI.engines()
-  .then(res => console.log(res))
-  .catch(error => console.error(error))
+```javascript
+openAI
+  .engines()
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
 ```
 
 ## Create Answer
 
-```
+```javascript
 import { AnswerRequest, EngineName, OpenAI } from '@dalenguyen/openai'
 
-... 
+...
 const question: AnswerRequest = {
   documents: [
     "Puppy A is happy.",
@@ -53,4 +54,13 @@ openAI.createAnswer(question)
   .then(res => console.log(res))
   .catch(error => console.error(error))
 
+```
+
+## List Files
+
+```javascript
+openAI
+  .listFiles()
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
 ```
