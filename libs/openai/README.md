@@ -64,3 +64,17 @@ openAI
   .then((res) => console.log(res))
   .catch((error) => console.error(error))
 ```
+
+## Upload File
+
+```javascript
+import { FilePurpose } from '@dalenguyen/openai'
+
+openAI
+  .uploadFile({
+    purpose: FilePurpose.Answers,
+    file: 'FILE_PATH',
+  })
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```

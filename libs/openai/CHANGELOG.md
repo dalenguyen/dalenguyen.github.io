@@ -17,3 +17,4 @@
 
 - added list files function
 - added retrieve file function
+- added upload file function

@@ -59,6 +59,7 @@
     "buttercms": "^1.2.7",
     "express": "4.17.1",
     "firebase": "8.6.1",
+    "form-data": "^4.0.0",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.2.0",
     "rxjs": "~6.6.0",
