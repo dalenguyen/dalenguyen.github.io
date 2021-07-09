@@ -15,4 +15,5 @@
 
 #### - :rocket: [New Feature]
 
-- added list files functions
+- added list files function
+- added retrieve file function

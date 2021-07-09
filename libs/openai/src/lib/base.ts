@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ListEngine, AnswerResponse, AnswerRequest, ListFile } from '../models'
+import { ListEngine, AnswerResponse, AnswerRequest, ListFile, File } from '../models'
 
 export class OpenAI {
   protected apiKey: string
@@ -39,5 +39,9 @@ export class OpenAI {
 
   listFiles(): Promise<ListFile> {
     return this.request<ListFile>(`${this.baseUrl}/files`, 'GET')
+  }
+
+  retrieveFile(fileId: string): Promise<File> {
+    return this.request<File>(`${this.baseUrl}/files/${fileId}`, 'GET')
   }
 }
