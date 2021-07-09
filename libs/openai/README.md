@@ -78,3 +78,12 @@ openAI
   .then((res) => console.log(res))
   .catch((error) => console.error(error))
 ```
+
+## Delete File
+
+```javascript
+openAI
+  .deleteFile(fileId)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```

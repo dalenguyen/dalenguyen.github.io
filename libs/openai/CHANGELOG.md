@@ -11,10 +11,11 @@
 
 ---
 
-## [0.1.0] - 2021-07-08
+## [0.1.0] - 2021-07-09
 
 #### - :rocket: [New Feature]
 
 - added list files function
 - added retrieve file function
 - added upload file function
+- added delete file function

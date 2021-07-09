@@ -36,3 +36,9 @@ export interface FileRequest {
    */
   purpose: FilePurpose
 }
+
+export interface FileDeleted {
+  id: string
+  object: 'file'
+  deleted: boolean
+}

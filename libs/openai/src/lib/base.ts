@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ListEngine, AnswerResponse, AnswerRequest, ListFile, File, FileRequest } from '../models'
+import { ListEngine, AnswerResponse, AnswerRequest, ListFile, File, FileRequest, FileDeleted } from '../models'
 import * as FormData from 'form-data'
 import * as fs from 'fs'
 
@@ -11,7 +11,11 @@ export class OpenAI {
     this.apiKey = apiKey
   }
 
-  private async request<T>(url: string, method: 'GET' | 'POST', data?: AnswerRequest | FileRequest): Promise<T> {
+  private async request<T>(
+    url: string,
+    method: 'GET' | 'POST' | 'DELETE',
+    data?: AnswerRequest | FileRequest,
+  ): Promise<T> {
     try {
       const options: AxiosRequestConfig = {
         method,
@@ -25,7 +29,7 @@ export class OpenAI {
 
       // TODO - better type checking for data
       // Upload file
-      if (data.file != null && data['purpose'] != null) {
+      if (data?.file != null && data?.['purpose'] != null) {
         const formData = new FormData()
         formData.append('purpose', data['purpose'])
         formData.append('file', fs.createReadStream(data.file))
@@ -66,5 +70,9 @@ export class OpenAI {
 
   uploadFile(data: FileRequest): Promise<File> {
     return this.request<File>(`${this.baseUrl}/files`, 'POST', data)
+  }
+
+  deleteFile(fileId: string): Promise<FileDeleted> {
+    return this.request<FileDeleted>(`${this.baseUrl}/files/${fileId}`, 'DELETE')
   }
 }
