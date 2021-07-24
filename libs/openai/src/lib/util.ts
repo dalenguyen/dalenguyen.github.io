@@ -9,10 +9,11 @@ export const text2JsonlFile = (text: string, filePath = 'converted.jsonl', purpo
   switch (purpose) {
     case FilePurpose.Answers:
       console.log(`Prepare for 'Answers' purpose`)
-      phrases = text.split('.')
+      phrases = text.replace(/"|“|”/g, "'").split(/\r|\n|\./)
+
       phrases.forEach((item) => {
         if (item.trim() !== '') {
-          const sentence = `{"text": ${item.trim()}}`
+          const sentence = `{"text": "${item.trim()}"}`
           stream.write(sentence + '\n')
         }
       })

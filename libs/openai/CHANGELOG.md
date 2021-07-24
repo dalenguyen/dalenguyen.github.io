@@ -11,6 +11,12 @@
 
 ---
 
+## [0.2.1] - 2021-07-24
+
+#### - :nail_care: [Polish]
+
+- Replaced double quotes & next line
+
 ## [0.2.0] - 2021-07-23
 
 #### - :rocket: [New Feature]
