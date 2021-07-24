@@ -11,6 +11,12 @@
 
 ---
 
+## [0.2.0] - 2021-07-23
+
+#### - :rocket: [New Feature]
+
+- added text 2 jsonl conversion
+
 ## [0.1.0] - 2021-07-09
 
 #### - :rocket: [New Feature]

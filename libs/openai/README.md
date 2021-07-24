@@ -56,7 +56,28 @@ openAI.createAnswer(question)
 
 ```
 
-## List Files
+## Text Conversion
+
+Text 2 JSONL
+
+```javascript
+import { text2JsonlFile } from '@dalenguyen/openai'
+
+const text = 'This is first sentence. The is second sentence'
+const savedFile = text2JsonlFile(text)
+
+// Response
+//
+// {
+// "status": "success",
+// "filePath": "abspath/converted.jsonl",
+// "fileName": "converted.jsonl"
+// }
+```
+
+## Files
+
+### List files
 
 ```javascript
 openAI
@@ -65,7 +86,7 @@ openAI
   .catch((error) => console.error(error))
 ```
 
-## Upload File
+### Upload File
 
 ```javascript
 import { FilePurpose } from '@dalenguyen/openai'
@@ -79,7 +100,7 @@ openAI
   .catch((error) => console.error(error))
 ```
 
-## Delete File
+### Delete File
 
 ```javascript
 openAI
