@@ -1,4 +1,4 @@
-import { EngineName } from '.';
+import { EngineName } from '.'
 
 // https://beta.openai.com/docs/api-reference/answers/create
 
@@ -20,8 +20,8 @@ export interface AnswerRequest {
   examples: string[][]
 
   /**
-  * A text snippet containing the contextual information used to generate the answers for the `examples` you provide.
-  * */
+   * A text snippet containing the contextual information used to generate the answers for the `examples` you provide.
+   * */
   examples_context: string
 
   // OPTIONAL
@@ -124,7 +124,8 @@ export interface AnswerResponse {
   answers: string[]
   completion: string
   model: string
-  object: 'answer',
+  file: string
+  object: 'answer'
   search_model: EngineName
   selected_documents: AnswerDocument[]
 }

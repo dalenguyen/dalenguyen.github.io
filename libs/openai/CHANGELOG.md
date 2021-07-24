@@ -11,6 +11,12 @@
 
 ---
 
+## [0.2.3] - 2021-07-24
+
+#### - :nail_care: [Polish]
+
+- Added file to AnswerResponse model
+
 ## [0.2.2] - 2021-07-24
 
 #### - :boom: [Breaking Change]
