@@ -4,7 +4,7 @@ export enum FilePurpose {
   Classifications = 'classifications',
 }
 
-export interface File {
+export interface OpenAIFile {
   id: string
   object: 'file'
   bytes: number
@@ -16,7 +16,7 @@ export interface File {
 }
 
 export interface ListFile {
-  data: File[]
+  data: OpenAIFile[]
   object: 'list'
 }
 

@@ -11,6 +11,12 @@
 
 ---
 
+## [0.2.2] - 2021-07-24
+
+#### - :boom: [Breaking Change]
+
+- Change File name model to OpenAIFile
+
 ## [0.2.1] - 2021-07-24
 
 #### - :nail_care: [Polish]

@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ListEngine, AnswerResponse, AnswerRequest, ListFile, File, FileRequest, FileDeleted } from '../models'
+import { ListEngine, AnswerResponse, AnswerRequest, ListFile, OpenAIFile, FileRequest, FileDeleted } from '../models'
 import * as FormData from 'form-data'
 import * as fs from 'fs'
 
@@ -64,12 +64,12 @@ export class OpenAI {
     return this.request<ListFile>(`${this.baseUrl}/files`, 'GET')
   }
 
-  retrieveFile(fileId: string): Promise<File> {
-    return this.request<File>(`${this.baseUrl}/files/${fileId}`, 'GET')
+  retrieveFile(fileId: string): Promise<OpenAIFile> {
+    return this.request<OpenAIFile>(`${this.baseUrl}/files/${fileId}`, 'GET')
   }
 
-  uploadFile(data: FileRequest): Promise<File> {
-    return this.request<File>(`${this.baseUrl}/files`, 'POST', data)
+  uploadFile(data: FileRequest): Promise<OpenAIFile> {
+    return this.request<OpenAIFile>(`${this.baseUrl}/files`, 'POST', data)
   }
 
   deleteFile(fileId: string): Promise<FileDeleted> {
