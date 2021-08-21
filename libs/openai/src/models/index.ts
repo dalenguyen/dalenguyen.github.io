@@ -1,3 +1,5 @@
 export * from './engine.model'
 export * from './answer.model'
 export * from './file.model'
+export * from './classification.model'
+export * from './base.model'

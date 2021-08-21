@@ -1,5 +1,15 @@
 import axios, { AxiosRequestConfig } from 'axios'
-import { ListEngine, AnswerResponse, AnswerRequest, ListFile, OpenAIFile, FileRequest, FileDeleted } from '../models'
+import {
+  ListEngine,
+  AnswerResponse,
+  AnswerRequest,
+  ListFile,
+  OpenAIFile,
+  FileRequest,
+  FileDeleted,
+  ClassificationRequest,
+  ClassificationResponse,
+} from '../models'
 import * as FormData from 'form-data'
 import * as fs from 'fs'
 
@@ -14,7 +24,7 @@ export class OpenAI {
   private async request<T>(
     url: string,
     method: 'GET' | 'POST' | 'DELETE',
-    data?: AnswerRequest | FileRequest,
+    data?: AnswerRequest | FileRequest | ClassificationRequest,
   ): Promise<T> {
     try {
       const options: AxiosRequestConfig = {
@@ -59,7 +69,6 @@ export class OpenAI {
   }
 
   // FILES
-
   listFiles(): Promise<ListFile> {
     return this.request<ListFile>(`${this.baseUrl}/files`, 'GET')
   }
@@ -74,5 +83,10 @@ export class OpenAI {
 
   deleteFile(fileId: string): Promise<FileDeleted> {
     return this.request<FileDeleted>(`${this.baseUrl}/files/${fileId}`, 'DELETE')
+  }
+
+  // CLASSIFICATIONS
+  createClassification(data: ClassificationRequest): Promise<ClassificationResponse> {
+    return this.request<ClassificationResponse>(`${this.baseUrl}/classifications`, 'POST', data)
   }
 }

@@ -11,6 +11,12 @@
 
 ---
 
+## [0.3.0] - 2021-08-21
+
+#### - :rocket: [New Feature]
+
+- added classification method
+
 ## [0.2.3] - 2021-07-24
 
 #### - :nail_care: [Polish]

@@ -108,3 +108,30 @@ openAI
   .then((res) => console.log(res))
   .catch((error) => console.error(error))
 ```
+
+## Classifications
+
+Create Classification
+
+```javascript
+const ClassificationRequest: ClassificationRequest = {
+  examples: [
+    ['A happy moment', 'Positive'],
+    ['I am sad.', 'Negative'],
+    ['I am feeling awesome', 'Positive'],
+  ],
+  query: 'It is a raining day :(',
+  search_model: 'ada',
+  model: 'curie',
+  labels: ['Positive', 'Negative', 'Neutral'],
+}
+
+openAI
+  .createClassification(ClassificationRequest)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+## Contributions
+
+Feel free to report bugs and make feature requests in the [Issue Tracker](https://github.com/dalenguyen/dalenguyen.github.io/issues), fork and create pull requests!
