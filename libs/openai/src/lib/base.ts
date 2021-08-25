@@ -9,6 +9,9 @@ import {
   FileDeleted,
   ClassificationRequest,
   ClassificationResponse,
+  CompletionRequest,
+  CompletionResponse,
+  EngineName,
 } from '../models'
 import * as FormData from 'form-data'
 import * as fs from 'fs'
@@ -24,7 +27,7 @@ export class OpenAI {
   private async request<T>(
     url: string,
     method: 'GET' | 'POST' | 'DELETE',
-    data?: AnswerRequest | FileRequest | ClassificationRequest,
+    data?: AnswerRequest | FileRequest | ClassificationRequest | CompletionRequest,
   ): Promise<T> {
     try {
       const options: AxiosRequestConfig = {
@@ -88,5 +91,10 @@ export class OpenAI {
   // CLASSIFICATIONS
   createClassification(data: ClassificationRequest): Promise<ClassificationResponse> {
     return this.request<ClassificationResponse>(`${this.baseUrl}/classifications`, 'POST', data)
+  }
+
+  // COMPLETIONS
+  createCompletion(engine: EngineName, data: CompletionRequest): Promise<CompletionResponse> {
+    return this.request<CompletionResponse>(`${this.baseUrl}/engines/${engine}/completions`, 'POST', data)
   }
 }

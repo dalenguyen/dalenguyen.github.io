@@ -28,6 +28,27 @@ openAI
   .catch((error) => console.error(error))
 ```
 
+## Create Completions
+
+```javascript
+import { CompletionRequest, EngineName } from '@dalenguyen/openai'
+
+const completionRequest: CompletionRequest = {
+  prompt: `Once upon a time...`,
+  temperature: 0,
+  max_tokens: 100,
+  top_p: 1,
+  frequency_penalty: 0.0,
+  presence_penalty: 0.0,
+  stop: ['\n'],
+}
+
+openAI
+  .createCompletion(EngineName.Ada, completionRequest)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
 ## Create Answer
 
 ```javascript

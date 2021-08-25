@@ -11,6 +11,12 @@
 
 ---
 
+## [0.4.0] - 2021-08-24
+
+#### - :rocket: [New Feature]
+
+- added completion method
+
 ## [0.3.0] - 2021-08-21
 
 #### - :rocket: [New Feature]
