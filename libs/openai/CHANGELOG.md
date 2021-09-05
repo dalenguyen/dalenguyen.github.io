@@ -11,6 +11,12 @@
 
 ---
 
+## [0.4.1] - 2021-09-05
+
+#### - :nail_care: [Polish]
+
+- added instruct beta engine
+
 ## [0.4.0] - 2021-08-24
 
 #### - :rocket: [New Feature]
