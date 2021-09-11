@@ -2,6 +2,9 @@ export enum FilePurpose {
   Search = 'search',
   Answers = 'answers',
   Classifications = 'classifications',
+  Finetune = 'fine-tune',
+  FinetuneTrain = 'fine-tune-train',
+  FinetuneResults = 'fine-tune-results',
 }
 
 export interface OpenAIFile {

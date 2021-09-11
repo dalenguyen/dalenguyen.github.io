@@ -153,6 +153,53 @@ openAI
   .catch((error) => console.error(error))
 ```
 
+## Fine-tune
+
+### List fine-tunes
+
+```javascript
+openAI
+  .listFinetunes()
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+### List fine-tune events
+
+```javascript
+openAI
+  .listFinetuneEvents(finetuneId)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+### Cancel fine-tune
+
+```javascript
+openAI
+  .cancelFinetune(finetuneId)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+### Create fine-tune
+
+```javascript
+openAI
+  .createFinetune({ training_file: 'file-id' })
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+### Retrieve fine-tune
+
+```javascript
+openAI
+  .retrieveFinetune(finetuneId)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
 ## Contributions
 
 Feel free to report bugs and make feature requests in the [Issue Tracker](https://github.com/dalenguyen/dalenguyen.github.io/issues), fork and create pull requests!

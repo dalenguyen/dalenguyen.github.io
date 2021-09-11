@@ -1,20 +1,24 @@
 import axios, { AxiosRequestConfig } from 'axios'
+import * as FormData from 'form-data'
+import * as fs from 'fs'
 import {
-  ListEngine,
-  AnswerResponse,
   AnswerRequest,
-  ListFile,
-  OpenAIFile,
-  FileRequest,
-  FileDeleted,
+  AnswerResponse,
   ClassificationRequest,
   ClassificationResponse,
   CompletionRequest,
   CompletionResponse,
   EngineName,
+  FileDeleted,
+  FileRequest,
+  Finetune,
+  FinetuneEventResponse,
+  FinetuneRequest,
+  ListEngine,
+  ListFile,
+  ListFinetunes,
+  OpenAIFile,
 } from '../models'
-import * as FormData from 'form-data'
-import * as fs from 'fs'
 
 export class OpenAI {
   protected apiKey: string
@@ -27,7 +31,7 @@ export class OpenAI {
   private async request<T>(
     url: string,
     method: 'GET' | 'POST' | 'DELETE',
-    data?: AnswerRequest | FileRequest | ClassificationRequest | CompletionRequest,
+    data?: AnswerRequest | FileRequest | ClassificationRequest | CompletionRequest | FinetuneRequest,
   ): Promise<T> {
     try {
       const options: AxiosRequestConfig = {
@@ -42,10 +46,10 @@ export class OpenAI {
 
       // TODO - better type checking for data
       // Upload file
-      if (data?.file != null && data?.['purpose'] != null) {
+      if (data?.['file'] != null && data?.['purpose'] != null) {
         const formData = new FormData()
         formData.append('purpose', data['purpose'])
-        formData.append('file', fs.createReadStream(data.file))
+        formData.append('file', fs.createReadStream(data['file']))
 
         options.headers = {
           ...options.headers,
@@ -103,4 +107,23 @@ export class OpenAI {
   }
 
   // FINE-TUNE
+  listFinetunes(): Promise<ListFinetunes> {
+    return this.request<ListFinetunes>(`${this.baseUrl}/fine-tunes`, 'GET')
+  }
+
+  listFinetuneEvents(finetuneId: string): Promise<FinetuneEventResponse> {
+    return this.request<FinetuneEventResponse>(`${this.baseUrl}/fine-tunes/${finetuneId}/events`, 'GET')
+  }
+
+  cancelFinetune(finetuneId: string): Promise<Finetune> {
+    return this.request<Finetune>(`${this.baseUrl}/fine-tunes/${finetuneId}/cancel`, 'POST')
+  }
+
+  createFinetune(data: FinetuneRequest): Promise<Finetune> {
+    return this.request<Finetune>(`${this.baseUrl}/fine-tunes`, 'POST', data)
+  }
+
+  retrieveFinetune(finetuneId: string): Promise<Finetune> {
+    return this.request<Finetune>(`${this.baseUrl}/fine-tunes/${finetuneId}`, 'GET')
+  }
 }

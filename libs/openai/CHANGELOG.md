@@ -16,6 +16,7 @@
 #### - :rocket: [New Feature]
 
 - added retrieve file content method
+- added fine-tune methods
 
 ## [0.4.1] - 2021-09-05
 

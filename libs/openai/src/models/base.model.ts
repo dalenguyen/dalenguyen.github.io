@@ -95,3 +95,12 @@ export interface BaseModel {
    */
   expand?: string[] // []
 }
+
+export interface OpenAIError {
+  error: {
+    code: null | unknown
+    message: string
+    param: null | unknown
+    type: string
+  }
+}
