@@ -106,6 +106,10 @@ export class OpenAI {
     return this.request<CompletionResponse>(`${this.baseUrl}/engines/${engine}/completions`, 'POST', data)
   }
 
+  createCompletionFromModel(data: CompletionRequest): Promise<CompletionResponse> {
+    return this.request<CompletionResponse>(`${this.baseUrl}/completions`, 'POST', data)
+  }
+
   // FINE-TUNE
   listFinetunes(): Promise<ListFinetunes> {
     return this.request<ListFinetunes>(`${this.baseUrl}/fine-tunes`, 'GET')

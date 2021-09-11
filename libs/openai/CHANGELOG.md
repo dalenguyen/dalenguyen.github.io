@@ -11,6 +11,12 @@
 
 ---
 
+## [0.6.0] - 2021-09-10
+
+#### - :rocket: [New Feature]
+
+- added create completion from fine-tune model
+
 ## [0.5.0] - 2021-09-10
 
 #### - :rocket: [New Feature]

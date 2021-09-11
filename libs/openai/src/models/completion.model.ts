@@ -45,6 +45,11 @@ export interface CompletionRequest extends BaseModel {
    * Results cannot be streamed. When used with n, best_of controls the number of candidate completions and n specifies how many to return – best_of must be greater than n.
    */
   best_of?: number
+
+  /**
+   * Fine-tune model if possible
+   */
+  model?: string
 }
 
 export interface CompletionChoice {

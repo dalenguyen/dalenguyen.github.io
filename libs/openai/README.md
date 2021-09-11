@@ -30,6 +30,8 @@ openAI
 
 ## Create Completions
 
+### Create completion from engine
+
 ```javascript
 import { CompletionRequest, EngineName } from '@dalenguyen/openai'
 
@@ -45,6 +47,15 @@ const completionRequest: CompletionRequest = {
 
 openAI
   .createCompletion(EngineName.Ada, completionRequest)
+  .then((res) => console.log(res))
+  .catch((error) => console.error(error))
+```
+
+### Create completion from fine-tune model
+
+```javascript
+openAI
+  .createCompletionFromModel(completionRequest)
   .then((res) => console.log(res))
   .catch((error) => console.error(error))
 ```
