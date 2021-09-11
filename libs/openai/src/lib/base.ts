@@ -80,6 +80,10 @@ export class OpenAI {
     return this.request<OpenAIFile>(`${this.baseUrl}/files/${fileId}`, 'GET')
   }
 
+  retrieveFileContent(fileId: string): Promise<OpenAIFile> {
+    return this.request<OpenAIFile>(`${this.baseUrl}/files/${fileId}/content`, 'GET')
+  }
+
   uploadFile(data: FileRequest): Promise<OpenAIFile> {
     return this.request<OpenAIFile>(`${this.baseUrl}/files`, 'POST', data)
   }
@@ -97,4 +101,6 @@ export class OpenAI {
   createCompletion(engine: EngineName, data: CompletionRequest): Promise<CompletionResponse> {
     return this.request<CompletionResponse>(`${this.baseUrl}/engines/${engine}/completions`, 'POST', data)
   }
+
+  // FINE-TUNE
 }

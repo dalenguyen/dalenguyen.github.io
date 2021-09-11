@@ -11,6 +11,12 @@
 
 ---
 
+## [0.5.0] - 2021-09-10
+
+#### - :rocket: [New Feature]
+
+- added retrieve file content method
+
 ## [0.4.1] - 2021-09-05
 
 #### - :nail_care: [Polish]
