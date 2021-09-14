@@ -55,7 +55,12 @@ export interface CompletionRequest extends BaseModel {
 export interface CompletionChoice {
   text: string
   index: number
-  logprobs: null | number
+  logprobs: null | {
+    tokens: string[]
+    token_logprobs: number[]
+    top_logprobs: Record<string, number>[]
+    text_offset: string[]
+  }
   finish_reason: string
 }
 

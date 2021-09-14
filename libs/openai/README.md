@@ -32,7 +32,7 @@ yarn add @dalenguyen/openai
 
 ```javascript
 import { OpenAI } from '@dalenguyen/openai'
-const openAI = new OpenAI('OPENAI_API_KEY')
+const openAI = new OpenAI(process.env.OPENAI_API_KEY)
 ```
 
 ## Get Engines

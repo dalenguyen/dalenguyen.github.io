@@ -25,15 +25,17 @@ describe('OpenAI', () => {
       temperature: 0.7,
       max_tokens: 100,
       top_p: 1,
+      logprobs: 1,
       frequency_penalty: 0.0,
       presence_penalty: 0.0,
       stop: ['\n'],
     }
 
-    const completion = await openAI.createCompletion(EngineName.Curie, completionRequest)
+    const completion = await openAI.createCompletion(EngineName.Davinci, completionRequest)
 
     expect(completion.object).toEqual('text_completion')
     expect(completion.choices).toHaveLength(1)
+    expect(completion.choices[0].logprobs).toBeDefined()
   }, 60000)
 
   it('Create Answer', async () => {

@@ -11,6 +11,13 @@
 
 ---
 
+## [0.7.1] - 2021-09-14
+
+#### - :nail_care: [Polish]
+
+- Updated CompletionChoice > logprobs type
+- Added environment example for OpenAI API Key
+
 ## [0.7.0] - 2021-09-13
 
 #### - :nail_care: [Polish]
