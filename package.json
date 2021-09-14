@@ -55,7 +55,7 @@
     "@nrwl/angular": "12.3.4",
     "@sentry/browser": "^6.4.1",
     "@sentry/integrations": "^6.4.1",
-    "axios": "^0.21.1",
+    "axios": "^0.21.2",
     "buttercms": "^1.2.7",
     "express": "4.17.1",
     "firebase": "8.6.1",
