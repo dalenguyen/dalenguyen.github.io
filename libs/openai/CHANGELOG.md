@@ -11,6 +11,13 @@
 
 ---
 
+## [0.7.0] - 2021-09-13
+
+#### - :nail_care: [Polish]
+
+- Updated readme for best practices
+- Added test cases
+
 ## [0.6.0] - 2021-09-10
 
 #### - :rocket: [New Feature]

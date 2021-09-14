@@ -1,6 +1,22 @@
-# OpenAI
+# OpenAI TypeScript
 
 TypesScript library for OpenAI
+
+**Note:** this project is not affiliated with OpenAI in any way, and this was written purely out of interest.
+
+**Safe key practices:** DO NOT reveal you OpenAI API Key publicly or on client site. Put it in a safe place such as in the environment or Secret Manager.
+
+## Development
+
+The project is a monorepo using [Nx Workspace](https://nx.dev/). OpenAI library is under `libs/openai` folder.
+
+Before testing the package, you should rename `.env-template` to `.env` then add your `OPENAI_API_KEY` to the environment file.
+
+After you clone & modify the package. You can run the test to make sure everything passes.
+
+```
+yarn test openai
+```
 
 ## Getting started
 
@@ -146,7 +162,7 @@ openAI
 Create Classification
 
 ```javascript
-const ClassificationRequest: ClassificationRequest = {
+const classificationRequest: ClassificationRequest = {
   examples: [
     ['A happy moment', 'Positive'],
     ['I am sad.', 'Negative'],
@@ -159,7 +175,7 @@ const ClassificationRequest: ClassificationRequest = {
 }
 
 openAI
-  .createClassification(ClassificationRequest)
+  .createClassification(classificationRequest)
   .then((res) => console.log(res))
   .catch((error) => console.error(error))
 ```
