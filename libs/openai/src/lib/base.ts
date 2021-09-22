@@ -130,4 +130,24 @@ export class OpenAI {
   retrieveFinetune(finetuneId: string): Promise<Finetune> {
     return this.request<Finetune>(`${this.baseUrl}/fine-tunes/${finetuneId}`, 'GET')
   }
+
+  // CONTENT FILTERS
+  contentFilter(data: CompletionRequest): Promise<CompletionResponse> {
+    // use default settings
+    // https://beta.openai.com/docs/engines/how-do-you-use-the-filter
+    const updatedData = {
+      ...data,
+      prompt: data.prompt.indexOf('<|endoftext|>') > -1 ? data.prompt : `<|endoftext|>${data.prompt}\n--\nLabel:`,
+      max_tokens: data.max_tokens || 1,
+      temperature: data.temperature || 0.0,
+      top_p: data.top_p || 0,
+      logprobs: data.logprobs || 100,
+    }
+
+    return this.request<CompletionResponse>(
+      `${this.baseUrl}/engines/content-filter-alpha-c4/completions`,
+      'POST',
+      updatedData,
+    )
+  }
 }

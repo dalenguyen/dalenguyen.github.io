@@ -227,6 +227,15 @@ openAI
   .catch((error) => console.error(error))
 ```
 
+## Content Filter
+
+This will help to check if user's input is "safe" or not. This is based on [Content filter](https://beta.openai.com/docs/engines/content-filter) from OpenAI.
+
+```javascript
+const content = await openAI.contentFilter({ prompt: `You're a big pig!` })
+const accepted = isContentSafe(response) // true or false
+```
+
 ## Contributions
 
 Feel free to report bugs and make feature requests in the [Issue Tracker](https://github.com/dalenguyen/dalenguyen.github.io/issues), fork and create pull requests!

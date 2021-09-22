@@ -11,6 +11,16 @@
 
 ---
 
+## [0.8.0] - 2021-09-21
+
+#### - :rocket: [New Feature]
+
+- add content filter function
+
+#### - :nail_care: [Polish]
+
+- add user to completion request
+
 ## [0.7.1] - 2021-09-14
 
 #### - :nail_care: [Polish]

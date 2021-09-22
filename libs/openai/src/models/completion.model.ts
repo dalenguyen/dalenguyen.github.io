@@ -50,6 +50,11 @@ export interface CompletionRequest extends BaseModel {
    * Fine-tune model if possible
    */
   model?: string
+
+  /**
+   * Incorporate user for logging purposes
+   */
+  user?: string
 }
 
 export interface CompletionChoice {
@@ -59,7 +64,7 @@ export interface CompletionChoice {
     tokens: string[]
     token_logprobs: number[]
     top_logprobs: Record<string, number>[]
-    text_offset: string[]
+    text_offset: number[]
   }
   finish_reason: string
 }

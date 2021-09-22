@@ -1,6 +1,6 @@
 {
   "name": "@dalenguyen/openai",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "keywords": [
     "OpenAI",
     "TypeScript",
@@ -15,5 +15,10 @@
   "bugs": {
     "url": "https://github.com/dalenguyen/dalenguyen.github.io/issues"
   },
-  "homepage": "https://github.com/dalenguyen/dalenguyen.github.io/tree/dev/libs/openai#readme"
+  "homepage": "https://github.com/dalenguyen/dalenguyen.github.io/tree/dev/libs/openai#readme",
+  "browser": {
+    "fs": false,
+    "os": false,
+    "path": false
+  }
 }
