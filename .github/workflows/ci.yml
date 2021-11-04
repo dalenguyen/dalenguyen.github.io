@@ -19,7 +19,6 @@ jobs:
 
     steps:
       # - uses: actions/checkout@v1
-
       # - name: install angular-cli-ghpages
       #   run: sudo npm install -g angular-cli-ghpages
 
