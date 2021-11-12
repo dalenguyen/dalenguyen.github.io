@@ -21,39 +21,43 @@
       }
     }
   },
-  "projects": {
-    "api-products": {
-      "tags": []
+  "targetDependencies": {
+    "build": [
+      {
+        "target": "build",
+        "projects": "dependencies"
+      }
+    ]
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "defaultProject": "portfolio",
+  "generators": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
     },
-    "chat": {
-      "tags": []
+    "@nrwl/angular:application": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
     },
-    "chat-e2e": {
-      "tags": [],
-      "implicitDependencies": ["chat"]
+    "@nrwl/angular:library": {
+      "style": "scss",
+      "linter": "eslint",
+      "unitTestRunner": "jest"
     },
-    "material": {
-      "tags": []
-    },
-    "openai": {
-      "tags": []
-    },
-    "portfolio": {
-      "tags": []
-    },
-    "portfolio-e2e": {
-      "tags": [],
-      "implicitDependencies": ["portfolio"]
-    },
-    "saas": {
-      "tags": []
-    },
-    "saas-e2e": {
-      "tags": [],
-      "implicitDependencies": ["saas"]
-    },
-    "saas-libs": {
-      "tags": ["npm", "lib"]
+    "@nrwl/angular:component": {
+      "style": "scss"
     }
   }
 }

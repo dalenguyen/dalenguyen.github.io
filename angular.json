@@ -1,36 +1,5 @@
 {
   "version": 1,
-  "cli": {
-    "defaultCollection": "@nrwl/angular"
-  },
-  "defaultProject": "portfolio",
-  "schematics": {
-    "@nrwl/angular": {
-      "application": {
-        "linter": "eslint"
-      },
-      "library": {
-        "linter": "eslint"
-      },
-      "storybook-configuration": {
-        "linter": "eslint"
-      }
-    },
-    "@nrwl/angular:application": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest",
-      "e2eTestRunner": "cypress"
-    },
-    "@nrwl/angular:library": {
-      "style": "scss",
-      "linter": "eslint",
-      "unitTestRunner": "jest"
-    },
-    "@nrwl/angular:component": {
-      "style": "scss"
-    }
-  },
   "projects": {
     "api-products": {
       "root": "apps/api-products",
@@ -70,7 +39,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/api-products/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -80,7 +50,8 @@
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "chat": {
       "projectType": "application",
@@ -156,7 +127,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/chat/src/**/*.ts", "apps/chat/src/**/*.html"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -166,7 +138,8 @@
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "chat-e2e": {
       "root": "apps/chat-e2e",
@@ -190,9 +163,12 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/chat-e2e/**/*.{js,ts}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": ["chat"]
     },
     "material": {
       "projectType": "library",
@@ -212,9 +188,11 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/material/src/**/*.ts", "libs/material/src/**/*.html"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
-      }
+      },
+      "tags": []
     },
     "openai": {
       "root": "libs/openai",
@@ -225,7 +203,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/openai/**/*.ts"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -246,7 +225,8 @@
             "assets": ["libs/openai/*.md"]
           }
         }
-      }
+      },
+      "tags": []
     },
     "portfolio": {
       "projectType": "application",
@@ -330,7 +310,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/portfolio/src/**/*.ts", "apps/portfolio/src/**/*.html"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -340,7 +321,8 @@
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "portfolio-e2e": {
       "root": "apps/portfolio-e2e",
@@ -364,9 +346,12 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/portfolio-e2e/**/*.{js,ts}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": ["portfolio"]
     },
     "saas": {
       "projectType": "application",
@@ -442,7 +427,8 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/saas/src/**/*.ts", "apps/saas/src/**/*.html"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         },
         "test": {
           "builder": "@nrwl/jest:jest",
@@ -452,7 +438,8 @@
             "passWithNoTests": true
           }
         }
-      }
+      },
+      "tags": []
     },
     "saas-e2e": {
       "root": "apps/saas-e2e",
@@ -476,9 +463,12 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["apps/saas-e2e/**/*.{js,ts}"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
-      }
+      },
+      "tags": [],
+      "implicitDependencies": ["saas"]
     },
     "saas-libs": {
       "projectType": "library",
@@ -513,9 +503,11 @@
           "builder": "@nrwl/linter:eslint",
           "options": {
             "lintFilePatterns": ["libs/saas-libs/src/**/*.ts", "libs/saas-libs/src/**/*.html"]
-          }
+          },
+          "outputs": ["{options.outputFile}"]
         }
-      }
+      },
+      "tags": ["npm", "lib"]
     }
   }
 }

@@ -4,19 +4,23 @@
   "overrides": [
     {
       "files": ["*.ts"],
-      "extends": [
-        "plugin:@nrwl/nx/angular",
-        "plugin:@angular-eslint/template/process-inline-templates"
-      ],
-      "parserOptions": { "project": ["apps/portfolio/tsconfig.*?.json"] },
+      "extends": ["plugin:@nrwl/nx/angular", "plugin:@angular-eslint/template/process-inline-templates"],
       "rules": {
         "@angular-eslint/directive-selector": [
           "error",
-          { "type": "attribute", "prefix": "dalenguyen", "style": "camelCase" }
+          {
+            "type": "attribute",
+            "prefix": "dalenguyen",
+            "style": "camelCase"
+          }
         ],
         "@angular-eslint/component-selector": [
           "error",
-          { "type": "element", "prefix": "dalenguyen", "style": "kebab-case" }
+          {
+            "type": "element",
+            "prefix": "dalenguyen",
+            "style": "kebab-case"
+          }
         ]
       }
     },
