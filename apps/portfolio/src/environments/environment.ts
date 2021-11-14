@@ -1,19 +1,18 @@
 // This file can be replaced during build by using the `fileReplacements` array.
 // `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
 // The list of file replacements can be found in `angular.json`.
-import { versions } from './versions';
-import packageInfo from '../../../../package.json';
+import packageInfo from '../../../../package.json'
+import { versions } from './versions'
 
 export const environment = {
   production: false,
-  version: packageInfo.version,
+  version: packageInfo?.version,
   gitHash: versions.revision,
   butterCMSToken: '10de8a1782f01676902398495c4062893956ac9c',
   mapbox: {
-    accessToken:
-      'pk.eyJ1IjoiZGFsZW5ndXllbiIsImEiOiJja2tlamhhNjcwMHVyMnFvNHJtNHhjZ2RyIn0.Lm3dJG12k3-LmOu_G5y-qA',
+    accessToken: 'pk.eyJ1IjoiZGFsZW5ndXllbiIsImEiOiJja2tlamhhNjcwMHVyMnFvNHJtNHhjZ2RyIn0.Lm3dJG12k3-LmOu_G5y-qA',
   },
-};
+}
 
 /*
  * For easier debugging in development mode, you can import the following file
