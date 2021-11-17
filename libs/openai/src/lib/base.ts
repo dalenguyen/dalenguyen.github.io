@@ -41,7 +41,10 @@ export class OpenAI {
           Authorization: `Bearer ${this.apiKey}`,
           'Content-Type': 'application/json',
         },
-        data: data || '',
+      }
+
+      if (method !== 'GET') {
+        options.data = data || ''
       }
 
       // TODO - better type checking for data
