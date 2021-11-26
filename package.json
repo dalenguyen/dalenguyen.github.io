@@ -20,7 +20,9 @@
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
-    "api-products": "",
+    "api-stripe": "----",
+    "build:api:stripe": "nx build api-stripe",
+    "api-products": "----",
     "start:api:products": "nx serve --project api-products",
     "build:api:products": "nx build api-products",
     "affected:apps": "nx affected:apps",
@@ -52,7 +54,6 @@
     "@angular/platform-browser": "13.0.1",
     "@angular/platform-browser-dynamic": "13.0.1",
     "@angular/router": "13.0.1",
-    "@nrwl/angular": "13.2.0-rc.0",
     "@sentry/browser": "^6.4.1",
     "@sentry/integrations": "^6.4.1",
     "axios": "^0.21.2",
@@ -81,6 +82,7 @@
     "@nrwl/cypress": "13.2.0-rc.0",
     "@nrwl/eslint-plugin-nx": "13.2.0-rc.0",
     "@nrwl/express": "13.2.0-rc.0",
+    "@nrwl/angular": "13.2.0-rc.0",
     "@nrwl/jest": "13.2.0-rc.0",
     "@nrwl/linter": "13.2.0-rc.0",
     "@nrwl/node": "13.2.0-rc.0",
@@ -119,4 +121,3 @@
     "@angular-devkit/core": "13.0.2"
   }
 }
-

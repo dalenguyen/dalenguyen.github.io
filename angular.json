@@ -53,6 +53,58 @@
       },
       "tags": []
     },
+    "api-stripe": {
+      "root": "apps/api-stripe",
+      "sourceRoot": "apps/api-stripe/src",
+      "projectType": "application",
+      "architect": {
+        "build": {
+          "builder": "@nrwl/node:build",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/api-stripe",
+            "main": "apps/api-stripe/src/main.ts",
+            "tsConfig": "apps/api-stripe/tsconfig.app.json",
+            "assets": ["apps/api-stripe/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "optimization": true,
+              "extractLicenses": true,
+              "inspect": false,
+              "fileReplacements": [
+                {
+                  "replace": "apps/api-stripe/src/environments/environment.ts",
+                  "with": "apps/api-stripe/src/environments/environment.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "api-stripe:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/api-stripe/**/*.ts"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/api-stripe"],
+          "options": {
+            "jestConfig": "apps/api-stripe/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
     "chat": {
       "projectType": "application",
       "root": "apps/chat",
