@@ -222,6 +222,132 @@
       "tags": [],
       "implicitDependencies": ["chat"]
     },
+    "ext-utils": {
+      "projectType": "application",
+      "root": "apps/ext-utils",
+      "sourceRoot": "apps/ext-utils/src",
+      "prefix": "dalenguyen",
+      "architect": {
+        "build": {
+          "builder": "@angular-builders/custom-webpack:browser",
+          "outputs": ["{options.outputPath}"],
+          "options": {
+            "outputPath": "dist/apps/ext-utils",
+            "index": "apps/ext-utils/src/index.html",
+            "main": "apps/ext-utils/src/main.ts",
+            "polyfills": "apps/ext-utils/src/polyfills.ts",
+            "tsConfig": "apps/ext-utils/tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "apps/ext-utils/src/favicon.ico",
+              "apps/ext-utils/src/assets",
+              "apps/ext-utils/src/manifest.json"
+            ],
+            "styles": ["apps/ext-utils/src/styles.scss"],
+            "scripts": [],
+            "aot": true,
+            "customWebpackConfig": { "path": "apps/ext-utils/custom-webpack.config.js" }
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "500kb",
+                  "maximumError": "1mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "fileReplacements": [
+                {
+                  "replace": "apps/ext-utils/src/environments/environment.ts",
+                  "with": "apps/ext-utils/src/environments/environment.prod.ts"
+                }
+              ],
+              "outputHashing": "none"
+            },
+            "development": {
+              "customWebpackConfig": {
+                "path": "apps/ext-utils/custom-webpack-dev.config.js"
+              },
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "ext-utils:build:production"
+            },
+            "development": {
+              "browserTarget": "ext-utils:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ext-utils:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/ext-utils/src/**/*.ts", "apps/ext-utils/src/**/*.html"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/apps/ext-utils"],
+          "options": {
+            "jestConfig": "apps/ext-utils/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      },
+      "tags": []
+    },
+    "ext-utils-e2e": {
+      "root": "apps/ext-utils-e2e",
+      "sourceRoot": "apps/ext-utils-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/ext-utils-e2e/cypress.json",
+            "devServerTarget": "ext-utils:serve:development",
+            "tsConfig": "apps/ext-utils-e2e/tsconfig.json"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "ext-utils:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "outputs": ["{options.outputFile}"],
+          "options": {
+            "lintFilePatterns": ["apps/ext-utils-e2e/**/*.{js,ts}"]
+          }
+        }
+      },
+      "tags": [],
+      "implicitDependencies": ["ext-utils"]
+    },
     "material": {
       "projectType": "library",
       "root": "libs/material",
