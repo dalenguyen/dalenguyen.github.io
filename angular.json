@@ -271,6 +271,9 @@
               "outputHashing": "none"
             },
             "development": {
+              "customWebpackConfig": {
+                "path": "apps/ext-utils/custom-webpack-dev.config.js"
+              },
               "buildOptimizer": false,
               "optimization": false,
               "vendorChunk": true,

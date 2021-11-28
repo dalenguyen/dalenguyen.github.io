@@ -6,13 +6,18 @@ import { Component } from '@angular/core'
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  changeBackground() {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      if (tabs.length > 0 && tabs[0].id != null) {
-        chrome.tabs.executeScript(tabs[0].id, {
-          code: 'document.body.style.backgroundColor = "red";',
-        })
-      }
-    })
+  async changeBackground() {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+    if (tab.id != null) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          chrome.storage.sync.get('color', ({ color }) => {
+            document.body.style.backgroundColor = color
+          })
+        },
+      })
+    }
   }
 }

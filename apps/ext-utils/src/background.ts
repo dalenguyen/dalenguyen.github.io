@@ -1,15 +1,8 @@
 /// <reference types="chrome"/>
 
+const color = '#3aa757'
+
 chrome.runtime.onInstalled.addListener(() => {
-  chrome.webNavigation?.onCompleted.addListener(
-    () => {
-      chrome.tabs.query({ active: true, currentWindow: true }, ([{ id }]) => {
-        console.log(`Change background to ${id}`)
-        if (id != null) {
-          chrome.pageAction.show(id)
-        }
-      })
-    },
-    // { url: [{ urlMatches: 'google.com' }] },
-  )
+  chrome.storage.sync.set({ color })
+  console.log('Default background color set to %cgreen', `color: ${color}`)
 })
