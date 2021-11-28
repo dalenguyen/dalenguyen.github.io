@@ -3,7 +3,11 @@
   "version": "1.0",
   "description": "Build an Extension with Angular",
   "manifest_version": 2,
-  "browser_action": {
+  "page_action": {
     "default_popup": "index.html"
-  }
+  },
+  "background": {
+    "scripts": ["background.js", "runtime.js"]
+  },
+  "permissions": ["activeTab", "webNavigation"]
 }

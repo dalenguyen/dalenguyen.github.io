@@ -6,5 +6,13 @@ import { Component } from '@angular/core'
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'ext-utils'
+  changeBackground() {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs: { id?: number }[]) => {
+      if (tabs.length > 0 && tabs[0].id != null) {
+        chrome.tabs.executeScript(tabs[0].id, {
+          code: 'document.body.style.backgroundColor = "red";',
+        })
+      }
+    })
+  }
 }

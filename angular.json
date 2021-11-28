@@ -229,7 +229,7 @@
       "prefix": "dalenguyen",
       "architect": {
         "build": {
-          "builder": "@angular-devkit/build-angular:browser",
+          "builder": "@angular-builders/custom-webpack:browser",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/ext-utils",
@@ -245,7 +245,8 @@
             ],
             "styles": ["apps/ext-utils/src/styles.scss"],
             "scripts": [],
-            "aot": true
+            "aot": true,
+            "customWebpackConfig": { "path": "apps/ext-utils/custom-webpack.config.js" }
           },
           "configurations": {
             "production": {
@@ -267,7 +268,7 @@
                   "with": "apps/ext-utils/src/environments/environment.prod.ts"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "none"
             },
             "development": {
               "buildOptimizer": false,
