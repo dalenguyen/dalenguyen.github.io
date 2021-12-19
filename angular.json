@@ -246,7 +246,9 @@
             "styles": ["apps/ext-utils/src/styles.scss"],
             "scripts": [],
             "aot": true,
-            "customWebpackConfig": { "path": "apps/ext-utils/custom-webpack.config.js" }
+            "customWebpackConfig": {
+              "path": "apps/ext-utils/custom-webpack.config.js"
+            }
           },
           "configurations": {
             "production": {
@@ -431,7 +433,8 @@
               }
             ],
             "styles": ["apps/portfolio/src/styles.scss"],
-            "scripts": []
+            "scripts": [],
+            "allowedCommonJsDependencies": ["buttercms"]
           },
           "configurations": {
             "production": {

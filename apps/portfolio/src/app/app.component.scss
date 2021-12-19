@@ -1,6 +1,8 @@
 @import '../variables';
 
 .main-content {
+  max-width: 75rem;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   position: absolute;
@@ -11,6 +13,7 @@
 }
 
 .hamburger {
+  display: none;
   position: fixed;
   /* Make sure the toolbar will stay on top of the content as it scrolls past. */
   z-index: 2;
@@ -41,8 +44,8 @@ mat-sidenav-content {
   min-height: 100vh;
 }
 
-@media screen and (max-width: 540px) {
-  main {
-    margin-top: 4rem;
+@media screen and (max-width: 600px) {
+  .hamburger {
+    display: block;
   }
 }

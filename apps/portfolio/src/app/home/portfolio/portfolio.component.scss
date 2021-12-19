@@ -1,14 +1,13 @@
 #portfolio {
-    text-align: center;    
-    a {
-        img {
-            width: 100%;
-        }
+  .projects {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    .project {
+      max-width: 350px;
+      span {
+        margin-right: 1rem;
+      }
     }
-    mat-card {
-        text-align: left;
-        span {
-            padding-right: 10px;
-        }
-    }
+  }
 }
