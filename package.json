@@ -10,7 +10,7 @@
     "start:saas": "ng serve --project saas",
     "start:chat": "ng serve --project chat",
     "build": "ng build",
-    "build:portfolio": "ng build --project portfolio --base-href=/ --parallel",
+    "build:portfolio": "ng build --project portfolio --base-href=/",
     "libs:saas": "-------------------",
     "build:saas-libs": "nx build saas-libs",
     "publish:saas-libs": "npm publish ./dist/libs/saas-libs",
@@ -27,7 +27,7 @@
     "build:api:products": "nx build api-products",
     "affected:apps": "nx affected:apps",
     "affected:libs": "nx affected:libs --base=origin/dev",
-    "affected:build": "nx affected:build --base=origin/dev --parallel",
+    "affected:build": "nx affected:build --base=origin/dev",
     "affected:e2e": "nx affected:e2e",
     "affected:test": "nx affected:test",
     "affected:lint": "nx affected:lint",
@@ -124,4 +124,3 @@
     "@angular-devkit/core": "13.0.2"
   }
 }
-
