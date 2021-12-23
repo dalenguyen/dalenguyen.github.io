@@ -1,12 +1,12 @@
 import * as dotenv from 'dotenv'
-import { AnswerRequest, ClassificationRequest, CompletionRequest, CompletionResponse, EngineName } from '../models'
-import { OpenAI } from './base'
-import { isContentSafe, text2JsonlFile } from './util'
+import { OpenAI } from '../src/lib/base'
+import { isContentSafe, text2JsonlFile } from '../src/lib/util'
+import { AnswerRequest, ClassificationRequest, CompletionRequest, CompletionResponse, EngineName } from '../src/models'
 
 const config = dotenv.config()
 const apiKey = config.parsed['OPENAI_API_KEY']
 
-describe('OpenAI', () => {
+describe('OpenAI - Base', () => {
   let openAI: OpenAI
 
   beforeAll(() => {

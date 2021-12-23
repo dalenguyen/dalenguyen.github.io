@@ -11,6 +11,12 @@
 
 ---
 
+## [0.9.0] - 2021-12-23
+
+#### - :rocket: [New Feature]
+
+- Add codex engines & test cases (Thanks, @microsoftbuild)
+
 ## [0.8.1] - 2021-11-16
 
 #### - :bug: [Bug Fix]
