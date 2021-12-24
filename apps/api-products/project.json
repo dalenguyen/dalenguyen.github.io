@@ -1,0 +1,52 @@
+{
+  "root": "apps/api-products",
+  "sourceRoot": "apps/api-products/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "builder": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/api-products",
+        "main": "apps/api-products/src/main.ts",
+        "tsConfig": "apps/api-products/tsconfig.app.json",
+        "assets": ["apps/api-products/src/assets"]
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/api-products/src/environments/environment.ts",
+              "with": "apps/api-products/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "builder": "@nrwl/node:execute",
+      "options": {
+        "buildTarget": "api-products:build"
+      }
+    },
+    "lint": {
+      "builder": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/api-products/**/*.ts"]
+      },
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "builder": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/api-products"],
+      "options": {
+        "jestConfig": "apps/api-products/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "projects": {
+    "api-products": "apps/api-products",
+    "api-stripe": "apps/api-stripe",
+    "chat": "apps/chat",
+    "chat-e2e": "apps/chat-e2e",
+    "ext-utils": "apps/ext-utils",
+    "ext-utils-e2e": "apps/ext-utils-e2e",
+    "portfolio": "apps/portfolio",
+    "portfolio-e2e": "apps/portfolio-e2e",
+    "saas": "apps/saas",
+    "saas-e2e": "apps/saas-e2e",
+    "material": "libs/material",
+    "openai": "libs/openai",
+    "saas-libs": "libs/saas-libs"
+  }
+}

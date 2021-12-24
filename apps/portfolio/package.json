@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "build:portfolio": "ng build --project portfolio --base-href=/"
+  }
+}

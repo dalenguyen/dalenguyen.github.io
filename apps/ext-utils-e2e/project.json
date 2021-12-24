@@ -1,0 +1,29 @@
+{
+  "root": "apps/ext-utils-e2e",
+  "sourceRoot": "apps/ext-utils-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "builder": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/ext-utils-e2e/cypress.json",
+        "devServerTarget": "ext-utils:serve:development",
+        "tsConfig": "apps/ext-utils-e2e/tsconfig.json"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "ext-utils:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "builder": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/ext-utils-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["ext-utils"]
+}
