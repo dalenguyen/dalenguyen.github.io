@@ -18,11 +18,14 @@ nx generate @nrwl/angular:app myApp
 nx generate @nrwl/angular:library mylibrary --buildable --publishable
 nx generate @nrwl/express:application <express-app>
 
+# sub modules
+nx g m --name=parent --module=app-routing --route=parent --routing
+nx g m --name=parent/child --module=parent/parent-routing --route=child --routing
+
 # NPM package
-nx generate @nrwl/node:library name --importPath @dalenguyen/name --publishable 
+nx generate @nrwl/node:library name --importPath @dalenguyen/name --publishable
 
 ```
-
 
 ## Update sentry
 
