@@ -21,5 +21,12 @@
   "background": {
     "service_worker": "background.js"
   },
-  "permissions": ["storage", "activeTab", "scripting", "contextMenus"]
+  "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content-script.js"],
+      "all_frames": true
+    }
+  ]
 }
