@@ -1,10 +1,10 @@
 export enum EngineName {
   Davinci = 'davinci',
-  DavinciCodex = 'davinci-codex',
+  DavinciCodex = 'code-davinci-001',
   DavinciInstructBeta = 'davinci-instruct-beta ',
   Curie = 'curie',
   CurieInstructBeta = 'curie-instruct-beta',
-  CushmanCodex = 'cushman-codex',
+  CushmanCodex = 'code-cushman-001',
   Babbage = 'babbage',
   Ada = 'ada',
 }
