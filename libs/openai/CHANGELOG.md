@@ -11,6 +11,12 @@
 
 ---
 
+## [0.10.0] - 2022-01-24
+
+> - :nail_care: [Polish]
+
+- Update [model names](https://help.openai.com/en/articles/5832130-what-s-changed-with-engine-names-and-best-practices)
+
 ## [0.9.0] - 2021-12-23
 
 #### - :rocket: [New Feature]
