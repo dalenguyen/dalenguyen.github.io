@@ -22,7 +22,15 @@ interface CatFact {
 export class AppComponent {
   randomFact$ = this.http.get('https://cat-fact.herokuapp.com/facts/random') as Observable<CatFact>
 
-  constructor(private http: HttpClient) {}
+  originalText = 'Hello world'
+
+  constructor(private http: HttpClient) {
+    chrome.storage?.sync?.get('originalText', (storage) => {
+      console.log({ storage })
+      this.originalText = storage.originalText
+      // alert(this.originalText)
+    })
+  }
 
   async changeBackground() {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
@@ -34,6 +42,20 @@ export class AppComponent {
           chrome.storage.sync.get('color', ({ color }) => {
             document.body.style.backgroundColor = color
           })
+        },
+      })
+    }
+  }
+
+  async test() {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true })
+
+    if (tab.id != null) {
+      chrome.scripting.executeScript({
+        target: { tabId: tab.id },
+        func: () => {
+          console.log(document.getSelection()?.toString())
+          alert(document.getSelection()?.toString())
         },
       })
     }

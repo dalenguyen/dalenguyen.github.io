@@ -2,3 +2,8 @@
 <em>{{ (randomFact$ | async)?.text }}</em>
 <br />
 <button (click)="changeBackground()">Change Background</button>
+
+<button id="test" (click)="test()">Click</button>
+
+<pre>{{ originalText }}</pre>
+<router-outlet></router-outlet>
