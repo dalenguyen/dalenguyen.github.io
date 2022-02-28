@@ -7,12 +7,12 @@
     "chat-e2e": "apps/chat-e2e",
     "ext-utils": "apps/ext-utils",
     "ext-utils-e2e": "apps/ext-utils-e2e",
+    "material": "libs/material",
+    "openai": "libs/openai",
     "portfolio": "apps/portfolio",
     "portfolio-e2e": "apps/portfolio-e2e",
     "saas": "apps/saas",
     "saas-e2e": "apps/saas-e2e",
-    "material": "libs/material",
-    "openai": "libs/openai",
     "saas-libs": "libs/saas-libs"
   }
 }
