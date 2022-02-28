@@ -16,6 +16,7 @@
     "portfolio-e2e": "apps/portfolio-e2e",
     "saas": "apps/saas",
     "saas-e2e": "apps/saas-e2e",
-    "saas-libs": "libs/saas-libs"
+    "saas-libs": "libs/saas-libs",
+    "shared-mdx-elements": "libs/shared/mdx-elements"
   }
 }

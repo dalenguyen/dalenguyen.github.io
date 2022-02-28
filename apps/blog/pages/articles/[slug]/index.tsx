@@ -1,13 +1,14 @@
 import {
   getParsedFileContentBySlug, MarkdownRenderingResult, renderMarkdown
 } from '@dalenguyen/markdown';
+import { mdxElements } from '@dalenguyen/shared/mdx-elements';
 import fs from 'fs';
 import { GetStaticPaths, GetStaticProps } from "next";
+import { MDXRemote } from 'next-mdx-remote';
 import { join } from 'path';
 import { ParsedUrlQuery } from "querystring";
 
 const POSTS_PATH = join(process.cwd(), '_articles');
-
 
 interface ArticleProps extends ParsedUrlQuery {
   slug: string;
@@ -46,21 +47,20 @@ export const getStaticProps: GetStaticProps<MarkdownRenderingResult> = async ({
   };
 };
 
-export function Article({ frontMatter, html }) {
-  console.log(html);
-  
+export function Article({ frontMatter, html }) {  
   return (
     <div className="md:container md:mx-auto">
-      <article>
-        <h1 className="text-3xl font-bold hover:text-gray-700 pb-4">
-          {frontMatter.title}
-        </h1>
-        <div>by {frontMatter.author.name}</div>
-        <hr />
+    <article>
+      <h1 className="text-3xl font-bold hover:text-gray-700 pb-4">
+        {frontMatter.title}
+      </h1>
+      <div>by {frontMatter.author.name}</div>
+      <hr />
+      <br />
 
-        <main dangerouslySetInnerHTML={{ __html: html }} />
-      </article>
-    </div>
+      <MDXRemote {...html} components={mdxElements} />
+    </article>
+  </div>
   );
 }
 
