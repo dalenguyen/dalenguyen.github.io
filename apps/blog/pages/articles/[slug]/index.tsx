@@ -1,44 +1,67 @@
+import {
+  getParsedFileContentBySlug, MarkdownRenderingResult, renderMarkdown
+} from '@dalenguyen/markdown';
+import fs from 'fs';
 import { GetStaticPaths, GetStaticProps } from "next";
+import { join } from 'path';
 import { ParsedUrlQuery } from "querystring";
 
-/* eslint-disable-next-line */
-export interface SlugProps {}
+const POSTS_PATH = join(process.cwd(), '_articles');
+
 
 interface ArticleProps extends ParsedUrlQuery {
   slug: string;
 }
 
+
 export const getStaticPaths: GetStaticPaths<ArticleProps> = async () => {
+  const paths = fs
+    .readdirSync(POSTS_PATH)
+    // Remove file extensions for page paths
+    .map((path) => path.replace(/\.mdx?$/, ''))
+    // Map the path into the static paths object required by Next.js
+    .map((slug) => ({ params: { slug } }));
+
   return {
-    paths: [1, 2, 3].map((idx) => {
-      return {
-        params: {
-          slug: `page${idx}`,
-        },
-      };
-    }),
+    paths,
     fallback: false,
   };
 };
 
-export const getStaticProps: GetStaticProps<ArticleProps> = async ({
+export const getStaticProps: GetStaticProps<MarkdownRenderingResult> = async ({
   params,
 }: {
   params: ArticleProps;
 }) => {
+
+  const articleMarkdownContent = getParsedFileContentBySlug(params.slug, POSTS_PATH);
+  const renderedHTML = await renderMarkdown(articleMarkdownContent.content);
+
+
   return {
     props: {
-      slug: params.slug,
+      frontMatter: articleMarkdownContent.frontMatter,
+      html: renderedHTML,
     },
   };
 };
 
-export function Slug(props: ArticleProps) {
+export function Article({ frontMatter, html }) {
+  console.log(html);
+  
   return (
-    <div>
-      <h1>Visiting {props.slug}</h1>
+    <div className="md:container md:mx-auto">
+      <article>
+        <h1 className="text-3xl font-bold hover:text-gray-700 pb-4">
+          {frontMatter.title}
+        </h1>
+        <div>by {frontMatter.author.name}</div>
+        <hr />
+
+        <main dangerouslySetInnerHTML={{ __html: html }} />
+      </article>
     </div>
-  )
+  );
 }
 
-export default Slug
+export default Article

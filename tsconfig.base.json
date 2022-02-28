@@ -17,6 +17,7 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@dalenguyen/markdown": ["libs/markdown/src/index.ts"],
       "@dalenguyen/material": ["libs/material/src/index.ts"],
       "@dalenguyen/openai": ["libs/openai/src/index.ts"],
       "@dalenguyen/portfolio/*": ["apps/porfolio/*"],
