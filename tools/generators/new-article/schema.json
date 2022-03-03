@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "cli": "nx",
+  "$id": "new-article",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "The title of the article",
+      "default": "My New Article",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      },
+      "x-prompt": "What is the title of the article?",
+      "pattern": "^[a-zA-Z].*$"
+    },
+    "author": {
+      "type": "string",
+      "description": "The author of the article",
+      "x-prompt": "Who is the author of the article?",
+      "pattern": "^[a-zA-Z].*$",
+      "default": "Dale Nguyen"
+    },
+    "excerpt": {
+      "type": "string",
+      "description": "The excerpt of the article"
+    }
+  },
+  "required": ["title", "author"]
+}

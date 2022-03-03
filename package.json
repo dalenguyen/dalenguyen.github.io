@@ -84,6 +84,7 @@
     "@nrwl/angular": "13.8.0-beta.1",
     "@nrwl/cli": "13.8.0-beta.1",
     "@nrwl/cypress": "13.8.0-beta.1",
+    "@nrwl/devkit": "13.8.0-beta.1",
     "@nrwl/eslint-plugin-nx": "13.8.0-beta.1",
     "@nrwl/express": "13.8.0-beta.1",
     "@nrwl/jest": "13.8.0-beta.1",
