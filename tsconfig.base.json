@@ -22,7 +22,8 @@
       "@dalenguyen/openai": ["libs/openai/src/index.ts"],
       "@dalenguyen/portfolio/*": ["apps/porfolio/*"],
       "@dalenguyen/saas-libs": ["libs/saas-libs/src/index.ts"],
-      "@dalenguyen/shared/mdx-elements": ["libs/shared/mdx-elements/src/index.ts"]
+      "@dalenguyen/shared/mdx-elements": ["libs/shared/mdx-elements/src/index.ts"],
+      "@dalenguyen/shared/ui": ["libs/shared/ui/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
