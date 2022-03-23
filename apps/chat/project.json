@@ -5,7 +5,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "build": {
-      "builder": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
         "outputPath": "dist/apps/chat",
         "index": "apps/chat/src/index.html",
@@ -51,7 +51,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "builder": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
           "browserTarget": "chat:build:production"
@@ -63,20 +63,20 @@
       "defaultConfiguration": "development"
     },
     "extract-i18n": {
-      "builder": "@angular-devkit/build-angular:extract-i18n",
+      "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
         "browserTarget": "chat:build"
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/chat/src/**/*.ts", "apps/chat/src/**/*.html"]
       },
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/chat"],
       "options": {
         "jestConfig": "apps/chat/jest.config.js",

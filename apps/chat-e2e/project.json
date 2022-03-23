@@ -4,7 +4,7 @@
   "projectType": "application",
   "targets": {
     "e2e": {
-      "builder": "@nrwl/cypress:cypress",
+      "executor": "@nrwl/cypress:cypress",
       "options": {
         "cypressConfig": "apps/chat-e2e/cypress.json",
         "tsConfig": "apps/chat-e2e/tsconfig.e2e.json",
@@ -17,7 +17,7 @@
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/chat-e2e/**/*.{js,ts}"]
       },

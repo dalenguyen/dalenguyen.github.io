@@ -5,7 +5,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "build": {
-      "builder": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
         "outputPath": "dist/apps/saas",
         "index": "apps/saas/src/index.html",
@@ -51,7 +51,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "builder": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
           "browserTarget": "saas:build:production"
@@ -63,20 +63,20 @@
       "defaultConfiguration": "development"
     },
     "extract-i18n": {
-      "builder": "@angular-devkit/build-angular:extract-i18n",
+      "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
         "browserTarget": "saas:build"
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/saas/src/**/*.ts", "apps/saas/src/**/*.html"]
       },
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/saas"],
       "options": {
         "jestConfig": "apps/saas/jest.config.js",

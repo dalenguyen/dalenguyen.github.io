@@ -5,7 +5,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "build": {
-      "builder": "@angular-devkit/build-angular:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "options": {
         "outputPath": "dist/apps/portfolio",
         "index": "apps/portfolio/src/index.html",
@@ -60,7 +60,7 @@
       "defaultConfiguration": "production"
     },
     "serve": {
-      "builder": "@angular-devkit/build-angular:dev-server",
+      "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
           "browserTarget": "portfolio:build:production"
@@ -72,20 +72,20 @@
       "defaultConfiguration": "development"
     },
     "extract-i18n": {
-      "builder": "@angular-devkit/build-angular:extract-i18n",
+      "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
         "browserTarget": "portfolio:build"
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["apps/portfolio/src/**/*.ts", "apps/portfolio/src/**/*.html"]
       },
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/portfolio"],
       "options": {
         "jestConfig": "apps/portfolio/jest.config.js",

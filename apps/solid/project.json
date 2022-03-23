@@ -1,26 +1,22 @@
 {
   "projectType": "application",
-  "root": "apps/ext-utils",
-  "sourceRoot": "apps/ext-utils/src",
+  "root": "apps/solid",
+  "sourceRoot": "apps/solid/src",
   "prefix": "dalenguyen",
   "targets": {
     "build": {
-      "executor": "@angular-builders/custom-webpack:browser",
+      "executor": "@angular-devkit/build-angular:browser",
       "outputs": ["{options.outputPath}"],
       "options": {
-        "outputPath": "dist/apps/ext-utils",
-        "index": "apps/ext-utils/src/index.html",
-        "main": "apps/ext-utils/src/main.ts",
-        "polyfills": "apps/ext-utils/src/polyfills.ts",
-        "tsConfig": "apps/ext-utils/tsconfig.app.json",
+        "outputPath": "dist/apps/solid",
+        "index": "apps/solid/src/index.html",
+        "main": "apps/solid/src/main.ts",
+        "polyfills": "apps/solid/src/polyfills.ts",
+        "tsConfig": "apps/solid/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": ["apps/ext-utils/src/favicon.ico", "apps/ext-utils/src/assets", "apps/ext-utils/src/manifest.json"],
-        "styles": ["apps/ext-utils/src/styles.scss"],
-        "scripts": [],
-        "aot": true,
-        "customWebpackConfig": {
-          "path": "apps/ext-utils/custom-webpack.config.js"
-        }
+        "assets": ["apps/solid/src/favicon.ico", "apps/solid/src/assets"],
+        "styles": ["./node_modules/@angular/material/prebuilt-themes/indigo-pink.css", "apps/solid/src/styles.scss"],
+        "scripts": []
       },
       "configurations": {
         "production": {
@@ -38,16 +34,13 @@
           ],
           "fileReplacements": [
             {
-              "replace": "apps/ext-utils/src/environments/environment.ts",
-              "with": "apps/ext-utils/src/environments/environment.prod.ts"
+              "replace": "apps/solid/src/environments/environment.ts",
+              "with": "apps/solid/src/environments/environment.prod.ts"
             }
           ],
-          "outputHashing": "none"
+          "outputHashing": "all"
         },
         "development": {
-          "customWebpackConfig": {
-            "path": "apps/ext-utils/custom-webpack-dev.config.js"
-          },
           "buildOptimizer": false,
           "optimization": false,
           "vendorChunk": true,
@@ -62,10 +55,10 @@
       "executor": "@angular-devkit/build-angular:dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "ext-utils:build:production"
+          "browserTarget": "solid:build:production"
         },
         "development": {
-          "browserTarget": "ext-utils:build:development"
+          "browserTarget": "solid:build:development"
         }
       },
       "defaultConfiguration": "development"
@@ -73,20 +66,20 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "ext-utils:build"
+        "browserTarget": "solid:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/ext-utils/src/**/*.ts", "apps/ext-utils/src/**/*.html"]
+        "lintFilePatterns": ["apps/solid/src/**/*.ts", "apps/solid/src/**/*.html"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/ext-utils"],
+      "outputs": ["coverage/apps/solid"],
       "options": {
-        "jestConfig": "apps/ext-utils/jest.config.js",
+        "jestConfig": "apps/solid/jest.config.js",
         "passWithNoTests": true
       }
     }

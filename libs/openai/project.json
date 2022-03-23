@@ -4,14 +4,14 @@
   "projectType": "library",
   "targets": {
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["libs/openai/**/*.ts"]
       },
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/openai"],
       "options": {
         "jestConfig": "libs/openai/jest.config.js",
@@ -19,7 +19,7 @@
       }
     },
     "build": {
-      "builder": "@nrwl/node:package",
+      "executor": "@nrwl/node:package",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/libs/openai",

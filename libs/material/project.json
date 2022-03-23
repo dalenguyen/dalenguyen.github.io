@@ -5,7 +5,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/material"],
       "options": {
         "jestConfig": "libs/material/jest.config.js",
@@ -13,7 +13,7 @@
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": ["libs/material/src/**/*.ts", "libs/material/src/**/*.html"]
       },

@@ -4,7 +4,7 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "builder": "@nrwl/node:build",
+      "executor": "@nrwl/node:build",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/api-stripe",
@@ -27,20 +27,20 @@
       }
     },
     "serve": {
-      "builder": "@nrwl/node:execute",
+      "executor": "@nrwl/node:execute",
       "options": {
         "buildTarget": "api-stripe:build"
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/api-stripe/**/*.ts"]
       }
     },
     "test": {
-      "builder": "@nrwl/jest:jest",
+      "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/api-stripe"],
       "options": {
         "jestConfig": "apps/api-stripe/jest.config.js",

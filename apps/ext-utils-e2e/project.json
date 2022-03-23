@@ -4,7 +4,7 @@
   "projectType": "application",
   "targets": {
     "e2e": {
-      "builder": "@nrwl/cypress:cypress",
+      "executor": "@nrwl/cypress:cypress",
       "options": {
         "cypressConfig": "apps/ext-utils-e2e/cypress.json",
         "devServerTarget": "ext-utils:serve:development",
@@ -17,7 +17,7 @@
       }
     },
     "lint": {
-      "builder": "@nrwl/linter:eslint",
+      "executor": "@nrwl/linter:eslint",
       "outputs": ["{options.outputFile}"],
       "options": {
         "lintFilePatterns": ["apps/ext-utils-e2e/**/*.{js,ts}"]
