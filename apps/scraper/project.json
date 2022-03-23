@@ -1,0 +1,65 @@
+{
+  "root": "apps/scraper",
+  "sourceRoot": "apps/scraper/src",
+  "projectType": "application",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/node:build",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/scraper",
+        "main": "apps/scraper/src/main.ts",
+        "tsConfig": "apps/scraper/tsconfig.app.json",
+        "assets": ["apps/scraper/src/assets"],
+        "externalDependencies": "all",
+        "outputFileName": "index.js",
+        "generatePackageJson": true
+      },
+      "configurations": {
+        "production": {
+          "optimization": true,
+          "extractLicenses": true,
+          "inspect": false,
+          "fileReplacements": [
+            {
+              "replace": "apps/scraper/src/environments/environment.ts",
+              "with": "apps/scraper/src/environments/environment.prod.ts"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nrwl/node:execute",
+      "options": {
+        "buildTarget": "scraper:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/scraper/**/*.ts"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/scraper"],
+      "options": {
+        "jestConfig": "apps/scraper/jest.config.js",
+        "passWithNoTests": true
+      }
+    },
+    "deploy": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "gcloud beta functions deploy scraper --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point helloGET --source ./dist/apps/scraper --allow-unauthenticated --project {args.gcpProject}"
+        ],
+        "color": true,
+        "parallel": false
+      }
+    }
+  },
+  "tags": []
+}
