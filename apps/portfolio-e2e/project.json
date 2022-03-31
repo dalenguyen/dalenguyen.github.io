@@ -19,11 +19,17 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/portfolio-e2e/**/*.{js,ts}"]
+        "lintFilePatterns": [
+          "apps/portfolio-e2e/**/*.{js,ts}"
+        ]
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     }
   },
   "tags": [],
-  "implicitDependencies": ["portfolio"]
+  "implicitDependencies": [
+    "portfolio"
+  ]
 }

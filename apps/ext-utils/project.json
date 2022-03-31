@@ -6,7 +6,9 @@
   "targets": {
     "build": {
       "executor": "@angular-builders/custom-webpack:browser",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/ext-utils",
         "index": "apps/ext-utils/src/index.html",
@@ -14,8 +16,14 @@
         "polyfills": "apps/ext-utils/src/polyfills.ts",
         "tsConfig": "apps/ext-utils/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": ["apps/ext-utils/src/favicon.ico", "apps/ext-utils/src/assets", "apps/ext-utils/src/manifest.json"],
-        "styles": ["apps/ext-utils/src/styles.scss"],
+        "assets": [
+          "apps/ext-utils/src/favicon.ico",
+          "apps/ext-utils/src/assets",
+          "apps/ext-utils/src/manifest.json"
+        ],
+        "styles": [
+          "apps/ext-utils/src/styles.scss"
+        ],
         "scripts": [],
         "aot": true,
         "customWebpackConfig": {
@@ -79,12 +87,17 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/ext-utils/src/**/*.ts", "apps/ext-utils/src/**/*.html"]
+        "lintFilePatterns": [
+          "apps/ext-utils/src/**/*.ts",
+          "apps/ext-utils/src/**/*.html"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/ext-utils"],
+      "outputs": [
+        "coverage/apps/ext-utils"
+      ],
       "options": {
         "jestConfig": "apps/ext-utils/jest.config.js",
         "passWithNoTests": true

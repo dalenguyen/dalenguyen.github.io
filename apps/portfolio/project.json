@@ -7,7 +7,7 @@
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
       "options": {
-        "outputPath": "dist/apps/portfolio",
+        "outputPath": "dist/apps/portfolio/browser",
         "index": "apps/portfolio/src/index.html",
         "main": "apps/portfolio/src/main.ts",
         "polyfills": "apps/portfolio/src/polyfills.ts",
@@ -91,6 +91,46 @@
         "jestConfig": "apps/portfolio/jest.config.js",
         "passWithNoTests": true
       }
+    },
+    "server": {
+      "executor": "@angular-devkit/build-angular:server",
+      "options": {
+        "outputPath": "dist/apps/portfolio/server",
+        "main": "apps/portfolio/src/main.server.ts",
+        "tsConfig": "apps/portfolio/tsconfig.server.json",
+        "inlineStyleLanguage": "scss"
+      },
+      "configurations": {
+        "production": {
+          "outputHashing": "media",
+          "fileReplacements": [
+            {
+              "replace": "apps/portfolio/src/environments/environment.ts",
+              "with": "apps/portfolio/src/environments/environment.prod.ts"
+            }
+          ]
+        },
+        "development": {
+          "optimization": false,
+          "sourceMap": true,
+          "extractLicenses": false
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve-ssr": {
+      "executor": "@nguniversal/builders:ssr-dev-server",
+      "configurations": {
+        "development": {
+          "browserTarget": "portfolio:build:development",
+          "serverTarget": "portfolio:server:development"
+        },
+        "production": {
+          "browserTarget": "portfolio:build:production",
+          "serverTarget": "portfolio:server:production"
+        }
+      },
+      "defaultConfiguration": "development"
     }
   },
   "tags": []

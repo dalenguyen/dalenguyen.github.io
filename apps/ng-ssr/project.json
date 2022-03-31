@@ -1,6 +1,6 @@
 {
-  "root": "apps/scraper",
-  "sourceRoot": "apps/scraper/src",
+  "root": "apps/ng-ssr",
+  "sourceRoot": "apps/ng-ssr/src",
   "projectType": "application",
   "targets": {
     "build": {
@@ -9,11 +9,11 @@
         "{options.outputPath}"
       ],
       "options": {
-        "outputPath": "dist/apps/scraper",
-        "main": "apps/scraper/src/main.ts",
-        "tsConfig": "apps/scraper/tsconfig.app.json",
+        "outputPath": "dist/apps/ng-ssr",
+        "main": "apps/ng-ssr/src/main.ts",
+        "tsConfig": "apps/ng-ssr/tsconfig.app.json",
         "assets": [
-          "apps/scraper/src/assets"
+          "apps/ng-ssr/src/assets"
         ],
         "externalDependencies": "all",
         "outputFileName": "index.js",
@@ -26,8 +26,8 @@
           "inspect": false,
           "fileReplacements": [
             {
-              "replace": "apps/scraper/src/environments/environment.ts",
-              "with": "apps/scraper/src/environments/environment.prod.ts"
+              "replace": "apps/ng-ssr/src/environments/environment.ts",
+              "with": "apps/ng-ssr/src/environments/environment.prod.ts"
             }
           ]
         }
@@ -36,7 +36,7 @@
     "serve": {
       "executor": "@nrwl/node:execute",
       "options": {
-        "buildTarget": "scraper:build"
+        "buildTarget": "ng-ssr:build"
       }
     },
     "lint": {
@@ -46,17 +46,17 @@
       ],
       "options": {
         "lintFilePatterns": [
-          "apps/scraper/**/*.ts"
+          "apps/ng-ssr/**/*.ts"
         ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
       "outputs": [
-        "coverage/apps/scraper"
+        "coverage/apps/ng-ssr"
       ],
       "options": {
-        "jestConfig": "apps/scraper/jest.config.js",
+        "jestConfig": "apps/ng-ssr/jest.config.js",
         "passWithNoTests": true
       }
     },
@@ -64,7 +64,7 @@
       "executor": "@nrwl/workspace:run-commands",
       "options": {
         "commands": [
-          "gcloud beta functions deploy scraper --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point helloGET --source ./dist/apps/scraper --allow-unauthenticated --project {args.gcpProject}"
+          "gcloud beta functions deploy ssr --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point api --source ./dist/apps/ng-ssr --allow-unauthenticated --project {args.gcpProject}"
         ],
         "color": true,
         "parallel": false

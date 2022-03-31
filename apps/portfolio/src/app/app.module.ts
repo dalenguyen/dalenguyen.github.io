@@ -50,7 +50,7 @@ export class SentryErrorHandler implements ErrorHandler {
     NavComponent,
     ResumeComponent,
   ],
-  imports: [BrowserModule, BrowserAnimationsModule, AppRoutingModule, MaterialModule, HttpClientModule],
+  imports: [BrowserModule.withServerTransition({ appId: 'serverApp' }), BrowserAnimationsModule, AppRoutingModule, MaterialModule, HttpClientModule],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   bootstrap: [AppComponent],
 })

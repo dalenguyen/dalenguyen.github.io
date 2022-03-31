@@ -6,13 +6,19 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/openai/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/openai/**/*.ts"
+        ]
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/openai"],
+      "outputs": [
+        "coverage/libs/openai"
+      ],
       "options": {
         "jestConfig": "libs/openai/jest.config.js",
         "passWithNoTests": true
@@ -20,13 +26,17 @@
     },
     "build": {
       "executor": "@nrwl/node:package",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/openai",
         "tsConfig": "libs/openai/tsconfig.lib.json",
         "packageJson": "libs/openai/package.json",
         "main": "libs/openai/src/index.ts",
-        "assets": ["libs/openai/*.md"]
+        "assets": [
+          "libs/openai/*.md"
+        ]
       }
     }
   },

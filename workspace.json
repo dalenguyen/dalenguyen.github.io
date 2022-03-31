@@ -11,6 +11,7 @@
     "ext-utils-e2e": "apps/ext-utils-e2e",
     "markdown": "libs/markdown",
     "material": "libs/material",
+    "ng-ssr": "apps/ng-ssr",
     "openai": "libs/openai",
     "portfolio": "apps/portfolio",
     "portfolio-e2e": "apps/portfolio-e2e",
