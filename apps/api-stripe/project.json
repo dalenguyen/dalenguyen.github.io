@@ -4,17 +4,13 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/api-stripe",
         "main": "apps/api-stripe/src/main.ts",
         "tsConfig": "apps/api-stripe/tsconfig.app.json",
-        "assets": [
-          "apps/api-stripe/src/assets"
-        ]
+        "assets": ["apps/api-stripe/src/assets"]
       },
       "configurations": {
         "production": {
@@ -31,27 +27,21 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/node:execute",
+      "executor": "@nrwl/node:node",
       "options": {
         "buildTarget": "api-stripe:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/api-stripe/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/api-stripe/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/api-stripe"
-      ],
+      "outputs": ["coverage/apps/api-stripe"],
       "options": {
         "jestConfig": "apps/api-stripe/jest.config.js",
         "passWithNoTests": true

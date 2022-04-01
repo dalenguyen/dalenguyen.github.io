@@ -4,17 +4,13 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/node:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/ng-ssr",
         "main": "apps/ng-ssr/src/main.ts",
         "tsConfig": "apps/ng-ssr/tsconfig.app.json",
-        "assets": [
-          "apps/ng-ssr/src/assets"
-        ],
+        "assets": ["apps/ng-ssr/src/assets"],
         "externalDependencies": "all",
         "outputFileName": "index.js",
         "generatePackageJson": true
@@ -34,27 +30,21 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/node:execute",
+      "executor": "@nrwl/node:node",
       "options": {
         "buildTarget": "ng-ssr:build"
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/ng-ssr/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/ng-ssr/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/ng-ssr"
-      ],
+      "outputs": ["coverage/apps/ng-ssr"],
       "options": {
         "jestConfig": "apps/ng-ssr/jest.config.js",
         "passWithNoTests": true
