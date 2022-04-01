@@ -1,6 +1,7 @@
 {
   "version": 2,
   "projects": {
+    "api-nest": "apps/api-nest",
     "api-products": "apps/api-products",
     "api-stripe": "apps/api-stripe",
     "blog": "apps/blog",
