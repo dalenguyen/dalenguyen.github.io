@@ -5,16 +5,12 @@
   "targets": {
     "build": {
       "executor": "@nrwl/node:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/scraper",
         "main": "apps/scraper/src/main.ts",
         "tsConfig": "apps/scraper/tsconfig.app.json",
-        "assets": [
-          "apps/scraper/src/assets"
-        ],
+        "assets": ["apps/scraper/src/assets"],
         "externalDependencies": "all",
         "outputFileName": "index.js",
         "generatePackageJson": true
@@ -34,27 +30,26 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/node:execute",
+      "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "buildTarget": "scraper:build"
+        "buildTarget": "scraper:build",
+        "commands": [
+          {
+            "command": "nodemon --watch ./dist/apps/scraper --exec functions-framework --target=helloGET --source ./dist/apps/scraper/"
+          }
+        ]
       }
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/scraper/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/scraper/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/scraper"
-      ],
+      "outputs": ["coverage/apps/scraper"],
       "options": {
         "jestConfig": "apps/scraper/jest.config.js",
         "passWithNoTests": true
