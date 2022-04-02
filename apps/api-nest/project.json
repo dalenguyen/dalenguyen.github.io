@@ -10,7 +10,10 @@
         "outputPath": "dist/apps/api-nest",
         "main": "apps/api-nest/src/main.ts",
         "tsConfig": "apps/api-nest/tsconfig.app.json",
-        "assets": ["apps/api-nest/src/assets"]
+        "assets": ["apps/api-nest/src/assets"],
+        "externalDependencies": "all",
+        "outputFileName": "index.js",
+        "generatePackageJson": true
       },
       "configurations": {
         "production": {
@@ -45,6 +48,16 @@
       "options": {
         "jestConfig": "apps/api-nest/jest.config.js",
         "passWithNoTests": true
+      }
+    },
+    "deploy": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "gcloud beta functions deploy api-nest --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point apiNEST --source ./dist/apps/api-nest --allow-unauthenticated --project {args.gcpProject}"
+        ],
+        "color": true,
+        "parallel": false
       }
     }
   },
