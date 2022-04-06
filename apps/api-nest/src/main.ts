@@ -12,6 +12,7 @@ import 'tslib' // needed until importHelpers is set to false
 import { AppModule } from './app/app.module'
 import { environment } from './environments/environment'
 import { AllExceptionFilter } from './infrastructure/common/filter/exception.filter'
+import { LoggerInterceptor } from './infrastructure/common/interceptors/logger.interceptor'
 import { LoggerService } from './infrastructure/logger/logger.service'
 
 // async function bootstrap() {
@@ -35,6 +36,9 @@ export const createNestServer = async (expressInstance) => {
 
   // pipes
   app.useGlobalPipes(new ValidationPipe())
+
+  // interceptors
+  app.useGlobalInterceptors(new LoggerInterceptor(new LoggerService()))
 
   const globalPrefix = 'api'
   app.setGlobalPrefix(globalPrefix)

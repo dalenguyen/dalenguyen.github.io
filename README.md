@@ -33,6 +33,7 @@ nx generate @nrwl/node:library name --importPath @dalenguyen/name --publishable
 npx nx g @nrwl/nest:module path/module-name
 npx nx g @nrwl/nest:service path/service-name
 npx nx g @nrwl/nest:filter path/filter-name
+npx nx g @nrwl/nest:interceptor path/interceptor-name
 ```
 
 ## Update sentry
