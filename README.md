@@ -27,6 +27,14 @@ nx generate @nrwl/node:library name --importPath @dalenguyen/name --publishable
 
 ```
 
+## NestJS commands
+
+```
+npx nx g @nrwl/nest:module path/module-name
+npx nx g @nrwl/nest:service path/service-name
+npx nx g @nrwl/nest:filter path/filter-name
+```
+
 ## Update sentry
 
 After deploying new feature or fix a bug. The Sentry release should be updated.
