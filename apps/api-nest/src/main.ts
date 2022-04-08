@@ -7,12 +7,14 @@ import { http } from '@google-cloud/functions-framework'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { ExpressAdapter } from '@nestjs/platform-express'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as express from 'express'
 import 'tslib' // needed until importHelpers is set to false
 import { AppModule } from './app/app.module'
 import { environment } from './environments/environment'
 import { AllExceptionFilter } from './infrastructure/common/filter/exception.filter'
 import { LoggerInterceptor } from './infrastructure/common/interceptors/logger.interceptor'
+import { ResponseFormat, ResponseInterceptor } from './infrastructure/common/interceptors/response.interceptor'
 import { LoggerService } from './infrastructure/logger/logger.service'
 
 // async function bootstrap() {
@@ -39,8 +41,9 @@ export const createNestServer = async (expressInstance) => {
 
   // interceptors
   app.useGlobalInterceptors(new LoggerInterceptor(new LoggerService()))
+  app.useGlobalInterceptors(new ResponseInterceptor())
 
-  const globalPrefix = 'api'
+  const globalPrefix = 'v1'
   app.setGlobalPrefix(globalPrefix)
   app.enableCors()
 
@@ -54,16 +57,19 @@ createNestServer(server)
     } else {
       Logger.log(`🚀 Starting development server on http://localhost:${process.env.PORT || 3333}`)
 
-      // const config = new DocumentBuilder()
-      //   .addBearerAuth()
-      //   .setTitle('API Nest')
-      //   .setDescription('The API Nest API description')
-      //   .setVersion('1.0')
-      //   .build()
+      const config = new DocumentBuilder()
+        .addBearerAuth()
+        .setTitle('API Nest')
+        .setDescription('The API Nest API description')
+        .setVersion('1.0')
+        .build()
 
-      // const document = SwaggerModule.createDocument(v, config)
+      const document = SwaggerModule.createDocument(v, config, {
+        extraModels: [ResponseFormat],
+        deepScanRoutes: true,
+      })
 
-      // SwaggerModule.setup('api', v, document)
+      SwaggerModule.setup('api', v, document)
 
       v.listen(process.env.PORT || 3333)
     }

@@ -54,10 +54,10 @@
     "@angular/platform-server": "13.3.1",
     "@angular/router": "13.3.1",
     "@google-cloud/functions-framework": "^3.0.0",
-    "@nestjs/common": "^7.0.0",
-    "@nestjs/core": "^7.0.0",
-    "@nestjs/platform-express": "^7.0.0",
-    "@nestjs/swagger": "^5.2.1",
+    "@nestjs/common": "8.4.4",
+    "@nestjs/core": "8.4.4",
+    "@nestjs/platform-express": "8.4.4",
+    "@nestjs/swagger": "5.2.1",
     "@nguniversal/express-engine": "^13.1.0",
     "@sentry/browser": "^6.4.1",
     "@sentry/core": "^6.16.1",
@@ -71,7 +71,6 @@
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "express": "^4.17.3",
-    "fastify-swagger": "^5.1.0",
     "firebase": "8.6.1",
     "firebase-admin": "^10.0.2",
     "form-data": "^4.0.0",
@@ -87,7 +86,7 @@
     "react-test-renderer": "18.0.0",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.7",
-    "rxjs": "~6.6.0",
+    "rxjs": "7.5.5",
     "smoothscroll-polyfill": "^0.4.4",
     "tslib": "^2.0.0",
     "zone.js": "0.11.4"
@@ -106,8 +105,8 @@
     "@babel/preset-env": "^7.16.8",
     "@babel/preset-typescript": "7.12.13",
     "@fortawesome/fontawesome-free": "^5.15.3",
-    "@nestjs/schematics": "^8.0.0",
-    "@nestjs/testing": "^7.0.0",
+    "@nestjs/schematics": "8.0.10",
+    "@nestjs/testing": "8.4.4",
     "@nguniversal/builders": "^13.1.0",
     "@nrwl/angular": "13.10.0-beta.9",
     "@nrwl/cli": "^13.9.5",
@@ -168,7 +167,7 @@
     "prettier": "2.5.1",
     "react-test-renderer": "17.0.2",
     "sass": "1.49.9",
-    "swagger-ui-express": "^4.3.0",
+    "swagger-ui-express": "4.3.0",
     "tailwindcss": "^3.0.23",
     "ts-jest": "27.0.5",
     "ts-node": "~9.1.1",
@@ -184,3 +183,4 @@
     "@angular-devkit/core": "13.0.2"
   }
 }
+
