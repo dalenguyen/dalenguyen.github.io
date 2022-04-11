@@ -55,9 +55,11 @@
     "@angular/router": "13.3.1",
     "@google-cloud/functions-framework": "^3.0.0",
     "@nestjs/common": "8.4.4",
+    "@nestjs/config": "^2.0.0",
     "@nestjs/core": "8.4.4",
     "@nestjs/platform-express": "8.4.4",
     "@nestjs/swagger": "5.2.1",
+    "@nestjs/typeorm": "^8.0.3",
     "@nguniversal/express-engine": "^13.1.0",
     "@sentry/browser": "^6.4.1",
     "@sentry/core": "^6.16.1",
@@ -89,6 +91,7 @@
     "rxjs": "7.5.5",
     "smoothscroll-polyfill": "^0.4.4",
     "tslib": "^2.0.0",
+    "typeorm": "^0.3.5",
     "zone.js": "0.11.4"
   },
   "devDependencies": {
@@ -165,7 +168,7 @@
     "postcss-preset-env": "^6.7.0",
     "postcss-url": "^10.1.1",
     "prettier": "2.5.1",
-    "react-test-renderer": "17.0.2",
+    "react-test-renderer": "18.0.0",
     "sass": "1.49.9",
     "swagger-ui-express": "4.3.0",
     "tailwindcss": "^3.0.23",
@@ -183,4 +186,3 @@
     "@angular-devkit/core": "13.0.2"
   }
 }
-
