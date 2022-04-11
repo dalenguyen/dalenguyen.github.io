@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common'
 import { TypeOrmModule, TypeOrmModuleOptions } from '@nestjs/typeorm'
-import { EnvironmentConfigService } from '../environment-config/environment-config.service'
+import { EnvironmentConfigModule, EnvironmentConfigService } from '../environment-config'
 
 export const getTypeOrmModuleOptions = (config: EnvironmentConfigService): TypeOrmModuleOptions => ({
   type: 'postgres',
@@ -20,7 +20,7 @@ export const getTypeOrmModuleOptions = (config: EnvironmentConfigService): TypeO
 @Module({
   imports: [
     TypeOrmModule.forRootAsync({
-      imports: [EnvironmentConfigService],
+      imports: [EnvironmentConfigModule],
       inject: [EnvironmentConfigService],
       useFactory: getTypeOrmModuleOptions,
     }),
