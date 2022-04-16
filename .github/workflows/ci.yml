@@ -49,7 +49,7 @@ jobs:
         run: yarn install
 
       - name: Build
-        run: yarn build:portfolio
+        run: npx nx build portfolio
         # run: yarn affected:build
 
       - name: Generate 404 files

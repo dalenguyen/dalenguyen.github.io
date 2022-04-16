@@ -64,6 +64,16 @@
         "color": true,
         "parallel": false
       }
+    },
+    "deploy-pubsub": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": [
+          "gcloud beta functions deploy nx-pubsub --region us-central1 --gen2 --runtime nodejs16 --trigger-topic my-topic --entry-point helloPubSub --source ./dist/apps/api-nest --project {args.gcpProject}"
+        ],
+        "color": true,
+        "parallel": false
+      }
     }
   },
   "tags": []
