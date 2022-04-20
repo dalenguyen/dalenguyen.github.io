@@ -43,6 +43,7 @@ export const createNestServer = async (expressInstance) => {
   app.useGlobalInterceptors(new LoggerInterceptor(new LoggerService()))
   app.useGlobalInterceptors(new ResponseInterceptor())
 
+  // http://localhost:3333/v1
   const globalPrefix = 'v1'
   app.setGlobalPrefix(globalPrefix)
   app.enableCors()

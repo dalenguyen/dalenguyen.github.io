@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common'
+import { EnvironmentConfigModule } from '../infrastructure/config/environment-config'
 import { ControllersModule } from '../infrastructure/controllers/controllers.module'
 import { ExceptionsModule } from '../infrastructure/exceptions/exceptions.module'
 import { LoggerModule } from '../infrastructure/logger/logger.module'
-import { AppController } from './app.controller'
-import { AppService } from './app.service'
+import { UseCasesProxyModule } from '../infrastructure/usecases-proxy/usecases-proxy.module'
 
 @Module({
-  imports: [LoggerModule, ExceptionsModule, ControllersModule],
-  controllers: [AppController],
-  providers: [AppService],
+  imports: [LoggerModule, ExceptionsModule, UseCasesProxyModule.register(), ControllersModule, EnvironmentConfigModule],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

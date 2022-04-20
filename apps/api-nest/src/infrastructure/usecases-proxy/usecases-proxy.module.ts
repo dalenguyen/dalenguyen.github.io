@@ -28,31 +28,31 @@ export class UseCasesProxyModule {
       module: UseCasesProxyModule,
       providers: [
         {
-          inject: [DatabaseTodoRepository],
+          inject: [LoggerService, DatabaseTodoRepository],
           provide: UseCasesProxyModule.GET_TODO_USECASES_PROXY,
           useFactory: (logger: LoggerService, todoRepository: DatabaseTodoRepository) =>
             new UseCasesProxy(new GetTodoUseCases(logger, todoRepository)),
         },
         {
-          inject: [DatabaseTodoRepository],
+          inject: [LoggerService, DatabaseTodoRepository],
           provide: UseCasesProxyModule.GET_TODOS_USECASES_PROXY,
           useFactory: (logger: LoggerService, todoRepository: DatabaseTodoRepository) =>
             new UseCasesProxy(new GetTodosUseCases(logger, todoRepository)),
         },
         {
-          inject: [DatabaseTodoRepository],
+          inject: [LoggerService, DatabaseTodoRepository],
           provide: UseCasesProxyModule.POST_TODO_USECASES_PROXY,
           useFactory: (logger: LoggerService, todoRepository: DatabaseTodoRepository) =>
             new UseCasesProxy(new AddTodoUseCases(logger, todoRepository)),
         },
         {
-          inject: [DatabaseTodoRepository],
+          inject: [LoggerService, DatabaseTodoRepository],
           provide: UseCasesProxyModule.PUT_TODO_USECASES_PROXY,
           useFactory: (logger: LoggerService, todoRepository: DatabaseTodoRepository) =>
             new UseCasesProxy(new UpdateTodoUseCases(logger, todoRepository)),
         },
         {
-          inject: [DatabaseTodoRepository],
+          inject: [LoggerService, DatabaseTodoRepository],
           provide: UseCasesProxyModule.DELETE_TODO_USECASES_PROXY,
           useFactory: (logger: LoggerService, todoRepository: DatabaseTodoRepository) =>
             new UseCasesProxy(new DeleteTodoUseCases(logger, todoRepository)),

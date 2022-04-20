@@ -4,6 +4,6 @@ import { TodoController } from './todo/todo.controller'
 
 @Module({
   imports: [UseCasesProxyModule.register()],
-  providers: [TodoController],
+  controllers: [TodoController],
 })
 export class ControllersModule {}
