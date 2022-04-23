@@ -24,6 +24,8 @@
     "shared-ui": "libs/shared/ui",
     "solid": "apps/solid",
     "solid-e2e": "apps/solid-e2e",
-    "storybook-e2e-ui-e2e": "apps/storybook-e2e/ui-e2e"
+    "storybook-e2e-ui-e2e": "apps/storybook-e2e/ui-e2e",
+    "supabase": "apps/supabase",
+    "supabase-e2e": "apps/supabase-e2e"
   }
 }

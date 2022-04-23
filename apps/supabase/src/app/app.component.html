@@ -1,0 +1,6 @@
+<div class="container" style="padding: 50px 0 100px 0">
+  <dalenguyen-account *ngIf="session; else auth" [session]="session"></dalenguyen-account>
+  <ng-template #auth>
+    <dalenguyen-auth></dalenguyen-auth>
+  </ng-template>
+</div>

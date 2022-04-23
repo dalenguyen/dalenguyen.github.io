@@ -1,0 +1,29 @@
+{
+  "root": "apps/supabase-e2e",
+  "sourceRoot": "apps/supabase-e2e/src",
+  "projectType": "application",
+  "targets": {
+    "e2e": {
+      "executor": "@nrwl/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/supabase-e2e/cypress.json",
+        "devServerTarget": "supabase:serve:development",
+        "tsConfig": "apps/supabase-e2e/tsconfig.json"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "supabase:serve:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/supabase-e2e/**/*.{js,ts}"]
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["supabase"]
+}

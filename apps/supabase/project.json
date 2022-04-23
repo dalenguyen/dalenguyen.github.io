@@ -1,0 +1,88 @@
+{
+  "projectType": "application",
+  "root": "apps/supabase",
+  "sourceRoot": "apps/supabase/src",
+  "prefix": "dalenguyen",
+  "targets": {
+    "build": {
+      "executor": "@angular-devkit/build-angular:browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/supabase",
+        "index": "apps/supabase/src/index.html",
+        "main": "apps/supabase/src/main.ts",
+        "polyfills": "apps/supabase/src/polyfills.ts",
+        "tsConfig": "apps/supabase/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/supabase/src/favicon.ico", "apps/supabase/src/assets"],
+        "styles": ["apps/supabase/src/styles.scss"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "fileReplacements": [
+            {
+              "replace": "apps/supabase/src/environments/environment.ts",
+              "with": "apps/supabase/src/environments/environment.prod.ts"
+            }
+          ],
+          "outputHashing": "all"
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-devkit/build-angular:dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "supabase:build:production"
+        },
+        "development": {
+          "browserTarget": "supabase:build:development"
+        }
+      },
+      "defaultConfiguration": "development"
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "supabase:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/supabase/src/**/*.ts", "apps/supabase/src/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/apps/supabase"],
+      "options": {
+        "jestConfig": "apps/supabase/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}
