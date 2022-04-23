@@ -1,4 +1,10 @@
 <div class="form-widget">
+  <dalenguyen-avatar
+    [avatarUrl]="this.profile?.avatar_url"
+    (upload)="updateProfile(username.value, website.value, $event)"
+  >
+  </dalenguyen-avatar>
+
   <div>
     <label for="email">Email</label>
     <input id="email" type="text" [value]="session?.user?.email" disabled />
