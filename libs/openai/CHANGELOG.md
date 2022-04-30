@@ -11,6 +11,12 @@
 
 ---
 
+## [0.11.2] - 2022-04-29
+
+#### - :nail_care: [Polish]
+
+- Add more parameters to create fine tune
+
 ## [0.11.1] - 2022-04-29
 
 #### - :bug: [Bug Fix]
