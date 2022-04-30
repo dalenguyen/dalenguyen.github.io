@@ -11,6 +11,12 @@
 
 ---
 
+## [0.11.1] - 2022-04-29
+
+#### - :bug: [Bug Fix]
+
+- fix file path
+
 ## [0.11.0] - 2022-04-29
 
 #### - :boom: [Breaking Change]
@@ -19,7 +25,7 @@
 
 ## [0.10.0] - 2022-01-24
 
-> - :nail_care: [Polish]
+#### - :nail_care: [Polish]
 
 - Update [model names](https://help.openai.com/en/articles/5832130-what-s-changed-with-engine-names-and-best-practices)
 

@@ -4,7 +4,7 @@ import { CompletionResponse, FileData, FilePurpose } from '../models'
 export const text2JsonlFile = (options: { data: FileData[]; filePath?: string; purpose?: FilePurpose }) => {
   const { data, filePath = `converted-${Date.now()}.jsonl`, purpose = FilePurpose.Answers } = options
 
-  const localFilePath = filePath === 'converted.jsonl' ? process.cwd() + '/' + filePath : filePath
+  const localFilePath = filePath.includes('converted-') ? process.cwd() + '/' + filePath : filePath
   const stream = fs.createWriteStream(localFilePath, { flags: 'a' })
   let phrases
 
