@@ -11,6 +11,12 @@
 
 ---
 
+## [0.11.0] - 2022-04-29
+
+#### - :boom: [Breaking Change]
+
+- Add prepare fine-tune file conversion
+
 ## [0.10.0] - 2022-01-24
 
 > - :nail_care: [Polish]

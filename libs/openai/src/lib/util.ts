@@ -1,15 +1,16 @@
 import * as fs from 'fs'
-import { CompletionResponse, FilePurpose } from '../models'
+import { CompletionResponse, FileData, FilePurpose } from '../models'
 
-export const text2JsonlFile = (text: string, filePath = 'converted.jsonl', purpose = FilePurpose.Answers) => {
+export const text2JsonlFile = (options: { data: FileData[]; filePath?: string; purpose?: FilePurpose }) => {
+  const { data, filePath = `converted-${Date.now()}.jsonl`, purpose = FilePurpose.Answers } = options
+
   const localFilePath = filePath === 'converted.jsonl' ? process.cwd() + '/' + filePath : filePath
   const stream = fs.createWriteStream(localFilePath, { flags: 'a' })
   let phrases
 
   switch (purpose) {
     case FilePurpose.Answers:
-      // console.log(`Prepare for 'Answers' purpose`)
-      phrases = text.replace(/"|“|”/g, "'").split(/\r|\n|\./)
+      phrases = data[0].text.replace(/"|“|”/g, "'").split(/\r|\n|\./)
 
       phrases.forEach((item) => {
         if (item.trim() !== '') {
@@ -17,6 +18,14 @@ export const text2JsonlFile = (text: string, filePath = 'converted.jsonl', purpo
           stream.write(sentence + '\n')
         }
       })
+      break
+
+    case FilePurpose.Finetune:
+      data.forEach((item) => {
+        const sentence = `{"prompt": "${item.prompt.trim()}", "completion": "${item.completion.trim()}"}`
+        stream.write(sentence + '\n')
+      })
+
       break
 
     default:

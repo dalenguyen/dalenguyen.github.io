@@ -1,6 +1,6 @@
 import * as dotenv from 'dotenv'
 import { OpenAI } from '../src/lib/base'
-import { isContentSafe, text2JsonlFile } from '../src/lib/util'
+import { isContentSafe } from '../src/lib/util'
 import { AnswerRequest, ClassificationRequest, CompletionRequest, CompletionResponse, EngineName } from '../src/models'
 
 const config = dotenv.config()
@@ -54,14 +54,6 @@ describe('OpenAI - Base', () => {
     expect(result.object).toEqual('answer')
     expect(result.answers).toHaveLength(1)
     expect(result.selected_documents).toHaveLength(2)
-  }, 60000)
-
-  it('Text Conversion', async () => {
-    const text = 'This is first sentence. The is second sentence'
-    const savedFile = text2JsonlFile(text)
-
-    expect(savedFile.status).toEqual('success')
-    expect(savedFile.fileName).toEqual('converted.jsonl')
   }, 60000)
 
   it('List files', async () => {

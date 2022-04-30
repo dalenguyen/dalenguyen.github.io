@@ -7,6 +7,12 @@ export enum FilePurpose {
   FinetuneResults = 'fine-tune-results',
 }
 
+export interface FileData {
+  text?: string
+  prompt?: string
+  completion?: string
+}
+
 export interface OpenAIFile {
   id: string
   object: 'file'

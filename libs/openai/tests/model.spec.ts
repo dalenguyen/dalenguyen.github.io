@@ -12,7 +12,7 @@ describe('OpenAI - Models', () => {
     openAI = new OpenAI(apiKey)
   })
 
-  for (let engine of Object.values(EngineName)) {
+  for (const engine of Object.values(EngineName)) {
     it(`Create completion from - ${engine}`, async () => {
       const completionRequest: CompletionRequest = {
         prompt: `Once upon a time...`,

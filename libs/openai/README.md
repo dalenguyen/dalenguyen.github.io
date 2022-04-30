@@ -106,13 +106,43 @@ openAI.createAnswer(question)
 
 ## Text Conversion
 
-Text 2 JSONL
+### Text 2 JSONL - Answer
 
 ```javascript
-import { text2JsonlFile } from '@dalenguyen/openai'
+import { text2JsonlFile, FileData } from '@dalenguyen/openai'
 
-const text = 'This is first sentence. The is second sentence'
-const savedFile = text2JsonlFile(text)
+const data: FileData[] = [
+  {
+    text: 'This is first sentence. The is second sentence',
+  },
+]
+const savedFile = text2JsonlFile({ data })
+
+// Response
+//
+// {
+// "status": "success",
+// "filePath": "abspath/converted.jsonl",
+// "fileName": "converted.jsonl"
+// }
+```
+
+### Text 2 JSONL - Fine Tune
+
+```javascript
+import { text2JsonlFile, FileData, FilePurpose } from '@dalenguyen/openai'
+
+const data: FileData[] = [
+  {
+    prompt: 'How about return or refund policy?',
+    completion: 'Due to the nature of digital products, which cannot be returned, we will not offer any refunds.',
+  },
+  {
+    prompt: 'How can i see the reviews?',
+    completion: 'There is no review at this moment',
+  },
+]
+const savedFile = text2JsonlFile({ data, purpose: FilePurpose.Finetune })
 
 // Response
 //
