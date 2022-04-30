@@ -11,6 +11,12 @@
 
 ---
 
+## [0.11.3] - 2022-04-30
+
+#### - :nail_care: [Polish]
+
+- update test file for text conversion
+
 ## [0.11.2] - 2022-04-29
 
 #### - :nail_care: [Polish]

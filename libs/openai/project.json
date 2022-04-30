@@ -28,6 +28,12 @@
         "main": "libs/openai/src/index.ts",
         "assets": ["libs/openai/*.md"]
       }
+    },
+    "deploy": {
+      "executor": "@nrwl/workspace:run-commands",
+      "options": {
+        "commands": ["npm publish dist/libs/openai"]
+      }
     }
   },
   "tags": []
