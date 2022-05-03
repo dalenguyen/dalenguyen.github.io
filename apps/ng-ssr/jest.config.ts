@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'api-nest',
-  preset: '../../jest.preset.js',
+  displayName: 'ng-ssr',
+
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
@@ -11,5 +11,6 @@ module.exports = {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/api-nest',
+  coverageDirectory: '../../coverage/apps/ng-ssr',
+  preset: '../../jest.preset.ts',
 }

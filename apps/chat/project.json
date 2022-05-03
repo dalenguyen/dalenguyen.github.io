@@ -13,13 +13,8 @@
         "polyfills": "apps/chat/src/polyfills.ts",
         "tsConfig": "apps/chat/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/chat/src/favicon.ico",
-          "apps/chat/src/assets"
-        ],
-        "styles": [
-          "apps/chat/src/styles.scss"
-        ],
+        "assets": ["apps/chat/src/favicon.ico", "apps/chat/src/assets"],
+        "styles": ["apps/chat/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -76,22 +71,15 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/chat/src/**/*.ts",
-          "apps/chat/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/chat/src/**/*.ts", "apps/chat/src/**/*.html"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/chat"
-      ],
+      "outputs": ["coverage/apps/chat"],
       "options": {
-        "jestConfig": "apps/chat/jest.config.js",
+        "jestConfig": "apps/chat/jest.config.ts",
         "passWithNoTests": true
       }
     }

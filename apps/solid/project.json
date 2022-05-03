@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/solid",
         "index": "apps/solid/src/index.html",
@@ -16,14 +14,8 @@
         "polyfills": "apps/solid/src/polyfills.ts",
         "tsConfig": "apps/solid/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/solid/src/favicon.ico",
-          "apps/solid/src/assets"
-        ],
-        "styles": [
-          "./node_modules/@angular/material/prebuilt-themes/indigo-pink.css",
-          "apps/solid/src/styles.scss"
-        ],
+        "assets": ["apps/solid/src/favicon.ico", "apps/solid/src/assets"],
+        "styles": ["./node_modules/@angular/material/prebuilt-themes/indigo-pink.css", "apps/solid/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -80,19 +72,14 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/solid/src/**/*.ts",
-          "apps/solid/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/solid/src/**/*.ts", "apps/solid/src/**/*.html"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/solid"
-      ],
+      "outputs": ["coverage/apps/solid"],
       "options": {
-        "jestConfig": "apps/solid/jest.config.js",
+        "jestConfig": "apps/solid/jest.config.ts",
         "passWithNoTests": true
       }
     }

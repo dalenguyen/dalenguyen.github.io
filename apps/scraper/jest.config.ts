@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'api-stripe',
-  preset: '../../jest.preset.js',
+  displayName: 'scraper',
+
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
@@ -11,5 +11,6 @@ module.exports = {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/api-stripe',
+  coverageDirectory: '../../coverage/apps/scraper',
+  preset: '../../jest.preset.ts',
 }

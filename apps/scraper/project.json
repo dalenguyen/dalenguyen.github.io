@@ -51,7 +51,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/scraper"],
       "options": {
-        "jestConfig": "apps/scraper/jest.config.js",
+        "jestConfig": "apps/scraper/jest.config.ts",
         "passWithNoTests": true
       }
     },

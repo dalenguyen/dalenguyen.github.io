@@ -6,5 +6,6 @@
   "angularCompilerOptions": {
     "compilationMode": "partial",
     "enableIvy": true
-  }
+  },
+  "exclude": ["jest.config.ts"]
 }

@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'ng-ssr',
-  preset: '../../jest.preset.js',
+  displayName: 'api-stripe',
+
   globals: {
     'ts-jest': {
       tsconfig: '<rootDir>/tsconfig.spec.json',
@@ -11,5 +11,6 @@ module.exports = {
     '^.+\\.[tj]s$': 'ts-jest',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
-  coverageDirectory: '../../coverage/apps/ng-ssr',
+  coverageDirectory: '../../coverage/apps/api-stripe',
+  preset: '../../jest.preset.ts',
 }

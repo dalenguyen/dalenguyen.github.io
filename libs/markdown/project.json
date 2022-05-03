@@ -5,22 +5,16 @@
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/markdown/**/*.ts"
-        ]
+        "lintFilePatterns": ["libs/markdown/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/markdown"
-      ],
+      "outputs": ["coverage/libs/markdown"],
       "options": {
-        "jestConfig": "libs/markdown/jest.config.js",
+        "jestConfig": "libs/markdown/jest.config.ts",
         "passWithNoTests": true
       }
     }

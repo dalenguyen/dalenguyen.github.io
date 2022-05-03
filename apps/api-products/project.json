@@ -43,7 +43,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/api-products"],
       "options": {
-        "jestConfig": "apps/api-products/jest.config.js",
+        "jestConfig": "apps/api-products/jest.config.ts",
         "passWithNoTests": true
       }
     }

@@ -13,13 +13,8 @@
         "polyfills": "apps/saas/src/polyfills.ts",
         "tsConfig": "apps/saas/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/saas/src/favicon.ico",
-          "apps/saas/src/assets"
-        ],
-        "styles": [
-          "apps/saas/src/styles.scss"
-        ],
+        "assets": ["apps/saas/src/favicon.ico", "apps/saas/src/assets"],
+        "styles": ["apps/saas/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -76,22 +71,15 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/saas/src/**/*.ts",
-          "apps/saas/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/saas/src/**/*.ts", "apps/saas/src/**/*.html"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/saas"
-      ],
+      "outputs": ["coverage/apps/saas"],
       "options": {
-        "jestConfig": "apps/saas/jest.config.js",
+        "jestConfig": "apps/saas/jest.config.ts",
         "passWithNoTests": true
       }
     }

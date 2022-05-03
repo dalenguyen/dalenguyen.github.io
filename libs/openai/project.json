@@ -14,7 +14,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/openai"],
       "options": {
-        "jestConfig": "libs/openai/jest.config.js",
+        "jestConfig": "libs/openai/jest.config.ts",
         "passWithNoTests": true
       }
     },

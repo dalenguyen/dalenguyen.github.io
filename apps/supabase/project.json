@@ -79,7 +79,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/supabase"],
       "options": {
-        "jestConfig": "apps/supabase/jest.config.js",
+        "jestConfig": "apps/supabase/jest.config.ts",
         "passWithNoTests": true
       }
     }

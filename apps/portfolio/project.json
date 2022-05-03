@@ -88,7 +88,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/portfolio"],
       "options": {
-        "jestConfig": "apps/portfolio/jest.config.js",
+        "jestConfig": "apps/portfolio/jest.config.ts",
         "passWithNoTests": true
       }
     },
