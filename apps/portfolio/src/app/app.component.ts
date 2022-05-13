@@ -1,12 +1,44 @@
 import { MediaMatcher } from '@angular/cdk/layout'
-import { MatSidenav } from '@angular/material/sidenav'
-import { MatIconRegistry } from '@angular/material/icon'
-import { NavService } from './shared/services/nav.service'
-import { Component, ChangeDetectorRef, OnDestroy, ViewChild } from '@angular/core'
+import {
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ErrorHandler,
+  Injectable,
+  OnDestroy,
+  ViewChild,
+} from '@angular/core'
+import { MatIconModule, MatIconRegistry } from '@angular/material/icon'
+import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav'
 import { Meta, Title } from '@angular/platform-browser'
+import { RouterModule } from '@angular/router'
+import * as Sentry from '@sentry/browser'
+import { RewriteFrames } from '@sentry/integrations'
+import { environment } from '../environments/environment'
+import { FooterComponent } from './shared/components/footer/footer.component'
+import { NavComponent } from './shared/components/nav/nav.component'
+import { NavService } from './shared/services/nav.service'
+
+Sentry.init({
+  dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
+  release: `dalenguyen-me@${environment.gitHash}`,
+  integrations: [new RewriteFrames()],
+})
+
+@Injectable()
+export class SentryErrorHandler implements ErrorHandler {
+  handleError(error) {
+    Sentry.captureException(error.originalError || error)
+    console.error(error)
+  }
+}
 
 @Component({
+  changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'app-root',
+  standalone: true,
+  imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent],
+  providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

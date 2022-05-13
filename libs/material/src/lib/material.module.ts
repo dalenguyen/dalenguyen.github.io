@@ -1,16 +1,14 @@
 import { NgModule } from '@angular/core'
-import { CommonModule } from '@angular/common'
-
-import { MatIconModule } from '@angular/material/icon'
-import { MatCardModule } from '@angular/material/card'
 import { MatButtonModule } from '@angular/material/button'
-import { MatSidenavModule } from '@angular/material/sidenav'
+import { MatCardModule } from '@angular/material/card'
 import { MatGridListModule } from '@angular/material/grid-list'
+import { MatIconModule } from '@angular/material/icon'
+import { MatSidenavModule } from '@angular/material/sidenav'
 
 const MATERIAL_MODULES = [MatButtonModule, MatIconModule, MatSidenavModule, MatGridListModule, MatCardModule]
 
 @NgModule({
-  imports: [CommonModule, MATERIAL_MODULES],
+  imports: [MATERIAL_MODULES],
   exports: [MATERIAL_MODULES],
 })
 export class MaterialModule {}
