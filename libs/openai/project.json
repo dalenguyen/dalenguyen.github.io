@@ -1,5 +1,4 @@
 {
-  "root": "libs/openai",
   "sourceRoot": "libs/openai/src",
   "projectType": "library",
   "targets": {

@@ -1,5 +1,4 @@
 {
-  "root": "apps/ng-ssr",
   "sourceRoot": "apps/ng-ssr/src",
   "projectType": "application",
   "targets": {

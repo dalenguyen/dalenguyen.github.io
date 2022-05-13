@@ -1,5 +1,4 @@
 {
-  "root": "apps/api-stripe",
   "sourceRoot": "apps/api-stripe/src",
   "projectType": "application",
   "targets": {

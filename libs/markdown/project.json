@@ -1,5 +1,4 @@
 {
-  "root": "libs/markdown",
   "sourceRoot": "libs/markdown/src",
   "projectType": "library",
   "targets": {

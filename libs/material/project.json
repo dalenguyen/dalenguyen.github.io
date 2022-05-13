@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/material",
   "sourceRoot": "libs/material/src",
   "prefix": "dalenguyen",
   "targets": {

@@ -1,5 +1,4 @@
 {
-  "root": "apps/blog",
   "sourceRoot": "apps/blog",
   "projectType": "application",
   "targets": {

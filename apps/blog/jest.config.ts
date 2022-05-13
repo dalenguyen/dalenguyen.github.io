@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   displayName: 'blog',
 
   transform: {
@@ -7,5 +7,5 @@ module.exports = {
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coverageDirectory: '../../coverage/apps/blog',
-  preset: '../../jest.preset.ts',
+  preset: '../../jest.preset.js',
 }

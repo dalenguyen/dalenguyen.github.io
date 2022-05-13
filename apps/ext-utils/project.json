@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/ext-utils",
   "sourceRoot": "apps/ext-utils/src",
   "prefix": "dalenguyen",
   "targets": {

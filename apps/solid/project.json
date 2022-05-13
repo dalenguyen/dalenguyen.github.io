@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/solid",
   "sourceRoot": "apps/solid/src",
   "prefix": "dalenguyen",
   "targets": {

@@ -1,5 +1,4 @@
 {
-  "root": "libs/shared/ui",
   "sourceRoot": "libs/shared/ui/src",
   "projectType": "library",
   "tags": [],

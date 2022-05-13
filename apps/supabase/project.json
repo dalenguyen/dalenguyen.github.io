@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/supabase",
   "sourceRoot": "apps/supabase/src",
   "prefix": "dalenguyen",
   "targets": {

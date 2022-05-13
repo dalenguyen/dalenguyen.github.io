@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/saas",
   "sourceRoot": "apps/saas/src",
   "prefix": "dalenguyen",
   "targets": {

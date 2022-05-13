@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/portfolio",
   "sourceRoot": "apps/portfolio/src",
   "prefix": "dalenguyen",
   "targets": {

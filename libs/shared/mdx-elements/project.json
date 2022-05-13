@@ -1,5 +1,4 @@
 {
-  "root": "libs/shared/mdx-elements",
   "sourceRoot": "libs/shared/mdx-elements/src",
   "projectType": "library",
   "tags": [],

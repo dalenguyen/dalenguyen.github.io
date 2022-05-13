@@ -1,5 +1,4 @@
 {
-  "root": "apps/api-nest",
   "sourceRoot": "apps/api-nest/src",
   "projectType": "application",
   "targets": {

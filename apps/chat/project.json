@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/chat",
   "sourceRoot": "apps/chat/src",
   "prefix": "dalenguyen",
   "targets": {

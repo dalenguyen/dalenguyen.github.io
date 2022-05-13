@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/saas-libs",
   "sourceRoot": "libs/saas-libs/src",
   "prefix": "dalenguyen",
   "targets": {

@@ -1,5 +1,4 @@
 {
-  "root": "apps/chat-e2e",
   "sourceRoot": "apps/chat-e2e/src",
   "projectType": "application",
   "targets": {
@@ -19,17 +18,11 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/chat-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["apps/chat-e2e/**/*.{js,ts}"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     }
   },
   "tags": [],
-  "implicitDependencies": [
-    "chat"
-  ]
+  "implicitDependencies": ["chat"]
 }

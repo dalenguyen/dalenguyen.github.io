@@ -1,5 +1,4 @@
 {
-  "root": "apps/scraper",
   "sourceRoot": "apps/scraper/src",
   "projectType": "application",
   "targets": {
