@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core'
-import { Routes, RouterModule } from '@angular/router'
+import { RouterModule, Routes } from '@angular/router'
 import { HomeComponent } from './home/home.component'
 import { ResumeComponent } from './resume/resume.component'
 
@@ -15,7 +15,7 @@ const routes: Routes = [
   imports: [
     RouterModule.forRoot(routes, {
       onSameUrlNavigation: 'reload',
-      initialNavigation: 'enabled',
+      initialNavigation: 'enabledBlocking',
       relativeLinkResolution: 'legacy',
     }),
   ],
