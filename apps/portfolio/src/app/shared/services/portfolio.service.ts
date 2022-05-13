@@ -1,23 +1,19 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-
-import { Observable } from 'rxjs';
-import { captureException } from '@sentry/core';
+import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
+import { captureException } from '@sentry/core'
+import { Observable } from 'rxjs'
 import {
-  map,
   // publishReplay,
   // refCount,
   catchError,
+  map,
   shareReplay,
-} from 'rxjs/operators';
+} from 'rxjs/operators'
+import { GitProject } from '../models/git.project'
 
-import { GitProject } from '../models/git.project';
-
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable()
 export class PortfolioService {
-  projects$: Observable<GitProject[]> = null;
+  projects$: Observable<GitProject[]> = null
 
   gitProjects = [
     'rest-api-node-typescript',
@@ -28,23 +24,21 @@ export class PortfolioService {
     'stockai',
     // 'WebdriverIO-TypeScript-Boilerplate',
     // 'angular-store-locator'
-  ];
+  ]
 
-  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100';
+  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100'
 
   constructor(private http: HttpClient) {
-    this.getGitProjects();
+    this.getGitProjects()
   }
 
   getGitProjects(): void {
     this.projects$ = this.http.get<GitProject[]>(this.gitBaseUrl).pipe(
-      map((projects) =>
-        projects.filter((project) => this.gitProjects.includes(project.name))
-      ),
+      map((projects) => projects.filter((project) => this.gitProjects.includes(project.name))),
       // publishReplay(1),
       // refCount(),
       shareReplay({ bufferSize: 1, refCount: true }),
-      catchError((error) => captureException(error))
-    ) as Observable<GitProject[]>;
+      catchError((error) => captureException(error)),
+    ) as Observable<GitProject[]>
   }
 }

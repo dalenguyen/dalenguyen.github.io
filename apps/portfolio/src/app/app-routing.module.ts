@@ -1,24 +1,10 @@
-import { NgModule } from '@angular/core'
-import { RouterModule, Routes } from '@angular/router'
-import { HomeComponent } from './home/home.component'
+import { Routes } from '@angular/router'
 import { ResumeComponent } from './resume/resume.component'
 
-const routes: Routes = [
-  { path: '', component: HomeComponent },
+export const APP_ROUTES: Routes = [
+  { path: '', loadComponent: () => import('./home/home.component').then((m) => m.HomeComponent) },
   { path: 'resume', component: ResumeComponent },
   { path: 'blog', loadChildren: () => import('./features/blog/blog.module').then((m) => m.BlogModule) },
   { path: 'projects', loadChildren: () => import('./features/projects/projects.module').then((m) => m.ProjectsModule) },
   { path: '**', redirectTo: '' },
 ]
-
-@NgModule({
-  imports: [
-    RouterModule.forRoot(routes, {
-      onSameUrlNavigation: 'reload',
-      initialNavigation: 'enabledBlocking',
-      relativeLinkResolution: 'legacy',
-    }),
-  ],
-  exports: [RouterModule],
-})
-export class AppRoutingModule {}
