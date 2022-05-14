@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
-import { NavService } from '../../shared/services/nav.service'
+import { NavService } from '@dalenguyen/portfolio/shell/ui'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

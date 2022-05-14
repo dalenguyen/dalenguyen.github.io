@@ -12,18 +12,8 @@ import { MatIconModule, MatIconRegistry } from '@angular/material/icon'
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav'
 import { Meta, Title } from '@angular/platform-browser'
 import { RouterModule } from '@angular/router'
+import { FooterComponent, NavComponent, NavService } from '@dalenguyen/portfolio/shell/ui'
 import * as Sentry from '@sentry/browser'
-import { RewriteFrames } from '@sentry/integrations'
-import { environment } from '../environments/environment'
-import { FooterComponent } from './shared/components/footer/footer.component'
-import { NavComponent } from './shared/components/nav/nav.component'
-import { NavService } from './shared/services/nav.service'
-
-Sentry.init({
-  dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
-  release: `dalenguyen-me@${environment.gitHash}`,
-  integrations: [new RewriteFrames()],
-})
 
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {

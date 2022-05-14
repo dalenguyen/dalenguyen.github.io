@@ -1,12 +1,20 @@
 @import '../../../variables';
 
 #intro {
-    background-image: url(/assets/images/home/intro.jpg);
-    background-size: cover;
-    background-position: center center;    
-    text-align: center;
-    color: $light_gray;
-    mat-icon {
-        vertical-align: baseline;
-    }
+  background-image: url(/assets/images/home/intro.jpg);
+  background-size: cover;
+  background-position: center center;
+  text-align: center;
+  color: $light_gray;
+
+  button {
+    display: flex;
+    margin: 0 auto;
+    align-items: center;
+  }
+
+  mat-icon {
+    display: flex;
+    align-items: center;
+  }
 }

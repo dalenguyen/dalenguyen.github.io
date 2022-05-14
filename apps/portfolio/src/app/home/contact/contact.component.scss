@@ -1,9 +1,15 @@
 @import '../../../variables';
 
 #contact {
-    text-align: center;
-    background-color: $porcelain;
-    mat-icon {
-        color: $gray;
-    }
+  text-align: center;
+  background-color: $porcelain;
+
+  h4 {
+    display: flex;
+    justify-content: center;
+  }
+
+  mat-icon {
+    color: $gray;
+  }
 }

@@ -1,0 +1,32 @@
+{
+  "projectType": "library",
+  "root": "libs/portfolio/shell/feature",
+  "sourceRoot": "libs/portfolio/shell/feature/src",
+  "prefix": "dalenguyen",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/portfolio/shell/feature/src/**/*.ts", "libs/portfolio/shell/feature/src/**/*.html"]
+      },
+      "defaultConfiguration": "local",
+      "configurations": {
+        "local": {},
+        "ci": {
+          "outputFile": "libs/portfolio/shell/feature/lint.json",
+          "format": "json"
+        }
+      },
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/portfolio/shell/feature"],
+      "options": {
+        "jestConfig": "libs/portfolio/shell/feature/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["type:lib"]
+}

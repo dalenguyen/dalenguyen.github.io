@@ -1,4 +1,7 @@
-@import '../../../../variables';
+// @import '../../../../variables';
+// TODO: move to shared lib
+$light_gray: rgba(255, 255, 255, 0.5);
+$white: #fff;
 
 #header {
   text-align: right;
