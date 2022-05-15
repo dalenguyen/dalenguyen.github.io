@@ -7,6 +7,10 @@ This project will host on two places:
 - Github Pages: https://dalenguyen.github.io
 - Heroku: http://dalenguyen.me (Server Side Rendering & SEO support)
 
+## Project Structure
+
+- [Portfolio](/docs/project-structure.md)
+
 ## Development server
 
 Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
