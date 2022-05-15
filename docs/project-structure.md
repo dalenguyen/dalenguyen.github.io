@@ -19,15 +19,13 @@ Example structure for a portfolio Angular webapp
         |    |
         |    └── home (dir)
         |    |   ├── feature (angular:lib) - smart UIs
-        |    |   ├── ui (dir) - presentation components (standalone)
+        |    |   ├── ui (dir) - presentation components, pipes, directives (standalone)
         |    |   └── utils (dir) - common services
         |    |
         |    └── shared (dir) - assets / images...
         |
         └── angular (dir) - angular libs for angular apps
-        |   ├── ui (dir)
-        |   ├── pipes (dir)
-        |   ├── directives (dir)
+        |   ├── ui (dir) - presentation components, pipes, directives (standalone)
         |   └── utils (angular:lib - shared Services, Guards, Interceptors, Validators...)
         |
         └── web - libs that can be consumed by web apps

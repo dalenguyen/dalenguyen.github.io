@@ -9,7 +9,15 @@ import {
   map,
   shareReplay,
 } from 'rxjs/operators'
-import { GitProject } from '../models/git.project'
+
+interface GitProject {
+  name: string
+  description: string
+  html_url: string
+  language: string
+  stargazers_count: number
+  forks: number
+}
 
 @Injectable()
 export class PortfolioService {

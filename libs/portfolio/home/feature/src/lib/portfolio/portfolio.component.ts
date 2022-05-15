@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common'
 import { HttpClientModule } from '@angular/common/http'
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { PortfolioService } from '../../shared/services/portfolio.service'
+import { PortfolioService } from './portfolio.service'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,

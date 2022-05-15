@@ -22,6 +22,8 @@
       "@dalenguyen/openai": ["libs/openai/src/index.ts"],
       "@dalenguyen/portfolio/shell/feature": ["libs/portfolio/shell/feature/src/index.ts"],
       "@dalenguyen/portfolio/shell/ui": ["libs/portfolio/shell/ui/src/index.ts"],
+      "@dalenguyen/portfolio/home/feature": ["libs/portfolio/home/feature/src/index.ts"],
+      "@dalenguyen/portfolio/home/ui": ["libs/portfolio/home/ui/src/index.ts"],
       "@dalenguyen/saas-libs": ["libs/saas-libs/src/index.ts"],
       "@dalenguyen/shared/mdx-elements": ["libs/shared/mdx-elements/src/index.ts"],
       "@dalenguyen/shared/ui": ["libs/shared/ui/src/index.ts"]

@@ -1,0 +1,32 @@
+{
+  "projectType": "library",
+  "root": "libs/portfolio/home/ui",
+  "sourceRoot": "libs/portfolio/home/ui/src",
+  "prefix": "dalenguyen",
+  "targets": {
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["libs/portfolio/home/ui/src/**/*.ts", "libs/portfolio/home/ui/src/**/*.html"]
+      },
+      "defaultConfiguration": "local",
+      "configurations": {
+        "local": {},
+        "ci": {
+          "outputFile": "libs/portfolio/home/ui/lint.json",
+          "format": "json"
+        }
+      },
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/portfolio/home/ui"],
+      "options": {
+        "jestConfig": "libs/portfolio/home/ui/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": ["type:lib"]
+}

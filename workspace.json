@@ -18,6 +18,8 @@
     "portfolio-e2e": "apps/portfolio-e2e",
     "portfolio-shell-feature": "libs/portfolio/shell/feature",
     "portfolio-shell-ui": "libs/portfolio/shell/ui",
+    "portfolio-home-feature": "libs/portfolio/home/feature",
+    "portfolio-home-ui": "libs/portfolio/home/ui",
     "saas": "apps/saas",
     "saas-e2e": "apps/saas-e2e",
     "saas-libs": "libs/saas-libs",
