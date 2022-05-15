@@ -63,6 +63,8 @@ MIT
 @angular/router
 MIT
 
+@dalenguyen/portfolio-home
+
 @dalenguyen/portfolio-shell
 
 @dalenguyen/portfolio-ui
