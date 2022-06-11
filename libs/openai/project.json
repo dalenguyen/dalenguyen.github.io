@@ -1,17 +1,24 @@
 {
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/openai/src",
   "projectType": "library",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/openai/**/*.ts"]
+        "lintFilePatterns": [
+          "libs/openai/**/*.ts"
+        ]
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/openai"],
+      "outputs": [
+        "coverage/libs/openai"
+      ],
       "options": {
         "jestConfig": "libs/openai/jest.config.ts",
         "passWithNoTests": true
@@ -19,19 +26,25 @@
     },
     "build": {
       "executor": "@nrwl/js:tsc",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/libs/openai",
         "tsConfig": "libs/openai/tsconfig.lib.json",
         "packageJson": "libs/openai/package.json",
         "main": "libs/openai/src/index.ts",
-        "assets": ["libs/openai/*.md"]
+        "assets": [
+          "libs/openai/*.md"
+        ]
       }
     },
     "deploy": {
       "executor": "@nrwl/workspace:run-commands",
       "options": {
-        "commands": ["npm publish dist/libs/openai"]
+        "commands": [
+          "npm publish dist/libs/openai"
+        ]
       }
     }
   },

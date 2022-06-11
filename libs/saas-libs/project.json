@@ -1,4 +1,5 @@
 {
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/saas-libs/src",
   "prefix": "dalenguyen",
@@ -20,7 +21,9 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/saas-libs"],
+      "outputs": [
+        "coverage/libs/saas-libs"
+      ],
       "options": {
         "jestConfig": "libs/saas-libs/jest.config.ts",
         "passWithNoTests": true
@@ -29,10 +32,18 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/saas-libs/src/**/*.ts", "libs/saas-libs/src/**/*.html"]
+        "lintFilePatterns": [
+          "libs/saas-libs/src/**/*.ts",
+          "libs/saas-libs/src/**/*.html"
+        ]
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     }
   },
-  "tags": ["npm", "lib"]
+  "tags": [
+    "npm",
+    "lib"
+  ]
 }

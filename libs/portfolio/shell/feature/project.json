@@ -1,13 +1,16 @@
 {
+  "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
-  "root": "libs/portfolio/shell/feature",
   "sourceRoot": "libs/portfolio/shell/feature/src",
   "prefix": "dalenguyen",
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": ["libs/portfolio/shell/feature/src/**/*.ts", "libs/portfolio/shell/feature/src/**/*.html"]
+        "lintFilePatterns": [
+          "libs/portfolio/shell/feature/src/**/*.ts",
+          "libs/portfolio/shell/feature/src/**/*.html"
+        ]
       },
       "defaultConfiguration": "local",
       "configurations": {
@@ -17,16 +20,22 @@
           "format": "json"
         }
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/libs/portfolio/shell/feature"],
+      "outputs": [
+        "coverage/libs/portfolio/shell/feature"
+      ],
       "options": {
         "jestConfig": "libs/portfolio/shell/feature/jest.config.js",
         "passWithNoTests": true
       }
     }
   },
-  "tags": ["type:lib"]
+  "tags": [
+    "type:lib"
+  ]
 }

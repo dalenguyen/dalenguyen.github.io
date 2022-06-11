@@ -14,12 +14,7 @@
     "default": {
       "runner": "@nrwl/nx-cloud",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ],
+        "cacheableOperations": ["build", "lint", "test", "e2e"],
         "accessToken": "ZGNhNTQzMzktNGVhMi00NmFhLWEwMzItZWJlZjRhNmExMTFjfHJlYWQtd3JpdGU=",
         "canTrackAnalytics": false,
         "showUsageWarnings": true,
@@ -34,9 +29,6 @@
         "projects": "dependencies"
       }
     ]
-  },
-  "cli": {
-    "defaultCollection": "@nrwl/angular"
   },
   "defaultProject": "portfolio",
   "generators": {
@@ -75,5 +67,6 @@
         "linter": "eslint"
       }
     }
-  }
+  },
+  "$schema": "./node_modules/nx/schemas/nx-schema.json"
 }

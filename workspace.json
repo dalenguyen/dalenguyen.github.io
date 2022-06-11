@@ -16,10 +16,10 @@
     "openai": "libs/openai",
     "portfolio": "apps/portfolio",
     "portfolio-e2e": "apps/portfolio-e2e",
-    "portfolio-shell-feature": "libs/portfolio/shell/feature",
-    "portfolio-shell-ui": "libs/portfolio/shell/ui",
     "portfolio-home-feature": "libs/portfolio/home/feature",
     "portfolio-home-ui": "libs/portfolio/home/ui",
+    "portfolio-shell-feature": "libs/portfolio/shell/feature",
+    "portfolio-shell-ui": "libs/portfolio/shell/ui",
     "saas": "apps/saas",
     "saas-e2e": "apps/saas-e2e",
     "saas-libs": "libs/saas-libs",
@@ -31,5 +31,6 @@
     "storybook-e2e-ui-e2e": "apps/storybook-e2e/ui-e2e",
     "supabase": "apps/supabase",
     "supabase-e2e": "apps/supabase-e2e"
-  }
+  },
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json"
 }

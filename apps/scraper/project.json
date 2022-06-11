@@ -1,15 +1,20 @@
 {
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/scraper/src",
   "projectType": "application",
   "targets": {
     "build": {
       "executor": "@nrwl/node:webpack",
-      "outputs": ["{options.outputPath}"],
+      "outputs": [
+        "{options.outputPath}"
+      ],
       "options": {
         "outputPath": "dist/apps/scraper",
         "main": "apps/scraper/src/main.ts",
         "tsConfig": "apps/scraper/tsconfig.app.json",
-        "assets": ["apps/scraper/src/assets"],
+        "assets": [
+          "apps/scraper/src/assets"
+        ],
         "externalDependencies": "all",
         "outputFileName": "index.js",
         "generatePackageJson": true
@@ -41,14 +46,20 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": ["{options.outputFile}"],
+      "outputs": [
+        "{options.outputFile}"
+      ],
       "options": {
-        "lintFilePatterns": ["apps/scraper/**/*.ts"]
+        "lintFilePatterns": [
+          "apps/scraper/**/*.ts"
+        ]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": ["coverage/apps/scraper"],
+      "outputs": [
+        "coverage/apps/scraper"
+      ],
       "options": {
         "jestConfig": "apps/scraper/jest.config.ts",
         "passWithNoTests": true
