@@ -183,7 +183,7 @@
     "webpack-extension-reloader": "^1.1.4"
   },
   "engines": {
-    "node": ">=14"
+    "node": ">=16"
   },
   "resolutions": {
     "@angular-devkit/core": "13.0.2"
