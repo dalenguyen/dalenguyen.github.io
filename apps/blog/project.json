@@ -5,9 +5,7 @@
   "targets": {
     "build": {
       "executor": "@nrwl/next:build",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
         "root": "apps/blog",
@@ -15,7 +13,9 @@
       },
       "configurations": {
         "production": {},
-        "development": {}
+        "development": {
+          "outputPath": "apps/blog"
+        }
       }
     },
     "serve": {
@@ -44,9 +44,7 @@
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/blog"
-      ],
+      "outputs": ["coverage/apps/blog"],
       "options": {
         "jestConfig": "apps/blog/jest.config.ts",
         "passWithNoTests": true
@@ -54,13 +52,9 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/blog/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["apps/blog/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },

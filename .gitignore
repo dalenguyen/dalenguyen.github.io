@@ -43,3 +43,6 @@ Thumbs.db
 
 .angular
 myDb.db
+
+# Next.js
+.next
