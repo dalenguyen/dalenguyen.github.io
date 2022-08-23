@@ -22,49 +22,32 @@ jobs:
       NODE_OPTIONS: '--max_old_space_size=4096'
 
     steps:
-      # - uses: actions/checkout@v1
-      # - name: install angular-cli-ghpages
-      #   run: sudo npm install -g angular-cli-ghpages
-
-      # - name: Checkout
-      #   uses: actions/checkout@v2
-
-      # - uses: actions/setup-node@v1 # this installs node and npm for us
-      #   with:
-      #     node-version: '14.x'
-
-      # - uses: actions/cache@v2
-      #   with:
-      #     path: '**/node_modules'
-      #     key: ${{ runner.os }}-modules-${{ hashFiles('**/yarn.lock') }}
-
-      # - name: Install dependencies
-      #   if: steps.yarn-cache.outputs.cache-hit != 'true'
-      #   run: yarn install
-
-      # - name: Check for cache
-      #   uses: actions/setup-node@v2
-      #   with:
-      #     node-version: '14'
-      #     cache: 'yarn'
-
-      # - name: Install dependencies
-      #   run: yarn install
-
       - name: Checkout
         uses: actions/checkout@v2
+
       - uses: pnpm/action-setup@v2.2.2
         with:
           version: 7
 
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v2
+      - name: node_modules cache
+        uses: actions/cache@v3
+        id: node_modules-cache
         with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
+          path: ./node_modules
+          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - name: pnpm cache
+        if: steps.node_modules-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        id: pnpm-store
+        with:
+          path: ~/.pnpm-store/v3
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
 
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm i --frozen-lockfile
 
       - name: Build
         run: npx nx build portfolio
@@ -83,12 +66,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           BRANCH: master
           FOLDER: dist/apps/portfolio/browser
-
-      # - name: deploy to github pages
-      #   run: |
-      #     sudo npm install --unsafe-perm
-      #     sudo npm run build:github
-      #     sudo ngh --branch=master --repo=https://${{ secrets.GH_TOKEN }}@github.com/dalenguyen/dalenguyen.github.io.git --no-silent
 
       # - name: deploy to heroku
       #   run: git push https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git origin/dev:master
