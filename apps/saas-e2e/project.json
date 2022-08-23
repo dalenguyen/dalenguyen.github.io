@@ -6,9 +6,10 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/saas-e2e/cypress.json",
+        "cypressConfig": "apps/saas-e2e/cypress.config.ts",
         "tsConfig": "apps/saas-e2e/tsconfig.e2e.json",
-        "devServerTarget": "saas:serve:development"
+        "devServerTarget": "saas:serve:development",
+        "testingType": "e2e"
       },
       "configurations": {
         "production": {
@@ -19,17 +20,11 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/saas-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["apps/saas-e2e/**/*.{js,ts}"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     }
   },
   "tags": [],
-  "implicitDependencies": [
-    "saas"
-  ]
+  "implicitDependencies": ["saas"]
 }

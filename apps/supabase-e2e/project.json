@@ -6,9 +6,10 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/supabase-e2e/cypress.json",
+        "cypressConfig": "apps/supabase-e2e/cypress.config.ts",
         "devServerTarget": "supabase:serve:development",
-        "tsConfig": "apps/supabase-e2e/tsconfig.json"
+        "tsConfig": "apps/supabase-e2e/tsconfig.json",
+        "testingType": "e2e"
       },
       "configurations": {
         "production": {
@@ -18,18 +19,12 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/supabase-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["apps/supabase-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": [
-    "supabase"
-  ]
+  "implicitDependencies": ["supabase"]
 }

@@ -6,9 +6,10 @@
     "e2e": {
       "executor": "@nrwl/cypress:cypress",
       "options": {
-        "cypressConfig": "apps/storybook-e2e/ui-e2e/cypress.json",
+        "cypressConfig": "apps/storybook-e2e/ui-e2e/cypress.config.ts",
         "devServerTarget": "shared-ui:storybook",
-        "tsConfig": "apps/storybook-e2e/ui-e2e/tsconfig.json"
+        "tsConfig": "apps/storybook-e2e/ui-e2e/tsconfig.json",
+        "testingType": "e2e"
       },
       "configurations": {
         "ci": {
@@ -18,18 +19,12 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/storybook-e2e/ui-e2e/**/*.{js,ts}"
-        ]
+        "lintFilePatterns": ["apps/storybook-e2e/ui-e2e/**/*.{js,ts}"]
       }
     }
   },
   "tags": [],
-  "implicitDependencies": [
-    "shared-ui"
-  ]
+  "implicitDependencies": ["shared-ui"]
 }
