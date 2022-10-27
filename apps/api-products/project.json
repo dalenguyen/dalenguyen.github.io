@@ -4,17 +4,15 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/api-products",
         "main": "apps/api-products/src/main.ts",
         "tsConfig": "apps/api-products/tsconfig.app.json",
-        "assets": [
-          "apps/api-products/src/assets"
-        ]
+        "assets": ["apps/api-products/src/assets"],
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -39,19 +37,13 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/api-products/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/api-products/**/*.ts"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/api-products"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/api-products"],
       "options": {
         "jestConfig": "apps/api-products/jest.config.ts",
         "passWithNoTests": true

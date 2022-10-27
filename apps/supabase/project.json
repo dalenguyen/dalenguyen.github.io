@@ -6,9 +6,7 @@
   "targets": {
     "build": {
       "executor": "@angular-devkit/build-angular:browser",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/supabase",
         "index": "apps/supabase/src/index.html",
@@ -16,13 +14,8 @@
         "polyfills": "apps/supabase/src/polyfills.ts",
         "tsConfig": "apps/supabase/tsconfig.app.json",
         "inlineStyleLanguage": "scss",
-        "assets": [
-          "apps/supabase/src/favicon.ico",
-          "apps/supabase/src/assets"
-        ],
-        "styles": [
-          "apps/supabase/src/styles.scss"
-        ],
+        "assets": ["apps/supabase/src/favicon.ico", "apps/supabase/src/assets"],
+        "styles": ["apps/supabase/src/styles.scss"],
         "scripts": []
       },
       "configurations": {
@@ -79,17 +72,12 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/supabase/src/**/*.ts",
-          "apps/supabase/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/supabase/src/**/*.ts", "apps/supabase/src/**/*.html"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/supabase"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/supabase"],
       "options": {
         "jestConfig": "apps/supabase/jest.config.ts",
         "passWithNoTests": true

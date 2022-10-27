@@ -4,20 +4,18 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/scraper",
         "main": "apps/scraper/src/main.ts",
         "tsConfig": "apps/scraper/tsconfig.app.json",
-        "assets": [
-          "apps/scraper/src/assets"
-        ],
+        "assets": ["apps/scraper/src/assets"],
         "externalDependencies": "all",
         "outputFileName": "index.js",
-        "generatePackageJson": true
+        "generatePackageJson": true,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -34,7 +32,7 @@
       }
     },
     "serve": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "buildTarget": "scraper:build",
         "commands": [
@@ -46,27 +44,21 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/scraper/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/scraper/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/scraper"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/scraper"],
       "options": {
         "jestConfig": "apps/scraper/jest.config.ts",
         "passWithNoTests": true
       }
     },
     "deploy": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           "gcloud beta functions deploy scraper --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point helloGET --source ./dist/apps/scraper --allow-unauthenticated --project {args.gcpProject}"
@@ -76,7 +68,7 @@
       }
     },
     "deploy-pubsub": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           "gcloud beta functions deploy nx-pubsub --region us-central1 --gen2 --runtime nodejs16 --trigger-topic my-topic --entry-point helloPubSub --source ./dist/apps/api-nest --project {args.gcpProject}"

@@ -4,20 +4,18 @@
   "projectType": "application",
   "targets": {
     "build": {
-      "executor": "@nrwl/node:webpack",
-      "outputs": [
-        "{options.outputPath}"
-      ],
+      "executor": "@nrwl/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/api-nest",
         "main": "apps/api-nest/src/main.ts",
         "tsConfig": "apps/api-nest/tsconfig.app.json",
-        "assets": [
-          "apps/api-nest/src/assets"
-        ],
+        "assets": ["apps/api-nest/src/assets"],
         "externalDependencies": "all",
         "outputFileName": "index.js",
-        "generatePackageJson": true
+        "generatePackageJson": true,
+        "target": "node",
+        "compiler": "tsc"
       },
       "configurations": {
         "production": {
@@ -41,27 +39,21 @@
     },
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "apps/api-nest/**/*.ts"
-        ]
+        "lintFilePatterns": ["apps/api-nest/**/*.ts"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/apps/api-nest"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/api-nest"],
       "options": {
         "jestConfig": "apps/api-nest/jest.config.ts",
         "passWithNoTests": true
       }
     },
     "deploy": {
-      "executor": "@nrwl/workspace:run-commands",
+      "executor": "nx:run-commands",
       "options": {
         "commands": [
           "gcloud beta functions deploy api-nest --region us-central1 --gen2 --runtime nodejs16 --trigger-http --entry-point apiNEST --source ./dist/apps/api-nest --allow-unauthenticated --project {args.gcpProject}"

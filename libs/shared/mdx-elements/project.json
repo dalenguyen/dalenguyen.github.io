@@ -6,20 +6,14 @@
   "targets": {
     "lint": {
       "executor": "@nrwl/linter:eslint",
-      "outputs": [
-        "{options.outputFile}"
-      ],
+      "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": [
-          "libs/shared/mdx-elements/**/*.{ts,tsx,js,jsx}"
-        ]
+        "lintFilePatterns": ["libs/shared/mdx-elements/**/*.{ts,tsx,js,jsx}"]
       }
     },
     "test": {
       "executor": "@nrwl/jest:jest",
-      "outputs": [
-        "coverage/libs/shared/mdx-elements"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/libs/shared/mdx-elements"],
       "options": {
         "jestConfig": "libs/shared/mdx-elements/jest.config.ts",
         "passWithNoTests": true
