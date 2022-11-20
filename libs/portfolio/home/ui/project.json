@@ -28,5 +28,6 @@
       }
     }
   },
-  "tags": ["type:lib"]
+  "tags": ["type:lib"],
+  "name": "portfolio-home-ui"
 }

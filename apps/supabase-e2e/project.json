@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["supabase"]
+  "implicitDependencies": ["supabase"],
+  "name": "supabase-e2e"
 }

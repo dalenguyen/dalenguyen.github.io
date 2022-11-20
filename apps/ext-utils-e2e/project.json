@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["ext-utils"]
+  "implicitDependencies": ["ext-utils"],
+  "name": "ext-utils-e2e"
 }

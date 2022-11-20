@@ -78,5 +78,6 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "name": "scraper"
 }

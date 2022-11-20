@@ -35,5 +35,6 @@
       "outputs": ["{options.outputFile}"]
     }
   },
-  "tags": ["npm", "lib"]
+  "tags": ["npm", "lib"],
+  "name": "saas-libs"
 }

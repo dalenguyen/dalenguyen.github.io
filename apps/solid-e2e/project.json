@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["solid"]
+  "implicitDependencies": ["solid"],
+  "name": "solid-e2e"
 }

@@ -20,5 +20,6 @@
       "outputs": ["{options.outputFile}"]
     }
   },
-  "tags": []
+  "tags": [],
+  "name": "material"
 }

@@ -28,5 +28,6 @@
       }
     }
   },
-  "tags": ["type:lib", "scope:portfolio"]
+  "tags": ["type:lib", "scope:portfolio"],
+  "name": "portfolio-home-feature"
 }

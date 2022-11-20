@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["chat"]
+  "implicitDependencies": ["chat"],
+  "name": "chat-e2e"
 }

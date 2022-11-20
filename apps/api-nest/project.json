@@ -63,5 +63,6 @@
       }
     }
   },
-  "tags": []
+  "tags": [],
+  "name": "api-nest"
 }

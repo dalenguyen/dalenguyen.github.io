@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["blog"]
+  "implicitDependencies": ["blog"],
+  "name": "blog-e2e"
 }

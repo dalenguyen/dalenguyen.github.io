@@ -26,5 +26,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["saas"]
+  "implicitDependencies": ["saas"],
+  "name": "saas-e2e"
 }

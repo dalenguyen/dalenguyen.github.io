@@ -25,5 +25,6 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["portfolio"]
+  "implicitDependencies": ["portfolio"],
+  "name": "portfolio-e2e"
 }
