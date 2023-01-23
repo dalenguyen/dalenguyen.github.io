@@ -5,7 +5,7 @@ import { PortfolioService } from './portfolio.service'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-portfolio',
+  selector: 'dalenguyen-portfolio',
   imports: [HttpClientModule, CommonModule],
   standalone: true,
   providers: [PortfolioService],

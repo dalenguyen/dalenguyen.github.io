@@ -6,7 +6,7 @@ import { NavService } from '@dalenguyen/portfolio/shell/ui'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-nav',
+  selector: 'dalenguyen-nav',
   standalone: true,
   imports: [CommonModule, MatIconModule],
   templateUrl: './nav.component.html',

@@ -25,7 +25,7 @@ export class SentryErrorHandler implements ErrorHandler {
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-root',
+  selector: 'dalenguyen-root',
   standalone: true,
   imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core'
 import { Plan } from '@dalenguyen/saas-libs'
 
 @Component({
-  selector: 'app-pricing-table',
+  selector: 'dalenguyen-pricing-table',
   templateUrl: './pricing-table.component.html',
   styleUrls: ['./pricing-table.component.scss'],
 })
