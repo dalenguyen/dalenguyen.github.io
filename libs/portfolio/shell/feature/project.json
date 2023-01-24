@@ -1,4 +1,5 @@
 {
+  "name": "portfolio-shell-feature",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/portfolio/shell/feature/src",
@@ -28,6 +29,5 @@
       }
     }
   },
-  "tags": ["type:lib"],
-  "name": "portfolio-shell-feature"
+  "tags": ["type:lib"]
 }

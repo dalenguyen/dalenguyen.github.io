@@ -1,4 +1,5 @@
 {
+  "name": "ext-utils",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/ext-utils/src",
@@ -91,6 +92,5 @@
       }
     }
   },
-  "tags": [],
-  "name": "ext-utils"
+  "tags": []
 }

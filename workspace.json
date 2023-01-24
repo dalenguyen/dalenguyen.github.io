@@ -18,6 +18,7 @@
     "portfolio-e2e": "apps/portfolio-e2e",
     "portfolio-home-feature": "libs/portfolio/home/feature",
     "portfolio-home-ui": "libs/portfolio/home/ui",
+    "portfolio-resume-feature": "libs/portfolio/resume/feature",
     "portfolio-shell-feature": "libs/portfolio/shell/feature",
     "portfolio-shell-ui": "libs/portfolio/shell/ui",
     "saas": "apps/saas",
@@ -32,5 +33,6 @@
     "supabase": "apps/supabase",
     "supabase-e2e": "apps/supabase-e2e"
   },
-  "$schema": "./node_modules/nx/schemas/workspace-schema.json"
+  "$schema": "./node_modules/nx/schemas/workspace-schema.json",
+  "defaultProject": "portfolio"
 }

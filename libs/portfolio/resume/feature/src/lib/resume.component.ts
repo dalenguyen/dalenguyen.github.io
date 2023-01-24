@@ -9,4 +9,4 @@ import { MatIconModule } from '@angular/material/icon'
   templateUrl: './resume.component.html',
   styleUrls: ['./resume.component.scss'],
 })
-export class ResumeComponent {}
+export default class ResumeComponent {}
