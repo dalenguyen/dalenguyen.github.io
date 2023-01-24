@@ -10,7 +10,7 @@ import { BlogService } from '../shared/services'
     `
       #blogNav,
       #post {
-        margin: $default-margin;
+        margin: 16px;
       }
 
       #post {
