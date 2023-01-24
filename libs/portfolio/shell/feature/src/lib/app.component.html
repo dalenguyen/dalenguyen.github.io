@@ -6,15 +6,15 @@
       [mode]="mobileQuery.matches ? 'over' : 'side'"
       [fixedInViewport]="mobileQuery.matches"
     >
-      <app-nav></app-nav>
+      <dalenguyen-nav/>
     </mat-sidenav>
     <mat-sidenav-content>
       <div class="hamburger">
         <button mat-icon-button (click)="snav.toggle()"><mat-icon>menu</mat-icon></button>
       </div>
       <main>
-        <router-outlet></router-outlet>
-        <app-footer></app-footer>
+        <router-outlet />
+        <dalenguyen-footer/>
       </main>
     </mat-sidenav-content>
   </mat-sidenav-container>
