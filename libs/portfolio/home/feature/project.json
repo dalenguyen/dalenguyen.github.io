@@ -1,4 +1,5 @@
 {
+  "name": "portfolio-home-feature",
   "$schema": "../../../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/portfolio/home/feature/src",
@@ -28,6 +29,5 @@
       }
     }
   },
-  "tags": ["type:lib", "scope:portfolio"],
-  "name": "portfolio-home-feature"
+  "tags": ["type:lib", "scope:portfolio"]
 }

@@ -6,7 +6,7 @@ import { NavService } from '@dalenguyen/portfolio/shell/ui'
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MatIconModule],
   providers: [NavService],
-  selector: 'app-intro',
+  selector: 'dalenguyen-intro',
   standalone: true,
   templateUrl: './intro.component.html',
   styleUrls: ['./intro.component.scss'],

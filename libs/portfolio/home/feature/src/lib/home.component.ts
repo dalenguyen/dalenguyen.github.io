@@ -6,7 +6,7 @@ import { PortfolioComponent } from './portfolio/portfolio.component'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-home',
+  selector: 'dalenguyen-home',
   standalone: true,
   imports: [ContactComponent, BiographyComponent, PortfolioComponent, IntroComponent],
   templateUrl: './home.component.html',

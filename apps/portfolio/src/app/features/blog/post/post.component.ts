@@ -1,12 +1,25 @@
-import { Title, Meta } from '@angular/platform-browser'
 import { Component, OnInit, ViewEncapsulation } from '@angular/core'
+import { Meta, Title } from '@angular/platform-browser'
 import { Article } from '../shared/models'
 import { BlogService } from '../shared/services'
 
 @Component({
-  selector: 'app-post',
+  selector: 'dalenguyen-post',
   templateUrl: './post.component.html',
-  styleUrls: ['./post.component.scss'],
+  styles: [
+    `
+      #blogNav,
+      #post {
+        margin: 16px;
+      }
+
+      #post {
+        img {
+          width: 100%;
+        }
+      }
+    `,
+  ],
   encapsulation: ViewEncapsulation.None,
 })
 export class PostComponent implements OnInit {

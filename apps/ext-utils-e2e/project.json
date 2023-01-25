@@ -1,4 +1,5 @@
 {
+  "name": "ext-utils-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ext-utils-e2e/src",
   "projectType": "application",
@@ -26,6 +27,5 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["ext-utils"],
-  "name": "ext-utils-e2e"
+  "implicitDependencies": ["ext-utils"]
 }

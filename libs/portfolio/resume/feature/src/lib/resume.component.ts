@@ -3,10 +3,10 @@ import { MatIconModule } from '@angular/material/icon'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-resume',
+  selector: 'dalenguyen-resume',
   standalone: true,
   imports: [MatIconModule],
   templateUrl: './resume.component.html',
   styleUrls: ['./resume.component.scss'],
 })
-export class ResumeComponent {}
+export default class ResumeComponent {}
