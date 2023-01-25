@@ -64,7 +64,7 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           BRANCH: master
-          FOLDER: dist/apps/production
+          FOLDER: dist/production
 
       # - name: deploy to heroku
       #   run: git push https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git origin/dev:master
