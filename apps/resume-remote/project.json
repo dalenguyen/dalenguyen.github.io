@@ -1,0 +1,110 @@
+{
+  "name": "resume-remote",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/resume-remote/src",
+  "prefix": "dalenguyen",
+  "targets": {
+    "build": {
+      "executor": "@nrwl/angular:webpack-browser",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/resume-remote",
+        "index": "apps/resume-remote/src/index.html",
+        "main": "apps/resume-remote/src/main.ts",
+        "polyfills": "apps/resume-remote/src/polyfills.ts",
+        "tsConfig": "apps/resume-remote/tsconfig.app.json",
+        "inlineStyleLanguage": "scss",
+        "assets": ["apps/resume-remote/src/favicon.ico", "apps/resume-remote/src/assets"],
+        "styles": ["apps/resume-remote/src/styles.scss"],
+        "scripts": [],
+        "customWebpackConfig": {
+          "path": "apps/resume-remote/webpack.config.js"
+        }
+      },
+      "configurations": {
+        "production": {
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "500kb",
+              "maximumError": "1mb"
+            },
+            {
+              "type": "anyComponentStyle",
+              "maximumWarning": "2kb",
+              "maximumError": "4kb"
+            }
+          ],
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "apps/resume-remote/webpack.prod.config.js"
+          }
+        },
+        "development": {
+          "buildOptimizer": false,
+          "optimization": false,
+          "vendorChunk": true,
+          "extractLicenses": false,
+          "sourceMap": true,
+          "namedChunks": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@nrwl/angular:webpack-dev-server",
+      "configurations": {
+        "production": {
+          "browserTarget": "resume-remote:build:production"
+        },
+        "development": {
+          "browserTarget": "resume-remote:build:development"
+        }
+      },
+      "defaultConfiguration": "development",
+      "options": {
+        "port": 4201,
+        "publicHost": "http://localhost:4201"
+      }
+    },
+    "extract-i18n": {
+      "executor": "@angular-devkit/build-angular:extract-i18n",
+      "options": {
+        "browserTarget": "resume-remote:build"
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["apps/resume-remote/**/*.ts", "apps/resume-remote/**/*.html"]
+      }
+    },
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
+      "options": {
+        "jestConfig": "apps/resume-remote/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "serve-static": {
+      "executor": "@nrwl/angular:file-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "resume-remote:build",
+        "port": 4201
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "resume-remote:build:development"
+        },
+        "production": {
+          "buildTarget": "resume-remote:build:production"
+        }
+      }
+    }
+  },
+  "tags": ["type:remote"]
+}

@@ -1,4 +1,4 @@
 module.exports = {
   name: 'portfolio',
-  remotes: [],
+  remotes: ['resume-remote'],
 }

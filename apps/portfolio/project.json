@@ -160,7 +160,16 @@
         }
       },
       "defaultConfiguration": "development"
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "outputs": [],
+      "options": {
+        "command": "rm -rf production && mkdir production && cp -r ./apps/portfolio/browser/* production && cp -r ./apps/resume-remote production",
+        "cwd": "dist"
+      }
     }
   },
-  "tags": []
+  "tags": ["type:app", "scope:portfolio"],
+  "implicitDependencies": ["resume-remote"]
 }

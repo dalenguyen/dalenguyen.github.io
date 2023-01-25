@@ -50,22 +50,21 @@ jobs:
         run: pnpm i --frozen-lockfile
 
       - name: Build
-        run: npx nx build portfolio
-        # run: yarn affected:build
+        run: npx nx deploy portfolio
 
       - name: Generate 404 files
         run: |
-          echo "---" > "./dist/apps/portfolio/404.html"
-          echo "permalink: /404.html" >> "./dist/apps/portfolio/404.html"
-          echo "---" >> "./dist/apps/portfolio/404.html"
-          cat "./dist/apps/portfolio/browser/index.html" >> "./dist/apps/portfolio/browser/404.html"
+          echo "---" > "./dist/production/404.html"
+          echo "permalink: /404.html" >> "./dist/production/404.html"
+          echo "---" >> "./dist/production/404.html"
+          cat "./dist/production/index.html" >> "./dist/production/404.html"
 
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@releases/v3
         with:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           BRANCH: master
-          FOLDER: dist/apps/portfolio/browser
+          FOLDER: dist/apps/production
 
       # - name: deploy to heroku
       #   run: git push https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git origin/dev:master

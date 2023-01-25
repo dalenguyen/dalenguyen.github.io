@@ -21,6 +21,7 @@
     "portfolio-resume-feature": "libs/portfolio/resume/feature",
     "portfolio-shell-feature": "libs/portfolio/shell/feature",
     "portfolio-shell-ui": "libs/portfolio/shell/ui",
+    "resume-remote": "apps/resume-remote",
     "saas": "apps/saas",
     "saas-e2e": "apps/saas-e2e",
     "saas-libs": "libs/saas-libs",
