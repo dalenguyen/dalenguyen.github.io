@@ -3,7 +3,7 @@ import { environment } from 'apps/portfolio/src/environments/environment'
 import L, { icon } from 'leaflet'
 
 @Component({
-  selector: 'app-leaflet',
+  selector: 'dalenguyen-leaflet',
   templateUrl: './leaflet.component.html',
   styleUrls: ['./leaflet.component.scss'],
   encapsulation: ViewEncapsulation.None,

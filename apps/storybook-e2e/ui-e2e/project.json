@@ -1,4 +1,5 @@
 {
+  "name": "storybook-e2e-ui-e2e",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/storybook-e2e/ui-e2e/src",
   "projectType": "application",
@@ -26,6 +27,5 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["shared-ui"],
-  "name": "storybook-e2e-ui-e2e"
+  "implicitDependencies": ["shared-ui"]
 }

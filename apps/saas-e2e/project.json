@@ -1,4 +1,5 @@
 {
+  "name": "saas-e2e",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/saas-e2e/src",
   "projectType": "application",
@@ -26,6 +27,5 @@
     }
   },
   "tags": [],
-  "implicitDependencies": ["saas"],
-  "name": "saas-e2e"
+  "implicitDependencies": ["saas"]
 }

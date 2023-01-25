@@ -3,7 +3,7 @@ import { MatIconModule } from '@angular/material/icon'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'app-contact',
+  selector: 'dalenguyen-contact',
   standalone: true,
   imports: [MatIconModule],
   templateUrl: './contact.component.html',

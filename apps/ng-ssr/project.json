@@ -1,4 +1,5 @@
 {
+  "name": "ng-ssr",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/ng-ssr/src",
   "projectType": "application",
@@ -63,6 +64,5 @@
       }
     }
   },
-  "tags": [],
-  "name": "ng-ssr"
+  "tags": []
 }

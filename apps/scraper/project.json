@@ -1,4 +1,5 @@
 {
+  "name": "scraper",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/scraper/src",
   "projectType": "application",
@@ -78,6 +79,5 @@
       }
     }
   },
-  "tags": [],
-  "name": "scraper"
+  "tags": []
 }

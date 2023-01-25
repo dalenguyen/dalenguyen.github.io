@@ -1,4 +1,5 @@
 {
+  "name": "shared-mdx-elements",
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/shared/mdx-elements/src",
   "projectType": "library",
@@ -19,6 +20,5 @@
         "passWithNoTests": true
       }
     }
-  },
-  "name": "shared-mdx-elements"
+  }
 }

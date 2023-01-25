@@ -1,11 +1,11 @@
-import { Router } from '@angular/router'
 import { Component } from '@angular/core'
 import { Title } from '@angular/platform-browser'
+import { Router } from '@angular/router'
 import { Article } from './shared/models'
 import { BlogService } from './shared/services'
 
 @Component({
-  selector: 'app-blog',
+  selector: 'dalenguyen-blog',
   templateUrl: './blog.component.html',
   styleUrls: ['./blog.component.scss'],
 })

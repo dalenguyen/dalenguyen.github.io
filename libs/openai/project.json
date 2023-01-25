@@ -1,4 +1,5 @@
 {
+  "name": "openai",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/openai/src",
   "projectType": "library",
@@ -36,6 +37,5 @@
       }
     }
   },
-  "tags": [],
-  "name": "openai"
+  "tags": []
 }

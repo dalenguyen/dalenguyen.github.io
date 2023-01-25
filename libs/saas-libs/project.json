@@ -1,4 +1,5 @@
 {
+  "name": "saas-libs",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/saas-libs/src",
@@ -35,6 +36,5 @@
       "outputs": ["{options.outputFile}"]
     }
   },
-  "tags": ["npm", "lib"],
-  "name": "saas-libs"
+  "tags": ["npm", "lib"]
 }
