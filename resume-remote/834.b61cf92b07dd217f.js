@@ -1,0 +1,1 @@
+(self.webpackChunkresume_remote=self.webpackChunkresume_remote||[]).push([[834],{2834:(m,u,_)=>{_.d(u,{of:()=>n});var o=_(689),s=_(6099);function n(...e){const f=(0,o.yG)(e);return(0,s.D)(e,f)}}}]);
