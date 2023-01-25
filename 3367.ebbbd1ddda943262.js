@@ -1,0 +1,1 @@
+(self.webpackChunkportfolio=self.webpackChunkportfolio||[]).push([[3367],{3367:(u,n,o)=>{o.r(n),o.d(n,{VERSION:()=>s});const s=new(o(5466).Version)("15.1.1")}}]);
