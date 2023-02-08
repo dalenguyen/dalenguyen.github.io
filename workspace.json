@@ -5,6 +5,7 @@
     "api-products": "apps/api-products",
     "api-stripe": "apps/api-stripe",
     "blog": "apps/blog",
+    "blog-app": "apps/blog-app",
     "blog-e2e": "apps/blog-e2e",
     "chat": "apps/chat",
     "chat-e2e": "apps/chat-e2e",
