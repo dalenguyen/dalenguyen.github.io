@@ -5,6 +5,5 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
   selector: 'dalenguyen-biography',
   standalone: true,
   templateUrl: './biography.component.html',
-  styleUrls: ['./biography.component.scss'],
 })
 export class BiographyComponent {}

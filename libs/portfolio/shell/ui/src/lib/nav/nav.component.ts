@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common'
-import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { Router } from '@angular/router'
-import { NavService } from '@dalenguyen/portfolio/shell/ui'
+import { NavService } from './nav.service'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -13,9 +13,9 @@ import { NavService } from '@dalenguyen/portfolio/shell/ui'
   styleUrls: ['./nav.component.scss'],
 })
 export class NavComponent implements OnInit {
+  private navService = inject(NavService)
+  private router = inject(Router)
   activeEl = 'intro'
-
-  constructor(private navService: NavService, private router: Router) {}
 
   ngOnInit() {
     // Set active nav by path

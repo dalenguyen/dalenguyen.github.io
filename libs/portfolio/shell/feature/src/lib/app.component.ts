@@ -10,9 +10,8 @@ import {
 } from '@angular/core'
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon'
 import { MatSidenav, MatSidenavModule } from '@angular/material/sidenav'
-import { Meta, Title } from '@angular/platform-browser'
 import { RouterModule } from '@angular/router'
-import { FooterComponent, NavComponent, NavService } from '@dalenguyen/portfolio/shell/ui'
+import { EditGithubComponent, FooterComponent, NavComponent, NavService } from '@dalenguyen/portfolio/shell/ui'
 import * as Sentry from '@sentry/browser'
 
 @Injectable()
@@ -27,9 +26,34 @@ export class SentryErrorHandler implements ErrorHandler {
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-root',
   standalone: true,
-  imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent],
+  imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent, EditGithubComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
-  templateUrl: './app.component.html',
+  template: `
+  <div class="main-content" [class.is-mobile]="mobileQuery.matches">
+  <mat-sidenav-container class="sidenav-container">
+    <mat-sidenav
+      #snav
+      [opened]="mobileQuery.matches ? false : true"
+      [mode]="mobileQuery.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery.matches"
+    >
+      <dalenguyen-nav/>
+    </mat-sidenav>
+    <mat-sidenav-content>
+      <div class="hamburger" (click)="snav.toggle()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+          <path class="text-white" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </div>
+      <main class="h-full">
+        <dalenguyen-edit-github />
+        <router-outlet />
+        <dalenguyen-footer/>
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
+`,
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
@@ -44,25 +68,7 @@ export class AppComponent implements OnDestroy {
     media: MediaMatcher,
     matIconRegistry: MatIconRegistry,
     private navService: NavService,
-    private meta: Meta,
-    private title: Title,
   ) {
-    // Meta tags
-    this.title.setTitle('Home | Dale Nguyen')
-    this.meta.addTags([
-      { name: 'og:title', content: 'Home | Dale Nguyen' },
-      {
-        name: 'og:description',
-        content: `Just a normal person who tries to explore the world and find his purpose.`,
-      },
-      { name: 'og:url', content: 'https://dalenguyen.me' },
-      {
-        name: 'og:image',
-        content: 'https://dalenguyen.me/assets/images/dale-nguyen-avatar.jpeg',
-      },
-      { name: 'type', content: 'website' },
-    ])
-
     this.mobileQuery = media.matchMedia('(max-width: 600px)')
     this._mobileQueryListener = () => cdf.detectChanges()
     this.mobileQuery.addListener(this._mobileQueryListener)

@@ -4,10 +4,7 @@
     <!-- Logo -->
     <div id="logo">
       <span class="image avatar48">
-        <img
-          src="assets/images/dale-nguyen-avatar.jpeg"
-          alt="Dale Nguyen Logo"
-        />
+        <img src="assets/images/dale-nguyen-avatar.jpeg" alt="Dale Nguyen Logo" />
       </span>
       <h1 id="title">Dale Nguyen</h1>
       <p>Software Engineer</p>
@@ -20,32 +17,101 @@
     <nav id="nav">
       <ul>
         <li [ngClass]="isActive('intro')" (click)="scroll('intro')">
-          <div id="top-link" class="nav">
-            <mat-icon fontSet="fa" fontIcon="fa-home"></mat-icon>
+          <div id="top-link" class="nav flex justify-between">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"
+              />
+            </svg>
+
             Architectural Philosophy
           </div>
         </li>
         <li [ngClass]="isActive('blog')" (click)="navigateTo('blog')">
-          <div id="blog-link" class="nav">
-            <mat-icon fontSet="fa" fontIcon="fa-book"></mat-icon>
+          <div id="blog-link" class="nav flex justify-between">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+              />
+            </svg>
+
             Thoughts
           </div>
         </li>
-        <li [ngClass]="isActive('portfolio')" (click)="scroll('portfolio')">
-          <div id="portfolio-link" class="nav">
-            <mat-icon fontSet="fa" fontIcon="fa-th"></mat-icon>
+        <!-- <li [ngClass]="isActive('portfolio')" (click)="scroll('portfolio')">
+          <div id="portfolio-link" class="nav flex justify-between">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 01-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625m0 12.75c0 .621-.504 1.125-1.125 1.125m1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125m0 3.75h-7.5A1.125 1.125 0 0112 18.375m9.75-12.75c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125m19.5 0v1.5c0 .621-.504 1.125-1.125 1.125M2.25 5.625v1.5c0 .621.504 1.125 1.125 1.125m0 0h17.25m-17.25 0h7.5c.621 0 1.125.504 1.125 1.125M3.375 8.25c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125m17.25-3.75h-7.5c-.621 0-1.125.504-1.125 1.125m8.625-1.125c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125M12 10.875v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 10.875c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125M13.125 12h7.5m-7.5 0c-.621 0-1.125.504-1.125 1.125M20.625 12c.621 0 1.125.504 1.125 1.125v1.5c0 .621-.504 1.125-1.125 1.125m-17.25 0h7.5M12 14.625v-1.5m0 1.5c0 .621-.504 1.125-1.125 1.125M12 14.625c0 .621.504 1.125 1.125 1.125m-2.25 0c.621 0 1.125.504 1.125 1.125m0 1.5v-1.5m0 0c0-.621.504-1.125 1.125-1.125m0 0h7.5"
+              />
+            </svg>
+
             Digital Portfolio
           </div>
-        </li>
+        </li> -->
         <li [ngClass]="isActive('about')" (click)="scroll('about')">
-          <div id="about-link" class="nav">
-            <mat-icon fontSet="fa" fontIcon="fa-user"></mat-icon>
+          <div id="about-link" class="nav flex justify-between">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+              />
+            </svg>
+
             Biography
           </div>
         </li>
         <li [ngClass]="isActive('contact')" (click)="scroll('contact')">
-          <div id="contact-link" class="nav">
-            <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>
+          <div id="contact-link" class="nav flex justify-between">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+              />
+            </svg>
             Contact
           </div>
         </li>
@@ -57,24 +123,43 @@
   <div class="bottom">
     <ul class="icons">
       <li>
-        <a
-          href="https://www.linkedin.com/in/dalenguyenblogger/"
-          class="icon"
-          target="_blank"
-        >
-          <mat-icon fontSet="fab" fontIcon="fa-linkedin"></mat-icon>
+        <a href="https://www.linkedin.com/in/dalenguyenblogger/" class="icon" target="_blank">
+          <svg class="w-6 h-6 fill-current" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+            <path
+              d="M100.28 448H7.4V148.9h92.88zM53.79 108.1C24.09 108.1 0 83.5 0 53.8a53.79 53.79 0 0 1 107.58 0c0 29.7-24.1 54.3-53.79 54.3zM447.9 448h-92.68V302.4c0-34.7-.7-79.2-48.29-79.2-48.29 0-55.69 37.7-55.69 76.7V448h-92.78V148.9h89.08v40.8h1.3c12.4-23.5 42.69-48.3 87.88-48.3 94 0 111.28 61.9 111.28 142.3V448z"
+            ></path>
+          </svg>
           <span class="label">LinkedIn</span>
         </a>
       </li>
       <li>
         <a href="https://github.com/dalenguyen" class="icon" target="_blank">
-          <mat-icon fontSet="fab" fontIcon="fa-github"></mat-icon>
+          <svg class="h-6 w-6" fill="currentColor" viewBox="0 0 24 24">
+            <path
+              fill-rule="evenodd"
+              d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+              clip-rule="evenodd"
+            />
+          </svg>
           <span class="label">Github</span>
         </a>
       </li>
       <li>
         <a href="mailto:dale@dalenguyen.me" class="icon">
-          <mat-icon fontSet="fa" fontIcon="fa-envelope"></mat-icon>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="1.5"
+            stroke="currentColor"
+            class="w-6 h-6"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
+            />
+          </svg>
           <span class="label">Email</span>
         </a>
       </li>
@@ -82,12 +167,9 @@
   </div>
 
   <!-- Sponsors -->
-  <div class="bottom sponsors" style="text-align: center;">
+  <div class="bottom sponsors text-center" style="text-align: center">
     <a href="https://buttercms.com/" target="_blank">
-      <img
-        src="https://cdn.buttercms.com/RyJ7UhcVTCRqrCFXwgCo"
-        alt="ButterCMS Icon"
-        width="70%"
+      <img src="https://cdn.buttercms.com/RyJ7UhcVTCRqrCFXwgCo" alt="ButterCMS Icon" width="70%" class="m-auto"
     /></a>
   </div>
 </div>

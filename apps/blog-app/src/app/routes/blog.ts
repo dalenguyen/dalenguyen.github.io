@@ -1,12 +1,12 @@
 import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
-import { Component, inject, OnChanges, SimpleChanges } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { Router, RouterLink, RouterOutlet } from '@angular/router'
 import { BlogService } from '../blog/blog.service'
 
 export const routeMeta: RouteMeta = {
-  title: `Dale Blog`,
-  meta: [{ name: 'description', content: 'Dale Blog Posts' }],
+  title: `Dale Nguyen Blog`,
+  meta: [{ name: 'description', content: 'Dale Nguyen Blog Posts' }],
 }
 
 @Component({
@@ -70,7 +70,7 @@ export const routeMeta: RouteMeta = {
     <router-outlet></router-outlet>
   `,
 })
-export default class BlogComponent implements OnChanges {
+export default class BlogComponent {
   private router = inject(Router)
   private blogService = inject(BlogService)
   readonly articles$ = this.blogService.getButterArticles()
@@ -78,10 +78,6 @@ export default class BlogComponent implements OnChanges {
   // TODO: router-outlet should not show blog content in slug
   // this is a hack :(
   showBlogContent = !location.pathname.includes('/blog/')
-
-  ngOnChanges(changes: SimpleChanges): void {
-    console.log(changes)
-  }
 
   openPost(slug: string) {
     this.showBlogContent = false

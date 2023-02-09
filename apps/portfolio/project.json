@@ -30,7 +30,7 @@
         ],
         "styles": ["apps/portfolio/src/styles.scss"],
         "scripts": [],
-        "allowedCommonJsDependencies": ["buttercms", "leaflet", "mapbox-gl", "localforage"],
+        "allowedCommonJsDependencies": ["buttercms", "leaflet", "mapbox-gl", "localstorage"],
         "customWebpackConfig": {
           "path": "apps/portfolio/webpack.config.js"
         }

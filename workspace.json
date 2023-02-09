@@ -18,7 +18,6 @@
     "portfolio": "apps/portfolio",
     "portfolio-e2e": "apps/portfolio-e2e",
     "portfolio-home-feature": "libs/portfolio/home/feature",
-    "portfolio-home-ui": "libs/portfolio/home/ui",
     "portfolio-resume-feature": "libs/portfolio/resume/feature",
     "portfolio-shell-feature": "libs/portfolio/shell/feature",
     "portfolio-shell-ui": "libs/portfolio/shell/ui",
