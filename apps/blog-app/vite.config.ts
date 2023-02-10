@@ -1,6 +1,7 @@
 /// <reference types="vitest" />
 
 import analog from '@analogjs/platform'
+import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -8,17 +9,27 @@ import tsconfigPaths from 'vite-tsconfig-paths'
 export default defineConfig(({ mode }) => ({
   publicDir: '../../libs/portfolio/shared',
   build: {
-    target: ['es2020'],
+    target: ['es2022'],
   },
   resolve: {
     mainFields: ['module'],
   },
+  // optimizeDeps: {
+  //   esbuildOptions: {
+  //     plugins: [esbuildCommonjs(['front-matter', 'reflect-metadata'])],
+  //   },
+  // },
   plugins: [
     tsconfigPaths(),
+    viteCommonjs(),
     analog({
       static: true,
+      // ssr: true,
+      // ssrBuildDir: '../../dist/apps/blog-app/ssr',
+      // entryServer: 'apps/blog-app/src/main.server.ts',
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
+        inlineStylesExtension: 'scss|sass|less',
       },
     }),
   ],

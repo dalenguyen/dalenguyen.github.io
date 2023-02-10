@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
     <a
       href="https://github.com/dalenguyen/dalenguyen.github.io/tree/dev/apps/blog-app"
       target="_blank"
-      class="absolute top-0 right-0 z-50 inline-flex items-center rounded-md border border-transparent bg-black-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+      class="bg-slate-400 bg-opacity-75 shadow-xl absolute top-0 right-0 z-50 inline-flex items-center rounded-md border border-transparent bg-black-600 px-3 py-2 text-sm font-medium leading-4 text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
     >
       Edit
       <svg
