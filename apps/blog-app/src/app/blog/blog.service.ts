@@ -47,7 +47,7 @@ export class BlogService {
       })
   }
 
-  getButterArticle(slug): Promise<Article> {
+  getButterArticle(slug: string): Promise<Article> {
     return this.butterService.post
       .retrieve(slug, { locale: 'en' })
       .then((res) => {

@@ -44,6 +44,21 @@
           "buildTarget": "blog-app:build:production"
         }
       }
+    },
+    "preview": {
+      "executor": "@nrwl/vite:preview-server",
+      "defaultConfiguration": "development",
+      "options": {
+        "buildTarget": "blog-app:build"
+      },
+      "configurations": {
+        "development": {
+          "buildTarget": "blog-app:build:development"
+        },
+        "production": {
+          "buildTarget": "blog-app:build:production"
+        }
+      }
     }
   },
   "tags": []

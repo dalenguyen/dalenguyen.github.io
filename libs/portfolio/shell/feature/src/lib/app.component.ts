@@ -16,7 +16,7 @@ import * as Sentry from '@sentry/browser'
 
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
-  handleError(error) {
+  handleError(error: { originalError: string }) {
     Sentry.captureException(error.originalError || error)
     console.error(error)
   }
@@ -78,7 +78,7 @@ export class AppComponent implements OnDestroy {
     matIconRegistry.registerFontClassAlias('fab')
 
     // close nav on mobile
-    this.navService.target.subscribe((data) => {
+    this.navService.target.subscribe(() => {
       setTimeout(() => {
         this.closeSideNav()
       }, 1000)

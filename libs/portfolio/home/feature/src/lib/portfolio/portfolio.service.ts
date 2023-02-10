@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http'
-import { Injectable } from '@angular/core'
+import { inject, Injectable } from '@angular/core'
 import { captureException } from '@sentry/core'
 import { Observable } from 'rxjs'
 import {
@@ -21,8 +21,8 @@ interface GitProject {
 
 @Injectable()
 export class PortfolioService {
-  projects$: Observable<GitProject[]> = null
-
+  private http = inject(HttpClient)
+  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100'
   gitProjects = [
     'rest-api-node-typescript',
     'firestore-backup-restore',
@@ -34,19 +34,11 @@ export class PortfolioService {
     // 'angular-store-locator'
   ]
 
-  gitBaseUrl = 'https://api.github.com/users/dalenguyen/repos?per_page=100'
-
-  constructor(private http: HttpClient) {
-    this.getGitProjects()
-  }
-
-  getGitProjects(): void {
-    this.projects$ = this.http.get<GitProject[]>(this.gitBaseUrl).pipe(
-      map((projects) => projects.filter((project) => this.gitProjects.includes(project.name))),
-      // publishReplay(1),
-      // refCount(),
-      shareReplay({ bufferSize: 1, refCount: true }),
-      catchError((error) => captureException(error)),
-    ) as Observable<GitProject[]>
-  }
+  projects$: Observable<GitProject[]> = this.http.get<GitProject[]>(this.gitBaseUrl).pipe(
+    map((projects) => projects.filter((project) => this.gitProjects.includes(project.name))),
+    // publishReplay(1),
+    // refCount(),
+    shareReplay({ bufferSize: 1, refCount: true }),
+    catchError((error) => captureException(error)),
+  ) as Observable<GitProject[]>
 }

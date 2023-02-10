@@ -2,7 +2,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  "include": [],
+  "include": ["src"],
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -15,12 +15,22 @@
     }
   ],
   "compilerOptions": {
+    "useDefineForClassFields": true,
+    "module": "ESNext",
     "resolveJsonModule": true,
+    "moduleResolution": "Node",
+    "isolatedModules": true,
+    "lib": ["ESNext", "DOM"],
+    "skipLibCheck": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
     "forceConsistentCasingInFileNames": false,
-    "strict": false,
-    "noImplicitReturns": false,
+    "strict": true,
+    "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": false,
-    "target": "es2022"
+    "target": "ESNext",
+    "types": ["vite/client"],
+    "strictPropertyInitialization": false
   },
   "angularCompilerOptions": {
     "strictInjectionParameters": false,
