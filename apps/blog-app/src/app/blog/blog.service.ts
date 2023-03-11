@@ -3,8 +3,6 @@ import { inject, Injectable } from '@angular/core'
 
 import Butter from 'buttercms'
 
-import { Article } from './article.model'
-
 @Injectable({
   providedIn: 'root',
 })
@@ -13,7 +11,7 @@ export class BlogService {
   http = inject(HttpClient)
   butterService = Butter('10de8a1782f01676902398495c4062893956ac9c')
 
-  currentArticle: Article
+  currentArticle: Butter.Post
 
   get articles() {
     return this.getDevArticles()
@@ -30,7 +28,7 @@ export class BlogService {
     return articles
   }
 
-  getButterArticles(): Promise<Article[]> {
+  getButterArticles(): Promise<Butter.Post[]> {
     return this.butterService.post
       .list({
         page: 1,
@@ -39,7 +37,7 @@ export class BlogService {
       })
       .then((res) => {
         console.log('Content from ButterCMS')
-        return res.data.data
+        return res.data?.data || []
       })
       .catch((error) => {
         console.error(error)
@@ -47,11 +45,11 @@ export class BlogService {
       })
   }
 
-  getButterArticle(slug: string): Promise<Article> {
+  getButterArticle(slug: string): Promise<Butter.Post<string, string> | null | undefined> {
     return this.butterService.post
-      .retrieve(slug, { locale: 'en' })
+      .retrieve(slug)
       .then((res) => {
-        return res.data.data
+        return res.data?.data
       })
       .catch((error) => {
         console.error(error)
