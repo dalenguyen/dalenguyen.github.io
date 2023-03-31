@@ -17,6 +17,10 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@dalenguyen/api-nest/domains": ["libs/api-nest/domains/src/index.ts"],
+      "@dalenguyen/api-nest/infrastructure": ["libs/api-nest/infrastructure/src/index.ts"],
+      "@dalenguyen/api-nest/shell": ["libs/api-nest/shell/src/index.ts"],
+      "@dalenguyen/api-nest/usecases": ["libs/api-nest/usecases/src/index.ts"],
       "@dalenguyen/markdown": ["libs/markdown/src/index.ts"],
       "@dalenguyen/material": ["libs/material/src/index.ts"],
       "@dalenguyen/openai": ["libs/openai/src/index.ts"],

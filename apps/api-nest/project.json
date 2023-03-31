@@ -11,7 +11,7 @@
         "outputPath": "dist/apps/api-nest",
         "main": "apps/api-nest/src/main.ts",
         "tsConfig": "apps/api-nest/tsconfig.app.json",
-        "assets": ["apps/api-nest/src/assets"],
+        "assets": [],
         "externalDependencies": "all",
         "outputFileName": "index.js",
         "generatePackageJson": true,

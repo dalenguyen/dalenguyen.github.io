@@ -1,8 +1,11 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
+import {
+  AllExceptionFilter,
+  LoggerInterceptor,
+  LoggerService,
+  ResponseFormat,
+  ResponseInterceptor,
+} from '@dalenguyen/api-nest/infrastructure'
+import { ApiNestShellModule } from '@dalenguyen/api-nest/shell'
 import { http } from '@google-cloud/functions-framework'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
@@ -10,28 +13,12 @@ import { ExpressAdapter } from '@nestjs/platform-express'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import * as express from 'express'
 import 'tslib' // needed until importHelpers is set to false
-import { AppModule } from './app/app.module'
 import { environment } from './environments/environment'
-import { AllExceptionFilter } from './infrastructure/common/filter/exception.filter'
-import { LoggerInterceptor } from './infrastructure/common/interceptors/logger.interceptor'
-import { ResponseFormat, ResponseInterceptor } from './infrastructure/common/interceptors/response.interceptor'
-import { LoggerService } from './infrastructure/logger/logger.service'
-
-// async function bootstrap() {
-//   const app = await NestFactory.create(AppModule)
-//   const globalPrefix = 'api'
-//   app.setGlobalPrefix(globalPrefix)
-//   const port = process.env.PORT || 3333
-//   await app.listen(port)
-//   Logger.log(`🚀 Application is running on: http://localhost:${port}/${globalPrefix}`)
-// }
-
-// bootstrap()
 
 const server = express()
 
 export const createNestServer = async (expressInstance) => {
-  const app = await NestFactory.create(AppModule, new ExpressAdapter(expressInstance))
+  const app = await NestFactory.create(ApiNestShellModule, new ExpressAdapter(expressInstance))
 
   // Filter
   app.useGlobalFilters(new AllExceptionFilter(new LoggerService()))
