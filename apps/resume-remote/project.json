@@ -90,7 +90,7 @@
       }
     },
     "serve-static": {
-      "executor": "@nrwl/angular:file-server",
+      "executor": "@nrwl/web:file-server",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "resume-remote:build",
