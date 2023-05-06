@@ -2,6 +2,7 @@ import { provideContent, withMarkdownRenderer } from '@analogjs/content'
 import { provideFileRouter } from '@analogjs/router'
 import { provideHttpClient } from '@angular/common/http'
 import { enableProdMode } from '@angular/core'
+import { bootstrapApplication, provideClientHydration } from '@angular/platform-browser'
 import { provideAnimations } from '@angular/platform-browser/animations'
 import { renderApplication } from '@angular/platform-server'
 import { withEnabledBlockingInitialNavigation, withInMemoryScrolling, withRouterConfig } from '@angular/router'
@@ -12,14 +13,12 @@ if (import.meta.env.PROD) {
   enableProdMode()
 }
 
-export default async function render(url: string, document: string) {
-  const html = await renderApplication(AppComponent, {
-    appId: 'analog-app',
-    document,
-    url,
+const bootstrap = () =>
+  bootstrapApplication(AppComponent, {
     providers: [
       provideAnimations(),
       provideHttpClient(),
+      provideClientHydration(),
       provideFileRouter(
         withRouterConfig({ onSameUrlNavigation: 'reload' }),
         withInMemoryScrolling({ anchorScrolling: 'enabled' }),
@@ -29,5 +28,10 @@ export default async function render(url: string, document: string) {
     ],
   })
 
+export default async function render(url: string, document: string) {
+  const html = await renderApplication(bootstrap, {
+    document,
+    url,
+  })
   return html
 }

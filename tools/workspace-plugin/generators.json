@@ -1,0 +1,9 @@
+{
+  "generators": {
+    "new-article": {
+      "implementation": "./src/generators/new-article",
+      "schema": "./src/generators/new-article/schema.json",
+      "description": "Generator new-article"
+    }
+  }
+}

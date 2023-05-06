@@ -1,16 +1,9 @@
-import { enableProdMode, importProvidersFrom } from '@angular/core'
 import { bootstrapApplication } from '@angular/platform-browser'
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
-import { provideRouter } from '@angular/router'
 import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
 import * as Sentry from '@sentry/browser'
 import { RewriteFrames } from '@sentry/integrations'
-import { APP_ROUTES } from './app/app.routes'
+import { appConfig } from './app/app.config'
 import { environment } from './environments/environment'
-
-if (environment.production) {
-  enableProdMode()
-}
 
 Sentry.init({
   dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
@@ -18,6 +11,4 @@ Sentry.init({
   integrations: [new RewriteFrames()],
 })
 
-bootstrapApplication(AppComponent, {
-  providers: [importProvidersFrom(BrowserAnimationsModule), provideRouter(APP_ROUTES)],
-}).catch((err) => console.error(err))
+bootstrapApplication(AppComponent, appConfig).catch((err) => console.error(err))

@@ -1,8 +1,6 @@
+import { appConfig } from './app/app.config'
 import { bootstrapApplication } from '@angular/platform-browser'
-import { provideRouter, withEnabledBlockingInitialNavigation } from '@angular/router'
-import ResumeComponent from '@dalenguyen/portfolio/resume/feature'
-import { appRoutes } from './app/app.routes'
 
-bootstrapApplication(ResumeComponent, {
-  providers: [provideRouter(appRoutes, withEnabledBlockingInitialNavigation())],
-})
+import ResumeComponent from '@dalenguyen/portfolio/resume/feature'
+
+bootstrapApplication(ResumeComponent, appConfig)

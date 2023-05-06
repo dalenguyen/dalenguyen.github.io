@@ -21,16 +21,18 @@
  * - Delete and reinstall your node_modules
  */
 
-const fs = require('fs');
-const os = require('os');
-const cp = require('child_process');
-const isWindows = os.platform() === 'win32';
-let output;
+const fs = require('fs')
+const os = require('os')
+const cp = require('child_process')
+const isWindows = os.platform() === 'win32'
+let output
 try {
-  output = require('@nrwl/workspace').output;
+  output = require('@nx/workspace').output
 } catch (e) {
-  console.warn('Angular CLI could not be decorated to enable computation caching. Please ensure @nrwl/workspace is installed.');
-  process.exit(0);
+  console.warn(
+    'Angular CLI could not be decorated to enable computation caching. Please ensure @nx/workspace is installed.',
+  )
+  process.exit(0)
 }
 
 /**
@@ -39,31 +41,30 @@ try {
  */
 function symlinkNgCLItoNxCLI() {
   try {
-    const ngPath = './node_modules/.bin/ng';
-    const nxPath = './node_modules/.bin/nx';
+    const ngPath = './node_modules/.bin/ng'
+    const nxPath = './node_modules/.bin/nx'
     if (isWindows) {
       /**
        * This is the most reliable way to create symlink-like behavior on Windows.
        * Such that it works in all shells and works with npx.
        */
-      ['', '.cmd', '.ps1'].forEach(ext => {
-        if (fs.existsSync(nxPath + ext)) fs.writeFileSync(ngPath + ext, fs.readFileSync(nxPath + ext));
-      });
+      ;['', '.cmd', '.ps1'].forEach((ext) => {
+        if (fs.existsSync(nxPath + ext)) fs.writeFileSync(ngPath + ext, fs.readFileSync(nxPath + ext))
+      })
     } else {
       // If unix-based, symlink
-      cp.execSync(`ln -sf ./nx ${ngPath}`);
+      cp.execSync(`ln -sf ./nx ${ngPath}`)
     }
-  }
-  catch(e) {
-    output.error({ title: 'Unable to create a symlink from the Angular CLI to the Nx CLI:' + e.message });
-    throw e;
+  } catch (e) {
+    output.error({ title: 'Unable to create a symlink from the Angular CLI to the Nx CLI:' + e.message })
+    throw e
   }
 }
 
 try {
-  symlinkNgCLItoNxCLI();
-  require('@nrwl/cli/lib/decorate-cli').decorateCli();
-  output.log({ title: 'Angular CLI has been decorated to enable computation caching.' });
-} catch(e) {
-  output.error({ title: 'Decoration of the Angular CLI did not complete successfully' });
+  symlinkNgCLItoNxCLI()
+  require('@nrwl/cli/lib/decorate-cli').decorateCli()
+  output.log({ title: 'Angular CLI has been decorated to enable computation caching.' })
+} catch (e) {
+  output.error({ title: 'Decoration of the Angular CLI did not complete successfully' })
 }

@@ -6,7 +6,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": ["libs/portfolio/shell/ui/src/**/*.ts", "libs/portfolio/shell/ui/src/**/*.html"]
       },
@@ -21,7 +21,7 @@
       "outputs": ["{options.outputFile}"]
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/portfolio/shell/ui"],
       "options": {
         "jestConfig": "libs/portfolio/shell/ui/jest.config.js",

@@ -6,7 +6,7 @@
   "prefix": "dalenguyen",
   "targets": {
     "build": {
-      "executor": "@nrwl/angular:package",
+      "executor": "@nx/angular:package",
       "options": {
         "project": "libs/saas-libs/ng-package.json"
       },
@@ -21,7 +21,7 @@
       "defaultConfiguration": "production"
     },
     "test": {
-      "executor": "@nrwl/jest:jest",
+      "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/saas-libs"],
       "options": {
         "jestConfig": "libs/saas-libs/jest.config.ts",
@@ -29,7 +29,7 @@
       }
     },
     "lint": {
-      "executor": "@nrwl/linter:eslint",
+      "executor": "@nx/linter:eslint",
       "options": {
         "lintFilePatterns": ["libs/saas-libs/src/**/*.ts", "libs/saas-libs/src/**/*.html"]
       },

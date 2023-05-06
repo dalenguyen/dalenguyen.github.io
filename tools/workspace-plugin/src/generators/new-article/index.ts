@@ -1,4 +1,4 @@
-import { formatFiles, generateFiles, joinPathFragments, names, Tree } from '@nrwl/devkit'
+import { formatFiles, generateFiles, joinPathFragments, names, Tree } from '@nx/devkit'
 
 interface NewArticleSchemaOptions {
   title: string

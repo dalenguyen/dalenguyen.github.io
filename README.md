@@ -18,26 +18,26 @@ Run `npm run dev` for a dev server. Navigate to `http://localhost:4200/`. The ap
 ## Generate a new app / library
 
 ```
-nx generate @nrwl/angular:app myApp
-nx generate @nrwl/angular:library mylibrary --buildable --publishable
-nx generate @nrwl/express:application <express-app>
+nx generate @nx/angular:app myApp
+nx generate @nx/angular:library mylibrary --buildable --publishable
+nx generate @nx/express:application <express-app>
 
 # sub modules
 nx g m --name=parent --module=app-routing --route=parent --routing
 nx g m --name=parent/child --module=parent/parent-routing --route=child --routing
 
 # NPM package
-nx generate @nrwl/node:library name --importPath @dalenguyen/name --publishable
+nx generate @nx/node:library name --importPath @dalenguyen/name --publishable
 
 ```
 
 ## NestJS commands
 
 ```
-npx nx g @nrwl/nest:module path/module-name
-npx nx g @nrwl/nest:service path/service-name
-npx nx g @nrwl/nest:filter path/filter-name
-npx nx g @nrwl/nest:interceptor path/interceptor-name
+npx nx g @nx/nest:module path/module-name
+npx nx g @nx/nest:service path/service-name
+npx nx g @nx/nest:filter path/filter-name
+npx nx g @nx/nest:interceptor path/interceptor-name
 ```
 
 ## Update sentry

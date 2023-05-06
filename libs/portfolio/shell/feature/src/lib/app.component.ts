@@ -57,7 +57,7 @@ export class SentryErrorHandler implements ErrorHandler {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
-  @ViewChild('snav') snav: MatSidenav
+  @ViewChild('snav') snav!: MatSidenav
 
   mobileQuery: MediaQueryList
   // tslint:disable-next-line:variable-name

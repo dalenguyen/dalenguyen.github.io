@@ -14,6 +14,11 @@ export default defineConfig(({ mode }) => ({
   resolve: {
     mainFields: ['module'],
   },
+  server: {
+    fs: {
+      allow: ['../../libs/portfolio'],
+    },
+  },
   // optimizeDeps: {
   //   esbuildOptions: {
   //     plugins: [esbuildCommonjs(['front-matter', 'reflect-metadata'])],
