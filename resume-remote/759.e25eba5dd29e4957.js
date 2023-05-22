@@ -1,1 +1,0 @@
-(self.webpackChunkresume_remote=self.webpackChunkresume_remote||[]).push([[759],{8759:(m,n,t)=>{t.r(n);var s=t(4310),o=t(1330),a=t(9021);const e=[{path:"",loadChildren:()=>t.e(608).then(t.bind(t,2608)).then(l=>l.remoteRoutes)}];(0,s.bootstrapApplication)(t.n(a)(),{providers:[(0,o.provideRouter)(e,(0,o.withEnabledBlockingInitialNavigation)())]})}}]);

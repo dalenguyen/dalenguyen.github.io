@@ -5,7 +5,7 @@
 
 var moduleMap = {
 	"./Routes": () => {
-		return __webpack_require__.e(608).then(() => (() => ((__webpack_require__(2608)))));
+		return __webpack_require__.e(220).then(() => (() => ((__webpack_require__(220)))));
 	}
 };
 var get = (module, getScope) => {
@@ -130,7 +130,7 @@ __webpack_require__.d(exports, {
 /******/ 	// This function allow to reference async chunks
 /******/ 	__webpack_require__.u = (chunkId) => {
 /******/ 		// return url for filenames based on template
-/******/ 		return "" + (chunkId === 592 ? "common" : chunkId) + "." + {"21":"c41c1dcc97eb969b","103":"c2d3e34421df490e","118":"6a8ed036eabeee17","175":"5bead79818004cf3","229":"c7edbf9f4383a0ae","247":"b4b2579bdce85191","309":"2e9fdce2483afcf1","310":"b8ba4027a7b178e0","333":"d1677a211f509f55","351":"27823da81c84b935","391":"d701fff686bb10c3","478":"1375821cfc40e3bb","503":"28a5edf6f5e2fc06","592":"e3fd523bd0a20de9","602":"e053167a1f8c2521","608":"a70b1100f9e28a7e","673":"36c1e0409ad20560","722":"b3ebc7656e03be65","793":"4282b1e8aa377d81","864":"9cf47eedaeeb44f6","908":"2d6f72eecea1bade"}[chunkId] + ".js";
+/******/ 		return "" + (chunkId === 592 ? "common" : chunkId) + "." + {"21":"c41c1dcc97eb969b","43":"e518ba1e9ed62c29","109":"d0791aa1d6ea030e","189":"a29dd6d597e07cc3","220":"9e70a571e0f93496","294":"be5c6f797395526f","336":"126b047c2c16069a","356":"4711911ba2b8cdbe","374":"bf8260a8d72078c3","435":"cadfe995f5ddc8d2","507":"98e6f2d827331286","548":"a20b89aee8c15fe9","592":"f1ada23d153f9498","596":"6f3a54d3f613f0d5","746":"029306c933c81138","779":"cc45df673b86d09f","804":"29f64ca6b2922337","837":"b99c448d65c1bc09","884":"dd3a440919d3d866","920":"36d3350c50cb4eac","971":"dfd0d4fc33888dc1"}[chunkId] + ".js";
 /******/ 	};
 /******/ })();
 /******/ 
@@ -185,7 +185,7 @@ __webpack_require__.d(exports, {
 /******/ 			script.parentNode && script.parentNode.removeChild(script);
 /******/ 			doneFns && doneFns.forEach((fn) => (fn(event)));
 /******/ 			if(prev) return prev(event);
-/******/ 		};
+/******/ 		}
 /******/ 		var timeout = setTimeout(onScriptComplete.bind(null, undefined, { type: 'timeout', target: script }), 120000);
 /******/ 		script.onerror = onScriptComplete.bind(null, script.onerror);
 /******/ 		script.onload = onScriptComplete.bind(null, script.onload);
@@ -243,17 +243,17 @@ __webpack_require__.d(exports, {
 /******/ 		var promises = [];
 /******/ 		switch(name) {
 /******/ 			case "default": {
-/******/ 				register("@angular/animations/browser", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(602), __webpack_require__.e(673)]).then(() => (() => (__webpack_require__(1673))))));
-/******/ 				register("@angular/animations", "15.2.2", () => (__webpack_require__.e(391).then(() => (() => (__webpack_require__(9391))))));
-/******/ 				register("@angular/common/http", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(908), __webpack_require__.e(229), __webpack_require__.e(247)]).then(() => (() => (__webpack_require__(7229))))));
-/******/ 				register("@angular/common", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(175)]).then(() => (() => (__webpack_require__(4175))))));
-/******/ 				register("@angular/core", "15.2.2", () => (Promise.all([__webpack_require__.e(908), __webpack_require__.e(722)]).then(() => (() => (__webpack_require__(3722))))));
-/******/ 				register("@angular/material/core", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(908), __webpack_require__.e(103), __webpack_require__.e(864)]).then(() => (() => (__webpack_require__(103))))));
-/******/ 				register("@angular/material/icon", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(908), __webpack_require__.e(310), __webpack_require__.e(333)]).then(() => (() => (__webpack_require__(6333))))));
-/******/ 				register("@angular/platform-browser/animations", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(310), __webpack_require__.e(602), __webpack_require__.e(351), __webpack_require__.e(592)]).then(() => (() => (__webpack_require__(5913))))));
-/******/ 				register("@angular/platform-browser", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(309)]).then(() => (() => (__webpack_require__(4309))))));
-/******/ 				register("@angular/router", "15.2.2", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(908), __webpack_require__.e(310), __webpack_require__.e(793)]).then(() => (() => (__webpack_require__(2793))))));
-/******/ 				register("@dalenguyen/portfolio/resume/feature", "1.0.0", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(478)]).then(() => (() => (__webpack_require__(2478))))));
+/******/ 				register("@angular/animations/browser", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(746), __webpack_require__.e(837)]).then(() => (() => (__webpack_require__(3837))))));
+/******/ 				register("@angular/animations", "16.0.2", () => (__webpack_require__.e(109).then(() => (() => (__webpack_require__(2109))))));
+/******/ 				register("@angular/common/http", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(374), __webpack_require__.e(920), __webpack_require__.e(884)]).then(() => (() => (__webpack_require__(3884))))));
+/******/ 				register("@angular/common", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(548)]).then(() => (() => (__webpack_require__(6548))))));
+/******/ 				register("@angular/core", "16.0.2", () => (Promise.all([__webpack_require__.e(374), __webpack_require__.e(596)]).then(() => (() => (__webpack_require__(596))))));
+/******/ 				register("@angular/material/core", "16.0.0", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(374), __webpack_require__.e(920), __webpack_require__.e(43), __webpack_require__.e(356)]).then(() => (() => (__webpack_require__(6043))))));
+/******/ 				register("@angular/material/icon", "16.0.0", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(374), __webpack_require__.e(920), __webpack_require__.e(804), __webpack_require__.e(435), __webpack_require__.e(189)]).then(() => (() => (__webpack_require__(7189))))));
+/******/ 				register("@angular/platform-browser/animations", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(920), __webpack_require__.e(804), __webpack_require__.e(746), __webpack_require__.e(294), __webpack_require__.e(592)]).then(() => (() => (__webpack_require__(4024))))));
+/******/ 				register("@angular/platform-browser", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(920), __webpack_require__.e(435), __webpack_require__.e(971)]).then(() => (() => (__webpack_require__(7971))))));
+/******/ 				register("@angular/router", "16.0.2", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(374), __webpack_require__.e(920), __webpack_require__.e(804), __webpack_require__.e(779)]).then(() => (() => (__webpack_require__(6779))))));
+/******/ 				register("@dalenguyen/portfolio/resume/feature", "1.0.0", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(336)]).then(() => (() => (__webpack_require__(3336))))));
 /******/ 			}
 /******/ 			break;
 /******/ 		}
@@ -340,7 +340,7 @@ __webpack_require__.d(exports, {
 /******/ 	};
 /******/ 	var getSingletonVersion = (scope, scopeName, key, requiredVersion) => {
 /******/ 		var version = findSingletonVersionKey(scope, key);
-/******/ 		if (!satisfy(requiredVersion, version)) typeof console !== "undefined" && console.warn && console.warn(getInvalidSingletonVersionMessage(scope, key, version, requiredVersion));
+/******/ 		if (!satisfy(requiredVersion, version)) warn(getInvalidSingletonVersionMessage(scope, key, version, requiredVersion));
 /******/ 		return get(scope[key][version]);
 /******/ 	};
 /******/ 	var getStrictSingletonVersion = (scope, scopeName, key, requiredVersion) => {
@@ -368,8 +368,11 @@ __webpack_require__.d(exports, {
 /******/ 		if(entry) return get(entry);
 /******/ 		throw new Error(getInvalidVersionMessage(scope, scopeName, key, requiredVersion));
 /******/ 	};
+/******/ 	var warn = (msg) => {
+/******/ 		if (typeof console !== "undefined" && console.warn) console.warn(msg);
+/******/ 	};
 /******/ 	var warnInvalidVersion = (scope, scopeName, key, requiredVersion) => {
-/******/ 		typeof console !== "undefined" && console.warn && console.warn(getInvalidVersionMessage(scope, scopeName, key, requiredVersion));
+/******/ 		warn(getInvalidVersionMessage(scope, scopeName, key, requiredVersion));
 /******/ 	};
 /******/ 	var get = (entry) => {
 /******/ 		entry.loaded = 1;
@@ -430,46 +433,48 @@ __webpack_require__.d(exports, {
 /******/ 	});
 /******/ 	var installedModules = {};
 /******/ 	var moduleToHandlerMapping = {
-/******/ 		118: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/core", [4,15,2,2], () => (Promise.all([__webpack_require__.e(908), __webpack_require__.e(722)]).then(() => (() => (__webpack_require__(3722))))))),
-/******/ 		6602: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/animations", [4,15,2,2], () => (__webpack_require__.e(391).then(() => (() => (__webpack_require__(9391))))))),
-/******/ 		7503: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/common", [4,15,2,2], () => (__webpack_require__.e(175).then(() => (() => (__webpack_require__(4175))))))),
-/******/ 		3737: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/platform-browser/animations", [4,15,2,2], () => (Promise.all([__webpack_require__.e(310), __webpack_require__.e(602), __webpack_require__.e(351), __webpack_require__.e(592)]).then(() => (() => (__webpack_require__(5913))))))),
-/******/ 		4310: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/platform-browser", [4,15,2,2], () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(503), __webpack_require__.e(309)]).then(() => (() => (__webpack_require__(4309))))))),
-/******/ 		4921: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/common/http", [4,15,2,2], () => (__webpack_require__.e(229).then(() => (() => (__webpack_require__(7229))))))),
-/******/ 		5439: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/material/core", [4,15,2,2], () => (__webpack_require__.e(103).then(() => (() => (__webpack_require__(103))))))),
-/******/ 		6351: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/animations/browser", [4,15,2,2], () => (__webpack_require__.e(673).then(() => (() => (__webpack_require__(1673))))))),
-/******/ 		9849: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/material/icon", [4,15,2,2], () => (Promise.all([__webpack_require__.e(503), __webpack_require__.e(908), __webpack_require__.e(310), __webpack_require__.e(333)]).then(() => (() => (__webpack_require__(6333))))))),
-/******/ 		9021: () => (loadFallback("default", "@dalenguyen/portfolio/resume/feature", () => (Promise.all([__webpack_require__.e(118), __webpack_require__.e(478)]).then(() => (() => (__webpack_require__(2478)))))))
+/******/ 		4507: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/core", [4,16,0,2], () => (Promise.all([__webpack_require__.e(374), __webpack_require__.e(596)]).then(() => (() => (__webpack_require__(596))))))),
+/******/ 		5746: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/animations", [4,16,0,2], () => (__webpack_require__.e(109).then(() => (() => (__webpack_require__(2109))))))),
+/******/ 		6920: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/common", [4,16,0,2], () => (__webpack_require__.e(548).then(() => (() => (__webpack_require__(6548))))))),
+/******/ 		2737: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/platform-browser/animations", [4,16,0,2], () => (Promise.all([__webpack_require__.e(804), __webpack_require__.e(746), __webpack_require__.e(294), __webpack_require__.e(592)]).then(() => (() => (__webpack_require__(4024))))))),
+/******/ 		4804: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/platform-browser", [4,16,0,2], () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(920), __webpack_require__.e(435), __webpack_require__.e(971)]).then(() => (() => (__webpack_require__(7971))))))),
+/******/ 		6435: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/common/http", [4,16,0,2], () => (Promise.all([__webpack_require__.e(374), __webpack_require__.e(884)]).then(() => (() => (__webpack_require__(3884))))))),
+/******/ 		6865: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/material/core", [4,16,0,0], () => (__webpack_require__.e(43).then(() => (() => (__webpack_require__(6043))))))),
+/******/ 		2294: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/animations/browser", [4,16,0,2], () => (__webpack_require__.e(837).then(() => (() => (__webpack_require__(3837))))))),
+/******/ 		6762: () => (loadStrictSingletonVersionCheckFallback("default", "@angular/material/icon", [4,16,0,0], () => (Promise.all([__webpack_require__.e(374), __webpack_require__.e(920), __webpack_require__.e(804), __webpack_require__.e(435), __webpack_require__.e(189)]).then(() => (() => (__webpack_require__(7189))))))),
+/******/ 		9021: () => (loadFallback("default", "@dalenguyen/portfolio/resume/feature", () => (Promise.all([__webpack_require__.e(507), __webpack_require__.e(336)]).then(() => (() => (__webpack_require__(3336)))))))
 /******/ 	};
 /******/ 	// no consumes in initial chunks
 /******/ 	var chunkMapping = {
 /******/ 		"21": [
 /******/ 			9021
 /******/ 		],
-/******/ 		"103": [
-/******/ 			3737
+/******/ 		"43": [
+/******/ 			2737
 /******/ 		],
-/******/ 		"118": [
-/******/ 			118
+/******/ 		"189": [
+/******/ 			6865
 /******/ 		],
-/******/ 		"310": [
-/******/ 			4310
+/******/ 		"294": [
+/******/ 			2294
 /******/ 		],
-/******/ 		"333": [
-/******/ 			4921,
-/******/ 			5439
+/******/ 		"336": [
+/******/ 			6762
 /******/ 		],
-/******/ 		"351": [
-/******/ 			6351
+/******/ 		"435": [
+/******/ 			6435
 /******/ 		],
-/******/ 		"478": [
-/******/ 			9849
+/******/ 		"507": [
+/******/ 			4507
 /******/ 		],
-/******/ 		"503": [
-/******/ 			7503
+/******/ 		"746": [
+/******/ 			5746
 /******/ 		],
-/******/ 		"602": [
-/******/ 			6602
+/******/ 		"804": [
+/******/ 			4804
+/******/ 		],
+/******/ 		"920": [
+/******/ 			6920
 /******/ 		]
 /******/ 	};
 /******/ 	__webpack_require__.f.consumes = (chunkId, promises) => {
@@ -521,7 +526,7 @@ __webpack_require__.d(exports, {
 /******/ 				if(installedChunkData) {
 /******/ 					promises.push(installedChunkData[2]);
 /******/ 				} else {
-/******/ 					if(!/^(118|21|310|351|503|602)$/.test(chunkId)) {
+/******/ 					if(!/^(21|294|435|507|746|804|920)$/.test(chunkId)) {
 /******/ 						// setup Promise in chunk cache
 /******/ 						var promise = new Promise((resolve, reject) => (installedChunkData = installedChunks[chunkId] = [resolve, reject]));
 /******/ 						promises.push(installedChunkData[2] = promise);
