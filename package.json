@@ -73,7 +73,7 @@
     "add": "^2.0.6",
     "axios": "^0.21.2",
     "buttercms": "^1.2.7",
-    "class-validator": "^0.13.2",
+    "class-validator": "^0.14.0",
     "core-js": "^3.6.5",
     "cors": "^2.8.5",
     "destr": "^1.2.2",
