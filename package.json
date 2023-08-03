@@ -213,7 +213,7 @@
     "ts-node": "10.9.1",
     "typescript": "5.0.4",
     "url-loader": "^4.1.1",
-    "vite": "4.3.4",
+    "vite": "4.3.9",
     "vite-plugin-commonjs": "^0.6.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-tsconfig-paths": "4.2.0",
