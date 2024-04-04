@@ -571,8 +571,8 @@ packages:
       tslib: 2.5.2
     dev: false
 
-  /@analogjs/content@1.1.0(@angular/common@16.0.2)(@angular/core@16.0.2)(@angular/platform-browser@16.0.2)(@angular/router@16.0.2)(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3)(marked-highlight@2.1.1)(marked@4.3.0)(mermaid@10.9.0)(prismjs@1.29.0)(rxjs@7.5.7):
-    resolution: {integrity: sha512-RxdhTAm3trAF4Y6kQ/2W8yPUF9/s513Rls2e8SpTI9u8i+3W7eCxo9VdDNaJDSfla+wsQhqnw0CBnXoby0g93Q==}
+  /@analogjs/content@1.1.1(@angular/common@16.0.2)(@angular/core@16.0.2)(@angular/platform-browser@16.0.2)(@angular/router@16.0.2)(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3)(marked-highlight@2.1.1)(marked@4.3.0)(mermaid@10.9.0)(prismjs@1.29.0)(rxjs@7.5.7):
+    resolution: {integrity: sha512-wAINfP98gN/fEs7aFLYeuz9c5wW5cAw63VuCMqj7u2yJPXrzLtbN6IQAkdlwrx/l7kCxlfTSpJHKZcnXO1xuXw==}
     requiresBuild: true
     peerDependencies:
       '@angular/common': ^15.0.0 || >=16.0.0
@@ -605,7 +605,7 @@ packages:
   /@analogjs/platform@0.1.0-beta.14(@angular-devkit/build-angular@16.0.2):
     resolution: {integrity: sha512-a6NZ7koXt06nzAB6C9g5RJVJvxnBM0C3tqNQWdDaioASP3KEIKwhrTyYwm4/+Ko5+os8eS9+SdoFvbbUOTBY+w==}
     dependencies:
-      '@analogjs/vite-plugin-angular': 1.1.0(@angular-devkit/build-angular@16.0.2)
+      '@analogjs/vite-plugin-angular': 1.1.1(@angular-devkit/build-angular@16.0.2)
       nitropack: 0.6.1
     transitivePeerDependencies:
       - '@angular-devkit/build-angular'
@@ -626,7 +626,7 @@ packages:
       '@angular/router': 16.0.2(@angular/common@16.0.2)(@angular/core@16.0.2)(@angular/platform-browser@16.0.2)(rxjs@7.5.7)
       tslib: 2.5.2
     optionalDependencies:
-      '@analogjs/content': 1.1.0(@angular/common@16.0.2)(@angular/core@16.0.2)(@angular/platform-browser@16.0.2)(@angular/router@16.0.2)(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3)(marked-highlight@2.1.1)(marked@4.3.0)(mermaid@10.9.0)(prismjs@1.29.0)(rxjs@7.5.7)
+      '@analogjs/content': 1.1.1(@angular/common@16.0.2)(@angular/core@16.0.2)(@angular/platform-browser@16.0.2)(@angular/router@16.0.2)(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3)(marked-highlight@2.1.1)(marked@4.3.0)(mermaid@10.9.0)(prismjs@1.29.0)(rxjs@7.5.7)
     transitivePeerDependencies:
       - '@angular/common'
       - '@angular/platform-browser'
@@ -639,8 +639,8 @@ packages:
       - rxjs
     dev: false
 
-  /@analogjs/vite-plugin-angular@1.1.0(@angular-devkit/build-angular@16.0.2):
-    resolution: {integrity: sha512-OH3/gCzh/+3yOHLtIsMJCHspoLtj7hj0CIErlt4nLbnJO+7K425V26GSbblcwrxgJGgwXEO5/QB6gZkXJlVBcw==}
+  /@analogjs/vite-plugin-angular@1.1.1(@angular-devkit/build-angular@16.0.2):
+    resolution: {integrity: sha512-yWeQnf0DUVGbmIxzHyy79vjywyAExKL9l9TGIh5RamZ2CESsn88dJPeduI7v/v232XT8Oj1TDHvDLG8ndoFQSQ==}
     peerDependencies:
       '@angular-devkit/build-angular': ^15.0.0 || >=16.0.0
     dependencies:
@@ -4336,6 +4336,10 @@ packages:
       text-decoding: 1.0.0
     dev: false
 
+  /@fastify/busboy@2.1.1:
+    resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
+    engines: {node: '>=14'}
+
   /@firebase/analytics-types@0.4.0:
     resolution: {integrity: sha512-Jj2xW+8+8XPfWGkv9HPv/uR+Qrmq37NPYT352wf7MvE9LrstpLVmFg3LqG6MCRr5miLAom5sen2gZ+iOhVDeRA==}
     dev: false
@@ -7427,7 +7431,7 @@ packages:
     engines: {node: ^12.20.0 || ^14.18.0 || >=16.0.0}
     dependencies:
       cross-spawn: 7.0.3
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       is-glob: 4.0.3
       open: 9.1.0
       picocolors: 1.0.0
@@ -9350,6 +9354,7 @@ packages:
   /@tootallnate/once@1.1.2:
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
     engines: {node: '>= 6'}
+    requiresBuild: true
 
   /@tootallnate/once@2.0.0:
     resolution: {integrity: sha512-XCuKFP5PS55gnMVu3dty8KPatLqUoy/ZYzDzAGCQ8JNFCkLXzmI7vNHCR+XpbZaMWQK/vQubr7PkYq8g470J/A==}
@@ -9391,7 +9396,7 @@ packages:
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
       '@tufjs/canonical-json': 1.0.0
-      minimatch: 9.0.1
+      minimatch: 9.0.4
     dev: true
 
   /@types/acorn@4.0.6:
@@ -15146,7 +15151,6 @@ packages:
       glob-parent: 5.1.2
       merge2: 1.4.1
       micromatch: 4.0.5
-    dev: false
 
   /fast-json-parse@1.0.3:
     resolution: {integrity: sha512-FRWsaZRWEJ1ESVNbDWmsAlqDk96gPQezzLghafp5J4GUKjbCz3OkAHuZs5TuPEtkbVQERysLp9xv6c24fBm8Aw==}
@@ -15862,7 +15866,7 @@ packages:
     dependencies:
       foreground-child: 3.1.1
       jackspeak: 2.2.1
-      minimatch: 9.0.1
+      minimatch: 9.0.4
       minipass: 5.0.0
       path-scurry: 1.9.2
 
@@ -15946,7 +15950,7 @@ packages:
     dependencies:
       array-union: 2.1.0
       dir-glob: 3.0.1
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 3.0.0
@@ -15957,7 +15961,7 @@ packages:
     dependencies:
       array-union: 3.0.1
       dir-glob: 3.0.1
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 4.0.0
@@ -16628,7 +16632,7 @@ packages:
     resolution: {integrity: sha512-C7FfFoTA+bI10qfeydT8aZbvr91vAEU+2W5BZUlzPec47oNb07SsOfwYrtxuvOYdUApPP/Qlh4DtAO51Ekk2QA==}
     engines: {node: ^14.17.0 || ^16.13.0 || >=18.0.0}
     dependencies:
-      minimatch: 9.0.1
+      minimatch: 9.0.4
     dev: true
 
   /ignore@5.2.4:
@@ -19413,18 +19417,11 @@ packages:
     dependencies:
       brace-expansion: 2.0.1
 
-  /minimatch@9.0.1:
-    resolution: {integrity: sha512-0jWhJpD/MdhPXwPuiRkCbfYfSKp2qnn2eOc279qI7f+osl/l+prKSrvhg157zSYvx/1nmgn2NqdT6k2Z7zSH9w==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    dependencies:
-      brace-expansion: 2.0.1
-
   /minimatch@9.0.4:
     resolution: {integrity: sha512-KqWh+VchfxcMNRAJjj2tnsSJdNbHsVgnkBhTNrW7AjVo6OvLtxw8zfT9oLw1JSohlFzJ8jCoTgaoXvJ+kHt6fw==}
     engines: {node: '>=16 || 14 >=14.17'}
     dependencies:
       brace-expansion: 2.0.1
-    dev: false
 
   /minimist-options@4.1.0:
     resolution: {integrity: sha512-Q4r8ghd80yhO/0j1O3B2BjweX3fiHg9cdOwjJd2J76Q135c+NDxGCqdYKQ1SKBuFfgWbAUzBfvYjPUEeNgqN1A==}
@@ -20463,7 +20460,7 @@ packages:
       destr: 1.2.2
       node-fetch-native: 0.1.8
       ufo: 0.8.6
-      undici: 5.22.1
+      undici: 5.28.4
     dev: false
 
   /on-finished@2.3.0:
@@ -20534,7 +20531,7 @@ packages:
       fast-glob: 3.2.12
       js-yaml: 4.1.0
       supports-color: 9.3.1
-      undici: 5.22.1
+      undici: 5.28.4
       yargs-parser: 21.1.1
     dev: true
 
@@ -24885,11 +24882,11 @@ packages:
     resolution: {integrity: sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==}
     dev: true
 
-  /undici@5.22.1:
-    resolution: {integrity: sha512-Ji2IJhFXZY0x/0tVBXeQwgPlLWw13GVzpsWPQ3rV50IFMMof2I55PZZxtm4P6iNq+L5znYN9nSTAq0ZyE6lSJw==}
+  /undici@5.28.4:
+    resolution: {integrity: sha512-72RFADWFqKmUb2hmmvNODKL3p9hcB6Gt2DOQMis1SEBaV6a4MH8soBvzg+95CYhCKPFedut2JY9bMfrDl9D23g==}
     engines: {node: '>=14.0'}
     dependencies:
-      busboy: 1.6.0
+      '@fastify/busboy': 2.1.1
 
   /unenv@0.6.2:
     resolution: {integrity: sha512-IdQfYsHsGKDkiBdeOmtU4MjWvPYfMDOC63cvFqZPodAc5aVezvfD9Bwr7FL/G78cAMMCaDm5Jux3vYo+Z8c/Dg==}
@@ -24948,7 +24945,7 @@ packages:
     dependencies:
       '@rollup/pluginutils': 5.0.2(rollup@2.79.1)
       escape-string-regexp: 5.0.0
-      fast-glob: 3.2.12
+      fast-glob: 3.3.2
       local-pkg: 0.4.3
       magic-string: 0.26.7
       mlly: 1.2.1
@@ -26380,6 +26377,7 @@ packages:
   /yocto-queue@0.1.0:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
+    requiresBuild: true
 
   /yocto-queue@1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
