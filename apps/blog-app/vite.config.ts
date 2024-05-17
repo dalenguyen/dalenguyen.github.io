@@ -19,11 +19,6 @@ export default defineConfig(({ mode }) => ({
       allow: ['../../libs/portfolio'],
     },
   },
-  // optimizeDeps: {
-  //   esbuildOptions: {
-  //     plugins: [esbuildCommonjs(['front-matter', 'reflect-metadata'])],
-  //   },
-  // },
   plugins: [
     tsconfigPaths(),
     viteCommonjs(),
