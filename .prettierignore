@@ -2,3 +2,5 @@
 countries.json
 /dist
 /coverage
+
+/.nx/cache
