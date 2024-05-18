@@ -1,8 +1,8 @@
-/* To learn more about this file see: https://angular.io/config/tsconfig. */
 {
   "extends": "../../tsconfig.base.json",
   "files": [],
-  "include": ["src"],
+  "include": [],
+  "exclude": [],
   "references": [
     {
       "path": "./tsconfig.app.json"
@@ -15,27 +15,18 @@
     }
   ],
   "compilerOptions": {
-    "useDefineForClassFields": true,
-    "module": "ESNext",
-    "resolveJsonModule": true,
-    "moduleResolution": "Node",
-    "isolatedModules": true,
-    "lib": ["ESNext", "DOM"],
-    "skipLibCheck": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "forceConsistentCasingInFileNames": false,
+    "target": "es2020",
+    "forceConsistentCasingInFileNames": true,
     "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
-    "noFallthroughCasesInSwitch": false,
-    "target": "ESNext",
-    "types": ["vite/client"],
-    "strictPropertyInitialization": false
+    "noFallthroughCasesInSwitch": true
   },
   "angularCompilerOptions": {
-    "strictInjectionParameters": false,
-    "strictInputAccessModifiers": false,
-    "strictTemplates": false,
-    "enableIvy": true
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
   }
 }

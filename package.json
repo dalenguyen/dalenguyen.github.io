@@ -42,7 +42,6 @@
   "private": true,
   "dependencies": {
     "@analogjs/content": "1.3.1",
-    "@analogjs/platform": "1.3.1",
     "@analogjs/router": "1.3.1",
     "@angular/animations": "17.0.0",
     "@angular/cdk": "17.0.0",
@@ -81,14 +80,18 @@
     "firebase": "8.6.1",
     "firebase-admin": "^10.0.2",
     "form-data": "^4.0.0",
+    "front-matter": "^4.0.2",
     "gray-matter": "^4.0.3",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.2.0",
+    "marked": "^5.0.2",
     "marked-gfm-heading-id": "3.1.3",
+    "marked-highlight": "^2.0.1",
     "mermaid": "10.9.1",
     "next": "13.3.0",
     "next-mdx-remote": "^4.0.0",
     "next-remote-watch": "^1.0.0",
+    "prismjs": "^1.29.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-is": "18.2.0",
@@ -104,6 +107,7 @@
     "zone.js": "0.13.0"
   },
   "devDependencies": {
+    "@analogjs/platform": "1.3.1",
     "@angular-builders/custom-webpack": "17.0.2",
     "@angular-devkit/architect": "0.1700.0",
     "@angular-devkit/build-angular": "17.0.0",
@@ -188,7 +192,7 @@
     "jest-environment-jsdom": "29.4.3",
     "jest-environment-node": "^29.4.1",
     "jest-preset-angular": "13.0.0",
-    "jsdom": "~20.0.3",
+    "jsdom": "^22.0.0",
     "jsonc-eslint-parser": "^2.1.0",
     "ng-packagr": "16.0.0",
     "nitropack": "^2.1.2",
@@ -211,13 +215,13 @@
     "tailwindcss": "3.2.4",
     "ts-jest": "29.1.0",
     "ts-node": "10.9.1",
-    "typescript": "5.0.4",
+    "typescript": "5.2.2",
     "url-loader": "^4.1.1",
-    "vite": "4.3.4",
+    "vite": "^4.4.8",
     "vite-plugin-commonjs": "^0.6.1",
     "vite-plugin-eslint": "^1.8.1",
     "vite-tsconfig-paths": "4.2.0",
-    "vitest": "0.31.0",
+    "vitest": "^0.32.2",
     "webpack": "^5.75.0",
     "webpack-extension-reloader": "^1.1.4",
     "webpack-merge": "^5.8.0"
@@ -226,4 +230,3 @@
     "node": ">=18"
   }
 }
-

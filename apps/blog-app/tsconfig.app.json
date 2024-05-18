@@ -1,12 +1,12 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "composite": false,
-    "outDir": "./out-tsc/app",
+    "outDir": "../../dist/out-tsc",
     "types": [],
     "target": "ES2022",
     "useDefineForClassFields": false
   },
   "files": ["src/main.ts", "src/main.server.ts"],
-  "include": ["src/**/*.d.ts", "src/app/routes/**/*.ts"]
+  "include": ["src/**/*.d.ts", "src/app/routes/**/*.ts", "src/app/pages/**/*.page.ts"],
+  "exclude": ["**/*.test.ts", "**/*.spec.ts"]
 }
