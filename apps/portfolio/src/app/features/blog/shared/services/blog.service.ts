@@ -1,11 +1,11 @@
-import { Injectable } from '@angular/core'
 import { HttpClient } from '@angular/common/http'
+import { Injectable } from '@angular/core'
 
 import Butter from 'buttercms'
 
 import { captureException } from '@sentry/core'
-import { Article } from '../models'
 import { environment } from 'apps/portfolio/src/environments/environment'
+import { Article } from '../models'
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ export class BlogService {
   devBaseUrl = 'https://dev.to/api/articles?username=dalenguyen'
   butterService
 
-  currentArticle: Article
+  currentArticle: Article = null
 
   get articles() {
     return this.getDevArticles()

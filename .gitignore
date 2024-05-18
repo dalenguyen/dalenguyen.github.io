@@ -48,3 +48,5 @@ myDb.db
 .next
 .idea
 thunder-tests
+.nx/cache
+.vercel

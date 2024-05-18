@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { Router } from '@angular/router'
+import { WINDOW } from '@dalenguyen/angular'
 import { NavService } from './nav.service'
-
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-nav',
@@ -15,11 +15,13 @@ import { NavService } from './nav.service'
 export class NavComponent implements OnInit {
   private navService = inject(NavService)
   private router = inject(Router)
+  private window = inject(WINDOW)
+
   activeEl = 'intro'
 
   ngOnInit() {
     // Set active nav by path
-    const currentPath = window.location.pathname.split('/')[1]
+    const currentPath = this.window.location.pathname.split('/')[1]
     if (currentPath !== '') {
       this.activeEl = currentPath
     }

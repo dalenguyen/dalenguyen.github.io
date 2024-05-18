@@ -2,6 +2,7 @@ import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
 import { Component, inject } from '@angular/core'
 import { Router, RouterLink } from '@angular/router'
+import { WINDOW } from '@dalenguyen/angular'
 import { BlogService } from '../../blog/blog.service'
 
 // TODO: meta data update later
@@ -115,12 +116,13 @@ export default class BlogPostComponent {
   private blogService = inject(BlogService)
   slug = location.pathname.split('/blog/')[1]
   readonly article$ = this.blogService.getButterArticle(this.slug)
+  private window = inject(WINDOW)
 
   openBlog() {
     // TODO: super hacky :|
     // need to figure out why blog doesn't load
     this.router.navigate(['blog']).then(() => {
-      window.location.reload()
+      this.window.location.reload()
     })
   }
 }

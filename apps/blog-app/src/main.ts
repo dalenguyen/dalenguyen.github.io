@@ -1,6 +1,6 @@
 import { provideContent, withMarkdownRenderer } from '@analogjs/content'
 import { provideFileRouter } from '@analogjs/router'
-import { provideHttpClient } from '@angular/common/http'
+import { provideHttpClient, withFetch } from '@angular/common/http'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { provideAnimations } from '@angular/platform-browser/animations'
 import { withEnabledBlockingInitialNavigation, withInMemoryScrolling, withRouterConfig } from '@angular/router'
@@ -16,7 +16,7 @@ import 'zone.js'
 bootstrapApplication(AppComponent, {
   providers: [
     provideAnimations(),
-    provideHttpClient(),
+    provideHttpClient(withFetch()),
     provideFileRouter(
       withRouterConfig({ onSameUrlNavigation: 'reload' }),
       withInMemoryScrolling({ anchorScrolling: 'enabled' }),

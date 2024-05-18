@@ -1,9 +1,10 @@
 /// <reference types="vitest" />
 
 import analog from '@analogjs/platform'
-import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+// import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import { defineConfig } from 'vite'
-import tsconfigPaths from 'vite-tsconfig-paths'
+// import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -16,22 +17,19 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     fs: {
-      allow: ['../../libs/portfolio'],
+      allow: ['.', '../../libs/portfolio'],
     },
   },
-  // optimizeDeps: {
-  //   esbuildOptions: {
-  //     plugins: [esbuildCommonjs(['front-matter', 'reflect-metadata'])],
-  //   },
-  // },
   plugins: [
-    tsconfigPaths(),
-    viteCommonjs(),
+    // tsconfigPaths(),
+    // viteCommonjs(),
+    nxViteTsPaths(),
     analog({
+      nitro: {
+        preset: 'vercel',
+      },
       static: true,
-      // ssr: true,
-      // ssrBuildDir: '../../dist/apps/blog-app/ssr',
-      // entryServer: 'apps/blog-app/src/main.server.ts',
+      ssr: false,
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
         inlineStylesExtension: 'scss|sass|less',
