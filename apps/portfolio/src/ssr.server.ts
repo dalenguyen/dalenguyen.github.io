@@ -1,5 +1,5 @@
 import { APP_BASE_HREF } from '@angular/common'
-import { ngExpressEngine } from '@nguniversal/express-engine'
+import { ngExpressEngine } from '@angular/ssr'
 import * as express from 'express'
 import { existsSync } from 'fs'
 import { join } from 'path'

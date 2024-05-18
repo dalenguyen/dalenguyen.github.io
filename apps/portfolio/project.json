@@ -28,9 +28,16 @@
             "output": "assets"
           }
         ],
-        "styles": ["apps/portfolio/src/styles.scss"],
+        "styles": [
+          "apps/portfolio/src/styles.scss"
+        ],
         "scripts": [],
-        "allowedCommonJsDependencies": ["buttercms", "leaflet", "mapbox-gl", "localstorage"],
+        "allowedCommonJsDependencies": [
+          "buttercms",
+          "leaflet",
+          "mapbox-gl",
+          "localstorage"
+        ],
         "customWebpackConfig": {
           "path": "apps/portfolio/webpack.config.js"
         }
@@ -95,13 +102,20 @@
     "lint": {
       "executor": "@nx/linter:eslint",
       "options": {
-        "lintFilePatterns": ["apps/portfolio/src/**/*.ts", "apps/portfolio/src/**/*.html"]
+        "lintFilePatterns": [
+          "apps/portfolio/src/**/*.ts",
+          "apps/portfolio/src/**/*.html"
+        ]
       },
-      "outputs": ["{options.outputFile}"]
+      "outputs": [
+        "{options.outputFile}"
+      ]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": ["{workspaceRoot}/coverage/apps/portfolio"],
+      "outputs": [
+        "{workspaceRoot}/coverage/apps/portfolio"
+      ],
       "options": {
         "jestConfig": "apps/portfolio/jest.config.ts",
         "passWithNoTests": true
@@ -149,7 +163,7 @@
       }
     },
     "serve-ssr": {
-      "executor": "@nguniversal/builders:ssr-dev-server",
+      "executor": "@angular-devkit/build-angular:ssr-dev-server",
       "configurations": {
         "development": {
           "browserTarget": "portfolio:build:development",
@@ -171,6 +185,11 @@
       }
     }
   },
-  "tags": ["type:app", "scope:portfolio"],
-  "implicitDependencies": ["resume-remote"]
+  "tags": [
+    "type:app",
+    "scope:portfolio"
+  ],
+  "implicitDependencies": [
+    "resume-remote"
+  ]
 }
