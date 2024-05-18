@@ -29,13 +29,11 @@ export default defineConfig(({ mode }) => ({
         preset: 'vercel',
       },
       static: true,
-      // ssr: true,
-      // ssrBuildDir: '../../dist/apps/blog-app/ssr',
-      // entryServer: 'apps/blog-app/src/main.server.ts',
-      // vite: {
-      //   tsconfig: 'apps/blog-app/tsconfig.app.json',
-      //   inlineStylesExtension: 'scss|sass|less',
-      // },
+      ssr: false,
+      vite: {
+        tsconfig: 'apps/blog-app/tsconfig.app.json',
+        inlineStylesExtension: 'scss|sass|less',
+      },
     }),
   ],
   test: {

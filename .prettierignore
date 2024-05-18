@@ -4,3 +4,4 @@ countries.json
 /coverage
 
 /.nx/cache
+.angular
