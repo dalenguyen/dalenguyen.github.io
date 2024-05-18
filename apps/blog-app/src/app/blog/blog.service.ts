@@ -11,7 +11,7 @@ export class BlogService {
   http = inject(HttpClient)
   butterService = Butter('10de8a1782f01676902398495c4062893956ac9c')
 
-  currentArticle: Butter.Post
+  currentArticle: Butter.Post | null = null
 
   get articles() {
     return this.getDevArticles()

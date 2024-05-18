@@ -49,3 +49,4 @@ myDb.db
 .idea
 thunder-tests
 .nx/cache
+.vercel
