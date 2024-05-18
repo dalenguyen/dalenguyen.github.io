@@ -1,25 +1,18 @@
 {
   "migrations": [
     {
-      "version": "17.0.0",
-      "description": "Angular v17 introduces a new control flow syntax that uses the @ and } characters. This migration replaces the existing usages with their corresponding HTML entities.",
-      "factory": "./migrations/block-template-entities/bundle",
-      "package": "@angular/core",
-      "name": "block-template-entities"
+      "version": "17.0.0-0",
+      "description": "Updates Angular Material to v17",
+      "factory": "./ng-update/index_bundled#updateToV17",
+      "package": "@angular/material",
+      "name": "migration-v17"
     },
     {
-      "version": "17.0.0",
-      "description": "CompilerOption.useJit and CompilerOption.missingTranslation are unused under Ivy. This migration removes their usage",
-      "factory": "./migrations/compiler-options/bundle",
-      "package": "@angular/core",
-      "name": "migration-v17-compiler-options"
-    },
-    {
-      "version": "17.0.0",
-      "description": "Updates `TransferState`, `makeStateKey`, `StateKey` imports from `@angular/platform-browser` to `@angular/core`.",
-      "factory": "./migrations/transfer-state/bundle",
-      "package": "@angular/core",
-      "name": "migration-transfer-state"
+      "version": "17.0.0-0",
+      "description": "Updates the Angular CDK to v17",
+      "factory": "./ng-update/index#updateToV17",
+      "package": "@angular/cdk",
+      "name": "migration-v17"
     }
   ]
 }
