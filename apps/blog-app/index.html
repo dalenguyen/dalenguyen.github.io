@@ -7,6 +7,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="/src/favicon.ico" />
     <link rel="stylesheet" href="/src/styles.css" />
+
+    <!-- Logichat -->
+    <script src="https://sdk.logichat.io/js/widget.js?appId=lg_czNzY4OD" defer id="logichat-sdk"></script>
+
+    <script>
+      // SDK events
+      const eventTypes = ['sdkLoaded', 'iframeResized']
+
+      // Global callback
+      function onLogichatEvent(event) {
+        if (event.type === 'sdkLoaded') {
+          const element = $logichat.V1.createElement('faq', {})
+          element.mount('#logichat-faq-widget')
+        }
+      }
+    </script>
+    <!-- End Logichat -->
   </head>
   <body>
     <dalenguyen-root />
