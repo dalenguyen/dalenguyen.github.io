@@ -4,13 +4,13 @@
   "projectType": "library",
   "sourceRoot": "libs/material/src",
   "prefix": "dalenguyen",
+  "tags": [],
   "targets": {
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/material"],
       "options": {
-        "jestConfig": "libs/material/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/material/jest.config.ts"
       }
     },
     "lint": {
@@ -20,6 +20,5 @@
       },
       "outputs": ["{options.outputFile}"]
     }
-  },
-  "tags": []
+  }
 }

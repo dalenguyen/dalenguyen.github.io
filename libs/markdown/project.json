@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/markdown/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -15,10 +16,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/markdown"],
       "options": {
-        "jestConfig": "libs/markdown/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/markdown/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

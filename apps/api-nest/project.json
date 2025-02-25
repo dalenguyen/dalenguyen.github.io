@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api-nest/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
@@ -49,8 +50,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/api-nest"],
       "options": {
-        "jestConfig": "apps/api-nest/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/api-nest/jest.config.ts"
       }
     },
     "deploy": {
@@ -63,6 +63,5 @@
         "parallel": false
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -8,8 +8,12 @@ import { defineConfig } from 'vite'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
+  root: __dirname,
   publicDir: '../../libs/portfolio/shared',
   build: {
+    outDir: '../../dist/apps/blog-app/client',
+    reportCompressedSize: true,
+    commonjsOptions: { transformMixedEsModules: true },
     target: ['es2022'],
   },
   resolve: {
@@ -37,6 +41,11 @@ export default defineConfig(({ mode }) => ({
     }),
   ],
   test: {
+    reporters: ['default'],
+    coverage: {
+      reportsDirectory: '../../coverage/apps/blog-app',
+      provider: 'v8',
+    },
     globals: true,
     environment: 'jsdom',
     setupFiles: ['src/test.ts'],

@@ -1,0 +1,26 @@
+[NX Daemon Server] - 2025-02-25T22:34:49.974Z - Started listening on: /var/folders/4f/61_dfmdn1_b896x9fjkj_mvh0000gn/T/f40c436aa750ec785638/d.sock
+[NX Daemon Server] - 2025-02-25T22:34:49.976Z - [WATCHER]: Subscribed to changes within: /Users/dalenguyen/projects/github/dalenguyen.github.io (native)
+[NX Daemon Server] - 2025-02-25T22:34:49.978Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T22:34:49.980Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T22:34:49.980Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T22:34:49.980Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T22:34:49.980Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T22:34:49.981Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - [WATCHER]: Stopping the watcher for /Users/dalenguyen/projects/github/dalenguyen.github.io (sources)
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - [WATCHER]: Stopping the watcher for /Users/dalenguyen/projects/github/dalenguyen.github.io (outputs)
+[NX Daemon Server] - 2025-02-25T22:34:49.982Z - Server stopped because: "Request to shutdown"
+[NX Daemon Server] - 2025-02-25T22:37:00.380Z - Started listening on: /var/folders/4f/61_dfmdn1_b896x9fjkj_mvh0000gn/T/f40c436aa750ec785638/d.sock
+[NX Daemon Server] - 2025-02-25T22:37:00.385Z - [WATCHER]: Subscribed to changes within: /Users/dalenguyen/projects/github/dalenguyen.github.io (native)
+[NX Daemon Server] - 2025-02-25T22:37:00.386Z - Established a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T22:37:00.387Z - Established a connection. Number of open connections: 2
+[NX Daemon Server] - 2025-02-25T22:37:00.388Z - Closed a connection. Number of open connections: 1
+[NX Daemon Server] - 2025-02-25T22:37:00.389Z - [REQUEST]: Responding to the client. Shutdown initiated
+[NX Daemon Server] - 2025-02-25T22:37:00.389Z - Done responding to the client Shutdown initiated
+[NX Daemon Server] - 2025-02-25T22:37:00.389Z - Handled FORCE_SHUTDOWN. Handling time: 0. Response time: 1.
+[NX Daemon Server] - 2025-02-25T22:37:00.391Z - [WATCHER]: Stopping the watcher for /Users/dalenguyen/projects/github/dalenguyen.github.io (sources)
+[NX Daemon Server] - 2025-02-25T22:37:00.391Z - Closed a connection. Number of open connections: 0
+[NX Daemon Server] - 2025-02-25T22:37:00.391Z - [WATCHER]: Stopping the watcher for /Users/dalenguyen/projects/github/dalenguyen.github.io (outputs)
+[NX Daemon Server] - 2025-02-25T22:37:00.391Z - Server stopped because: "Request to shutdown"

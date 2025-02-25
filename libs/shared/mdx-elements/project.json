@@ -16,8 +16,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/shared/mdx-elements"],
       "options": {
-        "jestConfig": "libs/shared/mdx-elements/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/shared/mdx-elements/jest.config.ts"
       }
     }
   }
