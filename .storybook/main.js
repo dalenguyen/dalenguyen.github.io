@@ -1,11 +1,18 @@
 module.exports = {
   framework: {
-    name: "@storybook/react-webpack5",
+    name: "@storybook/nextjs",
     options: {}
   },
+
   docs: {
     autodocs: true
-  }
+  },
+
+  typescript: {
+    reactDocgen: "react-docgen-typescript"
+  },
+
+  addons: ["@storybook/addon-webpack5-compiler-babel", "@chromatic-com/storybook"]
 } // uncomment the property below if you want to apply some webpack config globally
 // webpackFinal: async (config, { configType }) => {
 //   // Make whatever fine-grained changes you need that should apply to all storybook configs

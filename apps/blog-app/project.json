@@ -59,7 +59,8 @@
         "production": {
           "buildTarget": "blog-app:build:production"
         }
-      }
+      },
+      "dependsOn": ["build"]
     }
   }
 }

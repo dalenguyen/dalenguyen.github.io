@@ -49,4 +49,5 @@ myDb.db
 .idea
 thunder-tests
 .nx/cache
+.nx/workspace-data
 .vercel

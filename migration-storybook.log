@@ -1,0 +1,107 @@
+🔎 checking possible migrations..
+
+⚠️  failed to check fix mdx-to-csf
+
+Error: ❌ Unable to determine Storybook stories globs in {
+  "framework": {
+    "name": "@storybook/nextjs",
+    "options": {}
+  },
+  "docs": {
+    "autodocs": true
+  },
+  "typescript": {
+    "reactDocgen": "react-docgen-typescript"
+  },
+  "addons": [
+    "@storybook/addon-webpack5-compiler-babel",
+    "@chromatic-com/storybook"
+  ]
+}, skipping mdx-to-csf fix.
+
+In Storybook 7, we have deprecated defining stories in MDX files, and consequently have changed the suffix to simply .mdx.
+
+Now, since Storybook 8.0, we have removed support for .stories.mdx files.
+
+We were unable to automatically migrate your 'stories' config to include any .mdx file instead of just .stories.mdx.
+We suggest you make this change manually.
+To learn more about this change, see: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#mdx-docs-files
+    at Object.check (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:303:1403)
+    at runFixes (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:3115)
+    at async automigrate (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:1807)
+    at async doAutomigrate (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:453)
+    at async Command.<anonymous> (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:665:2892)
+
+⚠️  failed to check fix autodocs-tags
+
+Error: ❌ Failed to remove the deprecated docs.autodocs setting from .storybook/main.js.
+
+There is no preview config file in which to add the autodocs tag.
+
+Please perform the migration by hand: https://github.com/storybookjs/storybook/blob/next/MIGRATION.md#mainjs-docsautodocs-is-deprecated
+    at Object.check (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:193:534)
+    at runFixes (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:3115)
+    at async automigrate (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:1807)
+    at async doAutomigrate (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:595:453)
+    at async Command.<anonymous> (/Users/dalenguyen/.npm/_npx/5ced888ad0b53eb2/node_modules/@storybook/cli/dist/bin/index.cjs:665:2892)
+
+╭ Migration check ran with failures ───────────────────────────────────────────╮
+│                                                                              │
+│   Failed migrations:                                                         │
+│                                                                              │
+│   mdx-to-csf:                                                                │
+│   ❌ Unable to determine Storybook stories globs in {                        │
+│   "framework": {                                                             │
+│   "name": "@storybook/nextjs",                                               │
+│   "options": {}                                                              │
+│   },                                                                         │
+│   "docs": {                                                                  │
+│   "autodocs": true                                                           │
+│   },                                                                         │
+│   "typescript": {                                                            │
+│   "reactDocgen": "react-docgen-typescript"                                   │
+│   },                                                                         │
+│   "addons": [                                                                │
+│   "@storybook/addon-webpack5-compiler-babel",                                │
+│   "@chromatic-com/storybook"                                                 │
+│   ]                                                                          │
+│   }, skipping mdx-to-csf fix.                                                │
+│                                                                              │
+│   In Storybook 7, we have deprecated defining stories in MDX files, and      │
+│   consequently have changed the suffix to simply .mdx.                       │
+│                                                                              │
+│   Now, since Storybook 8.0, we have removed support for .stories.mdx         │
+│   files.                                                                     │
+│                                                                              │
+│   We were unable to automatically migrate your 'stories' config to include   │
+│   any .mdx file instead of just .stories.mdx.                                │
+│   We suggest you make this change manually.                                  │
+│   To learn more about this change, see: https://github.com/storybookjs/sto   │
+│   rybook/blob/next/MIGRATION.md#mdx-docs-files                               │
+│   autodocs-tags:                                                             │
+│   ❌ Failed to remove the deprecated docs.autodocs setting from              │
+│   .storybook/main.js.                                                        │
+│                                                                              │
+│   There is no preview config file in which to add the autodocs tag.          │
+│                                                                              │
+│   Please perform the migration by hand: https://github.com/storybookjs/sto   │
+│   rybook/blob/next/MIGRATION.md#mainjs-docsautodocs-is-deprecated            │
+│                                                                              │
+│   You can find the full logs in /Users/dalenguyen/projects/github/dalenguy   │
+│   en.github.io/migration-storybook.log                                       │
+│                                                                              │
+│   ─────────────────────────────────────────────────                          │
+│                                                                              │
+│   If you'd like to run the migrations again, you can do so by running 'npx   │
+│   storybook automigrate'                                                     │
+│                                                                              │
+│   The automigrations try to migrate common patterns in your project, but     │
+│   might not contain everything needed to migrate to the latest version of    │
+│   Storybook.                                                                 │
+│                                                                              │
+│   Please check the changelog and migration guide for manual migrations and   │
+│   more information: https://storybook.js.org/docs/migration-guide            │
+│   And reach out on Discord if you need help: https://discord.gg/storybook    │
+│                                                                              │
+╰──────────────────────────────────────────────────────────────────────────────╯
+
