@@ -9,11 +9,11 @@ importers:
   .:
     dependencies:
       '@analogjs/content':
-        specifier: 1.3.1
-        version: 1.3.1(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3(marked@5.1.2))(marked-highlight@2.2.1(marked@5.1.2))(marked@5.1.2)(mermaid@10.9.1)(prismjs@1.29.0)(rxjs@7.5.7)
+        specifier: 1.13.1
+        version: 1.13.1(5f39548ecd91d5fbf8afdcc5d8df8552)
       '@analogjs/router':
-        specifier: 1.3.1
-        version: 1.3.1(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3(marked@5.1.2))(marked-highlight@2.2.1(marked@5.1.2))(marked@5.1.2)(mermaid@10.9.1)(prismjs@1.29.0)(rxjs@7.5.7)
+        specifier: 1.13.1
+        version: 1.13.1(@analogjs/content@1.13.1(5f39548ecd91d5fbf8afdcc5d8df8552))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))
       '@angular/animations':
         specifier: 19.1.7
         version: 19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))
@@ -149,6 +149,9 @@ importers:
       marked-highlight:
         specifier: ^2.1.1
         version: 2.2.1(marked@5.1.2)
+      marked-mangle:
+        specifier: ^1.1.7
+        version: 1.1.10(marked@5.1.2)
       mermaid:
         specifier: 10.9.1
         version: 10.9.1
@@ -205,8 +208,8 @@ importers:
         version: 0.15.0
     devDependencies:
       '@analogjs/platform':
-        specifier: 1.3.1
-        version: 1.3.1(@angular-devkit/build-angular@19.1.5(e29a5aa20c07e2e5961931928fc54d96))(@angular/build@19.1.5(e468a7f105ada9017adf67ace4d821ca))(@nx/devkit@20.0.0-beta.4(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))))(@nx/vite@20.0.0-beta.4(@babel/traverse@7.26.9)(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@18.19.76)(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))(typescript@5.5.4)(vite@5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0))(vitest@0.34.6))(encoding@0.1.13)(sqlite3@5.1.7)(typescript@5.5.4)
+        specifier: 1.13.1
+        version: 1.13.1(266b63ef942e5a2622a3410d7dac3fec)
       '@angular-builders/custom-webpack':
         specifier: 17.0.2
         version: 17.0.2(6ab5d5782b519b4dea97ae5df30df8b4)
@@ -588,32 +591,61 @@ packages:
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
 
-  '@analogjs/content@1.3.1':
-    resolution: {integrity: sha512-3ihT9I+lnYjwVOrs3F3QBWOOSIjFc4U5WpHvELbe24THxSfUsyolWWOzthDtnb6h39gTmJyNKjXo4Dp6FxB71A==}
+  '@analogjs/content@1.13.1':
+    resolution: {integrity: sha512-MJ26Gt/dSXFog3EP0J3yrnN+LwB4qo0cQQbu/ccYmWltrjbNIYla8fpkA+N8NVw/cdtLyGhZ6ZjVDMdaHnygJQ==}
     peerDependencies:
-      '@angular/common': '>=15.0.0 || ^18.0.0-rc.0'
-      '@angular/core': '>=15.0.0 || ^18.0.0-rc.0'
-      '@angular/platform-browser': '>=15.0.0 || ^18.0.0-rc.0'
-      '@angular/router': '>=15.0.0 || ^18.0.0-rc.0'
+      '@angular/common': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@angular/core': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@angular/platform-browser': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@angular/router': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@nx/devkit': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0
       front-matter: ^4.0.2
-      marked: ^5.0.2
+      marked: '>=5.0.2'
       marked-gfm-heading-id: ^3.0.4
       marked-highlight: ^2.0.1
-      mermaid: ^10.2.4
+      marked-mangle: ^1.1.7
       prismjs: ^1.29.0
       rxjs: ^6.5.0 || ^7.5.0
+      satori: ^0.10.14
+      satori-html: ^0.3.2
+      sharp: ^0.33.5
+    peerDependenciesMeta:
+      satori:
+        optional: true
+      satori-html:
+        optional: true
+      sharp:
+        optional: true
 
-  '@analogjs/platform@1.3.1':
-    resolution: {integrity: sha512-j4tgNq/2IbYa5BLJXxOpCFpsajyETB2J7tKxfQnH8ErBk11zA2iqvPAmrpcfYvgH79cbo3oJDkJZdpYORLVotw==}
+  '@analogjs/platform@1.13.1':
+    resolution: {integrity: sha512-tR4I1TppTiBin6BhKbw2W6Oz3X5/7QbzOK9EbAXYl1QCW4Jjk/9BF0b6CEEG1ihYc4M1lY2WeHgxhdyy78wWfw==}
     peerDependencies:
-      '@nx/devkit': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      '@nx/vite': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@nx/angular': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0
+      '@nx/devkit': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0
+      '@nx/vite': ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0 || ^20.0.0
+      marked: '>=5.0.2'
+      marked-gfm-heading-id: ^3.0.4
+      marked-highlight: ^2.0.1
+      marked-mangle: ^1.1.7
+      marked-shiki: ^1.1.0
+      prismjs: '*'
+      shiki: ^1.6.1
+    peerDependenciesMeta:
+      marked-highlight:
+        optional: true
+      marked-shiki:
+        optional: true
+      prismjs:
+        optional: true
+      shiki:
+        optional: true
 
-  '@analogjs/router@1.3.1':
-    resolution: {integrity: sha512-YeTuYlBcS6aj5TZMAI6Bs9YLZyErWhSfIsb7snfKNnnSQ0kloSosZDajbzR6pi0JoMCp8pJlxet4q6H5zv49hQ==}
+  '@analogjs/router@1.13.1':
+    resolution: {integrity: sha512-msUT0QjWe3tAPGx9M1EP/JLtoosvBClfHNjvQFU+MPUfO4t8wVI8k/2sDJN43H8zB6PHbldfPYAYu28mN0di4g==}
     peerDependencies:
-      '@angular/core': '>=15.0.0 || ^18.0.0-rc.0'
-      '@angular/router': '>=15.0.0 || ^18.0.0-rc.0'
+      '@analogjs/content': ^1.13.1
+      '@angular/core': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      '@angular/router': ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
   '@analogjs/vite-plugin-angular@1.13.1':
     resolution: {integrity: sha512-9+zd7K3Vur3UzSTu2PUdPMPrBD/JDOxz5TF2GzbqhdlWEdKL8odC7mnkKdCwzYFkcB+x9E8j4hPPpmXnMnY5Jg==}
@@ -10932,6 +10964,11 @@ packages:
     peerDependencies:
       marked: '>=4 <16'
 
+  marked-mangle@1.1.10:
+    resolution: {integrity: sha512-TrpN67SMJJdzXXWIzOd/QmnpsC5o1B44PUYaG2bh1XEbqVjA0UCI2ijFuE5LWESwKeI2gCP5FqcUHRGQwFtDIA==}
+    peerDependencies:
+      marked: '>=4 <16'
+
   marked@5.1.2:
     resolution: {integrity: sha512-ahRPGXJpjMjwSOlBoTMZAK7ATXkli5qCPxZ21TG44rx1KEo44bii4ekgTDQPNRQ4Kh7JMb9Ub1PVk1NxRSsorg==}
     engines: {node: '>= 16'}
@@ -14937,6 +14974,14 @@ packages:
       yaml:
         optional: true
 
+  vitefu@0.2.5:
+    resolution: {integrity: sha512-SgHtMLoqaeeGnd2evZ849ZbACbnwQCIwRH57t18FxcXoZop0uQu0uzlIhJBlF/eWVzuce0sHeqPcDo+evVcg8Q==}
+    peerDependencies:
+      vite: ^3.0.0 || ^4.0.0 || ^5.0.0
+    peerDependenciesMeta:
+      vite:
+        optional: true
+
   vitest@0.34.6:
     resolution: {integrity: sha512-+5CALsOvbNKnS+ZHMXtuUC7nL8/7F1F2DnHGjSsszX8zCjWSSviphCb/NuS9Nzf4Q03KyyDRBAXhF/8lffME4Q==}
     engines: {node: '>=v14.18.0'}
@@ -15442,28 +15487,39 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@analogjs/content@1.3.1(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3(marked@5.1.2))(marked-highlight@2.2.1(marked@5.1.2))(marked@5.1.2)(mermaid@10.9.1)(prismjs@1.29.0)(rxjs@7.5.7)':
+  '@analogjs/content@1.13.1(5f39548ecd91d5fbf8afdcc5d8df8552)':
     dependencies:
       '@angular/common': 19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7)
       '@angular/core': 19.1.7(rxjs@7.5.7)(zone.js@0.15.0)
       '@angular/platform-browser': 19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))
       '@angular/router': 19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7)
+      '@nx/devkit': 20.0.0-beta.4(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))
       front-matter: 4.0.2
       marked: 5.1.2
       marked-gfm-heading-id: 3.1.3(marked@5.1.2)
       marked-highlight: 2.2.1(marked@5.1.2)
-      mermaid: 10.9.1
+      marked-mangle: 1.1.10(marked@5.1.2)
       prismjs: 1.29.0
       rxjs: 7.5.7
       tslib: 2.8.1
+    optionalDependencies:
+      sharp: 0.33.5
 
-  '@analogjs/platform@1.3.1(@angular-devkit/build-angular@19.1.5(e29a5aa20c07e2e5961931928fc54d96))(@angular/build@19.1.5(e468a7f105ada9017adf67ace4d821ca))(@nx/devkit@20.0.0-beta.4(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))))(@nx/vite@20.0.0-beta.4(@babel/traverse@7.26.9)(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@18.19.76)(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))(typescript@5.5.4)(vite@5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0))(vitest@0.34.6))(encoding@0.1.13)(sqlite3@5.1.7)(typescript@5.5.4)':
+  '@analogjs/platform@1.13.1(266b63ef942e5a2622a3410d7dac3fec)':
     dependencies:
       '@analogjs/vite-plugin-angular': 1.13.1(@angular-devkit/build-angular@19.1.5(e29a5aa20c07e2e5961931928fc54d96))(@angular/build@19.1.5(e468a7f105ada9017adf67ace4d821ca))
       '@analogjs/vite-plugin-nitro': 1.13.1(encoding@0.1.13)(sqlite3@5.1.7)(typescript@5.5.4)
+      '@nx/angular': 20.0.0-beta.4(@angular-devkit/build-angular@19.1.5(e29a5aa20c07e2e5961931928fc54d96))(@angular-devkit/core@19.1.5(chokidar@3.5.3))(@angular-devkit/schematics@19.1.5(chokidar@3.5.3))(@babel/traverse@7.26.9)(@schematics/angular@18.2.9(chokidar@3.5.3))(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@18.19.76)(@zkochan/js-yaml@0.0.7)(bufferutil@4.0.9)(esbuild@0.25.0)(eslint@8.57.1)(html-webpack-plugin@5.6.3(webpack@5.98.0(@swc/core@1.5.7(@swc/helpers@0.5.15))(esbuild@0.25.0)))(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(rxjs@7.5.7)(typescript@5.5.4)(utf-8-validate@5.0.10)
       '@nx/devkit': 20.0.0-beta.4(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))
       '@nx/vite': 20.0.0-beta.4(@babel/traverse@7.26.9)(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@18.19.76)(nx@20.0.0-beta.4(@swc-node/register@1.9.2(@swc/core@1.5.7(@swc/helpers@0.5.15))(@swc/types@0.1.17)(typescript@5.5.4))(@swc/core@1.5.7(@swc/helpers@0.5.15)))(typescript@5.5.4)(vite@5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0))(vitest@0.34.6)
+      marked: 5.1.2
+      marked-gfm-heading-id: 3.1.3(marked@5.1.2)
+      marked-mangle: 1.1.10(marked@5.1.2)
       nitropack: 2.10.4(encoding@0.1.13)(sqlite3@5.1.7)(typescript@5.5.4)
+      vitefu: 0.2.5(vite@5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0))
+    optionalDependencies:
+      marked-highlight: 2.2.1(marked@5.1.2)
+      prismjs: 1.29.0
     transitivePeerDependencies:
       - '@angular-devkit/build-angular'
       - '@angular/build'
@@ -15493,25 +15549,15 @@ snapshots:
       - supports-color
       - typescript
       - uploadthing
+      - vite
       - xml2js
 
-  '@analogjs/router@1.3.1(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3(marked@5.1.2))(marked-highlight@2.2.1(marked@5.1.2))(marked@5.1.2)(mermaid@10.9.1)(prismjs@1.29.0)(rxjs@7.5.7)':
+  '@analogjs/router@1.13.1(@analogjs/content@1.13.1(5f39548ecd91d5fbf8afdcc5d8df8552))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))':
     dependencies:
+      '@analogjs/content': 1.13.1(5f39548ecd91d5fbf8afdcc5d8df8552)
       '@angular/core': 19.1.7(rxjs@7.5.7)(zone.js@0.15.0)
       '@angular/router': 19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7)
       tslib: 2.8.1
-    optionalDependencies:
-      '@analogjs/content': 1.3.1(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/router@19.1.7(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@19.1.7(@angular/animations@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@19.1.7(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@19.1.7(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))(front-matter@4.0.2)(marked-gfm-heading-id@3.1.3(marked@5.1.2))(marked-highlight@2.2.1(marked@5.1.2))(marked@5.1.2)(mermaid@10.9.1)(prismjs@1.29.0)(rxjs@7.5.7)
-    transitivePeerDependencies:
-      - '@angular/common'
-      - '@angular/platform-browser'
-      - front-matter
-      - marked
-      - marked-gfm-heading-id
-      - marked-highlight
-      - mermaid
-      - prismjs
-      - rxjs
 
   '@analogjs/vite-plugin-angular@1.13.1(@angular-devkit/build-angular@19.1.5(e29a5aa20c07e2e5961931928fc54d96))(@angular/build@19.1.5(e468a7f105ada9017adf67ace4d821ca))':
     dependencies:
@@ -29967,6 +30013,10 @@ snapshots:
     dependencies:
       marked: 5.1.2
 
+  marked-mangle@1.1.10(marked@5.1.2):
+    dependencies:
+      marked: 5.1.2
+
   marked@5.1.2: {}
 
   math-intrinsics@1.1.0: {}
@@ -34861,6 +34911,10 @@ snapshots:
       stylus: 0.55.0
       terser: 5.37.0
       yaml: 2.7.0
+
+  vitefu@0.2.5(vite@5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0)):
+    optionalDependencies:
+      vite: 5.4.9(@types/node@18.19.76)(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0)
 
   vitest@0.34.6(@vitest/ui@0.34.7)(jsdom@22.1.0(bufferutil@4.0.9)(utf-8-validate@5.0.10))(less@4.1.3)(sass@1.55.0)(stylus@0.55.0)(terser@5.37.0):
     dependencies:

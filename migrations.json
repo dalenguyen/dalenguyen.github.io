@@ -1,26 +1,11 @@
 {
   "migrations": [
     {
-      "version": "19.0.0",
-      "description": "Updates non-standalone Directives, Component and Pipes to 'standalone:false' and removes 'standalone:true' from those who are standalone",
-      "factory": "./bundles/explicit-standalone-flag#migrate",
-      "package": "@angular/core",
-      "name": "explicit-standalone-flag"
-    },
-    {
-      "version": "19.0.0",
-      "description": "Updates ExperimentalPendingTasks to PendingTasks",
-      "factory": "./bundles/pending-tasks#migrate",
-      "package": "@angular/core",
-      "name": "pending-tasks"
-    },
-    {
-      "version": "19.0.0",
-      "description": "Replaces `APP_INITIALIZER`, `ENVIRONMENT_INITIALIZER` & `PLATFORM_INITIALIZER` respectively with `provideAppInitializer`, `provideEnvironmentInitializer` & `providePlatformInitializer`.",
-      "factory": "./bundles/provide-initializer#migrate",
-      "optional": true,
-      "package": "@angular/core",
-      "name": "provide-initializer"
+      "version": "1.5.0-beta.1",
+      "description": "Update withMarkdownRenderer feature with withPrismHighlighter",
+      "implementation": "./src/migrations/update-markdown-renderer-feature/update-markdown-renderer-feature",
+      "package": "@analogjs/content",
+      "name": "update-markdown-renderer-feature"
     }
   ]
 }
