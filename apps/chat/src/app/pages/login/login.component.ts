@@ -7,9 +7,10 @@ import { AlertService, AuthService, LoadingService } from '../../core/services'
 import { AlertType } from '../../enums'
 
 @Component({
-  selector: 'dalenguyen-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.scss'],
+    selector: 'dalenguyen-login',
+    templateUrl: './login.component.html',
+    styleUrls: ['./login.component.scss'],
+    standalone: false
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm = this.fb.group({

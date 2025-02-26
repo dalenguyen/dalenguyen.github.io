@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common'
-import { HttpClientModule } from '@angular/common/http'
+import {} from '@angular/common/http'
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { PortfolioService } from './portfolio.service'
@@ -7,8 +7,7 @@ import { PortfolioService } from './portfolio.service'
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-portfolio',
-  imports: [HttpClientModule, CommonModule, MatIconModule],
-  standalone: true,
+  imports: [CommonModule, MatIconModule],
   providers: [PortfolioService],
   template: `
     <section id="portfolio" class="section">

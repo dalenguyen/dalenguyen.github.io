@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/api-stripe/src",
   "projectType": "application",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/webpack:webpack",
@@ -46,10 +47,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/apps/api-stripe"],
       "options": {
-        "jestConfig": "apps/api-stripe/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/api-stripe/jest.config.ts"
       }
     }
-  },
-  "tags": []
+  }
 }

@@ -3,6 +3,8 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/portfolio-e2e/src",
   "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["portfolio"],
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
@@ -24,7 +26,5 @@
         "lintFilePatterns": ["apps/portfolio-e2e/**/*.{js,ts}"]
       }
     }
-  },
-  "tags": [],
-  "implicitDependencies": ["portfolio"]
+  }
 }

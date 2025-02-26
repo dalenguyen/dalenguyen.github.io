@@ -1,6 +1,7 @@
 const { share, withModuleFederation } = require('@nx/angular/module-federation')
 const config = require('./module-federation.config')
 module.exports = withModuleFederation({
+  dts: false,
   ...config,
   remotes: [['resume-remote', 'https://dalenguyen.github.io/resume-remote']],
   // shared: share({

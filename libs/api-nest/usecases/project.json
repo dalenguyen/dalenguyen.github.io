@@ -3,6 +3,7 @@
   "$schema": "../../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/api-nest/usecases/src",
   "projectType": "library",
+  "tags": ["type:usecases", "scope:api-nest"],
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -15,16 +16,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "libs/api-nest/usecases/jest.config.ts",
-        "passWithNoTests": true
-      },
-      "configurations": {
-        "ci": {
-          "ci": true,
-          "codeCoverage": true
-        }
+        "jestConfig": "libs/api-nest/usecases/jest.config.ts"
       }
     }
-  },
-  "tags": ["type:usecases", "scope:api-nest"]
+  }
 }

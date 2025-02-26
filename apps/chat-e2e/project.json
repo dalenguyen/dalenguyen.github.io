@@ -3,6 +3,8 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "apps/chat-e2e/src",
   "projectType": "application",
+  "tags": [],
+  "implicitDependencies": ["chat"],
   "targets": {
     "e2e": {
       "executor": "@nx/cypress:cypress",
@@ -25,7 +27,5 @@
       },
       "outputs": ["{options.outputFile}"]
     }
-  },
-  "tags": [],
-  "implicitDependencies": ["chat"]
+  }
 }

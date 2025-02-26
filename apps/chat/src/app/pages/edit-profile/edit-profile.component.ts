@@ -10,9 +10,10 @@ import { finalize, switchMap } from 'rxjs/operators'
 import { AlertService, AuthService, LoadingService } from '../../core/services'
 
 @Component({
-  selector: 'dalenguyen-edit-profile',
-  templateUrl: './edit-profile.component.html',
-  styleUrls: ['./edit-profile.component.scss'],
+    selector: 'dalenguyen-edit-profile',
+    templateUrl: './edit-profile.component.html',
+    styleUrls: ['./edit-profile.component.scss'],
+    standalone: false
 })
 export class EditProfileComponent implements OnInit, OnDestroy {
   currentUser: User | null | undefined = null

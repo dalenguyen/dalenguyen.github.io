@@ -1,4 +1,5 @@
 import { provideContent, withMarkdownRenderer } from '@analogjs/content'
+import { withPrismHighlighter } from '@analogjs/content/prism-highlighter'
 import { provideFileRouter } from '@analogjs/router'
 import { provideHttpClient } from '@angular/common/http'
 import { enableProdMode } from '@angular/core'
@@ -24,7 +25,7 @@ const bootstrap = () =>
         withInMemoryScrolling({ anchorScrolling: 'enabled' }),
         withEnabledBlockingInitialNavigation(),
       ),
-      provideContent(withMarkdownRenderer()),
+      provideContent(withMarkdownRenderer(), withPrismHighlighter()),
     ],
   })
 

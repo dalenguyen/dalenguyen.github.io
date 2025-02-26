@@ -3,10 +3,11 @@ import { FormControl, FormGroup, Validators } from '@angular/forms'
 import { FormProvider } from './form.provider'
 
 @Component({
-  selector: 'dalenguyen-onboarding',
-  templateUrl: './onboarding.component.html',
-  styleUrls: ['./onboarding.component.css'],
-  providers: [{ provide: FormProvider, useExisting: OnboardingComponent }],
+    selector: 'dalenguyen-onboarding',
+    templateUrl: './onboarding.component.html',
+    styleUrls: ['./onboarding.component.css'],
+    providers: [{ provide: FormProvider, useExisting: OnboardingComponent }],
+    standalone: false
 })
 export class OnboardingComponent extends FormProvider {
   onboardingForm = new FormGroup({

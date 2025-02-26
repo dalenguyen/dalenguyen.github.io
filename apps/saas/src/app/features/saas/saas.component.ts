@@ -2,9 +2,10 @@ import { Component } from '@angular/core'
 import { Plan } from '@dalenguyen/saas-libs'
 
 @Component({
-  selector: 'dalenguyen-saas',
-  templateUrl: './saas.component.html',
-  styleUrls: ['./saas.component.css'],
+    selector: 'dalenguyen-saas',
+    templateUrl: './saas.component.html',
+    styleUrls: ['./saas.component.css'],
+    standalone: false
 })
 export class SaasComponent {
   plans: Plan[] = [

@@ -17,12 +17,12 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
+      "@dalenguyen/angular": ["libs/angular/src/index.ts"],
       "@dalenguyen/api-nest/domains": ["libs/api-nest/domains/src/index.ts"],
       "@dalenguyen/api-nest/infrastructure": ["libs/api-nest/infrastructure/src/index.ts"],
       "@dalenguyen/api-nest/shell": ["libs/api-nest/shell/src/index.ts"],
       "@dalenguyen/api-nest/usecases": ["libs/api-nest/usecases/src/index.ts"],
       "@dalenguyen/markdown": ["libs/markdown/src/index.ts"],
-      "@dalenguyen/material": ["libs/material/src/index.ts"],
       "@dalenguyen/openai": ["libs/openai/src/index.ts"],
       "@dalenguyen/portfolio/home/feature": ["libs/portfolio/home/feature/src/index.ts"],
       "@dalenguyen/portfolio/home/ui": ["libs/portfolio/home/ui/src/index.ts"],
@@ -32,8 +32,7 @@
       "@dalenguyen/saas-libs": ["libs/saas-libs/src/index.ts"],
       "@dalenguyen/shared/mdx-elements": ["libs/shared/mdx-elements/src/index.ts"],
       "@dalenguyen/shared/ui": ["libs/shared/ui/src/index.ts"],
-      "@dalenguyen/workspace-plugin": ["tools/workspace-plugin/src/index.ts"],
-      "@dalenguyen/angular": ["libs/angular/src/index.ts"]
+      "@dalenguyen/workspace-plugin": ["tools/workspace-plugin/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

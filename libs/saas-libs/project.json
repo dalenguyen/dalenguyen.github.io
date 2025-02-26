@@ -4,6 +4,7 @@
   "projectType": "library",
   "sourceRoot": "libs/saas-libs/src",
   "prefix": "dalenguyen",
+  "tags": ["npm", "lib"],
   "targets": {
     "build": {
       "executor": "@nx/angular:package",
@@ -24,8 +25,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/saas-libs"],
       "options": {
-        "jestConfig": "libs/saas-libs/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/saas-libs/jest.config.ts"
       }
     },
     "lint": {
@@ -35,6 +35,5 @@
       },
       "outputs": ["{options.outputFile}"]
     }
-  },
-  "tags": ["npm", "lib"]
+  }
 }

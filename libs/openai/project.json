@@ -3,6 +3,7 @@
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
   "sourceRoot": "libs/openai/src",
   "projectType": "library",
+  "tags": [],
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -15,8 +16,7 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/openai"],
       "options": {
-        "jestConfig": "libs/openai/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "libs/openai/jest.config.ts"
       }
     },
     "build": {
@@ -36,6 +36,5 @@
         "commands": ["npm publish dist/libs/openai"]
       }
     }
-  },
-  "tags": []
+  }
 }

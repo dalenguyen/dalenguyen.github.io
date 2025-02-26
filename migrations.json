@@ -1,11 +1,11 @@
 {
   "migrations": [
     {
-      "version": "17.0.0-0",
-      "description": "Updates Angular Material to v17",
-      "factory": "./ng-update/index_bundled#updateToV17",
-      "package": "@angular/material",
-      "name": "migration-v17"
+      "version": "1.5.0-beta.1",
+      "description": "Update withMarkdownRenderer feature with withPrismHighlighter",
+      "implementation": "./src/migrations/update-markdown-renderer-feature/update-markdown-renderer-feature",
+      "package": "@analogjs/content",
+      "name": "update-markdown-renderer-feature"
     }
   ]
 }

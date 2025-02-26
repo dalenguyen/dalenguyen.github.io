@@ -55,7 +55,7 @@ export const routeMeta: RouteMeta = {
                     <span class="hover:underline">{{ article.author.first_name }}</span>
                   </p>
                   <div class="flex space-x-1 text-sm text-gray-500">
-                    <time [datetime]="article.published">{{ article.published | date: mediumDate }}</time>
+                    <time [attr.datetime]="article.published">{{ article.published | date: 'mediumDate' }}</time>
                     <!-- <span aria-hidden="true">&middot;</span>
                     <span>6 min read</span> -->
                   </div>

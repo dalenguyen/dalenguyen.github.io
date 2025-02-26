@@ -3,8 +3,8 @@ import { FormGroup } from '@angular/forms'
 import { FormProvider } from '../form.provider'
 
 @Component({
-  selector: 'dalenguyen-account',
-  template: `
+    selector: 'dalenguyen-account',
+    template: `
     <form [formGroup]="form">
       <input formControlName="name" />
       <input formControlName="email" />
@@ -12,6 +12,7 @@ import { FormProvider } from '../form.provider'
       <button [disabled]="form.invalid">Next</button>
     </form>
   `,
+    standalone: false
 })
 export class AccountComponent {
   form!: FormGroup

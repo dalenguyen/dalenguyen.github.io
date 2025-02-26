@@ -5,9 +5,10 @@ import { Article } from './shared/models'
 import { BlogService } from './shared/services'
 
 @Component({
-  selector: 'dalenguyen-blog',
-  templateUrl: './blog.component.html',
-  styleUrls: ['./blog.component.scss'],
+    selector: 'dalenguyen-blog',
+    templateUrl: './blog.component.html',
+    styleUrls: ['./blog.component.scss'],
+    standalone: false
 })
 export class BlogComponent {
   articles$: Promise<Article[]>

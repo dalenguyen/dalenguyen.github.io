@@ -4,6 +4,7 @@
   "projectType": "library",
   "sourceRoot": "libs/portfolio/shell/feature/src",
   "prefix": "dalenguyen",
+  "tags": ["type:lib"],
   "targets": {
     "lint": {
       "executor": "@nx/linter:eslint",
@@ -24,10 +25,8 @@
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/libs/portfolio/shell/feature"],
       "options": {
-        "jestConfig": "libs/portfolio/shell/feature/jest.config.js",
-        "passWithNoTests": true
+        "jestConfig": "libs/portfolio/shell/feature/jest.config.js"
       }
     }
-  },
-  "tags": ["type:lib"]
+  }
 }

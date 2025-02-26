@@ -4,6 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/blog-app/src",
   "prefix": "blog",
+  "tags": [],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",
@@ -15,7 +16,7 @@
       ],
       "options": {
         "configFile": "apps/blog-app/vite.config.ts",
-        "outputPath": "dist/apps/blog-app/client"
+        "outputPath": "dist/apps/blog-app"
       },
       "defaultConfiguration": "production",
       "configurations": {
@@ -58,8 +59,8 @@
         "production": {
           "buildTarget": "blog-app:build:production"
         }
-      }
+      },
+      "dependsOn": ["build"]
     }
-  },
-  "tags": []
+  }
 }

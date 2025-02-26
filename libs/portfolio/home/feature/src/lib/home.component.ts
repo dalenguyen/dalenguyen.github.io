@@ -7,9 +7,12 @@ import { PortfolioComponent } from './portfolio/portfolio.component'
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-home',
-  standalone: true,
   imports: [ContactComponent, BiographyComponent, PortfolioComponent, IntroComponent],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+  template: `
+    <dalenguyen-intro />
+    <!-- <dalenguyen-portfolio /> -->
+    <dalenguyen-biography />
+    <dalenguyen-contact />
+  `,
 })
 export class HomeComponent {}

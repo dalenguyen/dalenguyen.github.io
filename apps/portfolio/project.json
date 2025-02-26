@@ -4,6 +4,8 @@
   "projectType": "application",
   "sourceRoot": "apps/portfolio/src",
   "prefix": "dalenguyen",
+  "tags": ["type:app", "scope:portfolio"],
+  "implicitDependencies": ["resume-remote"],
   "targets": {
     "build": {
       "executor": "@nx/angular:webpack-browser",
@@ -28,16 +30,9 @@
             "output": "assets"
           }
         ],
-        "styles": [
-          "apps/portfolio/src/styles.scss"
-        ],
+        "styles": ["apps/portfolio/src/styles.scss"],
         "scripts": [],
-        "allowedCommonJsDependencies": [
-          "buttercms",
-          "leaflet",
-          "mapbox-gl",
-          "localstorage"
-        ],
+        "allowedCommonJsDependencies": ["buttercms", "leaflet", "mapbox-gl", "localstorage"],
         "customWebpackConfig": {
           "path": "apps/portfolio/webpack.config.js"
         }
@@ -82,10 +77,10 @@
       "executor": "@nx/angular:module-federation-dev-server",
       "configurations": {
         "production": {
-          "browserTarget": "portfolio:build:production"
+          "buildTarget": "portfolio:build:production"
         },
         "development": {
-          "browserTarget": "portfolio:build:development"
+          "buildTarget": "portfolio:build:development"
         }
       },
       "defaultConfiguration": "development",
@@ -96,29 +91,21 @@
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
       "options": {
-        "browserTarget": "portfolio:build"
+        "buildTarget": "portfolio:build"
       }
     },
     "lint": {
       "executor": "@nx/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/portfolio/src/**/*.ts",
-          "apps/portfolio/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/portfolio/src/**/*.ts", "apps/portfolio/src/**/*.html"]
       },
-      "outputs": [
-        "{options.outputFile}"
-      ]
+      "outputs": ["{options.outputFile}"]
     },
     "test": {
       "executor": "@nx/jest:jest",
-      "outputs": [
-        "{workspaceRoot}/coverage/apps/portfolio"
-      ],
+      "outputs": ["{workspaceRoot}/coverage/apps/portfolio"],
       "options": {
-        "jestConfig": "apps/portfolio/jest.config.ts",
-        "passWithNoTests": true
+        "jestConfig": "apps/portfolio/jest.config.ts"
       }
     },
     "server": {
@@ -184,12 +171,5 @@
         "cwd": "dist"
       }
     }
-  },
-  "tags": [
-    "type:app",
-    "scope:portfolio"
-  ],
-  "implicitDependencies": [
-    "resume-remote"
-  ]
+  }
 }

@@ -5,12 +5,11 @@ import { Router } from '@angular/router'
 import { WINDOW } from '@dalenguyen/angular'
 import { NavService } from './nav.service'
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'dalenguyen-nav',
-  standalone: true,
-  imports: [CommonModule, MatIconModule],
-  templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'dalenguyen-nav',
+    imports: [CommonModule, MatIconModule],
+    templateUrl: './nav.component.html',
+    styleUrls: ['./nav.component.scss']
 })
 export class NavComponent implements OnInit {
   private navService = inject(NavService)

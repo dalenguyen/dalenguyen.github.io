@@ -3,10 +3,11 @@ import { environment } from 'apps/portfolio/src/environments/environment'
 import L, { icon } from 'leaflet'
 
 @Component({
-  selector: 'dalenguyen-leaflet',
-  templateUrl: './leaflet.component.html',
-  styleUrls: ['./leaflet.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'dalenguyen-leaflet',
+    templateUrl: './leaflet.component.html',
+    styleUrls: ['./leaflet.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class LeafletComponent implements OnInit {
   myMap: L.Map
