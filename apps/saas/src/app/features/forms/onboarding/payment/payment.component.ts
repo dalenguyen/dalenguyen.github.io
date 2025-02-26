@@ -3,8 +3,8 @@ import { FormGroup } from '@angular/forms'
 import { FormProvider } from '../form.provider'
 
 @Component({
-  selector: 'dalenguyen-payment',
-  template: `
+    selector: 'dalenguyen-payment',
+    template: `
     <form [formGroup]="form">
       <input formControlName="cardNumber" />
       <input formControlName="CVC" />
@@ -12,6 +12,7 @@ import { FormProvider } from '../form.provider'
       <button [disabled]="form.invalid">Submit</button>
     </form>
   `,
+    standalone: false
 })
 export class PaymentComponent {
   form: FormGroup

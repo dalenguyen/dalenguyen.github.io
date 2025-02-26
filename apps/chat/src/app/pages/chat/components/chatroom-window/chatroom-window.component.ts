@@ -6,9 +6,10 @@ import { ChatroomService } from 'apps/chat/src/app/core/services'
 import { Subscription } from 'rxjs'
 
 @Component({
-  selector: 'dalenguyen-chatroom-window',
-  templateUrl: './chatroom-window.component.html',
-  styleUrls: ['./chatroom-window.component.scss'],
+    selector: 'dalenguyen-chatroom-window',
+    templateUrl: './chatroom-window.component.html',
+    styleUrls: ['./chatroom-window.component.scss'],
+    standalone: false
 })
 export class ChatroomWindowComponent implements OnInit, OnDestroy, AfterViewChecked {
   @ViewChild('scrollContainer') private scrollContainer!: ElementRef

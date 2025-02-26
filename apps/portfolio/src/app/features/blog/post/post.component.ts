@@ -4,10 +4,10 @@ import { Article } from '../shared/models'
 import { BlogService } from '../shared/services'
 
 @Component({
-  selector: 'dalenguyen-post',
-  templateUrl: './post.component.html',
-  styles: [
-    `
+    selector: 'dalenguyen-post',
+    templateUrl: './post.component.html',
+    styles: [
+        `
       #blogNav,
       #post {
         margin: 16px;
@@ -19,8 +19,9 @@ import { BlogService } from '../shared/services'
         }
       }
     `,
-  ],
-  encapsulation: ViewEncapsulation.None,
+    ],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class PostComponent implements OnInit {
   article: Article

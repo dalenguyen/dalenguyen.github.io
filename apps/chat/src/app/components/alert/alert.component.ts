@@ -2,9 +2,10 @@ import { Component, Input, OnInit } from '@angular/core'
 import { AlertType } from '../../enums'
 
 @Component({
-  selector: 'dalenguyen-alert',
-  templateUrl: './alert.component.html',
-  styleUrls: ['./alert.component.scss'],
+    selector: 'dalenguyen-alert',
+    templateUrl: './alert.component.html',
+    styleUrls: ['./alert.component.scss'],
+    standalone: false
 })
 export class AlertComponent implements OnInit {
   @Input() type!: AlertType

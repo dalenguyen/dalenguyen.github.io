@@ -5,11 +5,10 @@ import { IntroComponent } from './intro/intro.component'
 import { PortfolioComponent } from './portfolio/portfolio.component'
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'dalenguyen-home',
-  standalone: true,
-  imports: [ContactComponent, BiographyComponent, PortfolioComponent, IntroComponent],
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'dalenguyen-home',
+    imports: [ContactComponent, BiographyComponent, PortfolioComponent, IntroComponent],
+    templateUrl: './home.component.html',
+    styleUrls: ['./home.component.scss']
 })
 export class HomeComponent {}

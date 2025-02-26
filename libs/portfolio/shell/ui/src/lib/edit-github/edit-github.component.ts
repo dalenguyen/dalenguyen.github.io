@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common'
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 
 @Component({
-  selector: 'dalenguyen-edit-github',
-  standalone: true,
-  imports: [CommonModule],
-  template: `
+    selector: 'dalenguyen-edit-github',
+    imports: [CommonModule],
+    template: `
     <a
       href="https://github.com/dalenguyen/dalenguyen.github.io/tree/dev/apps/blog-app"
       target="_blank"
@@ -28,6 +27,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
       </svg>
     </a>
   `,
-  changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class EditGithubComponent {}

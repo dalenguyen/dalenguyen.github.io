@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core'
 import { Plan } from '@dalenguyen/saas-libs'
 
 @Component({
-  selector: 'dalenguyen-pricing-table',
-  templateUrl: './pricing-table.component.html',
-  styleUrls: ['./pricing-table.component.scss'],
+    selector: 'dalenguyen-pricing-table',
+    templateUrl: './pricing-table.component.html',
+    styleUrls: ['./pricing-table.component.scss'],
+    standalone: false
 })
 export class PricingTableComponent implements OnInit {
   plans: Plan[] = [

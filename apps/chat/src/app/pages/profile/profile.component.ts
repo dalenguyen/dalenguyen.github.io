@@ -6,9 +6,10 @@ import { User } from '../../classes'
 import { AuthService, LoadingService } from '../../core/services'
 
 @Component({
-  selector: 'dalenguyen-profile',
-  templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss'],
+    selector: 'dalenguyen-profile',
+    templateUrl: './profile.component.html',
+    styleUrls: ['./profile.component.scss'],
+    standalone: false
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   currentUser$ = this.auth.currentUser$

@@ -9,9 +9,10 @@ interface Product {
 }
 
 @Component({
-  selector: 'dalenguyen-products',
-  templateUrl: './products.component.html',
-  styleUrls: ['./products.component.scss'],
+    selector: 'dalenguyen-products',
+    templateUrl: './products.component.html',
+    styleUrls: ['./products.component.scss'],
+    standalone: false
 })
 export class ProductsComponent implements OnInit {
   products = [] as Product[]

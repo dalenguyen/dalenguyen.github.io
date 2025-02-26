@@ -3,10 +3,11 @@ import { Observable } from 'rxjs'
 import { MapService } from '../../services/map.service'
 
 @Component({
-  selector: 'dalenguyen-mapbox',
-  templateUrl: './mapbox.component.html',
-  styleUrls: ['./mapbox.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+    selector: 'dalenguyen-mapbox',
+    templateUrl: './mapbox.component.html',
+    styleUrls: ['./mapbox.component.scss'],
+    encapsulation: ViewEncapsulation.None,
+    standalone: false
 })
 export class MapboxComponent implements OnInit {
   content$: Observable<string>

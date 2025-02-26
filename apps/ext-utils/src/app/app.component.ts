@@ -15,9 +15,10 @@ interface CatFact {
 }
 
 @Component({
-  selector: 'dalenguyen-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss'],
+    selector: 'dalenguyen-root',
+    templateUrl: './app.component.html',
+    styleUrls: ['./app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
   randomFact$ = this.http.get('https://cat-fact.herokuapp.com/facts/random') as Observable<CatFact>

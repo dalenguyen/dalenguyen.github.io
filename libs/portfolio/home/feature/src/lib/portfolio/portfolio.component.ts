@@ -5,16 +5,16 @@ import { MatIconModule } from '@angular/material/icon'
 import { PortfolioService } from './portfolio.service'
 
 @Component({
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  selector: 'dalenguyen-portfolio',
-  imports: [
-// TODO: `HttpClientModule` should not be imported into a component directly.
-// Please refactor the code to add `provideHttpClient()` call to the provider list in the
-// application bootstrap logic and remove the `HttpClientModule` import from this component.
-HttpClientModule, CommonModule, MatIconModule],
-  standalone: true,
-  providers: [PortfolioService],
-  template: `
+    changeDetection: ChangeDetectionStrategy.OnPush,
+    selector: 'dalenguyen-portfolio',
+    imports: [
+        // TODO: `HttpClientModule` should not be imported into a component directly.
+        // Please refactor the code to add `provideHttpClient()` call to the provider list in the
+        // application bootstrap logic and remove the `HttpClientModule` import from this component.
+        HttpClientModule, CommonModule, MatIconModule
+    ],
+    providers: [PortfolioService],
+    template: `
     <section id="portfolio" class="section">
       <div>
         <header>
@@ -37,7 +37,7 @@ HttpClientModule, CommonModule, MatIconModule],
       </div>
     </section>
   `,
-  styleUrls: ['./portfolio.component.scss'],
+    styleUrls: ['./portfolio.component.scss']
 })
 export class PortfolioComponent {
   portfolioService = inject(PortfolioService)
