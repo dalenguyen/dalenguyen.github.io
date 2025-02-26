@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [16]
+        node-version: [20]
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
@@ -23,28 +23,18 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - uses: pnpm/action-setup@v2.2.2
+      - name: Setup PNPM
+        uses: pnpm/action-setup@v2.4.0
         with:
           version: 7
 
-      - name: node_modules cache
-        uses: actions/cache@v3
-        id: node_modules-cache
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
         with:
-          path: ./node_modules
-          key: ${{ runner.os }}-node_modules-${{ hashFiles('**/pnpm-lock.yaml') }}
-
-      - name: pnpm cache
-        if: steps.node_modules-cache.outputs.cache-hit != 'true'
-        uses: actions/cache@v3
-        id: pnpm-store
-        with:
-          path: ~/.pnpm-store/v3
-          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile
@@ -60,11 +50,12 @@ jobs:
           cat "./dist/production/index.html" >> "./dist/production/404.html"
 
       - name: Deploy
-        uses: JamesIves/github-pages-deploy-action@releases/v3
+        uses: JamesIves/github-pages-deploy-action@v4
         with:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
-          BRANCH: master
-          FOLDER: dist/production
+          token: ${{ secrets.GH_TOKEN }}
+          branch: master
+          folder: dist/production
+          clean: true
 
       # - name: deploy to heroku
       #   run: git push https://heroku:$HEROKU_API_TOKEN@git.heroku.com/$HEROKU_APP_NAME.git origin/dev:master
