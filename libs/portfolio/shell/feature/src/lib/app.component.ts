@@ -23,11 +23,11 @@ export class SentryErrorHandler implements ErrorHandler {
 }
 
 @Component({
-    changeDetection: ChangeDetectionStrategy.OnPush,
-    selector: 'dalenguyen-root',
-    imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent, EditGithubComponent],
-    providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
-    template: `
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  selector: 'dalenguyen-root',
+  imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent, EditGithubComponent],
+  providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
+  template: `
   <div class="main-content" [class.is-mobile]="mobileQuery.matches">
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav
@@ -53,7 +53,7 @@ export class SentryErrorHandler implements ErrorHandler {
   </mat-sidenav-container>
 </div>
 `,
-    styleUrls: ['./app.component.scss']
+  styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
   @ViewChild('snav') snav!: MatSidenav

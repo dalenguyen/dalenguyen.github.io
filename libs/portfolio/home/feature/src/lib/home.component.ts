@@ -10,7 +10,7 @@ import { PortfolioComponent } from './portfolio/portfolio.component'
   imports: [ContactComponent, BiographyComponent, PortfolioComponent, IntroComponent],
   template: `
     <dalenguyen-intro />
-    <!-- <dalenguyen-portfolio /> -->
+    <dalenguyen-portfolio />
     <dalenguyen-biography />
     <dalenguyen-contact />
   `,
