@@ -47,18 +47,14 @@ interface PortfolioItem {
                 </a>
               </h3>
               <p class="text-gray-600 mb-6 leading-relaxed">{{ project.description }}</p>
-              <div class="mb-4">
-                <mat-chip-set>
-                  <mat-chip
-                    *ngFor="let tech of project.technologies"
-                    class="inline-flex items-center justify-center text-xs"
-                  >
-                    <mat-icon class="text-xs h-3.5 w-3.5 mr-1 flex-shrink-0 my-0 align-middle">{{
-                      tech.icon
-                    }}</mat-icon>
-                    <span class="align-middle">{{ tech.name }}</span>
-                  </mat-chip>
-                </mat-chip-set>
+              <div class="mb-4 flex flex-wrap gap-2">
+                <div
+                  *ngFor="let tech of project.technologies"
+                  class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
+                >
+                  <mat-icon class="h-4 w-4 mr-1 text-gray-600">{{ tech.icon }}</mat-icon>
+                  <span>{{ tech.name }}</span>
+                </div>
               </div>
             </mat-card-content>
           </mat-card>
@@ -66,6 +62,18 @@ interface PortfolioItem {
       </div>
     </section>
   `,
+  styles: [
+    `
+      mat-icon {
+        font-size: 16px;
+        height: 16px;
+        width: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    `,
+  ],
 })
 export class PortfolioComponent {
   portfolioItems: PortfolioItem[] = [
