@@ -30,7 +30,7 @@ interface PortfolioItem {
           </p>
         </header>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <mat-card
             *ngFor="let project of portfolioItems"
             class="h-full flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
@@ -126,6 +126,20 @@ export class PortfolioComponent {
         { name: 'OpenScript', icon: 'code' },
       ],
       projectUrl: 'https://pdfun.xyz',
+    },
+    {
+      id: 4,
+      title: 'SafePlate (AI Meal Planner)',
+      description:
+        'Generate personalized meals that avoid allergens and incorporate your favorite ingredients, promoting a healthy lifestyle with our advanced AI technology. Eat safely, live confidently.',
+      imageUrl: 'assets/images/home/safeplate.png',
+      technologies: [
+        { name: 'Ionic', icon: 'phone_iphone' },
+        { name: 'Vertex AI', icon: 'psychology' },
+        { name: 'GCP', icon: 'cloud' },
+        { name: 'NestJS', icon: 'code' },
+      ],
+      projectUrl: 'https://safeplate.ai',
     },
   ]
 }
