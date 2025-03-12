@@ -182,7 +182,7 @@ export default class BucketListComponent implements OnInit {
       { id: 25, text: 'Learn photography', completed: true },
       { id: 26, text: 'Working abroad', completed: true },
       { id: 27, text: 'Go wine tasting in Napa Valley', completed: false },
-      { id: 28, text: 'See a Broadway show in New York', completed: false, link: 'https://www.broadway.com/' },
+      { id: 28, text: 'Visit Maple syrup festival farm', completed: false },
       { id: 29, text: 'Ride a gondola in Venice', completed: false },
       { id: 30, text: 'Learn to surf', completed: false },
       { id: 31, text: 'Go on a helicopter ride', completed: false },
