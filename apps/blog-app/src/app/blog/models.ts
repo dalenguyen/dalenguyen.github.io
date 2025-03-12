@@ -3,4 +3,11 @@ export interface PostAttributes {
   slug: string
   description: string
   coverImage: string
+  categories: string[]
+  published: string
+  profileImage: string
+  author: {
+    firstName: string
+    lastName: string
+  }
 }

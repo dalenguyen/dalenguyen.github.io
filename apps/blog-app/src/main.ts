@@ -4,9 +4,16 @@ import { provideFileRouter } from '@analogjs/router'
 import { provideHttpClient, withFetch } from '@angular/common/http'
 import { bootstrapApplication } from '@angular/platform-browser'
 import { provideAnimations } from '@angular/platform-browser/animations'
-import { withEnabledBlockingInitialNavigation, withInMemoryScrolling, withRouterConfig } from '@angular/router'
+import {
+  withComponentInputBinding,
+  withEnabledBlockingInitialNavigation,
+  withInMemoryScrolling,
+  withRouterConfig,
+} from '@angular/router'
 import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
 import 'zone.js'
+
+import 'prismjs/plugins/diff-highlight/prism-diff-highlight'
 
 // Sentry.init({
 //   dsn: 'https://3151dbdf068e4196907c2a61f2ec9e1b@sentry.io/1766223',
@@ -21,6 +28,7 @@ bootstrapApplication(AppComponent, {
     provideFileRouter(
       withRouterConfig({ onSameUrlNavigation: 'reload' }),
       withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+      withComponentInputBinding(),
       withEnabledBlockingInitialNavigation(),
     ),
     provideContent(withMarkdownRenderer(), withPrismHighlighter()),

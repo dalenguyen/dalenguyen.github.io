@@ -1,6 +1,6 @@
 /// <reference types="vitest" />
 
-import analog from '@analogjs/platform'
+import analog, { type PrerenderContentFile } from '@analogjs/platform'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 // import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import { defineConfig } from 'vite'
@@ -37,6 +37,32 @@ export default defineConfig(({ mode }) => ({
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
         inlineStylesExtension: 'scss|sass|less',
+      },
+      prerender: {
+        routes: async () => [
+          '/',
+          '/blog',
+          {
+            contentDir: 'src/content',
+            transform: (file: PrerenderContentFile) => {
+              // do not include files marked as draft in frontmatter
+              if (file.attributes['draft']) {
+                return false
+              }
+              // use the slug from frontmatter if defined, otherwise use the files basename
+              const slug = file.attributes['slug'] || file.name
+              return `/blog/${slug}`
+            },
+          },
+        ],
+        sitemap: {
+          host: 'https://dalenguyen.me/',
+        },
+      },
+      content: {
+        prismOptions: {
+          additionalLangs: ['diff'],
+        },
       },
     }),
   ],
