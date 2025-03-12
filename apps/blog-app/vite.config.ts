@@ -2,6 +2,7 @@
 
 import analog, { type PrerenderContentFile } from '@analogjs/platform'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
+import { PrerenderRoute } from 'nitropack'
 // import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import { defineConfig } from 'vite'
 // import tsconfigPaths from 'vite-tsconfig-paths'
@@ -53,6 +54,22 @@ export default defineConfig(({ mode }) => ({
               const slug = file.attributes['slug'] || file.name
               return `/blog/${slug}`
             },
+          },
+        ],
+        postRenderingHooks: [
+          async (route: PrerenderRoute) => {
+            const gTag = `
+              <!-- Google tag (gtag.js) -->
+              <script async src="https://www.googletagmanager.com/gtag/js?id=G-J6E8YSVG6N"></script>
+              <script>
+                window.dataLayer = window.dataLayer || [];
+                function gtag(){dataLayer.push(arguments);}
+                gtag('js', new Date());
+
+                gtag('config', 'G-J6E8YSVG6N');
+              </script>
+            `
+            route.contents = route.contents?.concat(gTag)
           },
         ],
         sitemap: {
