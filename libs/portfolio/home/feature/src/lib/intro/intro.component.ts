@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core'
 import { NavService } from '@dalenguyen/portfolio/shell/ui'
 
 @Component({
@@ -9,5 +9,5 @@ import { NavService } from '@dalenguyen/portfolio/shell/ui'
   templateUrl: './intro.component.html',
 })
 export class IntroComponent {
-  constructor(public navService: NavService) {}
+  protected readonly navService = inject(NavService)
 }

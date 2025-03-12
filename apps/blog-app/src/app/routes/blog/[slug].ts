@@ -104,9 +104,9 @@ export const routeMeta: RouteMeta = {
 })
 export default class BlogPostComponent {
   private readonly router = inject(Router)
-  readonly post$ = injectContent<PostAttributes>()
-
   private readonly window = inject(WINDOW)
+
+  readonly post$ = injectContent<PostAttributes>()
 
   openBlog() {
     // TODO: super hacky :|

@@ -3,6 +3,7 @@ import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
 import { Component, inject, signal } from '@angular/core'
 import { Router, RouterOutlet } from '@angular/router'
+import { WINDOW } from '@dalenguyen/angular'
 import { PostAttributes } from '../blog/models'
 
 export const routeMeta: RouteMeta = {
@@ -139,6 +140,7 @@ export const routeMeta: RouteMeta = {
 })
 export default class BlogComponent {
   private readonly router = inject(Router)
+  private readonly window = inject(WINDOW)
   // private readonly blogService = inject(BlogService)
   // readonly articles$ = this.blogService.getButterArticles()
 
@@ -148,7 +150,7 @@ export default class BlogComponent {
 
   // TODO: router-outlet should not show blog content in slug
   // this is a hack :(
-  showBlogContent = signal(!location.pathname.includes('/blog/'))
+  showBlogContent = signal(this.window?.location.pathname.includes('/blog/') === false)
 
   openPost(slug: string) {
     this.showBlogContent.set(false)

@@ -34,7 +34,7 @@ export default defineConfig(({ mode }) => ({
         preset: 'vercel',
       },
       static: true,
-      ssr: false,
+      ssr: true,
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
         inlineStylesExtension: 'scss|sass|less',
@@ -43,6 +43,8 @@ export default defineConfig(({ mode }) => ({
         routes: async () => [
           '/',
           '/blog',
+          // add page not found
+
           {
             contentDir: 'src/content',
             transform: (file: PrerenderContentFile) => {

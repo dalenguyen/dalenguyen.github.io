@@ -1,9 +1,11 @@
 import { MediaMatcher } from '@angular/cdk/layout'
 import {
+  afterNextRender,
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
   ErrorHandler,
+  inject,
   Injectable,
   OnDestroy,
   ViewChild,
@@ -28,13 +30,13 @@ export class SentryErrorHandler implements ErrorHandler {
   imports: [MatSidenavModule, MatIconModule, RouterModule, FooterComponent, NavComponent, EditGithubComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
-  <div class="main-content" [class.is-mobile]="mobileQuery.matches">
+  <div class="main-content" [class.is-mobile]="mobileQuery?.matches">
   <mat-sidenav-container class="sidenav-container">
     <mat-sidenav
       #snav
-      [opened]="mobileQuery.matches ? false : true"
-      [mode]="mobileQuery.matches ? 'over' : 'side'"
-      [fixedInViewport]="mobileQuery.matches"
+      [opened]="mobileQuery?.matches ? false : true"
+      [mode]="mobileQuery?.matches ? 'over' : 'side'"
+      [fixedInViewport]="mobileQuery?.matches"
     >
       <dalenguyen-nav/>
     </mat-sidenav>
@@ -56,40 +58,44 @@ export class SentryErrorHandler implements ErrorHandler {
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
+  protected readonly navService = inject(NavService)
+  private readonly cdf = inject(ChangeDetectorRef)
+  private readonly media = inject(MediaMatcher)
+  private readonly matIconRegistry = inject(MatIconRegistry)
+
   @ViewChild('snav') snav!: MatSidenav
 
-  mobileQuery: MediaQueryList
+  mobileQuery: MediaQueryList | undefined
   // tslint:disable-next-line:variable-name
-  private _mobileQueryListener: () => void
+  private _mobileQueryListener: () => void = () => {}
 
-  constructor(
-    cdf: ChangeDetectorRef,
-    media: MediaMatcher,
-    matIconRegistry: MatIconRegistry,
-    private navService: NavService,
-  ) {
-    this.mobileQuery = media.matchMedia('(max-width: 600px)')
-    this._mobileQueryListener = () => cdf.detectChanges()
-    this.mobileQuery.addListener(this._mobileQueryListener)
+  constructor() {
+    console.log('AppComponent - constructor')
+    afterNextRender(() => {
+      console.log('AppComponent - afterNextRender')
+      this.mobileQuery = this.media.matchMedia('(max-width: 600px)')
+      this._mobileQueryListener = () => this.cdf.detectChanges()
+      this.mobileQuery.addListener(this._mobileQueryListener)
 
-    // Add custom material icons
-    matIconRegistry.registerFontClassAlias('fa')
-    matIconRegistry.registerFontClassAlias('fab')
+      // Add custom material icons
+      this.matIconRegistry.registerFontClassAlias('fa')
+      this.matIconRegistry.registerFontClassAlias('fab')
 
-    // close nav on mobile
-    this.navService.target.subscribe(() => {
-      setTimeout(() => {
-        this.closeSideNav()
-      }, 1000)
+      // close nav on mobile
+      this.navService.target.subscribe(() => {
+        setTimeout(() => {
+          this.closeSideNav()
+        }, 1000)
+      })
     })
   }
 
   ngOnDestroy(): void {
-    this.mobileQuery.removeListener(this._mobileQueryListener)
+    this.mobileQuery?.removeListener(this._mobileQueryListener)
   }
 
   closeSideNav() {
-    if (this.mobileQuery.matches) {
+    if (this.mobileQuery?.matches) {
       // mobile
       this.snav.close()
     }
