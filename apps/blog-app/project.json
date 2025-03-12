@@ -4,7 +4,7 @@
   "projectType": "application",
   "sourceRoot": "apps/blog-app/src",
   "prefix": "blog",
-  "tags": [],
+  "tags": ["type:app", "framework:angular", "scope:blog"],
   "targets": {
     "build": {
       "executor": "@nx/vite:build",

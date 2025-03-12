@@ -1,4 +1,5 @@
 import { injectContentFiles } from '@analogjs/content'
+import { MetaTag } from '@analogjs/router'
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router'
 import { PostAttributes } from './models'
 
@@ -11,29 +12,29 @@ function injectActivePostAttributes(route: ActivatedRouteSnapshot): PostAttribut
 
 export const postTitleResolver: ResolveFn<string> = (route) => injectActivePostAttributes(route).title
 
-// export const postMetaResolver: ResolveFn<MetaTag[]> = (route) => {
-//   const postAttributes = injectActivePostAttributes(route)
+export const postMetaResolver: ResolveFn<MetaTag[]> = (route) => {
+  const postAttributes = injectActivePostAttributes(route)
 
-//   return [
-//     {
-//       name: 'description',
-//       content: postAttributes.description,
-//     },
-//     {
-//       name: 'author',
-//       content: 'Analog Team',
-//     },
-//     {
-//       property: 'og:title',
-//       content: postAttributes.title,
-//     },
-//     {
-//       property: 'og:description',
-//       content: postAttributes.description,
-//     },
-//     {
-//       property: 'og:image',
-//       content: postAttributes.coverImage,
-//     },
-//   ]
-// }
+  return [
+    {
+      name: 'description',
+      content: postAttributes.description,
+    },
+    {
+      name: 'author',
+      content: 'Dale Nguyen',
+    },
+    {
+      property: 'og:title',
+      content: postAttributes.title,
+    },
+    {
+      property: 'og:description',
+      content: postAttributes.description,
+    },
+    {
+      property: 'og:image',
+      content: postAttributes.coverImage,
+    },
+  ]
+}
