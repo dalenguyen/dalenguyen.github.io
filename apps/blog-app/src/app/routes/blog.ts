@@ -142,7 +142,9 @@ export default class BlogComponent {
   // private readonly blogService = inject(BlogService)
   // readonly articles$ = this.blogService.getButterArticles()
 
-  readonly posts = injectContentFiles<PostAttributes>((contentFile) => contentFile.filename.includes('/src/content'))
+  readonly posts = injectContentFiles<PostAttributes>((contentFile) =>
+    contentFile.filename.includes('/src/content'),
+  ).sort((a, b) => b.attributes.published.localeCompare(a.attributes.published))
 
   // TODO: router-outlet should not show blog content in slug
   // this is a hack :(
