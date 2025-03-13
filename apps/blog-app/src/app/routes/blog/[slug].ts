@@ -1,13 +1,11 @@
 import { injectContent, MarkdownComponent } from '@analogjs/content'
 import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
-import { Component, inject } from '@angular/core'
-import { Router, RouterLink } from '@angular/router'
-import { WINDOW } from '@dalenguyen/angular'
+import { Component } from '@angular/core'
+import { RouterLink } from '@angular/router'
 import { PostAttributes } from '../../blog/models'
 import { postMetaResolver, postTitleResolver } from '../../blog/resolvers'
 
-// TODO: meta data update later
 export const routeMeta: RouteMeta = {
   title: postTitleResolver,
   meta: postMetaResolver,
@@ -56,16 +54,5 @@ export const routeMeta: RouteMeta = {
   `,
 })
 export default class BlogPostComponent {
-  private readonly router = inject(Router)
-  private readonly window = inject(WINDOW)
-
   readonly post$ = injectContent<PostAttributes>()
-
-  openBlog() {
-    // TODO: super hacky :|
-    // need to figure out why blog doesn't load
-    this.router.navigate(['blog']).then(() => {
-      this.window.location.reload()
-    })
-  }
 }
