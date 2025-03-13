@@ -3,9 +3,7 @@
 import analog, { type PrerenderContentFile } from '@analogjs/platform'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { PrerenderRoute } from 'nitropack'
-// import { viteCommonjs } from '@originjs/vite-plugin-commonjs'
 import { defineConfig } from 'vite'
-// import tsconfigPaths from 'vite-tsconfig-paths'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -26,12 +24,9 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    // tsconfigPaths(),
-    // viteCommonjs(),
     nxViteTsPaths(),
     analog({
       nitro: {
-        // preset: 'node-server',
         preset: 'vercel',
       },
       static: true,
