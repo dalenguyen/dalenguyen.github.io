@@ -31,10 +31,11 @@ export default defineConfig(({ mode }) => ({
     nxViteTsPaths(),
     analog({
       nitro: {
+        // preset: 'node-server',
         preset: 'vercel',
       },
       static: true,
-      ssr: true,
+      ssr: false,
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
         inlineStylesExtension: 'scss|sass|less',
