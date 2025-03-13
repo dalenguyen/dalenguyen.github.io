@@ -88,7 +88,7 @@ export class SentryErrorHandler implements ErrorHandler {
             [class.bg-slate-900]="isActive(item.id)"
             [class.text-white]="isActive(item.id)"
             [class.text-slate-300]="!isActive(item.id)"
-            class="block px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
+            class="px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
             (click)="setActive(item.id); toggleMobileMenu()"
           >
             <mat-icon class="w-5 h-5 mr-2 text-current">{{ item.icon }}</mat-icon>
@@ -107,13 +107,6 @@ export class SentryErrorHandler implements ErrorHandler {
     <dalenguyen-footer/>
   </div>
   `,
-  styles: [
-    `
-      :host ::ng-deep html {
-        scroll-behavior: smooth;
-      }
-    `,
-  ],
 })
 export class AppComponent {
   protected readonly navService = inject(NavService)
@@ -163,6 +156,7 @@ export class AppComponent {
   ]
 
   toggleMobileMenu(): void {
+    console.log('toggleMobileMenu')
     // Toggle the menu regardless of environment, but only trigger change detection in browser
     this.isMobileMenuOpen.update((value) => !value)
 
