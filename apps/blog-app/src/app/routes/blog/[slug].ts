@@ -17,96 +17,49 @@ export const routeMeta: RouteMeta = {
   standalone: true,
   imports: [CommonModule, MarkdownComponent],
   template: `
-    <div class="relative overflow-hidden bg-white py-16">
-      <div class="hidden lg:absolute lg:inset-y-0 lg:block lg:h-full lg:w-full lg:[overflow-anchor:none]">
-        <div class="relative mx-auto h-full max-w-prose text-lg" aria-hidden="true">
-          <svg
-            class="absolute top-12 left-full translate-x-32 transform"
-            width="404"
-            height="384"
-            fill="none"
-            viewBox="0 0 404 384"
-          >
-            <defs>
-              <pattern
-                id="74b3fd99-0a6f-4271-bef2-e80eeafdf357"
-                x="0"
-                y="0"
-                width="20"
-                height="20"
-                patternUnits="userSpaceOnUse"
-              >
-                <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="404" height="384" fill="url(#74b3fd99-0a6f-4271-bef2-e80eeafdf357)" />
-          </svg>
-          <svg
-            class="absolute top-1/2 right-full -translate-y-1/2 -translate-x-32 transform"
-            width="404"
-            height="384"
-            fill="none"
-            viewBox="0 0 404 384"
-          >
-            <defs>
-              <pattern
-                id="f210dbf6-a58d-4871-961e-36d5016a0f49"
-                x="0"
-                y="0"
-                width="20"
-                height="20"
-                patternUnits="userSpaceOnUse"
-              >
-                <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="404" height="384" fill="url(#f210dbf6-a58d-4871-961e-36d5016a0f49)" />
-          </svg>
-          <svg
-            class="absolute bottom-12 left-full translate-x-32 transform"
-            width="404"
-            height="384"
-            fill="none"
-            viewBox="0 0 404 384"
-          >
-            <defs>
-              <pattern
-                id="d3eb07ae-5182-43e6-857d-35c643af9034"
-                x="0"
-                y="0"
-                width="20"
-                height="20"
-                patternUnits="userSpaceOnUse"
-              >
-                <rect x="0" y="0" width="4" height="4" class="text-gray-200" fill="currentColor" />
-              </pattern>
-            </defs>
-            <rect width="404" height="384" fill="url(#d3eb07ae-5182-43e6-857d-35c643af9034)" />
-          </svg>
-        </div>
-      </div>
       <div class="relative px-6 lg:px-8">
-        <div class="-mt-6 flex justify-between">
-          <a class="font-medium text-blue-500 underline hover:text-blue-700 cursor-pointer" (click)="openBlog()"
-            >←
-            <!-- -->Back</a
-          >
-        </div>
-        <div class="mx-auto max-w-prose text-lg text-center">
+        <nav class="flex py-4" aria-label="Breadcrumb">
+          <ol class="inline-flex items-center space-x-1 md:space-x-3">
+            <li class="inline-flex items-center">
+              <a href="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+                <svg class="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
+                </svg>
+                Home
+              </a>
+            </li>
+            <li>
+              <div class="flex items-center">
+                <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <a href="/blog" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Blog</a>
+              </div>
+            </li>
+            <li aria-current="page" *ngIf="post$ | async as post">
+              <div class="flex items-center">
+                <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 truncate max-w-xs">{{ post.attributes.title }}</span>
+              </div>
+            </li>
+          </ol>
+        </nav>
+        <div class="mx-auto max-w-prose text-lg text-center mt-8">
           <ng-container *ngIf="post$ | async as post">
             <h1>{{ post.attributes.title }}</h1>
             <analog-markdown [content]="post.content" />
           </ng-container>
         </div>
       </div>
-    </div>
   `,
 })
 export default class BlogPostComponent {
   private readonly router = inject(Router)
-  readonly post$ = injectContent<PostAttributes>()
-
   private readonly window = inject(WINDOW)
+
+  readonly post$ = injectContent<PostAttributes>()
 
   openBlog() {
     // TODO: super hacky :|

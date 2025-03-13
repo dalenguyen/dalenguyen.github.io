@@ -1,12 +1,17 @@
 import { provideContent, withMarkdownRenderer } from '@analogjs/content'
 import { withPrismHighlighter } from '@analogjs/content/prism-highlighter'
 import { provideFileRouter } from '@analogjs/router'
-import { provideHttpClient } from '@angular/common/http'
+import { provideHttpClient, withFetch } from '@angular/common/http'
 import { enableProdMode } from '@angular/core'
-import { bootstrapApplication, provideClientHydration } from '@angular/platform-browser'
+import { bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideAnimations } from '@angular/platform-browser/animations'
-import { renderApplication } from '@angular/platform-server'
-import { withEnabledBlockingInitialNavigation, withInMemoryScrolling, withRouterConfig } from '@angular/router'
+import { provideServerRendering, renderApplication } from '@angular/platform-server'
+import {
+  withComponentInputBinding,
+  withEnabledBlockingInitialNavigation,
+  withInMemoryScrolling,
+  withRouterConfig,
+} from '@angular/router'
 import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
 import 'zone.js/node'
 
@@ -17,12 +22,14 @@ if (import.meta.env.PROD) {
 const bootstrap = () =>
   bootstrapApplication(AppComponent, {
     providers: [
+      provideServerRendering(),
       provideAnimations(),
-      provideHttpClient(),
-      provideClientHydration(),
+      provideHttpClient(withFetch()),
+      provideClientHydration(withEventReplay()),
       provideFileRouter(
         withRouterConfig({ onSameUrlNavigation: 'reload' }),
         withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+        withComponentInputBinding(),
         withEnabledBlockingInitialNavigation(),
       ),
       provideContent(withMarkdownRenderer(), withPrismHighlighter()),

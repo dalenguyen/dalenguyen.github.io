@@ -1,8 +1,7 @@
-import { CommonModule } from '@angular/common'
+import { CommonModule, Location } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { Router } from '@angular/router'
-import { WINDOW } from '@dalenguyen/angular'
 import { NavService } from './nav.service'
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -14,21 +13,25 @@ import { NavService } from './nav.service'
 export class NavComponent implements OnInit {
   private readonly navService = inject(NavService)
   private readonly router = inject(Router)
-  private readonly window = inject(WINDOW)
+  private readonly location = inject(Location)
 
   activeEl = 'intro'
 
   ngOnInit() {
     // Set active nav by path
-    const currentPath = this.window.location.pathname.split('/')[1]
-    if (currentPath !== '') {
+    const currentPath = this.location.path().split('/')[1]
+    console.log('currentPath', currentPath)
+    if (currentPath) {
       this.activeEl = currentPath
     }
+
+    console.log('activeEl', this.activeEl)
   }
 
   scroll(id: string) {
     // TODO: figured out how to navigate on mobile
     this.activeEl = id
+    console.log('scroll - activeEl', this.activeEl)
     if (this.router.url !== '/') {
       this.router.navigate([''])
       setTimeout(() => {
@@ -48,6 +51,7 @@ export class NavComponent implements OnInit {
   }
 
   isActive(id: string) {
+    console.log('isActive', id, this.activeEl)
     if (id === this.activeEl) {
       return 'active'
     }

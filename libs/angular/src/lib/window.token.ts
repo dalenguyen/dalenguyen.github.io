@@ -5,10 +5,10 @@ export const WINDOW = new InjectionToken<Window>('An abstraction over global win
   factory: () => {
     const { defaultView } = inject(DOCUMENT)
 
-    if (!defaultView) {
-      throw new Error('Window is not available')
-    }
+    // if (!defaultView) {
+    //   throw new Error('Window is not available')
+    // }
 
-    return defaultView
+    return defaultView ?? ({} as Window)
   },
 })

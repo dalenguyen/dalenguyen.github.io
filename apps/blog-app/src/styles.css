@@ -5,6 +5,10 @@
 @import 'prismjs/themes/prism.css';
 @import 'prismjs/plugins/diff-highlight/prism-diff-highlight.css';
 
+html {
+  scroll-behavior: smooth;
+}
+
 h1 {
   font-size: 2rem;
   font-weight: 600;
