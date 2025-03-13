@@ -2,6 +2,7 @@ import { injectContentFiles } from '@analogjs/content'
 import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
 import { Component } from '@angular/core'
+import { RouterLink } from '@angular/router'
 import { PostAttributes } from '../../blog/models'
 
 export const routeMeta: RouteMeta = {
@@ -10,7 +11,7 @@ export const routeMeta: RouteMeta = {
 }
 @Component({
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   template: `
     <div class="bg-gradient-to-b from-gray-50 to-white py-16 px-4 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
@@ -66,7 +67,7 @@ export const routeMeta: RouteMeta = {
                   <p class="font-medium text-white">{{ post.attributes.author }}</p>
                 </div>
                 <a
-                  [href]="'/blog/' + post.attributes.slug"
+                  routerLink="/blog/{{ post.attributes.slug }}"
                   class="ml-auto bg-white text-indigo-700 px-6 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
                 >
                   Read Article
@@ -106,7 +107,7 @@ export const routeMeta: RouteMeta = {
                   post.attributes.published | date: 'mediumDate'
                 }}</time>
               </div>
-              <a [href]="'/blog/' + post.attributes.slug" class="block cursor-pointer">
+              <a routerLink="/blog/{{ post.attributes.slug }}" class="block cursor-pointer">
                 <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-indigo-600 transition-colors">
                   {{ post.attributes.title }}
                 </h3>
@@ -119,7 +120,7 @@ export const routeMeta: RouteMeta = {
                 <span class="ml-2 text-sm font-medium text-gray-700">{{ post.attributes.author }}</span>
 
                 <a
-                  [href]="'/blog/' + post.attributes.slug"
+                  routerLink="/blog/{{ post.attributes.slug }}"
                   class="ml-auto text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors cursor-pointer"
                 >
                   Read More →

@@ -3,7 +3,7 @@ import { withPrismHighlighter } from '@analogjs/content/prism-highlighter'
 import { provideFileRouter } from '@analogjs/router'
 import { provideHttpClient, withFetch } from '@angular/common/http'
 import { enableProdMode } from '@angular/core'
-import { bootstrapApplication } from '@angular/platform-browser'
+import { bootstrapApplication, provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideAnimations } from '@angular/platform-browser/animations'
 import { provideServerRendering, renderApplication } from '@angular/platform-server'
 import {
@@ -25,8 +25,7 @@ const bootstrap = () =>
       provideServerRendering(),
       provideAnimations(),
       provideHttpClient(withFetch()),
-      // May this cause the flickering when rendering the DOM?
-      // provideClientHydration(withEventReplay()),
+      provideClientHydration(withEventReplay()),
       provideFileRouter(
         withRouterConfig({ onSameUrlNavigation: 'reload' }),
         withInMemoryScrolling({ anchorScrolling: 'enabled' }),
