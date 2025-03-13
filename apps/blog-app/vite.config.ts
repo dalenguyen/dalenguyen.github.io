@@ -35,7 +35,7 @@ export default defineConfig(({ mode }) => ({
         preset: 'vercel',
       },
       static: true,
-      ssr: false,
+      ssr: true,
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
         inlineStylesExtension: 'scss|sass|less',

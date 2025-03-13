@@ -1,10 +1,8 @@
 import { injectContentFiles } from '@analogjs/content'
 import { RouteMeta } from '@analogjs/router'
 import { CommonModule } from '@angular/common'
-import { Component, inject, signal } from '@angular/core'
-import { Router, RouterOutlet } from '@angular/router'
-import { WINDOW } from '@dalenguyen/angular'
-import { PostAttributes } from '../blog/models'
+import { Component } from '@angular/core'
+import { PostAttributes } from '../../blog/models'
 
 export const routeMeta: RouteMeta = {
   title: `Dale Nguyen Blog`,
@@ -12,9 +10,8 @@ export const routeMeta: RouteMeta = {
 }
 @Component({
   standalone: true,
-  imports: [RouterOutlet, CommonModule],
+  imports: [CommonModule],
   template: `
-    @if (showBlogContent()) {
     <div class="bg-gradient-to-b from-gray-50 to-white py-16 px-4 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
         <!-- Header Section -->
@@ -68,12 +65,12 @@ export const routeMeta: RouteMeta = {
                 <div>
                   <p class="font-medium text-white">{{ post.attributes.author }}</p>
                 </div>
-                <button
-                  (click)="openPost(post.attributes.slug)"
-                  class="ml-auto bg-white text-indigo-700 px-6 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:outline-none"
+                <a
+                  [href]="'/blog/' + post.attributes.slug"
+                  class="ml-auto bg-white text-indigo-700 px-6 py-2 rounded-lg font-medium hover:bg-indigo-50 transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:outline-none cursor-pointer"
                 >
                   Read Article
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -109,7 +106,7 @@ export const routeMeta: RouteMeta = {
                   post.attributes.published | date: 'mediumDate'
                 }}</time>
               </div>
-              <a (click)="openPost(post.attributes.slug)" class="block cursor-pointer">
+              <a [href]="'/blog/' + post.attributes.slug" class="block cursor-pointer">
                 <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-indigo-600 transition-colors">
                   {{ post.attributes.title }}
                 </h3>
@@ -120,12 +117,13 @@ export const routeMeta: RouteMeta = {
               <div class="flex items-center">
                 <img [src]="post.attributes.profileImage" alt="" class="h-8 w-8 rounded-full" />
                 <span class="ml-2 text-sm font-medium text-gray-700">{{ post.attributes.author }}</span>
-                <button
-                  (click)="openPost(post.attributes.slug)"
-                  class="ml-auto text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors"
+
+                <a
+                  [href]="'/blog/' + post.attributes.slug"
+                  class="ml-auto text-indigo-600 hover:text-indigo-800 text-sm font-medium transition-colors cursor-pointer"
                 >
                   Read More →
-                </button>
+                </a>
               </div>
             </div>
           </div>
@@ -133,27 +131,10 @@ export const routeMeta: RouteMeta = {
         </div>
       </div>
     </div>
-    }
-
-    <router-outlet></router-outlet>
   `,
 })
 export default class BlogComponent {
-  private readonly router = inject(Router)
-  private readonly window = inject(WINDOW)
-  // private readonly blogService = inject(BlogService)
-  // readonly articles$ = this.blogService.getButterArticles()
-
   readonly posts = injectContentFiles<PostAttributes>((contentFile) =>
     contentFile.filename.includes('/src/content'),
   ).sort((a, b) => b.attributes.published.localeCompare(a.attributes.published))
-
-  // TODO: router-outlet should not show blog content in slug
-  // this is a hack :(
-  showBlogContent = signal(this.window?.location.pathname.includes('/blog/') === false)
-
-  openPost(slug: string) {
-    this.showBlogContent.set(false)
-    this.router.navigate(['/blog', slug])
-  }
 }
