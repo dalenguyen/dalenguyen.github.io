@@ -103,8 +103,15 @@ export class SentryErrorHandler implements ErrorHandler {
       <router-outlet />
     </main>
 
-    <!-- Footer -->
-    <dalenguyen-footer/>
+    <!-- Footer - Using @defer to load after main content and with a min-height to prevent CLS -->
+    <div class="footer-container" style="min-height: 80px;">
+      @defer (on viewport) {
+        <dalenguyen-footer/>
+      } @placeholder {
+        <!-- Empty placeholder with same height to prevent layout shift -->
+        <div class="h-20"></div>
+      }
+    </div>
   </div>
   `,
 })

@@ -33,7 +33,7 @@ export default defineConfig(({ mode }) => ({
       ssr: true,
       vite: {
         tsconfig: 'apps/blog-app/tsconfig.app.json',
-        inlineStylesExtension: 'scss|sass|less',
+        inlineStylesExtension: 'scss|sass|less|css',
       },
       prerender: {
         routes: async () => [
