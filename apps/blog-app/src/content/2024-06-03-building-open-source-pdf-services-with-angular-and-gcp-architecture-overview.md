@@ -5,7 +5,7 @@ description: Welcome to the first part of the journey in building open source PD
 categories: ['angular', 'tutorial', 'gcp']
 coverImage: assets/images/blog/angular-pdf-service.webp
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2024-04-07T15:17:31.359Z
+published: 2024-06-03T15:17:31.359Z
 author: Dale Nguyen
 ---
 
@@ -17,7 +17,7 @@ author: Dale Nguyen
 Welcome to the first part of the journey in building open source PDF service using Angular (Analogjs), Firestore, Cloud Storage, and CloudRun. This project serves as a platform for sharing my knowledge, continually learning best practices, and simultaneously contributing to the community.
 
 - Part 1: **[Architecture Overview](blog/2024-06-03-building-open-source-pdf-services-with-angular-and-gcp-architecture-overview)**
-- Part 2: [Deploy services to Cloud Run]()
+- Part 2: [Deploy services to Cloud Run](blog/2024-06-08-building-open-source-pdf-services-with-angular-and-gcp-deploy-services-to-cloud-run)
 - Part 3: [Handling long processing tasks]()
 - Part 4: [PDF AI Chat]()
 

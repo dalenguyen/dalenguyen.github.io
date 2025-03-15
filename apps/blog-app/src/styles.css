@@ -36,6 +36,12 @@ h2 {
   margin: 1rem 0;
 }
 
+h3 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0.8rem 0;
+}
+
 /* Prevent layout shifts from images */
 img {
   max-width: 100%;
@@ -78,4 +84,10 @@ figure {
     font-size: 0.8rem;
     color: #666;
   }
+}
+
+blockquote {
+  background-color: #f0f0f0;
+  padding: 1rem;
+  border-left: 4px solid #4632de;
 }
