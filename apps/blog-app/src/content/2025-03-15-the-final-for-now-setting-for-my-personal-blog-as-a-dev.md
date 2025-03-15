@@ -16,6 +16,8 @@ author: Dale Nguyen
 
 As developers, we often find ourselves in a cycle of continuous improvement, especially when it comes to our personal projects. For me, revamping my personal blog has become a recurring theme, each iteration serving as a valuable learning experience. This latest setup marks a significant leap forward, addressing previous challenges while embracing new technologies that enhance both functionality and productivity.
 
+> Check out the [Github repo](https://github.com/dalenguyen/dalenguyen.github.io) of this project.
+
 ## The Struggle with SPAs
 
 Before this latest revamp, my blog was built solely with Angular as a Single Page Application (SPA). While SPAs offer a seamless user experience, they come with inherent drawbacks, particularly in terms of SEO and social sharing:
