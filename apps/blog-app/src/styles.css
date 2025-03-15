@@ -5,8 +5,23 @@
 @import 'prismjs/themes/prism.css';
 @import 'prismjs/plugins/diff-highlight/prism-diff-highlight.css';
 
-html {
+html,
+body {
+  height: 100%;
   scroll-behavior: smooth;
+}
+
+/* Ensure the app container takes full height */
+body > dalenguyen-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Sticky footer styles */
+footer {
+  flex-shrink: 0;
+  min-height: 80px; /* Consistent height to prevent CLS */
 }
 
 h1 {
@@ -21,10 +36,28 @@ h2 {
   margin-bottom: 1rem;
 }
 
+/* Prevent layout shifts from images */
+img {
+  max-width: 100%;
+  height: auto;
+  aspect-ratio: attr(width) / attr(height);
+}
+
+/* Fallback for images without explicit dimensions */
+img:not([width]):not([height]) {
+  aspect-ratio: 16 / 9;
+}
+
 .analog-markdown {
   text-align: left;
 
   p {
     padding: 1rem 0;
+  }
+
+  /* Ensure images in markdown content maintain aspect ratio */
+  img {
+    display: block;
+    margin: 1rem 0;
   }
 }

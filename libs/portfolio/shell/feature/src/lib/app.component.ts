@@ -28,7 +28,7 @@ export class SentryErrorHandler implements ErrorHandler {
   imports: [MatIconModule, RouterModule, RouterLink, FooterComponent, CommonModule],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
-  <div class="min-h-screen flex flex-col">
+  <div class="flex flex-col min-h-screen">
     <!-- Header Navigation -->
     <header class="bg-slate-800 shadow-lg">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -37,7 +37,7 @@ export class SentryErrorHandler implements ErrorHandler {
           <div class="flex items-center">
             <div class="flex-shrink-0 flex items-center">
               <a routerLink="/" class="flex items-center">
-                <img class="h-8 w-8 rounded-full" src="/assets/images/dale-nguyen-avatar.jpeg" alt="Dale Nguyen" />
+                <img class="h-8 w-8 rounded-full" src="/assets/images/dale-nguyen-avatar.webp" alt="Dale Nguyen" />
               </a>
             </div>
           </div>
@@ -98,20 +98,20 @@ export class SentryErrorHandler implements ErrorHandler {
       </div>
     </header>
 
-    <!-- Main Content -->
-    <main class="flex-grow">
+    <!-- Main content with flex-grow to push footer down -->
+    <main class="flex-grow flex flex-col">
       <router-outlet />
     </main>
 
-    <!-- Footer - Using @defer to load after main content and with a min-height to prevent CLS -->
-    <div class="footer-container" style="min-height: 80px;">
+    <!-- Footer - Using @defer to load after main content -->
+    <footer>
       @defer (on viewport) {
         <dalenguyen-footer/>
       } @placeholder {
         <!-- Empty placeholder with same height to prevent layout shift -->
         <div class="h-20"></div>
       }
-    </div>
+    </footer>
   </div>
   `,
 })

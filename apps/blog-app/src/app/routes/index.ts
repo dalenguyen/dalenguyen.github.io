@@ -13,7 +13,7 @@ export const routeMeta: RouteMeta = {
     { name: 'og:url', content: 'https://dalenguyen.me' },
     {
       name: 'og:image',
-      content: 'https://dalenguyen.me/assets/images/dale-nguyen-avatar.jpeg',
+      content: 'https://dalenguyen.me/assets/images/dale-nguyen-avatar.webp',
     },
     { name: 'type', content: 'website' },
   ],

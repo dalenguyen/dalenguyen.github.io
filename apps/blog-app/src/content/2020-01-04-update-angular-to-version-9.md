@@ -4,7 +4,7 @@ slug: '2020-01-04-update-angular-to-version-9'
 description: 'This is a new year project: update my personal website from Angular 8x to Angular 9. The process is very easy with only 2 commands from @angular/cli. You can check the guide from the Angular website.'
 categories: ['angular', 'tutorial', 'webdev']
 coverImage: 'https://cdn.buttercms.com/fQW7f9rvQnQLox2ztA1L'
-profileImage: 'assets/images/dale-nguyen-avatar.jpeg'
+profileImage: 'assets/images/dale-nguyen-avatar.webp'
 published: '2020-01-04'
 author: Dale Nguyen
 ---
