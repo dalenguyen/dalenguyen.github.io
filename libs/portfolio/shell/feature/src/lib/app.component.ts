@@ -169,7 +169,6 @@ export class AppComponent {
   ]
 
   toggleMobileMenu(): void {
-    console.log('toggleMobileMenu')
     // Toggle the menu regardless of environment, but only trigger change detection in browser
     this.isMobileMenuOpen.update((value) => !value)
 

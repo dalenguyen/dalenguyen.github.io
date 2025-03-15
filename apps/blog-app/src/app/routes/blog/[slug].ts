@@ -1,7 +1,7 @@
 import { injectContent, MarkdownComponent } from '@analogjs/content'
 import { RouteMeta } from '@analogjs/router'
-import { CommonModule } from '@angular/common'
-import { Component } from '@angular/core'
+import { CommonModule, DOCUMENT } from '@angular/common'
+import { AfterViewInit, Component, ElementRef, inject, viewChild } from '@angular/core'
 import { RouterLink } from '@angular/router'
 import { PostAttributes } from '../../blog/models'
 import { postMetaResolver, postTitleResolver } from '../../blog/resolvers'
@@ -51,8 +51,51 @@ export const routeMeta: RouteMeta = {
           </ng-container>
         </div>
       </div>
+
+      <!-- Comments section -->
+      <div class="mx-auto max-w-prose mt-12 mb-12">
+        <div #giscusContainer class="giscus-container"></div>
+      </div>
   `,
 })
-export default class BlogPostComponent {
+export default class BlogPostComponent implements AfterViewInit {
+  private readonly document = inject(DOCUMENT)
   readonly post$ = injectContent<PostAttributes>()
+
+  // Using viewChild with signal-based approach
+  giscusContainer = viewChild<ElementRef>('giscusContainer')
+
+  ngAfterViewInit() {
+    this.loadGiscusScript()
+  }
+
+  private loadGiscusScript() {
+    // Get the element reference from the signal
+    const container = this.giscusContainer()?.nativeElement
+
+    if (!container) {
+      console.error('Giscus container not found')
+      return
+    }
+
+    const script = this.document.createElement('script')
+    script.src = 'https://giscus.app/client.js'
+    script.setAttribute('data-repo', 'dalenguyen/dalenguyen.github.io')
+    script.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnkxMDQwMzE3NzA=')
+    script.setAttribute('data-category', 'Comments')
+    script.setAttribute('data-category-id', 'DIC_kwDOBjLQes4CXEgJ')
+    script.setAttribute('data-mapping', 'pathname')
+    script.setAttribute('data-strict', '0')
+    script.setAttribute('data-reactions-enabled', '1')
+    script.setAttribute('data-emit-metadata', '0')
+    script.setAttribute('data-input-position', 'top')
+    script.setAttribute('data-theme', 'transparent_dark')
+    script.setAttribute('data-lang', 'en')
+    script.setAttribute('data-loading', 'lazy')
+    script.setAttribute('crossorigin', 'anonymous')
+    script.async = true
+
+    // Add the script to the giscus container
+    container.appendChild(script)
+  }
 }
