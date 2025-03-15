@@ -19,7 +19,7 @@ Welcome to the first part of the journey in building open source PDF service usi
 - Part 1: [Architecture Overview](blog/2024-06-03-building-open-source-pdf-services-with-angular-and-gcp-architecture-overview)
 - Part 2: [Deploy services to Cloud Run](blog/2024-06-08-building-open-source-pdf-services-with-angular-and-gcp-deploy-services-to-cloud-run)
 - Part 3: **[Handling long processing tasks](blog/2024-07-06-building-open-source-pdf-services-with-angular-and-gcp-handling-long-processing-tasks)**
-- Part 4: [PDF AI Chat]()
+- Part 4: [PDF AI Chat](blog/2025-03-10-building-open-source-pdf-services-with-angular-and-gcp-pdf-ai-chat)
 
 Demo: <https://pdfun.xyz>
 
