@@ -9,10 +9,10 @@
     "build": {
       "executor": "@nx/vite:build",
       "outputs": [
-        "{options.outputPath}",
-        "{workspaceRoot}/dist/apps/blog-app/.nitro",
-        "{workspaceRoot}/dist/apps/blog-app/ssr",
-        "{workspaceRoot}/dist/apps/blog-app/server"
+        "{options.outputPath}"
+        // "{workspaceRoot}/dist/apps/blog-app/.nitro",
+        // "{workspaceRoot}/dist/apps/blog-app/ssr",
+        // "{workspaceRoot}/dist/apps/blog-app/server"
       ],
       "options": {
         "configFile": "apps/blog-app/vite.config.ts",

@@ -10,7 +10,7 @@ export default defineConfig(({ mode }) => ({
   root: __dirname,
   publicDir: '../../libs/portfolio/shared',
   build: {
-    outDir: '../../dist/apps/blog-app/client',
+    // outDir: '../../dist/apps/blog-app/client',
     reportCompressedSize: true,
     commonjsOptions: { transformMixedEsModules: true },
     target: ['es2022'],
