@@ -67,6 +67,54 @@ This setup offers several advantages that have significantly improved my product
   <figcaption>Good sharing experience with SSG</figcaption>
 </figure>
 
+## Technical Insights
+
+Let's see how the the blog project work under my current set up.
+
+> The project is using [Nx workspace](https://nx.dev/) + PNPM for package management
+
+<figure>
+  <img src="assets/images/blog/personal-blog-structure.png" alt="Project structure" width="100%" height="auto" style="aspect-ratio: 16/9;" />
+  <figcaption>Project structure</figcaption>
+</figure>
+
+Some of the highlights of the project structure:
+
+- File based routing
+- Blog post is written using markdown
+
+Now, let's check out the project. First, you need to clone the project from the Github:
+
+```bash
+git clone https://github.com/dalenguyen/dalenguyen.github.io.git
+```
+
+Then install the packages and run the project
+
+```bash
+pnpm i
+npx nx serve blog-app
+```
+
+You will able to access it locally at http://localhost:3000
+
+> Note: you may need to disable `ssr: false` for local development from vite.config.ts
+
+After that, for building project, you just need to run the following command:
+
+```bash
+npx nx build blog-app
+```
+
+Since I have `vercel` as a preset in `vite.config.ts`, you will find the generated content under `.vercel/output/static` folder:
+
+<figure>
+  <img src="assets/images/blog/personal-blog-generated-files.png" alt="Vercel generated files" width="100%" height="auto" style="aspect-ratio: 16/9;" />
+  <figcaption>Vercel generated files</figcaption>
+</figure>
+
+If you connect your Github project with Vercel, the deployment process is automated. If not, you can manually deploy the project to other hosting providers. However, the final built files will be under `dist/apps/blog-app` folder.
+
 ## Conclusion
 
 While this might not be the "final" iteration of my blog, it represents a significant milestone in my journey as a developer. Each revamp is an opportunity to learn and adapt, and this setup has undoubtedly made me more productive and better equipped to tackle future projects. Whether you're a seasoned developer or just starting out, embracing change and continuous improvement is key to staying ahead in the ever-evolving world of web development.
