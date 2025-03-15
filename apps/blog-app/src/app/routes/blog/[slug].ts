@@ -81,9 +81,9 @@ export default class BlogPostComponent implements AfterViewInit {
     const script = this.document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'dalenguyen/dalenguyen.github.io')
-    script.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnkxMDQwMzE3NzA=')
-    script.setAttribute('data-category', 'Comments')
-    script.setAttribute('data-category-id', 'DIC_kwDOBjLQes4CXEgJ')
+    script.setAttribute('data-repo-id', 'MDEwOlJlcG9zaXRvcnkyMDM2MzkxOTc=')
+    script.setAttribute('data-category', 'Announcements')
+    script.setAttribute('data-category-id', 'DIC_kwDODCNJnc4CoEkP')
     script.setAttribute('data-mapping', 'pathname')
     script.setAttribute('data-strict', '0')
     script.setAttribute('data-reactions-enabled', '1')
