@@ -74,6 +74,7 @@ img:not([width]):not([height]) {
   ul {
     list-style-type: disc;
     margin-left: 1rem;
+    padding-left: 1rem;
   }
 
   ol {
