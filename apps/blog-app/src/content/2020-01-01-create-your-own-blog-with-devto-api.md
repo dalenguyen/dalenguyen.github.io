@@ -4,7 +4,7 @@ slug: 2020-01-01-create-your-own-blog-with-devto-api
 description: It's quite an interesting platform where programmers share ideas and help each other grow. It is an online community for sharing and discovering great ideas, having debates, and making friends. Anyone can share articles, questions, discussions, etc. as long as they have the rights to the words they are sharing. Cross-posting from your own blog is welcome - quote from the About page.
 categories: ['webdev', 'tutorial', 'api']
 coverImage: https://cdn.buttercms.com/Sz4nZne1Rky8h9H7qj0b
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2020-01-01
 author: Dale Nguyen
 ---

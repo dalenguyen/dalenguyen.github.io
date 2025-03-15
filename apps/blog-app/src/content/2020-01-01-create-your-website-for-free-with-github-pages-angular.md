@@ -4,7 +4,7 @@ slug: 2020-01-01-create-your-website-for-free-with-github-pages-angular
 description: In the previous post, I show you how to do some research in order to have a glimpse of how to research for your own website - such as a portfolio website. Today, you will know to create a sample Angular site and host in on Github Pages.
 categories: ['webdev', 'tutorial', 'angular', 'github']
 coverImage: https://cdn.buttercms.com/0vHe9sB4SxdVtmbqqOml
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2020-01-01
 author: Dale Nguyen
 ---

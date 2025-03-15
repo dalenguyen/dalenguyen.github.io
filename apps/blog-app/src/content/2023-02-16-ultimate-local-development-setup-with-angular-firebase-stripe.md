@@ -4,7 +4,7 @@ slug: 2023-02-16-ultimate-local-development-setup-with-angular-firebase-stripe
 description: Building an eCommerce website is a complicated task. Especially when you have different services that need to communicate with each other. Here is the scenario where you don't have everything ready locally for development.
 categories: ['angular', 'firebase', 'stripe', 'tutorial', 'webdev']
 coverImage: https://cdn.buttercms.com/yG2XmIpRCYbQcu8VPCWg
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2023-02-16
 author: Dale Nguyen
 ---

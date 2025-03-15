@@ -4,7 +4,7 @@ slug: 2020-01-01-want-to-build-a-career-in-tech-start-with-your-website
 description: Your personal website always belongs to you. It's the best and easiest investment that you could make. Why do I say that? It's because If you are still in school — your website is your portfolio. And if you're working — your website is your portfolio and branding.
 categories: ['webdev', 'career', 'beginners']
 coverImage: https://cdn.buttercms.com/0qCMHkcDSA64DOE4D9sK
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2020-01-01
 author: Dale Nguyen
 ---

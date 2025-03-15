@@ -33,7 +33,7 @@ h1 {
 h2 {
   font-size: 1.5rem;
   font-weight: 500;
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 
 /* Prevent layout shifts from images */
@@ -58,6 +58,24 @@ img:not([width]):not([height]) {
   /* Ensure images in markdown content maintain aspect ratio */
   img {
     display: block;
-    margin: 1rem 0;
+  }
+
+  a {
+    text-decoration: underline;
+    color: #4632de;
+  }
+
+  ul {
+    list-style-type: disc;
+    margin-left: 1rem;
+  }
+}
+
+figure {
+  margin: 1rem 0;
+  text-align: center;
+  figcaption {
+    font-size: 0.8rem;
+    color: #666;
   }
 }

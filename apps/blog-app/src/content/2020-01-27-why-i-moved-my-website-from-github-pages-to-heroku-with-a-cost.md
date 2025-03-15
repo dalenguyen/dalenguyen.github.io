@@ -4,7 +4,7 @@ slug: 2020-01-27-why-i-moved-my-website-from-github-pages-to-heroku-with-a-cost
 description: As you may or may not know, I built my personal website as a Single Page Application (SPA) with the Angular framework and hosted on Github Pages. Everything works great until I integrated a Blog feature on my personal website. Things were getting ugly for search engine optimization (SEO) and social media preview.
 categories: ['angular', 'heroku', 'github', 'tutorial', 'webdev']
 coverImage: https://cdn.buttercms.com/Fca7jZuD12WBjML7ucCOJ
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2020-01-27
 author: Dale Nguyen
 ---

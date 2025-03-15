@@ -4,7 +4,7 @@ slug: 2020-01-01-create-your-own-blog-with-buttercms
 description: I wrote a bunch of articles, and somehow I wanted to have a blog on my personal website. I tried to get posts from DEV.TO and display them on my personal website, and it worked perfectly well. However, DEV.TO is a platform for software engineer sharing experience only, and I want more than that.
 categories: ['webdev', 'tutorial', 'cms']
 coverImage: https://cdn.buttercms.com/CeKKiyuaT4uG71yRTmoN
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2020-01-01
 author: Dale Nguyen
 ---

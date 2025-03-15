@@ -4,7 +4,7 @@ slug: 2023-04-07-angular-functional-router-guard-and-testing-with-inject
 description: In Angular, guards are a fundamental feature that protects routes within an application. Guards check if certain conditions are met before allowing users to access specific routes. Guards can be used for authentication and authorization, role-based access control, feature flag checks, and more.
 categories: ['angular', 'tutorial', 'webdev']
 coverImage: https://cdn.buttercms.com/EBYGJWB9TOSPLblq2Qma
-profileImage: https://d1ts43dypk8bqh.cloudfront.net/v1/avatars/e3c37839-e11d-44f4-97e2-6a9d3ad580fc
+profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2023-04-07
 author: Dale Nguyen
 ---
