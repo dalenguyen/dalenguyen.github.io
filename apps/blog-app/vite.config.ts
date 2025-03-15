@@ -39,8 +39,6 @@ export default defineConfig(({ mode }) => ({
         routes: async () => [
           '/',
           '/blog',
-          // add page not found
-
           {
             contentDir: 'src/content',
             transform: (file: PrerenderContentFile) => {
