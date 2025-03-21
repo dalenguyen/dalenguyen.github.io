@@ -62,7 +62,7 @@
     "@nestjs/platform-express": "9.4.0",
     "@nestjs/swagger": "6.3.0",
     "@nestjs/typeorm": "^8.1.4",
-    "@sentry/browser": "^6.19.7",
+    "@sentry/browser": "^7.119.1",
     "@sentry/core": "^6.19.7",
     "@sentry/integrations": "^6.19.7",
     "@storybook/addon-interactions": "^8.6.0",
