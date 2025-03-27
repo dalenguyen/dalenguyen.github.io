@@ -16,6 +16,19 @@ author: Dale Nguyen
 
 In the ever-evolving landscape of health technology, I'm thrilled to announce my latest open-source project: [EczEase](github.com/dalenguyen/eczease). This innovative platform aims to transform the way people manage eczema and food allergies, leveraging the power of artificial intelligence and modern web technologies. As someone who has witnessed the challenges faced by loved ones battling these conditions, I'm passionate about creating a solution that can make a real difference.
 
+Web: https://eczeease.com
+<br>
+Github: https://github.com/dalenguyen/EczEase
+
+<br>
+
+- Part 1: **[Introduction](blog/2025-03-22-building-eczease-with-cutting-edge-tech-introduction)**
+- Part 2: [Build Landing Page](blog/2025-03-27-building-eczease-with-cutting-edge-tech-build-landing-page)
+
+<br>
+
+> Looking for immediate help with allergy-friendly meal planning? Try 🍽️ **[SafePlate.ai (Beta)](https://SafePlate.ai)** — an iOS app designed to make dining safer and more enjoyable for people with food allergies.
+
 ## The Vision Behind EczEase
 
 EczEase is born out of a personal journey and a desire to harness technology for better health outcomes. The platform is designed to be a comprehensive tool for individuals dealing with eczema and food allergies, offering features that range from personalized advice to community support.
@@ -69,10 +82,6 @@ The success of EczEase hinges on its usability and effectiveness for individuals
 ### Integration of Latest Research
 
 The field of allergy and immunology is constantly evolving. I'm designing EczEase to be flexible, allowing for easy integration of new research findings and treatment approaches.
-
-### Exploring Meal Planning Solutions
-
-For those interested in meal planning, there are several innovative tools available that can complement EczEase's features. One such tool is [SafePlate AI - Beta](https://safeplate.ai/), which offers personalized meal planning with allergen avoidance and nutritional insights.
 
 ## The Road Ahead
 
