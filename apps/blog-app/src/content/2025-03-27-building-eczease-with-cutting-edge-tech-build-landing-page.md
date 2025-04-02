@@ -14,7 +14,7 @@ author: Dale Nguyen
   <figcaption>Manage eczema and food allergies, leveraging the power of artificial intelligence</figcaption>
 </figure>
 
-In the ever-evolving landscape of health technology, I'm thrilled to announce my latest open-source project: [EczEase](github.com/dalenguyen/eczease). This innovative platform aims to transform the way people manage eczema and food allergies, leveraging the power of artificial intelligence and modern web technologies. As someone who has witnessed the challenges faced by loved ones battling these conditions, I'm passionate about creating a solution that can make a real difference.
+In the ever-evolving landscape of health technology, I'm thrilled to announce my latest open-source project: [EczEase](https://github.com/dalenguyen/eczease). This innovative platform aims to transform the way people manage eczema and food allergies, leveraging the power of artificial intelligence and modern web technologies. As someone who has witnessed the challenges faced by loved ones battling these conditions, I'm passionate about creating a solution that can make a real difference.
 
 Web: https://eczeease.com
 <br>
