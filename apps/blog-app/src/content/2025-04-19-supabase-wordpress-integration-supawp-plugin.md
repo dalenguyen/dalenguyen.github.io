@@ -20,6 +20,9 @@ Get the plugin: https://techcater.com
 <br>
 Demo Video: https://www.youtube.com/watch?v=BewjtbcFZ3M
 
+- Part 1: **[SupaWP Plugin Overview](blog/2025-04-19-supabase-wordpress-integration-supawp-plugin)**
+- Part 2: [Save Users Data](blog/2025-04-28-supabase-wordpress-integration-save-users-data)
+
 ## Why Integrate Supabase with WordPress?
 
 - **Enhanced Authentication Management**  
