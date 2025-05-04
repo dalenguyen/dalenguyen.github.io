@@ -51,7 +51,7 @@ Create a new table in supabase is pretty straight forward, you can either do by 
 
 Here are some SQL scripts to create `profiles` table using SQL Editor:
 
-```
+```bash
 -- 1. Create the table to store user profiles
 -- Replace 'public.profiles' with your actual table name if different.
 CREATE TABLE public.profiles (
@@ -85,7 +85,7 @@ Using Row-Level Security (RLS) in Supabase is essential for implementing robust 
 
 Here are the example scripts that only allow authenticated users to create and update their own `Profiles`:
 
-```
+```bash
 -- 1. Enable Row Level Security (RLS) on the table
 -- IMPORTANT: This secures your table so that policies are enforced.
 -- Replace 'public.profiles' with your actual table name.
@@ -116,33 +116,24 @@ WITH CHECK (auth.uid() = id); -- Ensures they can't change the 'id' column
 
 For saving data from the frontend, you will need `@supabase/supabase-js` package. Here is the example on how we initialize Supabase client and save data to `profiles` table:
 
-```
-import { createClient } from '@supabase/supabase-js';
+```typescript
+import { createClient } from '@supabase/supabase-js'
 
 // Initialize the Supabase client
-const supabaseUrl = 'YOUR_SUPABASE_URL';
-const supabaseKey = 'YOUR_SUPABASE_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabaseUrl = 'YOUR_SUPABASE_URL'
+const supabaseKey = 'YOUR_SUPABASE_KEY'
+const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Function to insert a new profile
-async function insertProfile(profile: {
-  id: string;
-  username: string;
-  full_name?: string;
-  avatar_url?: string;
-}) {
-  const { data, error } = await supabase
-    .from('profiles')
-    .insert(profile)
-    .select(); // Optional: returns the inserted row(s)
-
+async function insertProfile(profile: { id: string; username: string; full_name?: string; avatar_url?: string }) {
+  const { data, error } = await supabase.from('profiles').insert(profile).select() // Optional: returns the inserted row(s)
 
   if (error) {
-    console.error('Error inserting profile:', error);
-    return null;
+    console.error('Error inserting profile:', error)
+    return null
   }
 
-  return data;
+  return data
 }
 
 // Example usage
@@ -150,10 +141,10 @@ const newProfile = {
   id: 'user-456',
   username: 'janedoe',
   full_name: 'Jane Doe',
-  avatar_url: 'https://example.com/jane-avatar.png'
-};
+  avatar_url: 'https://example.com/jane-avatar.png',
+}
 
-insertProfile(newProfile);
+insertProfile(newProfile)
 ```
 
 As you can see, the `.insert()` method adds a new row to the table. You can chain `.select()` to return the newly inserted data, or omit it if you don't need the response data.

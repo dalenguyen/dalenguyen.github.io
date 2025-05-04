@@ -28,7 +28,7 @@ It's a platform to build a static website with HTML, CSS & JavaScript, so I will
 
 After that, you can push a simple index.html to your master branch.
 
-```
+```bash
 git clone https://github.com/username/username.github.io
 cd username.github.io
 echo "Hello World!!!" > index.html
@@ -52,19 +52,19 @@ After this moment, it's totally depends on your imagination and skills — modif
 
 Now, we will take advantage of Angular to build our website on Github pages. angular-cli-ghpages is needed for deploying to Github.
 
-```
+```bash
 npm install -g angular-cli-ghpages
 ```
 
 The website is on master, so we need to create a dev branch for the development process.
 
-```
+```bash
 git checkout -b dev
 ```
 
 Create a new Angular project, make sure that the project is in the root folder of your git.
 
-```
+```bash
 ng new username-github-io
 ```
 
@@ -72,7 +72,7 @@ Remember to edit angular.json file, so the build will be under dist folder rathe
 
 ## Prepare for deployment
 
-```
+```bash
 ng build --prod --base-href 'https://username.github.io/'
 Deploy project to master
  ✔  ngh --message="Commit message"

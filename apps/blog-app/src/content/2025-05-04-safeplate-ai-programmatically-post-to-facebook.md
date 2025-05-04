@@ -52,7 +52,7 @@ Let's have a look at the steps:
 
 First, make sure that get the Facebook Page ID, and the User Access token in the environment.
 
-```
+```bash
 // .env
 # Retrieve from Facebook About page
 FACEBOOK_PAGE_ID= # The ID of your Facebook Page
@@ -65,7 +65,7 @@ FACEBOOK_USER_ACCESS_TOKEN=
   <figcaption>Safeplate AI - Get User Access Token</figcaption>
 </figure>
 
-The token will expire in an hour, but you can extend it to **three months** by visiting [Access Token Debugger](developers.facebook.com/tools/debug/accesstoken/).
+The token will expire in an hour, but you can extend it to **three months** by visiting [Access Token Debugger](https://developers.facebook.com/tools/debug/accesstoken/).
 
 After having everything ready, let's start sending generated meal to Facebook Page.
 

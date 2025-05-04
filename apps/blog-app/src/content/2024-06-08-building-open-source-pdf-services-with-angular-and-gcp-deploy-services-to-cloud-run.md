@@ -145,7 +145,7 @@ These commands in turn will build the docker image, push the image and deploy th
 
 Here is the result:
 
-```
+```bash
 dalenguyen$ yarn deploy
 
 yarn run v1.22.19

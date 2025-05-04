@@ -15,7 +15,7 @@ As you may or may not know, I built my personal website as a Single Page Applica
 
 ### Login to Heroku
 
-```
+```bash
 ╰─ heroku login
 
 heroku: Press any key to open up the browser to login or q to exit:
@@ -29,7 +29,7 @@ Logged in as xxx@dalenguyen.me
 
 ### Add project to Heroku
 
-```
+```bash
 ╰─ heroku git:remote -a dalenguyen-me
 
 set git remote heroku to https://git.heroku.com/dalenguyen-me.git
@@ -37,7 +37,7 @@ set git remote heroku to https://git.heroku.com/dalenguyen-me.git
 
 I push the project from dev to Heroku. Because my master branch is for Github pages.
 
-```
+```bash
 ╰─ git push heroku dev:master
 
 Enumerating objects: 704, done.
