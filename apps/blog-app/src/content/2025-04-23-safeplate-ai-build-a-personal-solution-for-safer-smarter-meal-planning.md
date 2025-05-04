@@ -16,6 +16,9 @@ author: Dale Nguyen
 
 I started working on [SafePlate AI](https://safeplate.ai/) because I wanted to help a loved one who was struggling with food allergies, hoping to make their daily life a little easier. Managing food allergies and dietary restrictions can be frustrating and time-consuming, especially when you want to make sure every meal is safe and fits your nutrition goals. I realized there wasn’t a simple tool that could help me quickly identify safe foods and suggest meals tailored to my needs. So, as a good developer, I decided to build one myself.
 
+- Part 1: **[Project Overview](blog/2025-04-23-safeplate-ai-build-a-personal-solution-for-safer-smarter-meal-planning)**
+- Part 2: [Programmatically Post to Facebook](blog/2025-05-04-safeplate-ai-programmatically-post-to-facebook)
+
 In this post, I want to share the story behind SafePlate AI, how it works, and why I chose to make it available to others through the [Apple App Store](https://apps.apple.com/app/safeplate-ai/id6742756212). This is a humble project born from my own experience, and I hope it can help others facing similar challenges.
 
 ---
