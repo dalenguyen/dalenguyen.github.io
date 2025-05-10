@@ -67,6 +67,14 @@ CREATE TABLE public.profiles (
 ALTER TABLE public.profiles
   ADD CONSTRAINT fk_auth_users FOREIGN KEY (id) REFERENCES auth.users(id) ON DELETE CASCADE;
   -- ON DELETE CASCADE means if a user is deleted from auth.users, their corresponding row here is also deleted.
+
+-- 3. Create SELECT policy (if you need users to read their own profile from frontend)
+-- Replace 'public.profiles' with your actual table name.
+CREATE POLICY "Allow authenticated users read own profile"
+ON public.profiles
+FOR SELECT
+TO authenticated
+USING (auth.uid() = id);
 ```
 
 ### Protect your tables with Row Level Security (RLS)
