@@ -10,4 +10,5 @@ export interface PostAttributes {
     firstName: string
     lastName: string
   }
+  series?: string
 }

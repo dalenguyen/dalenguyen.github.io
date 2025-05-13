@@ -6,23 +6,15 @@ categories: ['supabase', 'wordpress']
 coverImage: https://dalenguyen.me/assets/images/blog/supabase-wordpress-integration.png
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2025-04-19T15:17:31.359Z
+series: Supabase WordPress Integration
 author: Dale Nguyen
 ---
-
-<figure>
-  <img src="assets/images/blog/supabase-wordpress-integration.png" alt="Supabase WordPress Integration" width="100%" height="auto" style="aspect-ratio: 16/9;" />
-  <figcaption>Supabase WordPress Integration</figcaption>
-</figure>
 
 Integrating Supabase with WordPress offers a modern, scalable way to enhance your WordPress site with powerful backend capabilities such as user authentication and real-time data handling. Let's see how this integration is done.
 
 Get the plugin: https://techcater.com
 <br>
 Demo Video: https://www.youtube.com/watch?v=BewjtbcFZ3M
-
-- Part 1: **[SupaWP Plugin Overview](blog/2025-04-19-supabase-wordpress-integration-supawp-plugin)**
-- Part 2: [Save Users Data](blog/2025-04-28-supabase-wordpress-integration-save-users-data)
-- Part 3: [Enable Google Login](blog/2025-05-10-supabase-wordpress-integration-enable-google-login)
 
 ## Why Integrate Supabase with WordPress?
 

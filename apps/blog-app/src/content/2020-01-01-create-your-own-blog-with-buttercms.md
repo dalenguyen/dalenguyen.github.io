@@ -9,8 +9,6 @@ published: 2020-01-01
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/CeKKiyuaT4uG71yRTmoN" alt="Create Your Own Blog with ButterCMS" width="100%" />
-
 I wrote a bunch of articles, and somehow I wanted to have a blog on my personal website. I tried to get posts from DEV.TO and display them on my personal website, and it worked perfectly well. However, DEV.TO is a platform for software engineer sharing experience only, and I want more than that.
 
 Then here it comes - ButterCMS, a headless CMS. It's a paid system. However, it's free for Developer (yay!!).

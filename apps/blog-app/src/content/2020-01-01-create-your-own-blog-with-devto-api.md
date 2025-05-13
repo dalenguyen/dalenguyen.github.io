@@ -9,8 +9,6 @@ published: 2020-01-01
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/Sz4nZne1Rky8h9H7qj0b" alt="Create Your Own Blog with DevTO API" width="100%" />
-
 I joined DevTO since June 2019. It's quite an interesting platform where programmers share ideas and help each other grow. It is an online community for sharing and discovering great ideas, having debates, and making friends. Anyone can share articles, questions, discussions, etc. as long as they have the rights to the words they are sharing. Cross-posting from your own blog is welcome - quote from the About page.
 
 I wrote a few posts on the platform and I actually like it. And more intriguing, I discovered their API (beta version), which allows me to get the articles in JSON format.
@@ -31,7 +29,7 @@ I try to make it simple and readable on every different device. You can do some 
 
 The endpoint where I can get all the articles is Published articles. With the parameter "username", I can return all the articles written by me.
 
-```
+```bash
 https://dev.to/api/articles?username=dalenguyen
 ```
 

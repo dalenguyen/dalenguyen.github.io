@@ -9,8 +9,6 @@ published: 2020-01-27
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/Fca7jZuD12WBjML7ucCOJ" alt="Why I Moved My Website From Github Pages to Heroku - with a Cost" width="100%" />
-
 As you may or may not know, I built my personal website as a Single Page Application (SPA) with the Angular framework and hosted on Github Pages. Everything works great until I integrated a Blog feature on my personal website. Things were getting ugly for search engine optimization (SEO) and social media preview.
 
 ### Login to Heroku

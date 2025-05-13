@@ -9,8 +9,6 @@ published: '2020-01-04'
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/fQW7f9rvQnQLox2ztA1L" width="100%" alt="Update Angular to Version 9" />
-
 This is a new year project: update my personal website from Angular 8x to Angular 9. The process is very easy with only 2 commands from @angular/cli.
 
 ## Update Angular CLI

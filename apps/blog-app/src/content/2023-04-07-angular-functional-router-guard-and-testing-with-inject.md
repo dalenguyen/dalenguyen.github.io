@@ -9,8 +9,6 @@ published: 2023-04-07
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/EBYGJWB9TOSPLblq2Qma" alt="Angular functional router guard and testing with inject()" width="100%" height="auto" style="aspect-ratio: 16/9;" />
-
 In Angular, guards are a fundamental feature that protects routes within an application. Guards check if certain conditions are met before allowing users to access specific routes. Guards can be used for authentication and authorization, role-based access control, feature flag checks, and more.
 
 Angular provides several types of guards that can be used for different purposes, such as canActivate, canActivateChild, canDeactivate, and canLoad. These guards are defined as classes that implement specific interfaces provided by the Angular framework. When a guard is added to the canActivate array of a route, it is invoked before allowing the user to navigate to the desired route.

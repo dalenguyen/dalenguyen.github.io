@@ -1,5 +1,5 @@
 ---
-title: Building PDF Open Source Services with Angular & GCP — Deploy Services to Cloud Run
+title: Building PDF Open Source Services with Angular & GCP - Deploy Services to Cloud Run
 slug: 2024-06-08-building-open-source-pdf-services-with-angular-and-gcp-deploy-services-to-cloud-run
 description: Welcome to the first part of the journey in building open source PDF service using Angular (Analogjs), Firestore, Cloud Storage, and CloudRun. This project serves as a platform for sharing my knowledge, continually learning best practices, and simultaneously contributing to the community.
 categories: ['angular', 'tutorial', 'gcp']
@@ -7,19 +7,10 @@ coverImage: https://dalenguyen.me/assets/images/blog/angular-pdf-service.webp
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2024-06-08T15:17:31.359Z
 author: Dale Nguyen
+series: PDFun - Open Source PDF Services
 ---
 
-<figure>
-  <img src="assets/images/blog/angular-pdf-service.webp" alt="PDFun — Open Source PDF Services" width="100%" height="auto" style="aspect-ratio: 16/9;" />
-  <figcaption>PDFun — Open Source PDF Services</figcaption>
-</figure>
-
 Welcome to the first part of the journey in building open source PDF service using Angular (Analogjs), Firestore, Cloud Storage, and CloudRun. This project serves as a platform for sharing my knowledge, continually learning best practices, and simultaneously contributing to the community.
-
-- Part 1: [Architecture Overview](blog/2024-06-03-building-open-source-pdf-services-with-angular-and-gcp-architecture-overview)
-- Part 2: **[Deploy services to Cloud Run](blog/2024-06-08-building-open-source-pdf-services-with-angular-and-gcp-deploy-services-to-cloud-run)**
-- Part 3: [Handling long processing tasks](blog/2024-07-06-building-open-source-pdf-services-with-angular-and-gcp-handling-long-processing-tasks)
-- Part 4: [PDF AI Chat](blog/2025-03-10-building-open-source-pdf-services-with-angular-and-gcp-pdf-ai-chat)
 
 Demo: <https://pdfun.xyz>
 
@@ -27,8 +18,8 @@ GitHub - [dalenguyen/pdfun](https://github.com/dalenguyen/pdfun)
 
 The solution is built around GCP ecosystem, it’s better to deploy the project on GCP, so it can access their services. There are two parts of the solution:
 
-- Web UI (Analogjs — Angular): handle user interaction
-- Backend (Node — Express): process PDF files
+- Web UI (Analogjs - Angular): handle user interaction
+- Backend (Node - Express): process PDF files
 
 ## Why Deploy to Cloud Run?
 

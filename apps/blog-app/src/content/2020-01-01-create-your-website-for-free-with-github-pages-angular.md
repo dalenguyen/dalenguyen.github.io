@@ -1,5 +1,5 @@
 ---
-title: Create Your Website For FREE with Github Pages — Angular
+title: Create Your Website For FREE with Github Pages - Angular
 slug: 2020-01-01-create-your-website-for-free-with-github-pages-angular
 description: In the previous post, I show you how to do some research in order to have a glimpse of how to research for your own website - such as a portfolio website. Today, you will know to create a sample Angular site and host in on Github Pages.
 categories: ['webdev', 'tutorial', 'angular', 'github']
@@ -9,11 +9,9 @@ published: 2020-01-01
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/0vHe9sB4SxdVtmbqqOml" alt="Create Your Website For FREE with Github Pages — Angular" width="100%" />
-
 In the previous post, I show you how to do some research in order to have a glimpse of how to research for your own website - such as a portfolio website. Today, you will know to create a sample Angular site and host in on Github Pages.
 
-Github is great for storing and sharing projects. And if you may not know, Github can also host your websites — for FREE with some limitations. That's why you shouldn't use it to run online business or e-commerce site.
+Github is great for storing and sharing projects. And if you may not know, Github can also host your websites - for FREE with some limitations. That's why you shouldn't use it to run online business or e-commerce site.
 
 - GitHub Pages source repositories have a recommended limit of 1GB.
 - Published GitHub Pages sites may be no larger than 1 GB.
@@ -46,7 +44,7 @@ Form now, you can access your website. Is it fascinating!!!
 
 ![github pages works.png](https://cdn.buttercms.com/v4FS2DI0Q5mPeCsZT21O)
 
-After this moment, it's totally depends on your imagination and skills — modify index.html file and push it back to master → DONE.
+After this moment, it's totally depends on your imagination and skills - modify index.html file and push it back to master → DONE.
 
 ## Building Github Pages with Angular Project
 
@@ -89,4 +87,4 @@ Yay, my angular project is being deployed to Github pages!!!
 
 This is the final step, we need to update the default branch to dev because the master branch will have production files. Dev branch will give you a better understanding of the project.
 
-You may take a look at my [Github](https://github.com/dalenguyen/dalenguyen.github.io) — the real project may not be updated yet :)
+You may take a look at my [Github](https://github.com/dalenguyen/dalenguyen.github.io) - the real project may not be updated yet :)

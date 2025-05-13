@@ -7,12 +7,8 @@ coverImage: https://dalenguyen.me/assets/images/blog/ezcease-hero-image.webp
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2025-03-27T15:17:31.359Z
 author: Dale Nguyen
+series: EczEase
 ---
-
-<figure>
-  <img src="assets/images/blog/ezcease-hero-image.webp" alt="anage eczema and food allergies, leveraging the power of artificial intelligence" width="100%" height="auto" style="aspect-ratio: 16/9;" />
-  <figcaption>Manage eczema and food allergies, leveraging the power of artificial intelligence</figcaption>
-</figure>
 
 In the ever-evolving landscape of health technology, I'm thrilled to announce my latest open-source project: [EczEase](https://github.com/dalenguyen/eczease). This innovative platform aims to transform the way people manage eczema and food allergies, leveraging the power of artificial intelligence and modern web technologies. As someone who has witnessed the challenges faced by loved ones battling these conditions, I'm passionate about creating a solution that can make a real difference.
 
@@ -20,14 +16,7 @@ Web: https://eczeease.com
 <br>
 Github: https://github.com/dalenguyen/EczEase
 
-<br>
-
-- Part 1: [Introduction](blog/2025-03-22-building-eczease-with-cutting-edge-tech-introduction)
-- Part 2: **[Build Landing Page](blog/2025-03-27-building-eczease-with-cutting-edge-tech-build-landing-page)**
-
-<br>
-
-> Looking for immediate help with allergy-friendly meal planning? Try 🍽️ **[SafePlate.ai (Beta)](https://SafePlate.ai)** — an iOS app designed to make dining safer and more enjoyable for people with food allergies.
+> Looking for immediate help with allergy-friendly meal planning? Try 🍽️ **[SafePlate.ai (Beta)](https://SafePlate.ai)** - an iOS app designed to make dining safer and more enjoyable for people with food allergies.
 
 In the article, I will share the process on how to build a landing page for the project.
 

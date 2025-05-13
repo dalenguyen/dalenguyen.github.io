@@ -9,11 +9,6 @@ published: 2025-03-15T15:17:31.359Z
 author: Dale Nguyen
 ---
 
-<figure>
-  <img src="assets/images/blog/perfonal-blog-after.png" alt="Final improvement for my personal blog" width="100%" height="auto" style="aspect-ratio: 16/9;" />
-  <figcaption>Final improvement for my personal blog</figcaption>
-</figure>
-
 As developers, we often find ourselves in a cycle of continuous improvement, especially when it comes to our personal projects. For me, revamping my personal blog has become a recurring theme, each iteration serving as a valuable learning experience. This latest setup marks a significant leap forward, addressing previous challenges while embracing new technologies that enhance both functionality and productivity.
 
 > Check out the [Github repo](https://github.com/dalenguyen/dalenguyen.github.io) of this project.

@@ -9,8 +9,6 @@ published: '2020-01-18'
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/cYd5lSDMRBmI6tCiPTbh" width="100%" alt="Angular End To End (e2e) Testing With Cypress.io" />
-
 An End to End Test is a methodology used to test an application from a user's perspective. It ensures that the application behaves as expected from the beginning to the end. I usually run it after fixing a bug or adding new features to ensure that nothing breaks.
 
 ## What is Cypress.io?

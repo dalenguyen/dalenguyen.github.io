@@ -9,27 +9,25 @@ published: 2023-02-16
 author: Dale Nguyen
 ---
 
-<img src="https://cdn.buttercms.com/yG2XmIpRCYbQcu8VPCWg" alt="Ultimate Local Development Setup with Angular, Firebase & Stripe" width="100%" />
-
 Building an eCommerce website is a complicated task. Especially when you have different services that need to communicate with each other. Here is the scenario where you don't have everything ready locally for development.
 
 As in the title, the stacks that use to create an eCommerce site are:
 
-- [Angular](https://angular.io/) — frontend
-- [Firebase](https://firebase.google.com/) — authentication + database + storage + API
-- [Stripe](https://stripe.com/en-ca) — payment handling
+- [Angular](https://angular.io/) - frontend
+- [Firebase](https://firebase.google.com/) - authentication + database + storage + API
+- [Stripe](https://stripe.com/en-ca) - payment handling
 
 ### Without Local Development Ability
 
 Most of the reasons why you should set up the local development is **TIME SAVING**, and **TIME** is $$$.
 
 - Authentication is done directly to your firebase project
-- If you are using Webhook, cloud functions deployment takes time & money — especially for starters
+- If you are using Webhook, cloud functions deployment takes time & money - especially for starters
 - Database activities are eating your free tire— and you shouldn't work with production data
 
 ### Without Local Development Ability
 
-What happens in Local, Stays in Local — not for Stripe payment record for development.
+What happens in Local, Stays in Local - not for Stripe payment record for development.
 
 ## Angular & Firebase Emulators Setup
 
