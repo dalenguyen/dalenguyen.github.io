@@ -1,7 +1,7 @@
 ---
 title: Building PDF Open Source Services with Angular & GCP - Architecture Overview
 slug: 2024-06-03-building-open-source-pdf-services-with-angular-and-gcp-architecture-overview
-description: Welcome to the first part of the journey in building open source PDF service using Angular (Analogjs), Firestore, Cloud Storage, and CloudRun. This project serves as a platform for sharing my knowledge, continually learning best practices, and simultaneously contributing to the community.
+description: Welcome to the journey of building open source PDF service using Angular (Analogjs), Firestore, Cloud Storage, and CloudRun. This project serves as a platform for sharing my knowledge, continually learning best practices, and simultaneously contributing to the community.
 categories: ['angular', 'tutorial', 'gcp']
 coverImage: https://dalenguyen.me/assets/images/blog/angular-pdf-service.webp
 profileImage: assets/images/dale-nguyen-avatar.webp
