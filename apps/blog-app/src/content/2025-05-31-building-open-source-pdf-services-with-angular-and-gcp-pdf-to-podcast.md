@@ -5,7 +5,7 @@ description: Welcome to the journey of building open source PDF service using An
 categories: ['angular', 'tutorial', 'gcp']
 coverImage: https://dalenguyen.me/assets/images/blog/angular-pdf-service.webp
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2025-05-26T15:17:31.359Z
+published: 2025-05-31T13:17:31.359Z
 author: Dale Nguyen
 series: PDFun - Open Source PDF Services
 ---
