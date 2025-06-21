@@ -112,7 +112,7 @@ export class SentryErrorHandler implements ErrorHandler {
         <div class="h-20 mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8 flex items-center justify-center">
           <div class="border-t border-slate-900/5 w-full">
             <p class="text-center text-sm leading-6 text-slate-500">
-              Dale Nguyen © 2024 - By using Angular
+              Dale Nguyen © 2025 - By using Angular 19
             </p>
           </div>
         </div>
