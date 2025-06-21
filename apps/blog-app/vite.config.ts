@@ -83,7 +83,7 @@ export default defineConfig(({ mode }) => ({
       },
       content: {
         prismOptions: {
-          additionalLangs: ['diff', 'sql', 'markdown', 'yaml'],
+          additionalLangs: ['diff', 'sql', 'markdown', 'yaml', 'cron'],
         },
       },
     }),

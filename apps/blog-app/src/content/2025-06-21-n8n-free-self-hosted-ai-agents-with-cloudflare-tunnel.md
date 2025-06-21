@@ -79,6 +79,11 @@ docker-compose up -d
 
 This starts n8n locally on port 5678 with basic authentication enabled.
 
+<figure>
+  <img src="assets/images/blog/n8n-first-login-screen.png" alt="n8n first login screen" width="100%" height="auto" />
+  <figcaption>n8n first login screen</figcaption>
+</figure>
+
 ---
 
 ## Step 2: Install and Configure Cloudflare Tunnel
@@ -126,6 +131,13 @@ cloudflared tunnel run n8n-tunnel --url http://localhost:5678
 ```
 
 You can also run this as a systemd service for persistence.
+
+After that, you can access your n8n workflow everywhere using your subdomain.
+
+<figure>
+  <img src="assets/images/blog/n8n-cloudflared-logged-in.png" alt="n8n cloudflared logged in" width="100%" height="auto" />
+  <figcaption>n8n cloudflared logged in</figcaption>
+</figure>
 
 ---
 
