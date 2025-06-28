@@ -10,7 +10,7 @@ series: N8N Workflow Automation
 author: Dale Nguyen
 ---
 
-Self-hosting n8n offers flexibility and privacy, but exposing both the UI and webhooks to the public internet can create security risks. The best practice is to **separate your webhook endpoints and management/control panel (MCP) from the n8n login UI**, and apply different security measures to each. Here's a practical guide on how to do this using Cloudflare Tunnel, subdomains, and access controls.
+Self-hosting n8n offers flexibility and privacy, but exposing both the UI and webhooks to the public internet can create security risks. The best practice is to **separate your webhook endpoints and MCP (Model Context Protocol) from the n8n login UI**, and apply different security measures to each. Here's a practical guide on how to do this using Cloudflare Tunnel, subdomains, and access controls.
 
 > For those who want to jump straight to the code, I've created a starter template repository on GitHub. It includes all the configurations and scripts mentioned in this guide.
 >
