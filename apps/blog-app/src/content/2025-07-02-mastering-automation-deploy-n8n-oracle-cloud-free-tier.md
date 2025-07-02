@@ -78,6 +78,34 @@ This guide assumes you have an Oracle Cloud Free Tier account created, a domain 
     - **Boot Volume:** The default 50GB is usually sufficient for n8n.
 5.  Click **"Create"**. Wait for the instance to provision and become "Running".
 
+### Map Your Domain to Your Oracle Cloud Instance
+
+Before you can access your n8n instance using a custom domain (like `n8n.yourdomain.com`), you need to point your domain to your Oracle Cloud instance's public IP address. This is done by creating an **A record** in your domain's DNS settings.
+
+**Steps:**
+
+1. **Find your instance's public IP:**
+
+   - In the Oracle Cloud Console, go to your instance details and note the "Public IP Address" (e.g., `40.233.98.119`).
+
+2. **Log in to your domain registrar or DNS provider:**
+
+   - This could be Namecheap, GoDaddy, Cloudflare, Google Domains, etc.
+
+3. **Add an A record:**
+
+   - **Type:** A
+   - **Name/Host:** `n8n` (or the subdomain you want to use)
+   - **Value:** Your Oracle Cloud instance's public IP (e.g., `40.233.98.119`)
+   - **TTL:** Default or 5-10 minutes
+
+   For example, to use `n8n.yourdomain.com`, set the **Name/Host** to `n8n` and the **Value** to your instance's public IP.
+
+4. **Wait for DNS propagation:**
+   - Changes usually take a few minutes, but can take up to 24 hours. You can check if your domain points to the correct IP using tools like [Dig from Google Toolbox](https://toolbox.googleapps.com/apps/dig/).
+
+Once this is set up, visiting `http://n8n.yourdomain.com` in your browser should reach your Oracle Cloud instance (after Nginx is configured in the next steps).
+
 ### 2. Configure OCI Network Security (Firewall Rules)
 
 Even with `iptables` and UFW on the instance, OCI's network security groups (NSGs) or security lists act as a critical outer firewall.
