@@ -365,7 +365,7 @@ Now, we'll set up n8n with a PostgreSQL database using Docker Compose.
           DB_POSTGRESDB_USER: n8nuser
           DB_POSTGRESDB_PASSWORD: your_strong_database_password # MUST MATCH ABOVE!
           N8N_HOST: n8n.yourdomain.com # CHANGE THIS to your actual domain
-          WEBHOOK_URL: https://n8n.yourdomain.com/ # CHANGE THIS to your actual domain
+          WEBHOOK_URL: https://n8n.yourdomain.com # CHANGE THIS to your actual domain
           N8N_PROTOCOL: https
           GENERIC_TIMEZONE: America/Toronto # Adjust to your timezone
           N8N_ENCRYPTION_KEY: your_generated_32_char_key # PASTE THE GENERATED KEY HERE
@@ -475,6 +475,8 @@ Finally, tell Nginx to forward traffic from your domain to the running n8n conta
   - **Fix:** Double-check all environment variables in `docker-compose.yml`, especially database passwords and the 32-character encryption key. Add a `healthcheck` for the database service and `depends_on: { postgres: { condition: service_healthy } }` for n8n.
 
 ## Backup and Restore Strategy
+
+> **See also:** [Comprehensive backup & restore scripts and automation for n8n on Oracle Cloud (GitHub)](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter/tree/main/platforms/oracle-cloud)
 
 **Regular backups are crucial for self-hosted n8n!**
 
