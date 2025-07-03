@@ -14,7 +14,7 @@ Self-hosting n8n offers flexibility and privacy, but exposing both the UI and we
 
 > For those who want to jump straight to the code, I've created a starter template repository on GitHub. It includes all the configurations and scripts mentioned in this guide.
 >
-> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter)**
+> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-starter)**
 
 ## Why Separate Webhooks from the n8n UI?
 
@@ -111,6 +111,6 @@ Webhooks often need to be public, but you can still apply protection:
 
 By **separating your n8n UI and webhook endpoints onto different subdomains** and applying tailored security controls, you dramatically reduce the risk of unauthorized access to your automation platform. Use Cloudflare Tunnel and Access for the UI, and firewall/token protections for webhooks. For advanced setups, a reverse proxy like Traefik or Caddy can help route and isolate traffic internally.
 
-> For a detailed, step-by-step configuration, see guides like [dalenguyen's n8n Cloudflare starter](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter/blob/main/CLOUDFLARE_SETUP.md) and community write-ups on Cloudflare Zero Trust.
+> For a detailed, step-by-step configuration, see guides like [dalenguyen's n8n Cloudflare starter](https://github.com/dalenguyen/n8n-self-hosted-starter/blob/main/CLOUDFLARE_SETUP.md) and community write-ups on Cloudflare Zero Trust.
 
 Secure automating!

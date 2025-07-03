@@ -14,7 +14,7 @@ With recent versions of n8n, you can launch your own Model Context Protocol (MCP
 
 > For those who want to jump straight to the code, I've created a starter template repository on GitHub. It includes all the configurations and scripts mentioned in this guide.
 >
-> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter)**
+> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-starter)**
 
 Below is a step-by-step guide to getting started.
 

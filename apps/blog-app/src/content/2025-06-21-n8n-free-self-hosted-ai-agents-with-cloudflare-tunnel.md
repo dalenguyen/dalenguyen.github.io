@@ -14,7 +14,7 @@ Self-hosting your AI agent workflows can give you full control, privacy, and cos
 
 > For those who want to jump straight to the code, I've created a starter template repository on GitHub. It includes all the configurations and scripts mentioned in this guide.
 >
-> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter)**
+> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-starter)**
 
 ---
 
@@ -225,6 +225,6 @@ By combining n8n, Docker, and Cloudflare Tunnel, you can:
 - Use your own domain with Cloudflare DNS
 - Keep costs near zero aside from your device and internet
 - Easily back up and maintain your workflows
-- Get started quickly with the **[companion GitHub repository](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter)**.
+- Get started quickly with the **[companion GitHub repository](https://github.com/dalenguyen/n8n-self-hosted-starter)**.
 
 This approach is ideal for hobbyists, small businesses, and privacy-conscious users wanting full control over their AI agent workflows.

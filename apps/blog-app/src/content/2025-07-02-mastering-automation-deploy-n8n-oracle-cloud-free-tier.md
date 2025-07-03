@@ -12,7 +12,7 @@ author: Dale Nguyen
 
 > For those who want to jump straight to the code, I've created a starter template repository on GitHub. It includes all the configurations and scripts mentioned in this guide.
 >
-> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter)**
+> **[n8n-self-hosted-cloudflare-starter on GitHub](https://github.com/dalenguyen/n8n-self-hosted-starter)**
 
 In a previous article, we explored running n8n locally and exposing it to the internet using a Cloudflare Tunnel. This approach is great for quick setups, testing, or personal use, as it allows you to keep your workflows private and avoid complex network configurations. However, it comes with a major limitation: your server or laptop must remain powered on and connected to the internet at all times for your automations to work. This can be inconvenient, less reliable for production use, and may not be suitable for 24/7 automation needs.
 
@@ -476,7 +476,7 @@ Finally, tell Nginx to forward traffic from your domain to the running n8n conta
 
 ## Backup and Restore Strategy
 
-> **See also:** [Comprehensive backup & restore scripts and automation for n8n on Oracle Cloud (GitHub)](https://github.com/dalenguyen/n8n-self-hosted-cloudflare-starter/tree/main/platforms/oracle-cloud)
+> **See also:** [Comprehensive backup & restore scripts and automation for n8n on Oracle Cloud (GitHub)](https://github.com/dalenguyen/n8n-self-hosted-starter/tree/main/platforms/oracle-cloud)
 
 **Regular backups are crucial for self-hosted n8n!**
 
