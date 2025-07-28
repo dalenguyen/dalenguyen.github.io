@@ -135,7 +135,7 @@ ssr: {
 
 Analog.js uses file-based routing similar to Next.js, which significantly simplifies route management:
 
-```
+```bash
 pages/
 ├── (home).page.ts              # Route: /
 ├── jobs/
