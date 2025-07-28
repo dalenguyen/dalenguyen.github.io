@@ -33,7 +33,7 @@ Unlike traditional Angular applications, Analog.js eliminates much of the config
 
 TechLeadPilot is built as an Nx monorepo with the following structure:
 
-```
+```bash
 techleadpilot/
 ├── landing/                    # Analog.js application
 │   ├── src/
