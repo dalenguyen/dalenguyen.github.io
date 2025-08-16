@@ -49,8 +49,6 @@ These seem like learnable skills, but I'd rather practice them in a simulator th
 
 ## The tech stack
 
-Since this is dev.to:
-
 - **Frontend**: Angular with Analog.js for SSR
 - **Backend**: Node.js API routes
 - **Database**: Firestore for user data and simulation results
