@@ -56,7 +56,7 @@
     "@angular/router": "19.1.7",
     "@angular/ssr": "19.1.5",
     "@google-cloud/functions-framework": "^3.2.0",
-    "@nestjs/common": "9.4.0",
+    "@nestjs/common": "10.4.16",
     "@nestjs/config": "^2.3.2",
     "@nestjs/core": "9.4.0",
     "@nestjs/platform-express": "9.4.0",
