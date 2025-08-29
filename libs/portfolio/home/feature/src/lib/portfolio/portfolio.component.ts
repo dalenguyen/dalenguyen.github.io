@@ -79,6 +79,21 @@ export class PortfolioComponent {
   portfolioItems: PortfolioItem[] = [
     {
       id: 1,
+      title: 'DailyMastery (Learning Platform)',
+      description:
+        'A comprehensive learning platform designed to help users master new skills through daily practice and structured learning paths. Built with modern web technologies to provide an engaging and effective learning experience.',
+      imageUrl: 'assets/images/home/dailymastery.png',
+      technologies: [
+        { name: 'Next.js', icon: 'code' },
+        { name: 'Nx', icon: 'layers' },
+        { name: 'Firebase', icon: 'cloud' },
+        { name: 'TailwindCSS', icon: 'style' },
+        { name: 'GCP', icon: 'cloud' },
+      ],
+      projectUrl: 'https://dailymastery.io',
+    },
+    {
+      id: 2,
       title: 'TechLeadPilot (Leadership Simulator)',
       description:
         'A leadership simulator that puts you in realistic Tech Lead scenarios before you actually have to face them. Practice soft skills like navigating office politics, motivating team members, and making decisions under pressure.',
@@ -94,7 +109,7 @@ export class PortfolioComponent {
       projectUrl: 'https://techleadpilot.com',
     },
     {
-      id: 2,
+      id: 3,
       title: 'Techcater (E-Commerce Platform)',
       description:
         'A WordPress plugin marketplace offering premium extensions on a subscription model with automated license management and seamless updates.',
@@ -111,7 +126,7 @@ export class PortfolioComponent {
       projectUrl: 'https://techcater.com',
     },
     {
-      id: 3,
+      id: 4,
       title: 'LogiChat (AI Chatbot)',
       description: 'Automate your customer support with the next generation natural language processing technology',
       imageUrl: 'assets/images/home/logichat.png',
@@ -129,7 +144,7 @@ export class PortfolioComponent {
       projectUrl: 'https://logichat.io',
     },
     {
-      id: 4,
+      id: 5,
       title: 'PDFun (Open Source PDF Services)',
       description: 'A collection of open source services for PDF processing, Password removal, PDF AI chat, and more.',
       imageUrl: 'assets/images/home/pdfun.png',
@@ -144,7 +159,7 @@ export class PortfolioComponent {
       projectUrl: 'https://pdfun.xyz',
     },
     {
-      id: 5,
+      id: 6,
       title: 'SafePlate (AI Meal Planner)',
       description:
         'Generate personalized meals that avoid allergens and incorporate your favorite ingredients, promoting a healthy lifestyle with our advanced AI technology. Eat safely, live confidently.',
