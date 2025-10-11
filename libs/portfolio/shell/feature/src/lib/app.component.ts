@@ -1,4 +1,4 @@
-import { CommonModule, isPlatformBrowser } from '@angular/common'
+import { isPlatformBrowser } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -25,7 +25,7 @@ export class SentryErrorHandler implements ErrorHandler {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-root',
-  imports: [MatIconModule, RouterModule, RouterLink, FooterComponent, CommonModule],
+  imports: [MatIconModule, RouterModule, RouterLink, FooterComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
   <div class="flex flex-col min-h-screen">
@@ -41,24 +41,25 @@ export class SentryErrorHandler implements ErrorHandler {
               </a>
             </div>
           </div>
-
+  
           <!-- Desktop Navigation -->
           <nav class="hidden md:flex items-center space-x-4">
-            <a
-              *ngFor="let item of navItems"
-              [id]="item.id + '-link'"
-              [routerLink]="item.route"
-              [fragment]="item.fragment"
-              [class.text-white]="isActive(item.id)"
-              [class.text-slate-300]="!isActive(item.id)"
-              class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
-              (click)="setActive(item.id)"
-            >
-              <mat-icon class="w-5 h-5 mr-1 text-current">{{ item.icon }}</mat-icon>
-              {{ item.label }}
-            </a>
+            @for (item of navItems; track item) {
+              <a
+                [id]="item.id + '-link'"
+                [routerLink]="item.route"
+                [fragment]="item.fragment"
+                [class.text-white]="isActive(item.id)"
+                [class.text-slate-300]="!isActive(item.id)"
+                class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
+                (click)="setActive(item.id)"
+                >
+                <mat-icon class="w-5 h-5 mr-1 text-current">{{ item.icon }}</mat-icon>
+                {{ item.label }}
+              </a>
+            }
           </nav>
-
+  
           <!-- Mobile menu button - Only rendered on client -->
           <div class="flex md:hidden items-center">
             <button
@@ -66,58 +67,65 @@ export class SentryErrorHandler implements ErrorHandler {
               class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               (click)="toggleMobileMenu()"
               aria-label="Toggle mobile menu"
-            >
+              >
               <span class="sr-only">Open main menu</span>
               <!-- Icon when menu is closed -->
-              <mat-icon *ngIf="!isMobileMenuOpen()" class="block h-6 w-6">menu</mat-icon>
+              @if (!isMobileMenuOpen()) {
+                <mat-icon class="block h-6 w-6">menu</mat-icon>
+              }
               <!-- Icon when menu is open -->
-              <mat-icon *ngIf="isMobileMenuOpen()" class="block h-6 w-6">close</mat-icon>
+              @if (isMobileMenuOpen()) {
+                <mat-icon class="block h-6 w-6">close</mat-icon>
+              }
             </button>
           </div>
         </div>
       </div>
-
+  
       <!-- Mobile menu, show/hide based on menu state -->
-      <div class="md:hidden" *ngIf="isMobileMenuOpen()">
-        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-          <a
-            *ngFor="let item of navItems"
-            [id]="item.id + '-mobile-link'"
-            [routerLink]="item.route"
-            [fragment]="item.fragment"
-            [class.bg-slate-900]="isActive(item.id)"
-            [class.text-white]="isActive(item.id)"
-            [class.text-slate-300]="!isActive(item.id)"
-            class="px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
-            (click)="setActive(item.id); toggleMobileMenu()"
-          >
-            <mat-icon class="w-5 h-5 mr-2 text-current">{{ item.icon }}</mat-icon>
-            {{ item.label }}
-          </a>
+      @if (isMobileMenuOpen()) {
+        <div class="md:hidden">
+          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+            @for (item of navItems; track item) {
+              <a
+                [id]="item.id + '-mobile-link'"
+                [routerLink]="item.route"
+                [fragment]="item.fragment"
+                [class.bg-slate-900]="isActive(item.id)"
+                [class.text-white]="isActive(item.id)"
+                [class.text-slate-300]="!isActive(item.id)"
+                class="px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
+                (click)="setActive(item.id); toggleMobileMenu()"
+                >
+                <mat-icon class="w-5 h-5 mr-2 text-current">{{ item.icon }}</mat-icon>
+                {{ item.label }}
+              </a>
+            }
+          </div>
         </div>
-      </div>
+      }
     </header>
-
+  
     <!-- Main content with flex-grow to push footer down -->
     <main class="flex-grow flex flex-col h-full">
       <router-outlet />
     </main>
-
+  
     <!-- Footer - Using @defer to load after main content -->
     <footer>
       @defer (on immediate) {
-        <dalenguyen-footer/>
+      <dalenguyen-footer/>
       } @placeholder {
-        <!-- Empty placeholder with same height to prevent layout shift -->
-        <div class="h-20 mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-          <div class="border-t border-slate-900/5 w-full">
-            <p class="text-center text-sm leading-6 text-slate-500">
-              Dale Nguyen © 2025 - By using Angular 19
-            </p>
-          </div>
+      <!-- Empty placeholder with same height to prevent layout shift -->
+      <div class="h-20 mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8 flex items-center justify-center">
+        <div class="border-t border-slate-900/5 w-full">
+          <p class="text-center text-sm leading-6 text-slate-500">
+            Dale Nguyen © 2025 - By using Angular 19
+          </p>
         </div>
-      }
-    </footer>
+      </div>
+    }
+  </footer>
   </div>
   `,
 })

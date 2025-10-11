@@ -3,14 +3,15 @@
   <span>{{ article ? article?.slug : 'article-not-found' }}</span>
 </div>
 
-<div id="post" *ngIf="article">
-  <header>
-    <h1>{{ article.title }}</h1>
-    <p>
-      {{ article ? 'Written by ' + article?.author.first_name : '' }}
-    </p>
-    <p>{{ article?.published | date }}</p>
-  </header>
-
-  <article [innerHTML]="article?.body"></article>
-</div>
+@if (article) {
+  <div id="post">
+    <header>
+      <h1>{{ article.title }}</h1>
+      <p>
+        {{ article ? 'Written by ' + article?.author.first_name : '' }}
+      </p>
+      <p>{{ article?.published | date }}</p>
+    </header>
+    <article [innerHTML]="article?.body"></article>
+  </div>
+}
