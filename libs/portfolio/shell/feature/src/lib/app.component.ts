@@ -128,10 +128,6 @@ export class AppComponent {
   isMobileMenuOpen = signal(false)
   activeEl = signal('intro')
 
-  constructor() {
-    console.log('[AppComponent] Constructor - Platform:', typeof window !== 'undefined' ? 'BROWSER' : 'SERVER')
-  }
-
   // Navigation items with their icons, routes and fragments
   navItems = [
     {
@@ -172,9 +168,7 @@ export class AppComponent {
   ]
 
   toggleMobileMenu(): void {
-    console.log('[toggleMobileMenu] Called! Current state:', this.isMobileMenuOpen())
     this.isMobileMenuOpen.update((value) => !value)
-    console.log('[toggleMobileMenu] New state:', this.isMobileMenuOpen())
   }
 
   setActive(id: string): void {
