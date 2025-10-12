@@ -1,60 +1,48 @@
 /// <reference types="vitest" />
 
-import analog, { type PrerenderContentFile } from '@analogjs/platform'
-import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
-import { PrerenderRoute } from 'nitropack'
-import { defineConfig } from 'vite'
+import analog, { type PrerenderContentFile } from '@analogjs/platform';
+import { defineConfig } from 'vite';
+import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { PrerenderRoute } from 'nitropack';
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => ({
-  root: __dirname,
-  publicDir: '../../libs/portfolio/shared',
-  build: {
-    // outDir: '../../dist/apps/blog-app/client',
-    reportCompressedSize: true,
-    commonjsOptions: { transformMixedEsModules: true },
-    target: ['es2022'],
-  },
-  resolve: {
-    mainFields: ['module'],
-  },
-  server: {
-    fs: {
-      allow: ['.', '../../libs/portfolio'],
+export default defineConfig(({ mode }) => {
+  return {
+    root: __dirname,
+    publicDir: '../../libs/portfolio/shared',
+    cacheDir: `../../node_modules/.vite`,
+    build: {
+      outDir: '../../dist/apps/blog-app/client',
+      reportCompressedSize: true,
+      target: ['es2020'],
     },
-  },
-  plugins: [
-    nxViteTsPaths(),
-    analog({
-      nitro: {
-        preset: 'vercel',
+    server: {
+      fs: {
+        allow: ['.', '../../libs/portfolio'],
       },
-      static: true,
-      ssr: true,
-      vite: {
-        tsconfig: 'apps/blog-app/tsconfig.app.json',
-        inlineStylesExtension: 'scss|sass|less|css',
-      },
-      prerender: {
-        routes: async () => [
-          '/',
-          '/blog',
-          {
-            contentDir: 'src/content',
-            transform: (file: PrerenderContentFile) => {
-              // do not include files marked as draft in frontmatter
-              if (file.attributes['draft']) {
-                return false
-              }
-              // use the slug from frontmatter if defined, otherwise use the files basename
-              const slug = file.attributes['slug'] || file.name
-              return `/blog/${slug}`
+    },
+    plugins: [
+      analog({
+        prerender: {
+          routes: async () => [
+            '/',
+            '/blog',
+            {
+              contentDir: 'src/content',
+              transform: (file: PrerenderContentFile) => {
+                // do not include files marked as draft in frontmatter
+                if (file.attributes['draft']) {
+                  return false;
+                }
+                // use the slug from frontmatter if defined, otherwise use the files basename
+                const slug = file.attributes['slug'] || file.name;
+                return `/blog/${slug}`;
+              },
             },
-          },
-        ],
-        postRenderingHooks: [
-          async (route: PrerenderRoute) => {
-            const gTag = `
+          ],
+          postRenderingHooks: [
+            async (route: PrerenderRoute) => {
+              const gTag = `
               <!-- Google tag (gtag.js) -->
               <script async src="https://www.googletagmanager.com/gtag/js?id=G-J6E8YSVG6N"></script>
               <script>
@@ -73,33 +61,31 @@ export default defineConfig(({ mode }) => ({
                       y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
                   })(window, document, "clarity", "script", "qwxn51l4s0");
               </script>
-            `
-            route.contents = route.contents?.concat(gTag)
+            `;
+              route.contents = route.contents?.concat(gTag);
+            },
+          ],
+          sitemap: {
+            host: 'https://dalenguyen.me/',
           },
-        ],
-        sitemap: {
-          host: 'https://dalenguyen.me/',
         },
-      },
-      content: {
-        prismOptions: {
-          additionalLangs: ['diff', 'sql', 'markdown', 'yaml', 'cron', 'nginx', 'php', 'tsx', 'dockerfile'],
+        content: {
+          prismOptions: {
+            additionalLangs: ['diff', 'sql', 'markdown', 'yaml', 'cron', 'nginx', 'php', 'tsx', 'dockerfile'],
+          },
         },
-      },
-    }),
-  ],
-  test: {
-    reporters: ['default'],
-    coverage: {
-      reportsDirectory: '../../coverage/apps/blog-app',
-      provider: 'v8',
+      }),
+      nxViteTsPaths(),
+    ],
+    test: {
+      globals: true,
+      environment: 'jsdom',
+      setupFiles: ['src/test.ts'],
+      include: ['**/*.spec.ts'],
+      reporters: ['default'],
     },
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['src/test.ts'],
-    include: ['**/*.spec.ts'],
-  },
-  define: {
-    'import.meta.vitest': mode !== 'production',
-  },
-}))
+    define: {
+      'import.meta.vitest': mode !== 'production',
+    },
+  };
+});

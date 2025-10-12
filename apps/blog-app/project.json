@@ -7,11 +7,12 @@
   "tags": ["type:app", "framework:angular", "scope:blog"],
   "targets": {
     "build": {
-      "executor": "@nx/vite:build",
-      "outputs": ["{options.outputPath}"],
+      "executor": "@analogjs/platform:vite",
       "options": {
         "configFile": "apps/blog-app/vite.config.ts",
-        "outputPath": "dist/apps/blog-app"
+        "main": "apps/blog-app/src/main.ts",
+        "outputPath": "dist/apps/blog-app/client",
+        "tsConfig": "apps/blog-app/tsconfig.app.json"
       },
       "defaultConfiguration": "production",
       "configurations": {
@@ -22,10 +23,11 @@
           "sourcemap": false,
           "mode": "production"
         }
-      }
+      },
+      "outputs": ["{workspaceRoot}/dist/apps/blog-app"]
     },
     "serve": {
-      "executor": "@nx/vite:dev-server",
+      "executor": "@analogjs/platform:vite-dev-server",
       "defaultConfiguration": "development",
       "options": {
         "buildTarget": "blog-app:build",

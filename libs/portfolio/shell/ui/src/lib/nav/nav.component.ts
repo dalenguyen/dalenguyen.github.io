@@ -1,4 +1,4 @@
-import { CommonModule, Location } from '@angular/common';
+import { CommonModule, Location } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { Router } from '@angular/router'
@@ -8,7 +8,6 @@ import { NavService } from './nav.service'
   selector: 'dalenguyen-nav',
   imports: [CommonModule, MatIconModule],
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss'],
 })
 export class NavComponent implements OnInit {
   private readonly navService = inject(NavService)
