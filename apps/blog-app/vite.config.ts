@@ -25,6 +25,9 @@ export default defineConfig(({ mode }) => {
       analog({
         ssr: mode === 'production', // Enable SSR only in production for prerendering
         static: true,
+        nitro: {
+          preset: 'vercel',
+        },
         vite: {
           // tsconfig: 'apps/blog-app/tsconfig.app.json',
           inlineStylesExtension: 'scss|sass|less|css',
