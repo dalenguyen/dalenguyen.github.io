@@ -2,7 +2,6 @@ import { bootstrapApplication } from '@angular/platform-browser'
 import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
 import 'zone.js'
 
-import 'prismjs/plugins/diff-highlight/prism-diff-highlight'
 import { appConfig } from './app/app.config'
 
 // Sentry.init({

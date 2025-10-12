@@ -75,7 +75,20 @@ export default defineConfig(({ mode }) => {
             : undefined,
         content: {
           prismOptions: {
-            additionalLangs: ['diff', 'sql', 'markdown', 'yaml', 'cron', 'nginx', 'php', 'tsx', 'dockerfile'],
+            additionalLangs: [
+              'diff',
+              'typescript',
+              'tsx',
+              'json',
+              'sql',
+              'markdown',
+              'yaml',
+              'nginx',
+              'php',
+              'docker',
+              'jsx',
+              'bash',
+            ],
           },
         },
       }),

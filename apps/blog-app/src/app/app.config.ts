@@ -6,6 +6,7 @@ import { ApplicationConfig, provideBrowserGlobalErrorListeners, provideZoneChang
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser'
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'
 import { withComponentInputBinding, withInMemoryScrolling, withRouterConfig } from '@angular/router'
+import 'prismjs/plugins/diff-highlight/prism-diff-highlight'
 
 export const appConfig: ApplicationConfig = {
   providers: [
