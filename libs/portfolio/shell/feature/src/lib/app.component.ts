@@ -1,14 +1,4 @@
-import { isPlatformBrowser } from '@angular/common'
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component,
-  ErrorHandler,
-  inject,
-  Injectable,
-  PLATFORM_ID,
-  signal,
-} from '@angular/core'
+import { ChangeDetectionStrategy, Component, ErrorHandler, inject, Injectable, signal } from '@angular/core'
 import { MatIconModule } from '@angular/material/icon'
 import { RouterLink, RouterModule } from '@angular/router'
 import { FooterComponent, NavService } from '@dalenguyen/portfolio/shell/ui'
@@ -60,25 +50,27 @@ export class SentryErrorHandler implements ErrorHandler {
             }
           </nav>
 
-          <!-- Mobile menu button - Only rendered on client -->
+          <!-- Mobile menu button -->
           <div class="flex md:hidden items-center">
             <button
               type="button"
               class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               (click)="toggleMobileMenu()"
+              [attr.aria-expanded]="isMobileMenuOpen()"
               aria-label="Toggle mobile menu"
               >
               <span class="sr-only">Open main menu</span>
               <!-- Icon when menu is closed -->
               @if (!isMobileMenuOpen()) {
-                <mat-icon class="block h-6 w-6">menu</mat-icon>
+                <mat-icon class="block h-6 w-6" aria-hidden="true">menu</mat-icon>
               }
               <!-- Icon when menu is open -->
               @if (isMobileMenuOpen()) {
-                <mat-icon class="block h-6 w-6">close</mat-icon>
+                <mat-icon class="block h-6 w-6" aria-hidden="true">close</mat-icon>
               }
             </button>
           </div>
+
         </div>
       </div>
 
@@ -131,11 +123,14 @@ export class SentryErrorHandler implements ErrorHandler {
 })
 export class AppComponent {
   protected readonly navService = inject(NavService)
-  private readonly cdf = inject(ChangeDetectorRef)
-  private readonly platformId = inject(PLATFORM_ID)
+
   // Use signals for reactive state
   isMobileMenuOpen = signal(false)
   activeEl = signal('intro')
+
+  constructor() {
+    console.log('[AppComponent] Constructor - Platform:', typeof window !== 'undefined' ? 'BROWSER' : 'SERVER')
+  }
 
   // Navigation items with their icons, routes and fragments
   navItems = [
@@ -177,13 +172,9 @@ export class AppComponent {
   ]
 
   toggleMobileMenu(): void {
-    // Toggle the menu regardless of environment, but only trigger change detection in browser
+    console.log('[toggleMobileMenu] Called! Current state:', this.isMobileMenuOpen())
     this.isMobileMenuOpen.update((value) => !value)
-
-    // Only trigger change detection if in browser environment
-    if (isPlatformBrowser(this.platformId)) {
-      this.cdf.detectChanges()
-    }
+    console.log('[toggleMobileMenu] New state:', this.isMobileMenuOpen())
   }
 
   setActive(id: string): void {
