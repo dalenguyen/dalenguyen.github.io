@@ -24,6 +24,11 @@ export default defineConfig(({ mode }) => {
     plugins: [
       analog({
         ssr: mode === 'production', // Enable SSR only in production for prerendering
+        static: true,
+        vite: {
+          // tsconfig: 'apps/blog-app/tsconfig.app.json',
+          inlineStylesExtension: 'scss|sass|less|css',
+        },
         prerender:
           mode === 'production'
             ? {
