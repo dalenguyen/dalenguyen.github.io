@@ -1,45 +1,8 @@
-import { provideContent, withMarkdownRenderer } from '@analogjs/content'
-import { withPrismHighlighter } from '@analogjs/content/prism-highlighter'
-import { provideFileRouter } from '@analogjs/router'
-import { provideHttpClient, withFetch } from '@angular/common/http'
-import { enableProdMode } from '@angular/core'
-import { bootstrapApplication } from '@angular/platform-browser'
-import { provideAnimations } from '@angular/platform-browser/animations'
-import { provideServerRendering, renderApplication } from '@angular/platform-server'
-import {
-  withComponentInputBinding,
-  withEnabledBlockingInitialNavigation,
-  withInMemoryScrolling,
-  withRouterConfig,
-} from '@angular/router'
-import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
+import { render } from '@analogjs/router/server'
+import '@angular/platform-server/init'
 import 'zone.js/node'
 
-if (import.meta.env.PROD) {
-  enableProdMode()
-}
+import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
+import { config } from './app/app.config.server'
 
-const bootstrap = () =>
-  bootstrapApplication(AppComponent, {
-    providers: [
-      provideServerRendering(),
-      provideAnimations(),
-      provideHttpClient(withFetch()),
-      // provideClientHydration(withEventReplay()),
-      provideFileRouter(
-        withRouterConfig({ onSameUrlNavigation: 'reload' }),
-        withInMemoryScrolling({ anchorScrolling: 'enabled' }),
-        withComponentInputBinding(),
-        withEnabledBlockingInitialNavigation(),
-      ),
-      provideContent(withMarkdownRenderer(), withPrismHighlighter()),
-    ],
-  })
-
-export default async function render(url: string, document: string) {
-  const html = await renderApplication(bootstrap, {
-    document,
-    url,
-  })
-  return html
-}
+export default render(AppComponent, config)

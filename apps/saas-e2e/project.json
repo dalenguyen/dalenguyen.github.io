@@ -10,7 +10,6 @@
       "executor": "@nx/cypress:cypress",
       "options": {
         "cypressConfig": "apps/saas-e2e/cypress.config.ts",
-        "tsConfig": "apps/saas-e2e/tsconfig.e2e.json",
         "devServerTarget": "saas:serve:development",
         "testingType": "e2e"
       },

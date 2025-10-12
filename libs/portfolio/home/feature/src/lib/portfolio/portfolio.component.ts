@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common'
+
 import { ChangeDetectionStrategy, Component } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button'
 import { MatCardModule } from '@angular/material/card'
@@ -17,7 +17,7 @@ interface PortfolioItem {
 @Component({
   selector: 'dalenguyen-portfolio',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <section id="portfolio" class="py-12">
@@ -29,39 +29,41 @@ interface PortfolioItem {
             on intuitive interfaces that drive engagement and deliver measurable business outcomes.
           </p>
         </header>
-
+    
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <mat-card
-            *ngFor="let project of portfolioItems"
-            class="h-full flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-          >
-            <img mat-card-image [src]="project.imageUrl" [alt]="project.title" class="h-48 w-full object-cover" />
-            <mat-card-content class="flex-grow p-6">
-              <h3 class="text-2xl font-semibold my-3 text-gray-800">
-                <a
-                  [href]="project.projectUrl"
-                  target="_blank"
-                  class="hover:text-primary transition-colors duration-300 hover:underline"
-                >
-                  {{ project.title }}
-                </a>
-              </h3>
-              <p class="text-gray-600 mb-6 leading-relaxed">{{ project.description }}</p>
-              <div class="mb-4 flex flex-wrap gap-2">
-                <div
-                  *ngFor="let tech of project.technologies"
-                  class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
-                >
-                  <mat-icon class="h-4 w-4 mr-1 text-gray-600">{{ tech.icon }}</mat-icon>
-                  <span>{{ tech.name }}</span>
+          @for (project of portfolioItems; track project) {
+            <mat-card
+              class="h-full flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+              >
+              <img mat-card-image [src]="project.imageUrl" [alt]="project.title" class="h-48 w-full object-cover" />
+              <mat-card-content class="flex-grow p-6">
+                <h3 class="text-2xl font-semibold my-3 text-gray-800">
+                  <a
+                    [href]="project.projectUrl"
+                    target="_blank"
+                    class="hover:text-primary transition-colors duration-300 hover:underline"
+                    >
+                    {{ project.title }}
+                  </a>
+                </h3>
+                <p class="text-gray-600 mb-6 leading-relaxed">{{ project.description }}</p>
+                <div class="mb-4 flex flex-wrap gap-2">
+                  @for (tech of project.technologies; track tech) {
+                    <div
+                      class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
+                      >
+                      <mat-icon class="h-4 w-4 mr-1 text-gray-600">{{ tech.icon }}</mat-icon>
+                      <span>{{ tech.name }}</span>
+                    </div>
+                  }
                 </div>
-              </div>
-            </mat-card-content>
-          </mat-card>
+              </mat-card-content>
+            </mat-card>
+          }
         </div>
       </div>
     </section>
-  `,
+    `,
   styles: [
     `
       mat-icon {

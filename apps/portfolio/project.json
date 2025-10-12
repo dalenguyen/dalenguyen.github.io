@@ -86,7 +86,8 @@
       "defaultConfiguration": "development",
       "options": {
         "publicHost": "http://localhost:4200"
-      }
+      },
+      "continuous": true
     },
     "extract-i18n": {
       "executor": "@angular-devkit/build-angular:extract-i18n",
@@ -161,7 +162,8 @@
           "serverTarget": "portfolio:server:production"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "continuous": true
     },
     "deploy": {
       "executor": "nx:run-commands",

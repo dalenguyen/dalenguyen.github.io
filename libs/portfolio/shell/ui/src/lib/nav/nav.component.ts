@@ -8,7 +8,6 @@ import { NavService } from './nav.service'
   selector: 'dalenguyen-nav',
   imports: [CommonModule, MatIconModule],
   templateUrl: './nav.component.html',
-  styleUrls: ['./nav.component.scss'],
 })
 export class NavComponent implements OnInit {
   private readonly navService = inject(NavService)
