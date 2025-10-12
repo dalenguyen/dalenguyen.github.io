@@ -6,7 +6,7 @@
     "target": "ES2022",
     "useDefineForClassFields": false
   },
-  "files": ["src/main.ts", "src/main.server.ts", "src/app/app.component.ts", "src/app/app.config.ts", "src/app/app.config.server.ts"],
+  "files": ["src/main.ts", "src/main.server.ts", "src/app/app.config.ts", "src/app/app.config.server.ts"],
   "include": ["src/**/*.d.ts", "src/app/routes/**/*.ts", "src/app/pages/**/*.page.ts"],
   "exclude": ["**/*.test.ts", "**/*.spec.ts"]
 }
