@@ -54,7 +54,7 @@
     "@angular/platform-browser-dynamic": "20.3.4",
     "@angular/platform-server": "~20.3.4",
     "@angular/router": "20.3.4",
-    "@angular/ssr": "20.3.5",
+    "@angular/ssr": "20.3.6",
     "@google-cloud/functions-framework": "^3.2.0",
     "@nestjs/common": "10.4.16",
     "@nestjs/config": "^2.3.2",
