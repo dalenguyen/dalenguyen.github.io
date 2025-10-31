@@ -104,7 +104,7 @@
     "smoothscroll-polyfill": "^0.4.4",
     "sqlite3": "^5.1.6",
     "tslib": "^2.5.2",
-    "typeorm": "^0.3.16",
+    "typeorm": "^0.3.26",
     "zone.js": "0.15.0"
   },
   "devDependencies": {

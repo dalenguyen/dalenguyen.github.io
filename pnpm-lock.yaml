@@ -73,7 +73,7 @@ importers:
         version: 6.3.0(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)(class-transformer@0.5.1)(class-validator@0.13.2)(reflect-metadata@0.1.14)
       '@nestjs/typeorm':
         specifier: ^8.1.4
-        version: 8.1.4(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)(reflect-metadata@0.1.14)(rxjs@7.5.7)(typeorm@0.3.20(ioredis@5.5.0)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)))
+        version: 8.1.4(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)(reflect-metadata@0.1.14)(rxjs@7.5.7)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.5.0)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)))
       '@sentry/browser':
         specifier: ^7.119.1
         version: 7.119.1
@@ -201,8 +201,8 @@ importers:
         specifier: ^2.5.2
         version: 2.8.1
       typeorm:
-        specifier: ^0.3.16
-        version: 0.3.20(ioredis@5.5.0)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3))
+        specifier: ^0.3.26
+        version: 0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.5.0)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3))
       zone.js:
         specifier: 0.15.0
         version: 0.15.0
@@ -2527,6 +2527,9 @@ packages:
 
   '@emnapi/runtime@1.5.0':
     resolution: {integrity: sha512-97/BJ3iXHww3djw6hYIfErCZFee7qCtrneuLa20UXFCOTCfBM2cvQHjWJ2EG0s0MtdNwInarqCTz35i4wWXHsQ==}
+
+  '@emnapi/runtime@1.6.0':
+    resolution: {integrity: sha512-obtUmAHTMjll499P+D9A3axeJFlhdjOWdKUNs/U6QIGT7V5RjcUW1xToAzjvmgTSQhDbYn/NwfTRoJcQ2rNBxA==}
 
   '@emnapi/wasi-threads@1.0.1':
     resolution: {integrity: sha512-iIBu7mwkq4UQGeMEM8bLwNK962nXdhodeScX4slfQnRhEMMzvYivHhutCIk8uojvmASXXPC2WNEjwxFWk72Oqw==}
@@ -7663,6 +7666,10 @@ packages:
     resolution: {integrity: sha512-7HSX4QQb4CspciLpVFwyRe79O3xsIZDDLER21kERQ71oaPodF8jL725AgJMFAYbooIqolJoRLuM81SpeUkpkvA==}
     engines: {node: '>=12'}
 
+  ansi-regex@6.2.2:
+    resolution: {integrity: sha512-Bq3SmSpyFHaWjPk8If9yc6svM8c56dB5BAtW4Qbw5jHTwwXXcTLoRMkpDJp6VL0XzlWaCHTXrkFURMYmD0sLqg==}
+    engines: {node: '>=12'}
+
   ansi-styles@4.3.0:
     resolution: {integrity: sha512-zbB9rCJAT1rbjiVDb2hqKFHNYLxgtk8NURxZ3IZwD3F6NtxbXZQCnnSi1Lkx+IDohdPlFp222wVALIheZJQSEg==}
     engines: {node: '>=8'}
@@ -7674,6 +7681,14 @@ packages:
   ansi-styles@6.2.1:
     resolution: {integrity: sha512-bN798gFfQX+viw3R7yrGWRqnrN2oRkEkUjjl4JNn4E8GxxbjtG3FbrEIIY3l8/hrwUwIeCZvi4QuOTP4MErVug==}
     engines: {node: '>=12'}
+
+  ansi-styles@6.2.3:
+    resolution: {integrity: sha512-4Dj6M28JB+oAH8kFkTLUo+a2jwOFkuqb3yucU0CANcRRUbxS0cP0nZYCGjcc3BNXwRIsUVmDGgzawme7zvJHvg==}
+    engines: {node: '>=12'}
+
+  ansis@3.17.0:
+    resolution: {integrity: sha512-0qWUglt9JEqLFr3w1I1pbrChn1grhaiAR2ocX1PP/flRmxgtwTzPFFFnfIlD6aMOLQZgSuCRlidD70lvx8yhzg==}
+    engines: {node: '>=14'}
 
   any-promise@1.3.0:
     resolution: {integrity: sha512-7UvmKalWRt1wgjL1RrGxoSJW/0QZFIegpeGvZG9kjp8vrRu55XTHbwnqq2GpXm9uLbcuhxm3IqX9OB4MZR1b2A==}
@@ -8509,11 +8524,6 @@ packages:
   cli-cursor@5.0.0:
     resolution: {integrity: sha512-aCj4O5wKyszjMmDT4tZj93kxyydN/K5zPWSCe6/0AV/AA1pqe5ZBIw0a2ZfPQV7lL5/yb5HsUreJ6UFAF1tEQw==}
     engines: {node: '>=18'}
-
-  cli-highlight@2.1.11:
-    resolution: {integrity: sha512-9KDcoEVwyUXrjcJNvHD0NFc/hiwe/WPVYIleQh2O1N2Zro5gWJZ/K+3DGn8w8P/F6FxOgzyC5bxDyHIgCSPhGg==}
-    engines: {node: '>=8.0.0', npm: '>=5.0.0'}
-    hasBin: true
 
   cli-spinners@2.6.1:
     resolution: {integrity: sha512-x/5fWmGMnbKQAaNwN+UZlV79qBLM9JFnJuJ03gIi5whrob0xV0ofNVHy9DhwGdsMJQc2OKv0oGmLzvaqvAVv+g==}
@@ -9352,6 +9362,9 @@ packages:
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
+  dayjs@1.11.19:
+    resolution: {integrity: sha512-t5EcLVS6QPBNqM2z8fakk/NKel+Xzshgt8FFKAn+qwlD1pzZWxh0nVCrvFK7ZDb6XucZeF9z8C7CBWTRIVApAw==}
+
   db0@0.2.4:
     resolution: {integrity: sha512-hIzftLH1nMsF95zSLjDLYLbE9huOXnLYUTAQ5yKF5amp0FpeD+B15XJa8BvGYSOeSCH4gl2WahB/y1FcUByQSg==}
     peerDependencies:
@@ -9458,15 +9471,6 @@ packages:
       supports-color:
         optional: true
 
-  debug@4.4.1:
-    resolution: {integrity: sha512-KcKCqiftBJcZr++7ykoDIEwSa3XWowTfNPo92BYxjXiyYEVrUQh2aLyhxBCwww+heortUFxEJYcRzosstTEBYQ==}
-    engines: {node: '>=6.0'}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
-
   debug@4.4.3:
     resolution: {integrity: sha512-RGwwWnwQvkVfavKVt22FGLw+xYSdzARwm0ru6DhTVA3umU5hZc28V3kO4stgYryrTlLpuvgI9GiijltAjNbcqA==}
     engines: {node: '>=6.0'}
@@ -9500,14 +9504,6 @@ packages:
 
   dedent@0.7.0:
     resolution: {integrity: sha512-Q6fKUPqnAHAyhiUgFU7BUzLiv0kd8saH9al7tnu5Q/okj6dnupxyTgFIBjVzJATdfIAm9NAsvXNzjaKa+bxVyA==}
-
-  dedent@1.5.3:
-    resolution: {integrity: sha512-NHQtfOOW68WD8lgypbLA5oT+Bt0xXJhiYvoR6SmmNXZfpzOGXwdKWmcwG8N7PwVVWV3eF/68nmD9BaJSsTBhyQ==}
-    peerDependencies:
-      babel-plugin-macros: ^3.1.0
-    peerDependenciesMeta:
-      babel-plugin-macros:
-        optional: true
 
   dedent@1.7.0:
     resolution: {integrity: sha512-HGFtf8yhuhGhqO07SV79tRp+br4MnbdjeVxotpn1QBl30pcLLCQjX5b2295ll0fv8RKDKsmWYrl05usHM9CewQ==}
@@ -9770,6 +9766,10 @@ packages:
 
   dotenv@16.4.7:
     resolution: {integrity: sha512-47qPchRCykZC03FhkYAhrvwU4xDBFIj1QPqaarj6mdM/hgUzfPHcpkHJOn3mJAufFeeAxAzeGsr5X0M4k6fLZQ==}
+    engines: {node: '>=12'}
+
+  dotenv@16.6.1:
+    resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
     engines: {node: '>=12'}
 
   dotenv@17.2.3:
@@ -11128,9 +11128,6 @@ packages:
     resolution: {integrity: sha512-F/1DnUGPopORZi0ni+CvrCgHQ5FyEAHRLSApuYWMmrbSwoN2Mn/7k+Gl38gJnR7yyDZk6WLXwiGod1JOWNDKGw==}
     hasBin: true
 
-  highlight.js@10.7.3:
-    resolution: {integrity: sha512-tzcUFauisWKNHaRkN4Wjl/ZA07gENAjFl3J/c480dprkGTg5EQstgaNFqBfUqCq54kZRIEcreTsAgF/m2quD7A==}
-
   hmac-drbg@1.0.1:
     resolution: {integrity: sha512-Tti3gMqLdZfhOQY1Mzf/AanLiqh1WTiJgEj26ZuYQ9fbkLomzGchCws4FyrSd4VkpBfiNhaE1On+lOz894jvXg==}
 
@@ -12323,6 +12320,7 @@ packages:
   keygrip@1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
     engines: {node: '>= 0.6'}
+    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   keyv@4.5.4:
     resolution: {integrity: sha512-oxVHkHR/EJf2CNXnWxRLW6mg7JyCCUcG0DtEGmL2ctUo1PNTin1PUil+r/+4r5MpVgC/fn1kjsx7mjSujKqIpw==}
@@ -13153,11 +13151,6 @@ packages:
     engines: {node: '>=10'}
     hasBin: true
 
-  mkdirp@2.1.6:
-    resolution: {integrity: sha512-+hEnITedc8LAtIP9u3HJDFIdcLV2vXP33sqLLIzkv1Db1zO/1OxbvYf0Y1OC/S/Qo5dxHXepofhmxL02PsKe+A==}
-    engines: {node: '>=10'}
-    hasBin: true
-
   mkdirp@3.0.1:
     resolution: {integrity: sha512-+NsyUUAZDmo6YVHzL/stxSu3t9YS1iljliy3BSDrXJ/dkn1KYdmtZODGGjLcc9XLgVVpH4KshHB8XmZgMhaBXg==}
     engines: {node: '>=10'}
@@ -13793,9 +13786,6 @@ packages:
   parse5-html-rewriting-stream@8.0.0:
     resolution: {integrity: sha512-wzh11mj8KKkno1pZEu+l2EVeWsuKDfR5KNWZOTsslfUX8lPDZx77m9T0kIoAVkFtD1nx6YF8oh4BnPHvxMtNMw==}
 
-  parse5-htmlparser2-tree-adapter@6.0.1:
-    resolution: {integrity: sha512-qPuWvbLgvDGilKc5BoicRovlT4MtYT6JfJyBOMDsKoiT+GiuP5qyrPCnR9HcPECIJJmZh5jRndyNThnhhb/vlA==}
-
   parse5-sax-parser@7.0.0:
     resolution: {integrity: sha512-5A+v2SNsq8T6/mG3ahcz8ZtQ0OUFTatxPbeidoMB7tkJSGDY3tdfl4MHovtLQHkEn5CGxijNWRQHhRQ6IRpXKg==}
 
@@ -13804,12 +13794,6 @@ packages:
 
   parse5@4.0.0:
     resolution: {integrity: sha512-VrZ7eOd3T1Fk4XWNXMgiGBK/z0MG48BWG2uQNU4I72fkQuKUTZpl+u9k+CxEG0twMVzSmXEEz12z5Fnw1jIQFA==}
-
-  parse5@5.1.1:
-    resolution: {integrity: sha512-ugq4DFI0Ptb+WWjAdOK16+u/nHfiIrcE+sh8kZMaM0WllQKLI9rOUq6c2b7cwPkXdzfQESqvoqK6ug7U/Yyzug==}
-
-  parse5@6.0.1:
-    resolution: {integrity: sha512-Ofn/CTFzRGTTxwpNEs9PP93gXShHcTq255nzRYSKe8AkVpZY7e1fpmTfOyoIvjP5HG7Z2ZM7VS9PPhQGW2pOpw==}
 
   parse5@7.2.1:
     resolution: {integrity: sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==}
@@ -15674,8 +15658,9 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  sha.js@2.4.11:
-    resolution: {integrity: sha512-QMEp5B7cftE7APOjk5Y6xgrbWu+WkLVQwk8JNjZ8nKRciZaByEW6MubieAiToS7+dwvrjGhH8jRXz3MVd0AYqQ==}
+  sha.js@2.4.12:
+    resolution: {integrity: sha512-8LzC5+bvI45BjpfXU8V5fdU2mfeKiQe1D1gIMn7XUlF3OTUrpdJpPPH4EMAnF0DsHHdSZqCdSss5qCmJKuiO3w==}
+    engines: {node: '>= 0.10'}
     hasBin: true
 
   shallow-clone@3.0.1:
@@ -15918,6 +15903,10 @@ packages:
   sprintf-js@1.1.3:
     resolution: {integrity: sha512-Oo+0REFV59/rz3gfJNKQiBlwfHaSESl1pcGyABQsnnIfWOFt6JNj5gCog2U6MLZ//IGYD+nA8nI+mTShREReaA==}
 
+  sql-highlight@6.1.0:
+    resolution: {integrity: sha512-ed7OK4e9ywpE7pgRMkMQmZDPKSVdm0oX5IEtZiKnFucSF0zu6c80GZBe38UqHuVhTWJ9xsKgSMjCG2bml86KvA==}
+    engines: {node: '>=14'}
+
   sqlite3@5.1.7:
     resolution: {integrity: sha512-GGIyOiFaG+TUra3JIfkI/zGP8yZYLPQ0pl1bH+ODjiX57sPhrLU5sQJn1y9bDKZUFYkX1crlrPfSYt0BKKdkog==}
 
@@ -16086,6 +16075,10 @@ packages:
 
   strip-ansi@7.1.0:
     resolution: {integrity: sha512-iq6eVVI64nQQTRYq2KtEg2d2uU7LElhTJwsH4YzIHZshxlgZms/wIc4VoDQTlG/IvVIrBKG06CrZnp0qv7hkcQ==}
+    engines: {node: '>=12'}
+
+  strip-ansi@7.1.2:
+    resolution: {integrity: sha512-gmBGslpoQJtgnMAvOVqGZpEz9dyoKTCzy2nfz/n8aIFhN/jCE/rCmcxabB6jOOHV+0WNnylOxaxBQPSvcWklhA==}
     engines: {node: '>=12'}
 
   strip-bom-string@1.0.0:
@@ -16484,6 +16477,10 @@ packages:
   tmpl@1.0.5:
     resolution: {integrity: sha512-3f0uOEAQwIqGuWW2MVzYg8fV/QNnc/IpuJNG837rLuczAaLVHslWHZQj4IGiEl5Hs3kkbhwL9Ab7Hrsmuj+Smw==}
 
+  to-buffer@1.2.2:
+    resolution: {integrity: sha512-db0E3UJjcFhpDhAF4tLo03oli3pwl3dbnzXOUIlRKrp+ldk/VUxzpWYZENsw2SZiuBjHAk7DfB0VU7NKdpb6sw==}
+    engines: {node: '>= 0.4'}
+
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -16771,36 +16768,34 @@ packages:
   typedarray@0.0.6:
     resolution: {integrity: sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==}
 
-  typeorm@0.3.20:
-    resolution: {integrity: sha512-sJ0T08dV5eoZroaq9uPKBoNcGslHBR4E4y+EBHs//SiGbblGe7IeduP/IH4ddCcj0qp3PHwDwGnuvqEAnKlq/Q==}
+  typeorm@0.3.26:
+    resolution: {integrity: sha512-o2RrBNn3lczx1qv4j+JliVMmtkPSqEGpG0UuZkt9tCfWkoXKu8MZnjvp2GjWPll1SehwemQw6xrbVRhmOglj8Q==}
     engines: {node: '>=16.13.0'}
     hasBin: true
     peerDependencies:
-      '@google-cloud/spanner': ^5.18.0
-      '@sap/hana-client': ^2.12.25
-      better-sqlite3: ^7.1.2 || ^8.0.0 || ^9.0.0
-      hdb-pool: ^0.1.6
+      '@google-cloud/spanner': ^5.18.0 || ^6.0.0 || ^7.0.0
+      '@sap/hana-client': ^2.14.22
+      better-sqlite3: ^8.0.0 || ^9.0.0 || ^10.0.0 || ^11.0.0 || ^12.0.0
       ioredis: ^5.0.4
-      mongodb: ^5.8.0
-      mssql: ^9.1.1 || ^10.0.1
+      mongodb: ^5.8.0 || ^6.0.0
+      mssql: ^9.1.1 || ^10.0.1 || ^11.0.1
       mysql2: ^2.2.5 || ^3.0.1
       oracledb: ^6.3.0
       pg: ^8.5.1
       pg-native: ^3.0.0
       pg-query-stream: ^4.0.0
-      redis: ^3.1.1 || ^4.0.0
+      redis: ^3.1.1 || ^4.0.0 || ^5.0.14
+      reflect-metadata: ^0.1.14 || ^0.2.0
       sql.js: ^1.4.0
       sqlite3: ^5.0.3
       ts-node: ^10.7.0
-      typeorm-aurora-data-api-driver: ^2.0.0
+      typeorm-aurora-data-api-driver: ^2.0.0 || ^3.0.0
     peerDependenciesMeta:
       '@google-cloud/spanner':
         optional: true
       '@sap/hana-client':
         optional: true
       better-sqlite3:
-        optional: true
-      hdb-pool:
         optional: true
       ioredis:
         optional: true
@@ -18837,7 +18832,7 @@ snapshots:
       '@babel/traverse': 7.28.4
       '@babel/types': 7.28.4
       convert-source-map: 2.0.0
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
       gensync: 1.0.0-beta.2
       json5: 2.2.3
       semver: 6.3.1
@@ -21361,6 +21356,11 @@ snapshots:
       tslib: 2.8.1
     optional: true
 
+  '@emnapi/runtime@1.6.0':
+    dependencies:
+      tslib: 2.8.1
+    optional: true
+
   '@emnapi/wasi-threads@1.0.1':
     dependencies:
       tslib: 2.8.1
@@ -21821,7 +21821,7 @@ snapshots:
   '@eslint/eslintrc@2.1.4':
     dependencies:
       ajv: 6.12.6
-      debug: 4.4.1
+      debug: 4.4.0(supports-color@8.1.1)
       espree: 9.6.1
       globals: 13.24.0
       ignore: 5.3.2
@@ -22289,7 +22289,7 @@ snapshots:
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
       '@humanwhocodes/object-schema': 2.0.3
-      debug: 4.4.1
+      debug: 4.4.0(supports-color@8.1.1)
       minimatch: 3.1.2
     transitivePeerDependencies:
       - supports-color
@@ -22379,7 +22379,7 @@ snapshots:
 
   '@img/sharp-wasm32@0.33.5':
     dependencies:
-      '@emnapi/runtime': 1.5.0
+      '@emnapi/runtime': 1.6.0
     optional: true
 
   '@img/sharp-win32-ia32@0.33.5':
@@ -22518,7 +22518,7 @@ snapshots:
     dependencies:
       string-width: 5.1.2
       string-width-cjs: string-width@4.2.3
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
       strip-ansi-cjs: strip-ansi@6.0.1
       wrap-ansi: 8.1.0
       wrap-ansi-cjs: wrap-ansi@7.0.0
@@ -23732,13 +23732,13 @@ snapshots:
     optionalDependencies:
       '@nestjs/platform-express': 9.4.0(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)
 
-  '@nestjs/typeorm@8.1.4(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)(reflect-metadata@0.1.14)(rxjs@7.5.7)(typeorm@0.3.20(ioredis@5.5.0)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)))':
+  '@nestjs/typeorm@8.1.4(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/core@9.4.0)(reflect-metadata@0.1.14)(rxjs@7.5.7)(typeorm@0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.5.0)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)))':
     dependencies:
       '@nestjs/common': 10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7)
       '@nestjs/core': 9.4.0(@nestjs/common@10.4.16(class-transformer@0.5.1)(class-validator@0.13.2)(file-type@20.5.0)(reflect-metadata@0.1.14)(rxjs@7.5.7))(@nestjs/platform-express@9.4.0)(encoding@0.1.13)(reflect-metadata@0.1.14)(rxjs@7.5.7)
       reflect-metadata: 0.1.14
       rxjs: 7.5.7
-      typeorm: 0.3.20(ioredis@5.5.0)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3))
+      typeorm: 0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.5.0)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3))
       uuid: 8.3.2
 
   '@netlify/functions@2.8.2':
@@ -26798,7 +26798,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 7.18.0(typescript@5.9.3)
       '@typescript-eslint/utils': 7.18.0(eslint@8.57.1)(typescript@5.9.3)
-      debug: 4.4.0(supports-color@8.1.1)
+      debug: 4.4.3(supports-color@9.4.0)
       eslint: 8.57.1
       ts-api-utils: 1.4.3(typescript@5.9.3)
     optionalDependencies:
@@ -26810,7 +26810,7 @@ snapshots:
     dependencies:
       '@typescript-eslint/typescript-estree': 8.25.0(typescript@5.9.3)
       '@typescript-eslint/utils': 8.25.0(eslint@8.57.1)(typescript@5.9.3)
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
       eslint: 8.57.1
       ts-api-utils: 2.0.1(typescript@5.9.3)
       typescript: 5.9.3
@@ -27412,6 +27412,8 @@ snapshots:
 
   ansi-regex@6.1.0: {}
 
+  ansi-regex@6.2.2: {}
+
   ansi-styles@4.3.0:
     dependencies:
       color-convert: 2.0.1
@@ -27419,6 +27421,10 @@ snapshots:
   ansi-styles@5.2.0: {}
 
   ansi-styles@6.2.1: {}
+
+  ansi-styles@6.2.3: {}
+
+  ansis@3.17.0: {}
 
   any-promise@1.3.0: {}
 
@@ -28352,7 +28358,7 @@ snapshots:
       chokidar: 4.0.3
       confbox: 0.1.8
       defu: 6.1.4
-      dotenv: 16.4.7
+      dotenv: 16.6.1
       giget: 1.2.5
       jiti: 2.4.2
       mlly: 1.7.4
@@ -28627,15 +28633,6 @@ snapshots:
   cli-cursor@5.0.0:
     dependencies:
       restore-cursor: 5.1.0
-
-  cli-highlight@2.1.11:
-    dependencies:
-      chalk: 4.1.2
-      highlight.js: 10.7.3
-      mz: 2.7.0
-      parse5: 5.1.1
-      parse5-htmlparser2-tree-adapter: 6.0.1
-      yargs: 16.2.0
 
   cli-spinners@2.6.1: {}
 
@@ -29037,7 +29034,7 @@ snapshots:
       inherits: 2.0.4
       md5.js: 1.3.5
       ripemd160: 2.0.2
-      sha.js: 2.4.11
+      sha.js: 2.4.12
 
   create-hmac@1.1.7:
     dependencies:
@@ -29046,7 +29043,7 @@ snapshots:
       inherits: 2.0.4
       ripemd160: 2.0.2
       safe-buffer: 5.2.1
-      sha.js: 2.4.11
+      sha.js: 2.4.12
 
   create-jest@29.7.0(@types/node@20.19.9)(babel-plugin-macros@3.1.0)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)):
     dependencies:
@@ -29654,6 +29651,8 @@ snapshots:
 
   dayjs@1.11.13: {}
 
+  dayjs@1.11.19: {}
+
   db0@0.2.4(sqlite3@5.1.7):
     optionalDependencies:
       sqlite3: 5.1.7
@@ -29700,16 +29699,6 @@ snapshots:
     optionalDependencies:
       supports-color: 8.1.1
 
-  debug@4.4.1:
-    dependencies:
-      ms: 2.1.3
-
-  debug@4.4.3(supports-color@8.1.1):
-    dependencies:
-      ms: 2.1.3
-    optionalDependencies:
-      supports-color: 8.1.1
-
   debug@4.4.3(supports-color@9.4.0):
     dependencies:
       ms: 2.1.3
@@ -29736,10 +29725,6 @@ snapshots:
       mimic-response: 3.1.0
 
   dedent@0.7.0: {}
-
-  dedent@1.5.3(babel-plugin-macros@3.1.0):
-    optionalDependencies:
-      babel-plugin-macros: 3.1.0
 
   dedent@1.7.0(babel-plugin-macros@3.1.0):
     optionalDependencies:
@@ -29839,7 +29824,7 @@ snapshots:
   detect-port@1.6.1:
     dependencies:
       address: 1.2.2
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -29957,6 +29942,8 @@ snapshots:
   dotenv@16.1.4: {}
 
   dotenv@16.4.7: {}
+
+  dotenv@16.6.1: {}
 
   dotenv@17.2.3: {}
 
@@ -30620,7 +30607,7 @@ snapshots:
   eslint-import-resolver-typescript@3.8.3(eslint-plugin-import@2.31.0)(eslint@8.57.1):
     dependencies:
       '@nolyfill/is-core-module': 1.0.39
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
       enhanced-resolve: 5.18.1
       eslint: 8.57.1
       get-tsconfig: 4.10.0
@@ -31075,7 +31062,7 @@ snapshots:
 
   extract-zip@2.0.1(supports-color@8.1.1):
     dependencies:
-      debug: 4.4.3(supports-color@8.1.1)
+      debug: 4.4.0(supports-color@8.1.1)
       get-stream: 5.2.0
       yauzl: 2.10.0
     optionalDependencies:
@@ -31354,9 +31341,9 @@ snapshots:
     optionalDependencies:
       debug: 4.3.2
 
-  follow-redirects@1.15.11(debug@4.4.1):
+  follow-redirects@1.15.11(debug@4.4.3):
     optionalDependencies:
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
 
   for-each@0.3.5:
     dependencies:
@@ -31962,8 +31949,6 @@ snapshots:
 
   he@1.2.0: {}
 
-  highlight.js@10.7.3: {}
-
   hmac-drbg@1.0.1:
     dependencies:
       hash.js: 1.1.7
@@ -32119,7 +32104,7 @@ snapshots:
     dependencies:
       '@tootallnate/once': 2.0.0
       agent-base: 6.0.2
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -32169,8 +32154,8 @@ snapshots:
   http-proxy-middleware@3.0.5:
     dependencies:
       '@types/http-proxy': 1.17.16
-      debug: 4.4.1
-      http-proxy: 1.18.1(debug@4.4.1)
+      debug: 4.4.3(supports-color@9.4.0)
+      http-proxy: 1.18.1(debug@4.4.3)
       is-glob: 4.0.3
       is-plain-object: 5.0.0
       micromatch: 4.0.8
@@ -32185,10 +32170,10 @@ snapshots:
     transitivePeerDependencies:
       - debug
 
-  http-proxy@1.18.1(debug@4.4.1):
+  http-proxy@1.18.1(debug@4.4.3):
     dependencies:
       eventemitter3: 4.0.7
-      follow-redirects: 1.15.11(debug@4.4.1)
+      follow-redirects: 1.15.11(debug@4.4.3)
       requires-port: 1.0.0
     transitivePeerDependencies:
       - debug
@@ -32236,7 +32221,7 @@ snapshots:
   https-proxy-agent@5.0.1:
     dependencies:
       agent-base: 6.0.2
-      debug: 4.4.1
+      debug: 4.4.3(supports-color@9.4.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -32805,7 +32790,7 @@ snapshots:
       '@types/node': 20.19.9
       chalk: 4.1.2
       co: 4.6.0
-      dedent: 1.5.3(babel-plugin-macros@3.1.0)
+      dedent: 1.7.0(babel-plugin-macros@3.1.0)
       is-generator-fn: 2.1.0
       jest-each: 29.7.0
       jest-matcher-utils: 29.7.0
@@ -34789,8 +34774,6 @@ snapshots:
 
   mkdirp@1.0.4: {}
 
-  mkdirp@2.1.6: {}
-
   mkdirp@3.0.1: {}
 
   mlly@1.7.4:
@@ -35832,10 +35815,6 @@ snapshots:
       parse5: 8.0.0
       parse5-sax-parser: 8.0.0
 
-  parse5-htmlparser2-tree-adapter@6.0.1:
-    dependencies:
-      parse5: 6.0.1
-
   parse5-sax-parser@7.0.0:
     dependencies:
       parse5: 7.2.1
@@ -35845,10 +35824,6 @@ snapshots:
       parse5: 8.0.0
 
   parse5@4.0.0: {}
-
-  parse5@5.1.1: {}
-
-  parse5@6.0.1: {}
 
   parse5@7.2.1:
     dependencies:
@@ -35915,7 +35890,7 @@ snapshots:
       create-hmac: 1.1.7
       ripemd160: 2.0.2
       safe-buffer: 5.2.1
-      sha.js: 2.4.11
+      sha.js: 2.4.12
 
   pend@1.2.0: {}
 
@@ -37969,10 +37944,11 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  sha.js@2.4.11:
+  sha.js@2.4.12:
     dependencies:
       inherits: 2.0.4
       safe-buffer: 5.2.1
+      to-buffer: 1.2.2
 
   shallow-clone@3.0.1:
     dependencies:
@@ -38311,6 +38287,8 @@ snapshots:
 
   sprintf-js@1.1.3: {}
 
+  sql-highlight@6.1.0: {}
+
   sqlite3@5.1.7:
     dependencies:
       bindings: 1.5.0
@@ -38462,7 +38440,7 @@ snapshots:
     dependencies:
       eastasianwidth: 0.2.0
       emoji-regex: 9.2.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   string-width@7.2.0:
     dependencies:
@@ -38544,6 +38522,10 @@ snapshots:
   strip-ansi@7.1.0:
     dependencies:
       ansi-regex: 6.1.0
+
+  strip-ansi@7.1.2:
+    dependencies:
+      ansi-regex: 6.2.2
 
   strip-bom-string@1.0.0: {}
 
@@ -38998,6 +38980,12 @@ snapshots:
 
   tmpl@1.0.5: {}
 
+  to-buffer@1.2.2:
+    dependencies:
+      isarray: 2.0.5
+      safe-buffer: 5.2.1
+      typed-array-buffer: 1.0.3
+
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
@@ -39291,28 +39279,29 @@ snapshots:
 
   typedarray@0.0.6: {}
 
-  typeorm@0.3.20(ioredis@5.5.0)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)):
+  typeorm@0.3.26(babel-plugin-macros@3.1.0)(ioredis@5.5.0)(reflect-metadata@0.1.14)(sqlite3@5.1.7)(ts-node@10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)):
     dependencies:
       '@sqltools/formatter': 1.2.5
+      ansis: 3.17.0
       app-root-path: 3.1.0
       buffer: 6.0.3
-      chalk: 4.1.2
-      cli-highlight: 2.1.11
-      dayjs: 1.11.13
-      debug: 4.4.0(supports-color@8.1.1)
-      dotenv: 16.4.7
+      dayjs: 1.11.19
+      debug: 4.4.3(supports-color@9.4.0)
+      dedent: 1.7.0(babel-plugin-macros@3.1.0)
+      dotenv: 16.6.1
       glob: 10.4.5
-      mkdirp: 2.1.6
-      reflect-metadata: 0.2.2
-      sha.js: 2.4.11
+      reflect-metadata: 0.1.14
+      sha.js: 2.4.12
+      sql-highlight: 6.1.0
       tslib: 2.8.1
-      uuid: 9.0.1
+      uuid: 11.1.0
       yargs: 17.7.2
     optionalDependencies:
       ioredis: 5.5.0
       sqlite3: 5.1.7
       ts-node: 10.9.1(@swc/core@1.5.7(@swc/helpers@0.5.15))(@types/node@20.19.9)(typescript@5.9.3)
     transitivePeerDependencies:
+      - babel-plugin-macros
       - supports-color
 
   typescript@5.9.3: {}
@@ -40562,9 +40551,9 @@ snapshots:
 
   wrap-ansi@8.1.0:
     dependencies:
-      ansi-styles: 6.2.1
+      ansi-styles: 6.2.3
       string-width: 5.1.2
-      strip-ansi: 7.1.0
+      strip-ansi: 7.1.2
 
   wrap-ansi@9.0.0:
     dependencies:
@@ -40675,6 +40664,7 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 20.2.9
+    optional: true
 
   yargs@17.1.1:
     dependencies:
