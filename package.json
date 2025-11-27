@@ -44,7 +44,7 @@
     "@analogjs/router": "1.21.2",
     "@angular/animations": "20.3.4",
     "@angular/cdk": "20.2.8",
-    "@angular/common": "20.3.4",
+    "@angular/common": "20.3.14",
     "@angular/compiler": "20.3.4",
     "@angular/core": "20.3.4",
     "@angular/fire": "^6.1.5",
