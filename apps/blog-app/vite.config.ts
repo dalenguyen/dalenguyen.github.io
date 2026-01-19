@@ -96,6 +96,8 @@ export default defineConfig(({ mode }) => {
               'docker',
               'jsx',
               'bash',
+              'toml',
+              'gitignore'
             ],
           },
         },
