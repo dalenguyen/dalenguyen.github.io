@@ -44,6 +44,8 @@ Create a new table in supabase is pretty straight forward, you can either do by 
 
 Here are some SQL scripts to create `profiles` table using SQL Editor:
 
+> **Note (v1.5.0+):** If you're using the `extra_fields` parameter on the signup shortcode (e.g., `first_name`, `last_name`, `phone`, `company`), add those columns to your profiles table so SupaWP can sync them.
+
 ```bash
 -- 1. Create the table to store user profiles
 -- Replace 'public.profiles' with your actual table name if different.
@@ -51,7 +53,12 @@ CREATE TABLE public.profiles (
   id uuid NOT NULL PRIMARY KEY, -- Matches auth.users.id, Primary Key
   email text,                  -- User's email
   created_at timestamptz DEFAULT now(), -- Timestamp when the row is created
-  updated_at timestamptz DEFAULT now()  -- Timestamp for updates (can be auto-updated later with triggers if needed)
+  updated_at timestamptz DEFAULT now(), -- Timestamp for updates (can be auto-updated later with triggers if needed)
+  -- Optional: add these if using extra_fields in signup shortcode (v1.5.0+)
+  first_name text,
+  last_name text,
+  phone text,
+  company text
 );
 
 -- 2. Add Foreign Key constraint linking to auth.users table
@@ -126,7 +133,7 @@ const supabaseKey = 'YOUR_SUPABASE_KEY'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
 // Function to insert a new profile
-async function insertProfile(profile: { id: string; username: string; full_name?: string; avatar_url?: string }) {
+async function insertProfile(profile: { id: string; email: string; first_name?: string; last_name?: string }) {
   const { data, error } = await supabase.from('profiles').insert(profile).select() // Optional: returns the inserted row(s)
 
   if (error) {
@@ -140,9 +147,9 @@ async function insertProfile(profile: { id: string; username: string; full_name?
 // Example usage
 const newProfile = {
   id: 'user-456',
-  username: 'janedoe',
-  full_name: 'Jane Doe',
-  avatar_url: 'https://example.com/jane-avatar.png',
+  email: 'jane@example.com',
+  first_name: 'Jane',
+  last_name: 'Doe',
 }
 
 insertProfile(newProfile)

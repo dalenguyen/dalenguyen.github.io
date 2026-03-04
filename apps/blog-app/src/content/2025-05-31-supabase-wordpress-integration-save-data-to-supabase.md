@@ -157,11 +157,11 @@ contact__last_name placeholder "Contact Last Name"]
 Let's have a look into the the form in detail. The hidden fields are important.
 
 - [hidden table contacts] -> table name is `contacts`.
-- [hidden id "optional-table-id"] (optional) -> it will override the row id.
+- [hidden id “optional-table-id”] (optional) -> it will override the row id.
 - [hidden arrayType “hobbies,food”] (optional) -> array data should be added to arrayType field.
-- [hidden dateType “dateOfBirth”] (optional) -> will save as ISO string type.
+- [hidden dateType “date_of_birth”] (optional) -> will save as ISO string type.
 - [hidden objectType “contact”] (optional) -> will save a map (object) type
-- [hidden integerTypes “age,phone”] (optional) -> will save as integer type
+- [hidden integerTypes “age”] (optional) -> will save as integer type
 
 After that, all you need to do it put the shortcode into your WordPress page and it's done!
 

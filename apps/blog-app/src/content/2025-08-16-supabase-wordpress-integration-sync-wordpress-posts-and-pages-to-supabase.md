@@ -424,4 +424,4 @@ Start with the basic setup outlined in this guide, then gradually explore the ad
 
 ---
 
-_This guide covers SupaWP v1.3.2 and later. Features and configuration may vary in different versions._
+_This guide covers SupaWP v1.3.3 and later. Features and configuration may vary in different versions._

@@ -109,6 +109,27 @@ img:not([width]):not([height]) {
     font-size: 1rem;
     line-height: 1.6;
   }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+
+  th, td {
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f5f5f5;
+    font-weight: 600;
+  }
+
+  tr:nth-child(even) {
+    background-color: #fafafa;
+  }
 }
 
 figure {
