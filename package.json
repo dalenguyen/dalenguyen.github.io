@@ -236,7 +236,7 @@
     "vite-plugin-eslint": "^1.8.1",
     "vite-tsconfig-paths": "4.2.0",
     "vitest": "^3.0.0",
-    "webpack": "^5.83.1",
+    "webpack": "^5.104.1",
     "webpack-extension-reloader": "^1.1.4",
     "webpack-merge": "^5.9.0"
   },
