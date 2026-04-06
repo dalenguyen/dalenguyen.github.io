@@ -58,7 +58,7 @@
     "@google-cloud/functions-framework": "^3.2.0",
     "@nestjs/common": "10.4.16",
     "@nestjs/config": "^2.3.2",
-    "@nestjs/core": "9.4.0",
+    "@nestjs/core": "11.1.18",
     "@nestjs/platform-express": "9.4.0",
     "@nestjs/swagger": "6.3.0",
     "@nestjs/typeorm": "^8.1.4",
