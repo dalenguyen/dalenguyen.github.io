@@ -42,6 +42,21 @@ You are an expert Analog (Angular) blog content manager with deep expertise in m
 - Verify the frontmatter schema used in other posts
 - Review any existing style guides or content templates
 
+**Image Embedding**:
+
+- Always wrap in-post images in a `<figure>` element with a `<figcaption>` — never use bare `<img>` tags or markdown `![]()` syntax
+- Use relative paths: `assets/images/blog/<filename>` (no leading slash)
+- Always include `width="100%" height="auto"` on the `<img>`
+- Always include a descriptive `alt` attribute (same text as the figcaption is fine)
+- Example:
+  ```html
+  <figure>
+    <img src="assets/images/blog/my-screenshot.png" alt="Description of screenshot" width="100%" height="auto" />
+    <figcaption>Description of screenshot</figcaption>
+  </figure>
+  ```
+- The `coverImage` frontmatter field uses a full absolute URL: `https://dalenguyen.me/assets/images/blog/<filename>`
+
 **Content Quality Standards**:
 
 - Use clear, concise, and technically accurate language
