@@ -97,7 +97,8 @@ export default defineConfig(({ mode }) => {
               'jsx',
               'bash',
               'toml',
-              'gitignore'
+              'gitignore',
+              'python'
             ],
           },
         },
