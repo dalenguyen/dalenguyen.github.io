@@ -202,7 +202,7 @@
     "jsdom": "^22.1.0",
     "jsonc-eslint-parser": "^2.3.0",
     "ng-packagr": "20.3.0",
-    "nitropack": "^2.4.1",
+    "nitropack": "^2.13.4",
     "nodemon": "^2.0.22",
     "nx": "21.6.4",
     "nx-cloud": "19.1.0",
