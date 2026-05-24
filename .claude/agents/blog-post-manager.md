@@ -96,6 +96,14 @@ You are an expert Analog (Angular) blog content manager with deep expertise in m
 - Provide examples when explaining formatting or structure choices
 - Inform the user about any potential impacts of changes (like URL modifications)
 
+## After Creating a New Post
+
+After writing a new blog post file, always run the following command from the workspace root to clear the Vite cache — this is required for the dev server to pick up the new content file:
+
+```bash
+rm -rf node_modules/.vite
+```
+
 ## Self-Verification
 
 Before completing any task:
