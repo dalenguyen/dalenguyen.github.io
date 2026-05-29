@@ -44,21 +44,17 @@ Click the "Post Title" textbox uid from the snapshot and type the title.
 
 ### Step 5: Fill in the tags
 
-Dev.to supports up to 4 tags. Enter each tag **one at a time** — type a tag, then press `Enter` to confirm it, then type the next:
+Dev.to supports up to 4 tags. Confirm each tag by appending a **trailing comma** — do NOT use `Enter` or `press_key`, it does not work and causes tags to concatenate instead of being confirmed separately.
 
 ```
 click tag combobox textbox
-type_text "angular"   ← first tag, no comma
-press_key Enter        ← confirm tag
-type_text "mcp"       ← second tag
-press_key Enter
-type_text "typescript"
-press_key Enter
-type_text "vite"
-press_key Enter
+type_text "angular,"    ← comma confirms the tag immediately
+type_text "mcp,"
+type_text "typescript,"
+type_text "vite,"
 ```
 
-**Do NOT type tags as a comma-separated string in one go.** Each tag must be typed and confirmed individually with `Enter`.
+**Do NOT use `press_key Enter`** — it does not trigger tag confirmation and the text accumulates as one long string. The trailing comma is the only reliable way to confirm each tag.
 
 ### Step 6: Fill in the content
 
@@ -88,5 +84,5 @@ Take a final screenshot confirming the draft was saved (dev.to shows an "Unpubli
 
 - Always save as draft, never publish directly
 - After saving, dev.to redirects to the unpublished post preview — confirm the URL changed away from `/new`
-- If the tag dropdown shows suggestions after typing, pressing `Enter` selects the first match; this is expected
+- Tags are confirmed by a trailing comma (e.g. `type_text "ai,"`) — `press_key Enter` does not work and causes tags to concatenate
 - The cover image is not set programmatically — inform the user they can upload it manually from the draft editor if needed
