@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<!--
+  social-media-post template
+  Replace every {{PLACEHOLDER}} marker. Keep the structure unless you have reason to change it.
+  Sections:
+    1. Header        — badge, title, subtitle
+    2. Anatomy       — central color-coded pattern + legend (3-6 chunks)
+    3. Examples      — concrete real-world cases (2-4 cards)
+    4. Key insight   — the "aha" callout
+    5. Footer        — rule of thumb + signature
+    6. Post cards    — LinkedIn + X drafts (outside main card — not in screenshot)
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{TITLE}}</title>
+<style>
+  :root {
+    --bg: #0a0a12;
+    --surface: #14141e;
+    --surface2: #1c1c2a;
+    --border: #2a2a3c;
+    --accent: #6b7ce0;
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --purple: #a78bfa;
+    --text: #f0f0f8;
+    --muted: #8a8aa8;
+    --code-bg: #12121a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    padding: 40px 20px; min-height: 100vh; line-height: 1.5; }
+  .card { max-width: 980px; margin: 0 auto;
+    background: linear-gradient(180deg, var(--surface) 0%, #0f0f18 100%);
+    border: 1px solid var(--border); border-radius: 24px; padding: 48px 56px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+
+  /* Header */
+  .header { text-align: center; margin-bottom: 40px; padding-bottom: 32px;
+    border-bottom: 1px solid var(--border); }
+  .badge { display: inline-block; padding: 6px 14px; border-radius: 99px;
+    background: rgba(107,124,224,0.15); color: var(--accent); font-size: 12px;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 16px; }
+  h1 { font-size: 42px; font-weight: 800; letter-spacing: -1px;
+    background: linear-gradient(135deg, #fff 0%, #a3a3c2 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    margin-bottom: 10px; }
+  .subtitle { font-size: 16px; color: var(--muted); max-width: 580px;
+    margin: 0 auto; }
+
+  /* Anatomy / Formula */
+  .formula { text-align: center; padding: 36px 24px; margin-bottom: 40px;
+    background: var(--surface2); border-radius: 16px; border: 1px solid var(--border); }
+  .formula-label { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 1.5px; margin-bottom: 20px; font-weight: 600; }
+  .formula-name { font-family: 'SF Mono', 'JetBrains Mono', Monaco, monospace;
+    font-size: 22px; font-weight: 700; display: flex; flex-wrap: nowrap; gap: 3px;
+    justify-content: center; align-items: center; margin-bottom: 28px;
+    white-space: nowrap; }
+  .chunk { padding: 5px 10px; border-radius: 8px; border: 1px solid transparent;
+    white-space: nowrap; }
+  .chunk.c1 { background: rgba(107,124,224,0.18); color: #b8c1ff;
+    border-color: rgba(107,124,224,0.4); }
+  .chunk.c2 { background: rgba(251,191,36,0.18); color: var(--amber);
+    border-color: rgba(251,191,36,0.4); }
+  .chunk.c3 { background: rgba(248,113,113,0.18); color: #fca5a5;
+    border-color: rgba(248,113,113,0.4); }
+  .chunk.c4 { background: rgba(74,222,128,0.18); color: var(--green);
+    border-color: rgba(74,222,128,0.4); }
+  .chunk.c5 { background: rgba(167,139,250,0.18); color: var(--purple);
+    border-color: rgba(167,139,250,0.4); }
+  .chunk.sep { background: none; color: var(--muted); padding: 6px 2px;
+    border-color: transparent; }
+
+  /* Legend */
+  .legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px; }
+  .legend-item { text-align: left; padding: 10px 14px; background: var(--bg);
+    border-radius: 10px; border: 1px solid var(--border); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; display: inline-block;
+    margin-right: 6px; vertical-align: middle; }
+  .legend-title { font-size: 11px; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 4px; display: flex; align-items: center; }
+  .legend-desc { font-size: 11px; color: var(--muted); line-height: 1.4; }
+
+  /* Examples */
+  .examples { display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 36px; }
+  .example { padding: 22px 24px; background: var(--surface2); border-radius: 14px;
+    border: 1px solid var(--border); }
+  .example-name { font-family: 'SF Mono', monospace; font-size: 16px; font-weight: 700;
+    display: flex; flex-wrap: nowrap; gap: 2px; margin-bottom: 14px;
+    white-space: nowrap; overflow-x: auto; }
+  .example-chunk { padding: 3px 7px; border-radius: 6px; font-size: 15px;
+    white-space: nowrap; }
+  .example-chunk.c1 { background: rgba(107,124,224,0.18); color: #b8c1ff; }
+  .example-chunk.c2 { background: rgba(251,191,36,0.18); color: var(--amber); }
+  .example-chunk.c3 { background: rgba(248,113,113,0.18); color: #fca5a5; }
+  .example-chunk.c4 { background: rgba(74,222,128,0.18); color: var(--green); }
+  .example-chunk.c5 { background: rgba(167,139,250,0.18); color: var(--purple); }
+  .example-chunk.sep { color: var(--muted); padding: 3px 1px; }
+  .stats { display: flex; gap: 14px; flex-wrap: wrap; }
+  .stat { font-size: 11px; color: var(--muted); }
+  .stat strong { color: var(--text); font-family: monospace; font-size: 13px; }
+  .type-pill { display: inline-block; padding: 2px 8px; border-radius: 99px;
+    font-size: 10px; font-weight: 700; letter-spacing: 0.5px; margin-left: 8px; }
+  .type-pill.a { background: rgba(74,222,128,0.15); color: var(--green); }
+  .type-pill.b { background: rgba(107,124,224,0.15); color: #b8c1ff; }
+
+  /* Key insight */
+  .key-insight { padding: 24px 28px;
+    background: linear-gradient(135deg, rgba(107,124,224,0.1), rgba(74,222,128,0.06));
+    border: 1px solid rgba(107,124,224,0.3); border-radius: 14px;
+    margin-bottom: 24px; }
+  .insight-label { font-size: 11px; font-weight: 700; color: var(--accent);
+    text-transform: uppercase; letter-spacing: 1.2px; margin-bottom: 10px; }
+  .insight-text { font-size: 16px; line-height: 1.65; }
+  .insight-text strong { color: var(--green); }
+
+  /* Footer + signature */
+  .footer { text-align: center; margin-top: 32px; padding-top: 24px;
+    border-top: 1px solid var(--border); font-size: 12px; color: var(--muted); }
+  .footer strong { color: var(--text); }
+  .signature { margin-top: 18px; display: flex; align-items: center;
+    justify-content: center; gap: 8px; font-size: 13px; color: var(--text); }
+  .signature-icon { width: 18px; height: 18px; display: inline-flex;
+    align-items: center; justify-content: center; background: var(--text);
+    color: var(--bg); border-radius: 4px; font-weight: 800; font-size: 12px;
+    font-family: 'SF Mono', monospace; }
+  .signature-handle { font-family: 'SF Mono', monospace; font-weight: 600;
+    color: var(--accent); }
+
+  /* Post cards (outside infographic — not part of screenshot) */
+  .posts-wrap { max-width: 980px; margin: 40px auto 0; }
+  .posts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .post-card { background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 24px; }
+  .post-head { display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .post-platform { display: flex; align-items: center; gap: 10px; font-size: 14px;
+    font-weight: 700; }
+  .post-icon { width: 24px; height: 24px; border-radius: 6px;
+    display: inline-flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 14px; }
+  .post-icon.linkedin { background: #0a66c2; color: #fff; font-family: serif; }
+  .post-icon.x { background: #fff; color: #000; }
+  .copy-btn { padding: 6px 12px; border-radius: 6px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.15s; font-family: inherit; }
+  .copy-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .copy-btn.copied { border-color: var(--green); color: var(--green);
+    background: rgba(74,222,128,0.08); }
+  .post-body { font-size: 13px; line-height: 1.6; color: var(--text);
+    white-space: pre-wrap; max-height: 480px; overflow-y: auto;
+    font-family: -apple-system, sans-serif; }
+  .post-body code { background: var(--code-bg); padding: 1px 5px;
+    border-radius: 3px; font-size: 12px; color: #c5cae9;
+    font-family: 'SF Mono', monospace; }
+  @media (max-width: 720px) {
+    .posts-grid { grid-template-columns: 1fr; }
+    .examples { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ============== INFOGRAPHIC CARD (screenshot this) ============== -->
+<div class="card">
+
+  <div class="header">
+    <div class="badge">{{BADGE}}</div>
+    <h1>{{TITLE}}</h1>
+    <p class="subtitle">{{SUBTITLE}}</p>
+  </div>
+
+  <!-- ANATOMY: central pattern broken into color-coded chunks
+       Use classes c1..c5 to match the legend below.
+       Insert <span class="chunk sep">-</span> between chunks for separators. -->
+  <div class="formula">
+    <div class="formula-label">{{ANATOMY_LABEL}}</div>
+    <div class="formula-name">
+      <span class="chunk c1">{{ANATOMY_PART_1}}</span>
+      <span class="chunk sep">-</span>
+      <span class="chunk c2">{{ANATOMY_PART_2}}</span>
+      <span class="chunk sep">-</span>
+      <span class="chunk c3">{{ANATOMY_PART_3}}</span>
+      <span class="chunk sep">-</span>
+      <span class="chunk c4">{{ANATOMY_PART_4}}</span>
+      <span class="chunk sep">-</span>
+      <span class="chunk c5">{{ANATOMY_PART_5}}</span>
+    </div>
+
+    <!-- LEGEND: one item per chunk color used above -->
+    <div class="legend">
+      <div class="legend-item">
+        <div class="legend-title"><span class="legend-dot" style="background:#6b7ce0"></span>{{LEGEND_1_TITLE}}</div>
+        <div class="legend-desc">{{LEGEND_1_DESC}}</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-title"><span class="legend-dot" style="background:#fbbf24"></span>{{LEGEND_2_TITLE}}</div>
+        <div class="legend-desc">{{LEGEND_2_DESC}}</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-title"><span class="legend-dot" style="background:#f87171"></span>{{LEGEND_3_TITLE}}</div>
+        <div class="legend-desc">{{LEGEND_3_DESC}}</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-title"><span class="legend-dot" style="background:#4ade80"></span>{{LEGEND_4_TITLE}}</div>
+        <div class="legend-desc">{{LEGEND_4_DESC}}</div>
+      </div>
+      <div class="legend-item">
+        <div class="legend-title"><span class="legend-dot" style="background:#a78bfa"></span>{{LEGEND_5_TITLE}}</div>
+        <div class="legend-desc">{{LEGEND_5_DESC}}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXAMPLES: 2-4 real cases. Each example breaks the pattern into chunks
+       using the SAME color classes as the anatomy. Stats are optional. -->
+  <div class="examples">
+
+    <div class="example">
+      <div class="example-name">
+        <span class="example-chunk c1">{{EX1_PART_1}}</span>
+        <span class="example-chunk sep">-</span>
+        <span class="example-chunk c3">{{EX1_PART_2}}</span>
+      </div>
+      <div class="stats">
+        <span class="stat">{{EX1_STAT_LABEL}}<span class="type-pill b">{{EX1_TYPE}}</span></span>
+        <span class="stat">{{EX1_STAT_1_KEY}}: <strong>{{EX1_STAT_1_VAL}}</strong></span>
+        <span class="stat">{{EX1_STAT_2_KEY}}: <strong>{{EX1_STAT_2_VAL}}</strong></span>
+      </div>
+    </div>
+
+    <div class="example">
+      <div class="example-name">
+        <span class="example-chunk c1">{{EX2_PART_1}}</span>
+        <span class="example-chunk sep">-</span>
+        <span class="example-chunk c3">{{EX2_PART_2}}</span>
+        <span class="example-chunk sep">-</span>
+        <span class="example-chunk c4">{{EX2_PART_3}}</span>
+      </div>
+      <div class="stats">
+        <span class="stat">{{EX2_STAT_LABEL}}<span class="type-pill a">{{EX2_TYPE}}</span></span>
+        <span class="stat">{{EX2_STAT_1_KEY}}: <strong>{{EX2_STAT_1_VAL}}</strong></span>
+        <span class="stat">{{EX2_STAT_2_KEY}}: <strong>{{EX2_STAT_2_VAL}}</strong></span>
+      </div>
+    </div>
+
+    <!-- Add more <div class="example">...</div> blocks as needed (2-4 total) -->
+
+  </div>
+
+  <div class="key-insight">
+    <div class="insight-label">★ {{INSIGHT_LABEL}}</div>
+    <div class="insight-text">{{INSIGHT_TEXT}}</div>
+  </div>
+
+  <div class="footer">
+    {{FOOTER_TEXT}}
+    <div class="signature">
+      <span class="signature-icon">𝕏</span>
+      <span class="signature-handle">@dale_nguyen</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============== COPY-READY POST DRAFTS (not part of screenshot) ============== -->
+<div class="posts-wrap">
+  <div class="posts-grid">
+
+    <div class="post-card">
+      <div class="post-head">
+        <div class="post-platform">
+          <span class="post-icon linkedin">in</span>
+          LinkedIn post
+        </div>
+        <button class="copy-btn" onclick="copyPost('linkedin-text', this)">Copy</button>
+      </div>
+      <div class="post-body" id="linkedin-text">{{LINKEDIN_POST}}</div>
+    </div>
+
+    <div class="post-card">
+      <div class="post-head">
+        <div class="post-platform">
+          <span class="post-icon x">𝕏</span>
+          X / Twitter thread
+        </div>
+        <button class="copy-btn" onclick="copyPost('x-text', this)">Copy</button>
+      </div>
+      <div class="post-body" id="x-text">{{X_THREAD}}</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function copyPost(id, btn) {
+    const text = document.getElementById(id).innerText;
+    navigator.clipboard.writeText(text).then(() => {
+      const original = btn.textContent;
+      btn.textContent = '✓ Copied';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = original;
+        btn.classList.remove('copied');
+      }, 1800);
+    });
+  }
+</script>
+
+</body>
+</html>
