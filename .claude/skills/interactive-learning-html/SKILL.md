@@ -9,6 +9,8 @@ description: Use when asked to turn an article, blog post, documentation page, o
 
 Convert a static article or URL into a self-contained single-file HTML learning experience: dark theme, progress tracking, collapsible sections, live demos, and quizzes.
 
+**Use Claude Opus 4.7** (`claude-opus-4-7`) for this task — the HTML generation requires sustained reasoning over large content.
+
 ## Project Integration
 
 Files live at: `libs/portfolio/shared/learn/<kebab-slug>.html`
@@ -49,6 +51,21 @@ See `references/tooltip-pattern.md` for the full implementation.
 - `references/tooltip-pattern.md` — overflow-safe tooltip with smart right/left/below fallback
 - `references/demo-patterns.md` — race bars, optimistic update, component tree, quiz, progress tracking
 
+## Source Reference Footer
+
+Every page must end with a source attribution block just before `</body>`:
+
+```html
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="SOURCE_URL" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Source Title</a>
+  </div>
+</div>
+```
+
 ## Delivery Checklist
 
 - [ ] WebFetch called on source URL
@@ -59,5 +76,6 @@ See `references/tooltip-pattern.md` for the full implementation.
 - [ ] Each section has a live demo
 - [ ] Each section ends with a quiz question
 - [ ] Progress bar and completion banner wired up
+- [ ] Source reference footer added before `</body>`
 - [ ] No external CDN links — fully self-contained
 - [ ] Opened at `/learn/<filename>.html` in dev server to verify
