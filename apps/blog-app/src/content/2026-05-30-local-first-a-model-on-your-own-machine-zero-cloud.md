@@ -24,14 +24,29 @@ Apple Silicon Mac, 48 GB unified memory, **Ollama** already installed. The demo 
 
 > The wider Portway series uses `llama.cpp` on Mac (Ollama is called out as problematic for Qwen3.5 in Post 2). For Post 1 — one model, prove the contract — Ollama is fine and already on the box.
 
+## Model options by available RAM
+
+The demo script works with any Ollama-served model — just substitute the model name in `demo.py`. The table below covers machines from 9 GB unified memory upward.
+
+| Model | Pull command | Approx size | Min RAM | Notes |
+|---|---|---|---|---|
+| `llama3.2:3b` | `ollama pull llama3.2:3b` | ~2 GB | 8 GB | Fastest; good for testing the contract |
+| `gemma3:4b` | `ollama pull gemma3:4b` | ~3 GB | 8 GB | Google; solid instruction-following |
+| `mistral:7b` | `ollama pull mistral:7b` | ~4.1 GB | 8 GB | Classic 7B baseline |
+| `llama3.1:8b` | `ollama pull llama3.1:8b` | ~4.7 GB | 9 GB | Best quality under 10 GB |
+| `qwen2.5:7b` | `ollama pull qwen2.5:7b` | ~4.4 GB | 9 GB | Strong at instruction + reasoning |
+| `gpt-oss:20b` | `ollama pull gpt-oss:20b` | ~14 GB | 24 GB | Used in this post's sample output |
+
+On a 9 GB machine, replace `gpt-oss:20b` in `demo.py` with `llama3.1:8b` or `qwen2.5:7b` — the contract demonstration is identical.
+
 ## Prerequisites
 
 - [Ollama](https://ollama.com) running locally (`curl -s http://localhost:11434/api/tags` should return JSON)
 - [uv](https://docs.astral.sh/uv/) installed (`uv --version`)
-- The `gpt-oss:20b` model pulled:
+- The model pulled. This post uses `gpt-oss:20b` (requires ~24 GB RAM); see [Model options by available RAM](#model-options-by-available-ram) for lighter alternatives on 9 GB+ machines.
 
 ```bash
-ollama pull gpt-oss:20b
+ollama pull llama3.2:3b
 ```
 
 ## Run it
@@ -45,7 +60,7 @@ uv run --project 1-local-first python 1-local-first/demo.py
 
 ## Sample output
 
-A real run on this machine (M4-class Mac, 48 GB, `gpt-oss:20b` via Ollama):
+A real run on this machine (M4-class Mac, 48 GB, `gpt-oss:20b` via Ollama). Numbers will differ with smaller models — `prompt_tokens` for the same input stays deterministic regardless of model:
 
 ```
 ============================================================
@@ -93,7 +108,7 @@ Understanding this is the foundation for everything that follows in the series:
 
 ## Things worth noting now
 
-**Context size eats RAM/VRAM.** Ollama's default context for `gpt-oss:20b` is conservative; raising it (e.g. `ollama run gpt-oss:20b` → `/set parameter num_ctx 32768`) costs unified memory. It was not changed for this post.
+**Context size eats RAM/VRAM.** Ollama's default context window is conservative for most models; raising it (e.g. `ollama run llama3.2:3b` → `/set parameter num_ctx 32768`) costs unified memory. It was not changed for this post.
 
 **gpt-oss emits a reasoning channel** (Harmony format). The engine applies the template; you still get a normal `message.content`. The reasoning channel will be segregated at the gateway in Post 3.
 
