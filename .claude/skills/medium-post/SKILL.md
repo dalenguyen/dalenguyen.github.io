@@ -45,6 +45,9 @@ TOPICS  = ["Topic1", "Topic2"]   # mapped from categories
 
 context = launch_persistent_context(PROFILE_DIR, headless=False)
 
+# Grant clipboard permissions before any navigation
+context.grant_permissions(['clipboard-read', 'clipboard-write'])
+
 # ── Fetch rendered HTML from live blog ──────────────────────────────────────
 blog = context.new_page()
 blog.goto(f'https://dalenguyen.me/blog/{SLUG}')
@@ -76,34 +79,45 @@ full_html = f'<figure><img src="{COVER}"><figcaption>{TITLE}</figcaption></figur
 
 # ── Open Medium editor ───────────────────────────────────────────────────────
 page = context.new_page()
+context.grant_permissions(['clipboard-read', 'clipboard-write'])
 page.goto('https://medium.com/new-story')
-page.wait_for_load_state('networkidle', timeout=30000)
+page.wait_for_load_state('domcontentloaded', timeout=30000)
+time.sleep(3)
 
 if '/new-story' not in page.url:
     print("Please log in to Medium in the browser window...")
     page.wait_for_url('**/new-story**', timeout=120000)
 
+# ── Write HTML to clipboard via clipboard API ────────────────────────────────
+# DataTransfer + ClipboardEvent does NOT work in Medium's editor (May 2026).
+# Must use navigator.clipboard.write() + real Meta+v keystroke.
+result = page.evaluate(f"""async () => {{
+  try {{
+    var html = {json.dumps(full_html)};
+    var blob = new Blob([html], {{ type: 'text/html' }});
+    var item = new ClipboardItem({{ 'text/html': blob }});
+    await navigator.clipboard.write([item]);
+    return 'ok - len: ' + html.length;
+  }} catch(e) {{
+    return 'error: ' + e.message;
+  }}
+}}""")
+print(f"Clipboard: {result}")
+time.sleep(0.5)
+
 # ── Set title ────────────────────────────────────────────────────────────────
 # Medium uses plain contenteditable divs — data-testid/h1 selectors broken (May 2026)
 title_el = page.locator('div[contenteditable="true"]').first
-title_el.wait_for(timeout=5000)
+title_el.wait_for(timeout=10000)
 title_el.click()
 page.keyboard.type(TITLE)
 time.sleep(0.5)
 page.keyboard.press('Enter')
-time.sleep(0.5)
+time.sleep(1)
 
-# ── Paste rich HTML ──────────────────────────────────────────────────────────
-page.evaluate(f"""() => {{
-  var html = {json.dumps(full_html)};
-  var dt = new DataTransfer();
-  dt.setData('text/html', html);
-  dt.setData('text/plain', '');
-  document.activeElement.dispatchEvent(
-    new ClipboardEvent('paste', {{ clipboardData: dt, bubbles: true, cancelable: true }})
-  );
-}}""")
-time.sleep(4)
+# ── Paste — cursor is already in body after Enter, no re-focus needed ────────
+page.keyboard.press('Meta+v')
+time.sleep(5)
 
 print(f"Draft URL: {page.url}")
 print(f"Topics to add manually: {', '.join(TOPICS)}")
@@ -127,3 +141,6 @@ After the script runs:
 - **Tables** in the blog post will not render in Medium (Medium doesn't support tables) — leave as-is
 - The `<figure><figcaption>` pattern is the correct way to embed cover image + caption in one paste — `<img><br>` causes the following text to be misinterpreted as the caption
 - CloakBrowser passes Medium's bot detection reliably
+- **`DataTransfer` + `ClipboardEvent` does NOT work** in Medium's editor — the paste event fires but Medium ignores it. Use `navigator.clipboard.write()` with `ClipboardItem` + a real `Meta+v` keystroke instead
+- After pressing Enter at the end of the title, the cursor is already in the body area — no JS re-focus is needed before `Meta+v`
+- Use `domcontentloaded` (not `networkidle`) for the Medium editor page — Medium never reaches networkidle
