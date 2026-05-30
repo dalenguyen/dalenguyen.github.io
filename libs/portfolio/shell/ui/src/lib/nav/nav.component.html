@@ -56,6 +56,25 @@
             Thoughts
           </div>
         </li>
+        <li [ngClass]="isActive('learn')" (click)="navigateTo('learn')" class="cursor-pointer p-5 hover:bg-black/15 hover:shadow-[inset_0_0_0.25em_0_rgba(0,0,0,0.125)] transition-all duration-200 [&.active]:bg-black/15 [&.active]:shadow-[inset_0_0_0.25em_0_rgba(0,0,0,0.125)] [&.active]:text-white [&.active_svg]:text-[#e27689]">
+          <div id="learn-link" class="nav flex justify-between w-full">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              class="w-6 h-6"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.966 8.966 0 00-6 2.292m0-14.25v14.25"
+              />
+            </svg>
+            Learning
+          </div>
+        </li>
         <li [ngClass]="isActive('portfolio')" (click)="scroll('portfolio')" class="cursor-pointer p-5 hover:bg-black/15 hover:shadow-[inset_0_0_0.25em_0_rgba(0,0,0,0.125)] transition-all duration-200 [&.active]:bg-black/15 [&.active]:shadow-[inset_0_0_0.25em_0_rgba(0,0,0,0.125)] [&.active]:text-white [&.active_svg]:text-[#e27689]">
           <div id="portfolio-link" class="nav flex justify-between w-full">
             <svg

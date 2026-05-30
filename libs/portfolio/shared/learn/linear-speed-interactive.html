@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How is Linear So Fast? — Interactive Breakdown</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --accent: #5e6ad2;
+    --accent-glow: rgba(94,106,210,0.25);
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #7a7a99;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ── Layout ── */
+  .hero {
+    text-align: center;
+    padding: 64px 24px 48px;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94,106,210,0.12) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    background: linear-gradient(135deg, #fff 40%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    max-width: 560px;
+    margin: 12px auto 0;
+    font-size: 16px;
+  }
+
+  .progress-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    max-width: 480px;
+    margin: 32px auto 0;
+  }
+
+  .progress-bar-track {
+    flex: 1;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--accent);
+    border-radius: 99px;
+    transition: width 0.4s ease;
+  }
+
+  .progress-label { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+  main { max-width: 860px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── Section cards ── */
+  .section {
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+
+  .section:hover { border-color: var(--accent); }
+  .section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .section-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    border: 1px solid var(--border);
+  }
+
+  .section-title-group { flex: 1; }
+  .section-title { font-weight: 600; font-size: 16px; }
+  .section-subtitle { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  .section-chevron {
+    color: var(--muted);
+    transition: transform 0.25s ease;
+    font-size: 18px;
+  }
+  .section.active .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 0 24px 24px;
+  }
+  .section.active .section-body { display: block; }
+
+  .divider { border: none; border-top: 1px solid var(--border); margin-bottom: 20px; }
+
+  /* ── Concept tabs ── */
+  .tabs { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 20px; }
+
+  .tab {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .tab:hover { border-color: var(--accent); color: var(--text); }
+  .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── Demo blocks ── */
+  .demo {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+  }
+
+  .demo-header {
+    background: var(--surface2);
+    padding: 10px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .demo-body { padding: 20px; }
+
+  /* ── Latency race ── */
+  .race-container { display: flex; flex-direction: column; gap: 12px; }
+
+  .race-row { display: flex; align-items: center; gap: 12px; }
+
+  .race-label { width: 100px; font-size: 13px; color: var(--muted); flex-shrink: 0; text-align: right; }
+
+  .race-track {
+    flex: 1;
+    height: 28px;
+    background: var(--code-bg);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .race-fill {
+    height: 100%;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .race-fill.slow { background: linear-gradient(90deg, #ef444466, #ef4444); }
+  .race-fill.fast { background: linear-gradient(90deg, #4ade8066, #4ade80); color: #052e16; }
+  .race-fill.medium { background: linear-gradient(90deg, #fbbf2466, #fbbf24); color: #1c1003; }
+
+  .race-btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 16px;
+    transition: opacity 0.15s;
+  }
+  .race-btn:hover { opacity: 0.85; }
+
+  /* ── Optimistic update demo ── */
+  .issue-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .issue-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    font-size: 14px;
+    transition: all 0.2s;
+  }
+
+  .issue-status {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .status-todo { background: var(--muted); }
+  .status-progress { background: var(--amber); }
+  .status-done { background: var(--green); }
+  .status-pending { background: var(--accent); animation: pulse 1s infinite; }
+
+  @keyframes pulse {
+    0%,100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  .issue-title { flex: 1; }
+  .issue-badge {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+  .badge-optimistic { background: rgba(94,106,210,0.2); color: var(--accent); }
+  .badge-synced { background: rgba(74,222,128,0.15); color: var(--green); }
+  .badge-reverted { background: rgba(248,113,113,0.15); color: var(--red); }
+
+  .demo-controls { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+  .ctrl-btn {
+    padding: 7px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .ctrl-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .ctrl-btn.danger:hover { border-color: var(--red); color: var(--red); }
+
+  /* ── Reactivity graph ── */
+  .reactivity-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) { .reactivity-grid { grid-template-columns: 1fr; } }
+
+  .reactivity-panel {
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .reactivity-panel-title {
+    padding: 8px 12px;
+    background: var(--surface2);
+    font-size: 12px;
+    font-weight: 600;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .reactivity-panel-title .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+  }
+
+  .component-tree { padding: 12px; }
+
+  .comp-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    transition: background 0.15s;
+    border: 1px solid transparent;
+  }
+  .comp-node:hover { background: var(--surface2); }
+  .comp-node.re-render { background: rgba(251,191,36,0.12); border-color: var(--amber); }
+  .comp-node.child { margin-left: 16px; }
+  .comp-node.grandchild { margin-left: 32px; }
+
+  .comp-dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--border);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .comp-node.re-render .comp-dot { background: var(--amber); }
+
+  .update-field-label { font-size: 13px; color: var(--muted); margin-bottom: 8px; }
+
+  .field-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+
+  .field-btn {
+    padding: 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: none;
+    color: var(--muted);
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .field-btn:hover { border-color: var(--accent); color: var(--text); }
+
+  /* ── Bundle visualizer ── */
+  .bundle-bars { display: flex; flex-direction: column; gap: 10px; }
+
+  .bundle-row { display: flex; align-items: center; gap: 10px; }
+  .bundle-name { width: 90px; font-size: 13px; color: var(--muted); text-align: right; flex-shrink: 0; }
+
+  .bundle-track {
+    flex: 1;
+    background: var(--code-bg);
+    border-radius: 4px;
+    overflow: hidden;
+    height: 22px;
+  }
+
+  .bundle-fill {
+    height: 100%;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    transition: width 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* ── Animation timeline demo ── */
+  .anim-demo {
+    background: var(--code-bg);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .anim-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .anim-box {
+    width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    background: var(--accent);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.8);
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+    will-change: transform, opacity;
+  }
+
+  .anim-label { font-size: 12px; color: var(--muted); text-align: center; }
+  .anim-note { font-size: 11px; border-radius: 4px; padding: 2px 6px; font-weight: 500; text-align: center; }
+  .note-ok { background: rgba(74,222,128,0.12); color: var(--green); }
+  .note-bad { background: rgba(248,113,113,0.12); color: var(--red); }
+
+  /* ── Architecture diagram ── */
+  .arch-diagram {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    align-items: center;
+    padding: 20px 0;
+  }
+
+  .arch-node {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    max-width: 500px;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+  }
+
+  .arch-node:hover, .arch-node.highlight { border-color: var(--accent); background: rgba(94,106,210,0.08); box-shadow: 0 0 20px var(--accent-glow); }
+
+  .arch-node-icon { font-size: 18px; margin-right: 10px; }
+  .arch-node-desc { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+  .arch-node-inner { display: flex; flex-direction: column; flex: 1; }
+
+  .arch-arrow {
+    width: 2px;
+    height: 28px;
+    background: var(--border);
+    margin: 0 auto;
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .arch-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--border);
+    transform: translateX(-50%);
+    left: 50%;
+  }
+
+  .arch-tooltip {
+    display: none;
+    position: fixed;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    font-weight: 400;
+    color: var(--text);
+    width: 220px;
+    z-index: 1000;
+    pointer-events: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  /* ── Quiz ── */
+  .quiz-question {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    background: var(--surface2);
+    margin-bottom: 16px;
+  }
+
+  .quiz-q { font-weight: 600; margin-bottom: 14px; }
+  .quiz-options { display: flex; flex-direction: column; gap: 8px; }
+
+  .quiz-opt {
+    padding: 10px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.08); color: var(--red); }
+  .quiz-opt:disabled { cursor: default; }
+
+  .quiz-feedback { margin-top: 10px; font-size: 13px; display: none; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { color: var(--green); }
+  .quiz-feedback.wrong-fb { color: var(--red); }
+
+  /* ── KV chips ── */
+  .kv-chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+
+  .kv-chip {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    font-size: 12px;
+  }
+
+  .kv-chip-key {
+    padding: 4px 9px;
+    background: var(--surface2);
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .kv-chip-val {
+    padding: 4px 9px;
+    color: var(--text);
+  }
+
+  /* ── Callout ── */
+  .callout {
+    border-left: 3px solid var(--accent);
+    background: rgba(94,106,210,0.06);
+    border-radius: 0 8px 8px 0;
+    padding: 12px 16px;
+    font-size: 14px;
+    margin: 16px 0;
+    color: var(--text);
+  }
+
+  code {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Fira Code', 'Menlo', monospace;
+    font-size: 12.5px;
+    color: #c8d3f5;
+    border: 1px solid var(--border);
+  }
+
+  p { margin-bottom: 10px; color: var(--muted); font-size: 14px; }
+  p:last-child { margin-bottom: 0; }
+
+  ul { padding-left: 18px; color: var(--muted); font-size: 14px; }
+  li { margin-bottom: 5px; }
+  strong { color: var(--text); }
+
+  /* ── Completion banner ── */
+  .completion-banner {
+    display: none;
+    text-align: center;
+    padding: 40px;
+    border: 1px solid var(--green);
+    border-radius: 14px;
+    background: rgba(74,222,128,0.05);
+    margin-top: 32px;
+  }
+  .completion-banner.show { display: block; }
+  .completion-banner h2 { color: var(--green); margin-bottom: 8px; }
+  .completion-banner p { color: var(--muted); font-size: 15px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>How is Linear So Fast?</h1>
+  <p>An interactive technical breakdown of the architecture decisions behind one of the fastest web apps ever built.</p>
+  <div class="progress-bar-wrap">
+    <span class="progress-label" id="progress-text">0 / 6 sections</span>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+  </div>
+</div>
+
+<main>
+
+  <!-- ── Section 1: Core Philosophy ── -->
+  <div class="section" id="s1" data-section="1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-icon">🔄</div>
+      <div class="section-title-group">
+        <div class="section-title">The Core Inversion</div>
+        <div class="section-subtitle">Server as sync target, not source of truth</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <p>Most web apps have a simple loop: <strong>user acts → request sent → server responds → UI updates</strong>. Every action waits on the network. Linear broke this entirely.</p>
+
+      <div class="callout">
+        <strong>"The actual database the UI reads from is in the browser, in IndexedDB. Mutations apply locally first, then asynchronously push to the server."</strong>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this, 'arch-tabs', 'arch-traditional')">Traditional</button>
+        <button class="tab" onclick="switchTab(this, 'arch-tabs', 'arch-linear')">Linear's Way</button>
+      </div>
+      <div id="arch-tabs">
+        <div class="tab-panel active" id="arch-traditional">
+          <div class="arch-diagram">
+            <div class="arch-node">
+              <div class="arch-node-icon">👤</div>
+              <div class="arch-node-inner">
+                <div>User Action</div>
+                <div class="arch-node-desc">e.g., close an issue</div>
+              </div>
+              <div class="arch-tooltip">User performs action in the UI.</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-node-icon">📡</div>
+              <div class="arch-node-inner">
+                <div>Network Request</div>
+                <div class="arch-node-desc">POST /api/issues/:id — ~50-300ms</div>
+              </div>
+              <div class="arch-tooltip">UI freezes or shows spinner while waiting for server.</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-node-icon">🖥️</div>
+              <div class="arch-node-inner">
+                <div>Server Responds</div>
+                <div class="arch-node-desc">Validates, persists, returns updated data</div>
+              </div>
+              <div class="arch-tooltip">Server is the source of truth. UI can't update until it agrees.</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-node-icon">🖼️</div>
+              <div class="arch-node-inner">
+                <div>UI Updates</div>
+                <div class="arch-node-desc">Finally reflects the change</div>
+              </div>
+              <div class="arch-tooltip">Total lag = network round-trip + server processing time.</div>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="arch-linear">
+          <div class="arch-diagram">
+            <div class="arch-node">
+              <div class="arch-node-icon">👤</div>
+              <div class="arch-node-inner">
+                <div>User Action</div>
+                <div class="arch-node-desc">e.g., close an issue</div>
+              </div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node highlight">
+              <div class="arch-node-icon">🗄️</div>
+              <div class="arch-node-inner">
+                <div>Local MobX State Updates</div>
+                <div class="arch-node-desc">Instant — in-memory, no I/O</div>
+              </div>
+              <div class="arch-tooltip">The UI reads from MobX observables, not the server. Update is instant.</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-node-icon">🖼️</div>
+              <div class="arch-node-inner">
+                <div>UI Updates Instantly</div>
+                <div class="arch-node-desc">Feels native — zero wait</div>
+              </div>
+              <div class="arch-tooltip">Component re-renders happen synchronously against local state.</div>
+            </div>
+            <div class="arch-arrow"></div>
+            <div class="arch-node">
+              <div class="arch-node-icon">☁️</div>
+              <div class="arch-node-inner">
+                <div>Server Sync (Background)</div>
+                <div class="arch-node-desc">Mutation queued and sent async</div>
+              </div>
+              <div class="arch-tooltip">Network request goes out in the background. User is never blocked by it.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <div class="demo-header">Latency Race — Local vs Network</div>
+        <div class="demo-body">
+          <div class="race-container" id="race-container">
+            <div class="race-row">
+              <div class="race-label">Local read</div>
+              <div class="race-track"><div class="race-fill fast" id="race-local"></div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">LAN (~1ms)</div>
+              <div class="race-track"><div class="race-fill medium" id="race-lan"></div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">Good WiFi</div>
+              <div class="race-track"><div class="race-fill medium" id="race-wifi"></div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">Mobile 4G</div>
+              <div class="race-track"><div class="race-fill slow" id="race-4g"></div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">Server RTT</div>
+              <div class="race-track"><div class="race-fill slow" id="race-server"></div></div>
+            </div>
+          </div>
+          <button class="race-btn" onclick="runRace()">▶ Run Race</button>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-q">Q: When you update an issue in Linear, when does the UI change?</div>
+        <div class="quiz-options" id="q1-opts">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">After the server confirms the write</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">Immediately, before the server is even contacted</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">After IndexedDB flushes to disk</button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 2: Optimistic Updates ── -->
+  <div class="section" id="s2" data-section="2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-icon">⚡</div>
+      <div class="section-title-group">
+        <div class="section-title">Optimistic Updates</div>
+        <div class="section-subtitle">Assume success, revert on failure</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <p>Traditional UIs block until the server responds. Optimistic UIs <strong>assume the server will agree</strong> and apply changes instantly. If it doesn't, they revert.</p>
+
+      <div class="kv-chips">
+        <div class="kv-chip"><div class="kv-chip-key">Spinners shown</div><div class="kv-chip-val">0 for mutations</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Perceived latency</div><div class="kv-chip-val">~0ms</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Failure rate</div><div class="kv-chip-val">Very low → revert cost acceptable</div></div>
+      </div>
+
+      <div class="demo">
+        <div class="demo-header">Interactive — Optimistic Update Simulation</div>
+        <div class="demo-body">
+          <div class="issue-list" id="issue-list">
+            <div class="issue-item">
+              <div class="issue-status status-todo"></div>
+              <div class="issue-title">ENG-101 — Fix sidebar overflow bug</div>
+            </div>
+            <div class="issue-item">
+              <div class="issue-status status-progress"></div>
+              <div class="issue-title">ENG-102 — Add webhook support</div>
+            </div>
+            <div class="issue-item">
+              <div class="issue-status status-todo"></div>
+              <div class="issue-title">ENG-103 — Update dependencies</div>
+            </div>
+          </div>
+          <div class="demo-controls">
+            <button class="ctrl-btn" onclick="optimisticUpdate()">Close ENG-101 (optimistic)</button>
+            <button class="ctrl-btn danger" onclick="optimisticRevert()">Simulate server rejection</button>
+            <button class="ctrl-btn" onclick="resetIssues()">Reset</button>
+          </div>
+          <div id="optimistic-log" style="margin-top:12px; font-size:12px; color:var(--muted); min-height:20px;"></div>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-q">Q: What happens if the server rejects an optimistic mutation?</div>
+        <div class="quiz-options" id="q2-opts">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">The app crashes and shows an error page</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Nothing — the local state is kept anyway</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">The UI reverts to the pre-mutation state with minimal visual disruption</button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 3: Granular Reactivity ── -->
+  <div class="section" id="s3" data-section="3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-icon">🔬</div>
+      <div class="section-title-group">
+        <div class="section-title">Granular Reactivity with MobX</div>
+        <div class="section-subtitle">Only re-render what actually changed</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <p>React re-renders by default propagate <em>up then down</em> the component tree. MobX observables allow <strong>surgical updates</strong>: only the components that subscribed to the exact changed property re-render.</p>
+
+      <div class="callout">
+        When a single issue's <code>status</code> changes, only the status badge component re-renders — not the parent list, not the sidebar, not the header.
+      </div>
+
+      <div class="demo">
+        <div class="demo-header">Interactive — Which components re-render?</div>
+        <div class="demo-body">
+          <div class="reactivity-grid">
+            <div>
+              <div class="update-field-label">Choose a field to update on ENG-101:</div>
+              <div class="field-buttons">
+                <button class="field-btn" onclick="simulateUpdate('status')">status</button>
+                <button class="field-btn" onclick="simulateUpdate('title')">title</button>
+                <button class="field-btn" onclick="simulateUpdate('priority')">priority</button>
+                <button class="field-btn" onclick="simulateUpdate('assignee')">assignee</button>
+              </div>
+              <div style="margin-top:16px; font-size:12px; color:var(--muted)" id="react-explanation"></div>
+            </div>
+            <div class="reactivity-panel">
+              <div class="reactivity-panel-title">
+                <div class="dot" style="background:var(--accent)"></div>
+                Component Tree
+              </div>
+              <div class="component-tree" id="comp-tree">
+                <div class="comp-node" id="node-app"><div class="comp-dot"></div>App</div>
+                <div class="comp-node child" id="node-sidebar"><div class="comp-dot"></div>Sidebar</div>
+                <div class="comp-node child" id="node-issuelist"><div class="comp-dot"></div>IssueList</div>
+                <div class="comp-node grandchild" id="node-issuerow"><div class="comp-dot"></div>IssueRow (ENG-101)</div>
+                <div class="comp-node grandchild" id="node-statusbadge"><div class="comp-dot"></div>StatusBadge</div>
+                <div class="comp-node grandchild" id="node-titlelabel"><div class="comp-dot"></div>TitleLabel</div>
+                <div class="comp-node grandchild" id="node-priorityicon"><div class="comp-dot"></div>PriorityIcon</div>
+                <div class="comp-node grandchild" id="node-assigneeavatar"><div class="comp-dot"></div>AssigneeAvatar</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-q">Q: What makes MobX particularly suited for apps like Linear?</div>
+        <div class="quiz-options" id="q3-opts">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">It replaces IndexedDB for faster writes</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">It tracks individual property access, so only observers of a changed value re-render</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">It server-side renders components automatically</button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 4: Bundle & Load ── -->
+  <div class="section" id="s4" data-section="4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-icon">📦</div>
+      <div class="section-title-group">
+        <div class="section-title">Bundle Strategy & Load Optimization</div>
+        <div class="section-subtitle">50% less code, parallel fetches, service worker cache</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this, 'load-tabs', 'tab-bundle')">Bundle Size</button>
+        <button class="tab" onclick="switchTab(this, 'load-tabs', 'tab-preload')">Module Preloading</button>
+        <button class="tab" onclick="switchTab(this, 'load-tabs', 'tab-sw')">Service Worker</button>
+        <button class="tab" onclick="switchTab(this, 'load-tabs', 'tab-auth')">Auth Deferral</button>
+      </div>
+      <div id="load-tabs">
+        <div class="tab-panel active" id="tab-bundle">
+          <p>Linear migrated through four bundlers — Parcel → Rollup → Vite → Rolldown — optimizing at each step. The key wins:</p>
+          <ul>
+            <li><strong>Modern-browser targeting</strong> — no polyfills for features all modern browsers support</li>
+            <li><strong>Aggressive code splitting</strong> — routes load only what they need</li>
+            <li><strong>Tree shaking</strong> — dead code removed at build time</li>
+          </ul>
+          <div class="demo" style="margin-top:16px">
+            <div class="demo-header">Bundle Size Comparison (relative)</div>
+            <div class="demo-body" id="bundle-demo">
+              <div class="bundle-bars">
+                <div class="bundle-row">
+                  <div class="bundle-name">Baseline</div>
+                  <div class="bundle-track"><div class="bundle-fill" id="b-base" style="background:var(--muted);color:var(--bg);">loading…</div></div>
+                </div>
+                <div class="bundle-row">
+                  <div class="bundle-name">Modern target</div>
+                  <div class="bundle-track"><div class="bundle-fill" id="b-modern" style="background:var(--amber);color:#1c1003;">loading…</div></div>
+                </div>
+                <div class="bundle-row">
+                  <div class="bundle-name">+ Code split</div>
+                  <div class="bundle-track"><div class="bundle-fill" id="b-split" style="background:var(--accent);">loading…</div></div>
+                </div>
+                <div class="bundle-row">
+                  <div class="bundle-name">Final (compressed)</div>
+                  <div class="bundle-track"><div class="bundle-fill" id="b-final" style="background:var(--green);color:#052e16;">loading…</div></div>
+                </div>
+              </div>
+              <button class="race-btn" onclick="animateBundles()">Visualize reduction</button>
+            </div>
+          </div>
+        </div>
+        <div class="tab-panel" id="tab-preload">
+          <p>Without preloading, the browser discovers JS chunks sequentially — a <strong>waterfall</strong> that delays interactivity.</p>
+          <div class="callout">
+            Linear's HTML contains <code>&lt;link rel="modulepreload"&gt;</code> for every critical chunk. The browser fetches all of them <strong>in parallel</strong>, before the entry script even runs.
+          </div>
+          <ul>
+            <li>Waterfall collapsed into parallel fetches</li>
+            <li>Chunks arrive before they're needed</li>
+            <li>Time-to-interactive drops significantly</li>
+          </ul>
+        </div>
+        <div class="tab-panel" id="tab-sw">
+          <p>A service worker pre-caches ~1,200 assets in the background after the first visit.</p>
+          <div class="kv-chips">
+            <div class="kv-chip"><div class="kv-chip-key">Assets cached</div><div class="kv-chip-val">~1,200</div></div>
+            <div class="kv-chip"><div class="kv-chip-key">Subsequent loads</div><div class="kv-chip-val">Instant (disk)</div></div>
+            <div class="kv-chip"><div class="kv-chip-key">Offline support</div><div class="kv-chip-val">Partial ✓</div></div>
+          </div>
+          <p>On subsequent visits, JS and CSS come from cache — no network round-trip needed at all.</p>
+        </div>
+        <div class="tab-panel" id="tab-auth">
+          <p>Traditional apps block rendering until the session is verified. Linear does the opposite:</p>
+          <ol style="padding-left:18px; color:var(--muted); font-size:14px;">
+            <li style="margin-bottom:6px">Check <code>localStorage</code> for cached workspace data</li>
+            <li style="margin-bottom:6px">If found, <strong>render immediately</strong></li>
+            <li style="margin-bottom:6px">Verify auth token asynchronously in the sync engine</li>
+            <li style="margin-bottom:6px">If auth fails, redirect — but this is rare</li>
+          </ol>
+          <div class="callout">The optimistic assumption is: if you have cached data, you're probably authenticated. Don't penalize 99% of loads for the 1% edge case.</div>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-q">Q: What did Linear's use of <code>modulepreload</code> primarily solve?</div>
+        <div class="quiz-options" id="q4-opts">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">It compressed JavaScript bundles by 50%</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">It collapsed sequential JS discovery waterfalls into parallel fetches</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">It replaced the service worker for offline caching</button>
+        </div>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 5: Runtime UX ── -->
+  <div class="section" id="s5" data-section="5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-icon">⌨️</div>
+      <div class="section-title-group">
+        <div class="section-title">Runtime Responsiveness</div>
+        <div class="section-subtitle">Keyboard-first design and animation discipline</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab(this, 'runtime-tabs', 'tab-kbd')">Keyboard-First</button>
+        <button class="tab" onclick="switchTab(this, 'runtime-tabs', 'tab-anim')">Animation Discipline</button>
+      </div>
+      <div id="runtime-tabs">
+        <div class="tab-panel active" id="tab-kbd">
+          <p>Every common action in Linear has a keyboard shortcut. The command palette (<code>⌘K</code>) searches the local data store — no network request required.</p>
+          <div class="kv-chips">
+            <div class="kv-chip"><div class="kv-chip-key">Issue creation</div><div class="kv-chip-val">C</div></div>
+            <div class="kv-chip"><div class="kv-chip-key">Command palette</div><div class="kv-chip-val">⌘K</div></div>
+            <div class="kv-chip"><div class="kv-chip-key">Status change</div><div class="kv-chip-val">S then 1-5</div></div>
+            <div class="kv-chip"><div class="kv-chip-key">Search</div><div class="kv-chip-val">/ or ⌘K</div></div>
+          </div>
+          <p>Since <code>⌘K</code> results come from the in-memory store, they appear in <strong>under 16ms</strong> — faster than a single animation frame.</p>
+        </div>
+        <div class="tab-panel" id="tab-anim">
+          <p>Linear restricts animations to properties that don't trigger layout recalculation:</p>
+          <div class="anim-demo" id="anim-demo">
+            <div class="anim-item">
+              <div class="anim-box" id="anim-transform" onclick="playAnim('transform')">transform</div>
+              <div class="anim-label">transform<br>translate/scale</div>
+              <div class="anim-note note-ok">✓ GPU only</div>
+            </div>
+            <div class="anim-item">
+              <div class="anim-box" id="anim-opacity" onclick="playAnim('opacity')" style="opacity:0.5">opacity</div>
+              <div class="anim-label">opacity</div>
+              <div class="anim-note note-ok">✓ GPU only</div>
+            </div>
+            <div class="anim-item">
+              <div class="anim-box" id="anim-bgcolor" onclick="playAnim('bgcolor')" style="background:var(--surface2)">background</div>
+              <div class="anim-label">background-color<br>(occasional)</div>
+              <div class="anim-note note-ok">~ Paint only</div>
+            </div>
+            <div class="anim-item">
+              <div class="anim-box" id="anim-layout" onclick="playAnim('layout')" style="background:var(--red)">layout</div>
+              <div class="anim-label">width / height<br>margin / padding</div>
+              <div class="anim-note note-bad">✗ Triggers layout</div>
+            </div>
+          </div>
+          <p style="margin-top:12px">Click each box to preview. Transition durations are kept to <strong>100-250ms</strong> — below the perceptibility threshold.</p>
+        </div>
+      </div>
+
+      <div class="quiz-question">
+        <div class="quiz-q">Q: Why does Linear avoid animating <code>width</code> or <code>height</code>?</div>
+        <div class="quiz-options" id="q5-opts">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">These properties can't be animated in CSS</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">They trigger layout recalculation on every frame, causing jank</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">They require JavaScript to animate, not CSS transitions</button>
+        </div>
+        <div class="quiz-feedback" id="q5-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Section 6: The Whole Picture ── -->
+  <div class="section" id="s6" data-section="6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-icon">🧩</div>
+      <div class="section-title-group">
+        <div class="section-title">The Whole Picture</div>
+        <div class="section-subtitle">Hundreds of decisions, working together</div>
+      </div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <hr class="divider">
+
+      <div class="callout">
+        <strong>"There's no single thing that makes an app performant. It's the culmination of hundreds of decisions made correctly."</strong>
+      </div>
+
+      <div class="kv-chips" style="margin-top:16px">
+        <div class="kv-chip"><div class="kv-chip-key">Frontend</div><div class="kv-chip-val">React + MobX + TypeScript</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Rich text</div><div class="kv-chip-val">ProseMirror</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Backend</div><div class="kv-chip-val">Node.js + PostgreSQL + Redis</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Infra</div><div class="kv-chip-val">GCP + Kubernetes</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Rendering</div><div class="kv-chip-val">CSR only (no SSR)</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Bundler</div><div class="kv-chip-val">Rolldown</div></div>
+      </div>
+
+      <p style="margin-top:16px">How each layer eliminates latency:</p>
+      <ul>
+        <li><strong>Local-first data</strong> → no loading states for reads</li>
+        <li><strong>Optimistic mutations</strong> → no waiting for writes</li>
+        <li><strong>MobX observables</strong> → no cascading re-renders</li>
+        <li><strong>Module preloading</strong> → no sequential JS waterfalls</li>
+        <li><strong>Service worker</strong> → no network hits on repeat visits</li>
+        <li><strong>Keyboard shortcuts</strong> → minimal interaction distance</li>
+        <li><strong>Animation discipline</strong> → no layout jank</li>
+      </ul>
+
+      <div class="quiz-question" style="margin-top:20px">
+        <div class="quiz-q">Q: Linear chose client-side rendering (CSR) over server-side rendering (SSR). What's the key reason this works well for them?</div>
+        <div class="quiz-options" id="q6-opts">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">SSR is technically impossible with MobX</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">The local-first data model means the app hydrates from IndexedDB, making the server render unnecessary — and the service worker handles caching</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">CSR always loads faster than SSR regardless of setup</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="completion-banner" id="completion-banner">
+    <h2>All sections complete</h2>
+    <p>You now understand the architecture behind one of the fastest web apps ever built. The key insight: speed is a <em>system property</em>, not a feature.</p>
+  </div>
+
+</main>
+
+<script>
+// ── State ──
+const opened = new Set();
+const answered = new Set();
+const totalSections = 6;
+
+function updateProgress() {
+  const pct = (opened.size / totalSections) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+  if (opened.size === totalSections) {
+    document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+// ── Section toggle ──
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  const wasActive = el.classList.contains('active');
+  el.classList.toggle('active');
+  if (!wasActive) {
+    opened.add(id);
+    updateProgress();
+    // trigger bundler animation when s4 opens
+    if (id === 's4') setTimeout(animateBundles, 300);
+  }
+}
+
+// ── Tabs ──
+function switchTab(btn, groupId, panelId) {
+  const group = document.getElementById(groupId);
+  group.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.closest('.section-body').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(panelId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ── Latency race ──
+const raceData = [
+  { id: 'race-local', pct: 2, label: '~0.05ms' },
+  { id: 'race-lan',   pct: 8, label: '~1ms' },
+  { id: 'race-wifi',  pct: 25, label: '~30ms' },
+  { id: 'race-4g',    pct: 55, label: '~80ms' },
+  { id: 'race-server',pct: 90, label: '~150ms' },
+];
+
+function runRace() {
+  raceData.forEach(r => {
+    const el = document.getElementById(r.id);
+    el.style.width = '0%';
+    el.textContent = '';
+  });
+  setTimeout(() => {
+    raceData.forEach((r, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(r.id);
+        el.style.width = r.pct + '%';
+        el.textContent = r.label;
+      }, i * 120);
+    });
+  }, 100);
+}
+
+// ── Optimistic updates ──
+const originalIssues = [
+  { status: 'todo', title: 'ENG-101 — Fix sidebar overflow bug' },
+  { status: 'progress', title: 'ENG-102 — Add webhook support' },
+  { status: 'todo', title: 'ENG-103 — Update dependencies' },
+];
+
+let optimisticApplied = false;
+
+function renderIssues(issues) {
+  const list = document.getElementById('issue-list');
+  list.innerHTML = issues.map(iss => `
+    <div class="issue-item">
+      <div class="issue-status status-${iss.status}"></div>
+      <div class="issue-title">${iss.title}</div>
+      ${iss.badge ? `<div class="issue-badge badge-${iss.badge}">${iss.badge}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function optimisticUpdate() {
+  if (optimisticApplied) return;
+  optimisticApplied = true;
+  const issues = [
+    { status: 'done', title: 'ENG-101 — Fix sidebar overflow bug', badge: 'optimistic' },
+    { status: 'progress', title: 'ENG-102 — Add webhook support' },
+    { status: 'todo', title: 'ENG-103 — Update dependencies' },
+  ];
+  renderIssues(issues);
+  setLog('⚡ Applied locally. Syncing to server in background…');
+  setTimeout(() => {
+    if (!optimisticApplied) return;
+    const synced = [
+      { status: 'done', title: 'ENG-101 — Fix sidebar overflow bug', badge: 'synced' },
+      { status: 'progress', title: 'ENG-102 — Add webhook support' },
+      { status: 'todo', title: 'ENG-103 — Update dependencies' },
+    ];
+    renderIssues(synced);
+    setLog('✓ Server confirmed. Badge updated to synced.');
+  }, 1800);
+}
+
+function optimisticRevert() {
+  if (!optimisticApplied) {
+    setLog('Apply an optimistic update first.');
+    return;
+  }
+  optimisticApplied = false;
+  const reverted = [
+    { status: 'todo', title: 'ENG-101 — Fix sidebar overflow bug', badge: 'reverted' },
+    { status: 'progress', title: 'ENG-102 — Add webhook support' },
+    { status: 'todo', title: 'ENG-103 — Update dependencies' },
+  ];
+  renderIssues(reverted);
+  setLog('✗ Server rejected. Reverted to previous state.');
+  setTimeout(() => renderIssues(originalIssues.map(i => ({...i}))), 1500);
+}
+
+function resetIssues() {
+  optimisticApplied = false;
+  renderIssues(originalIssues.map(i => ({...i})));
+  setLog('');
+}
+
+function setLog(msg) {
+  document.getElementById('optimistic-log').textContent = msg;
+}
+
+// ── Reactivity demo ──
+const fieldMap = {
+  status: {
+    nodes: ['node-issuerow', 'node-statusbadge'],
+    explanation: '<strong>status</strong> changed → only <code>IssueRow</code> (as container) and <code>StatusBadge</code> re-render. The list, sidebar, and other rows are untouched.'
+  },
+  title: {
+    nodes: ['node-issuerow', 'node-titlelabel'],
+    explanation: '<strong>title</strong> changed → only <code>IssueRow</code> and <code>TitleLabel</code> re-render.'
+  },
+  priority: {
+    nodes: ['node-issuerow', 'node-priorityicon'],
+    explanation: '<strong>priority</strong> changed → only <code>IssueRow</code> and <code>PriorityIcon</code> re-render. StatusBadge and TitleLabel are unaffected.'
+  },
+  assignee: {
+    nodes: ['node-issuerow', 'node-assigneeavatar'],
+    explanation: '<strong>assignee</strong> changed → only <code>IssueRow</code> and <code>AssigneeAvatar</code> re-render.'
+  },
+};
+
+let reactTimer;
+function simulateUpdate(field) {
+  clearTimeout(reactTimer);
+  document.querySelectorAll('.comp-node').forEach(n => n.classList.remove('re-render'));
+  const data = fieldMap[field];
+  data.nodes.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.classList.add('re-render');
+  });
+  document.getElementById('react-explanation').innerHTML = data.explanation;
+  reactTimer = setTimeout(() => {
+    document.querySelectorAll('.comp-node').forEach(n => n.classList.remove('re-render'));
+  }, 2500);
+}
+
+// ── Bundle bars ──
+const bundleData = [
+  { id: 'b-base',   pct: 100, label: '100%' },
+  { id: 'b-modern', pct: 78,  label: '−22% polyfills' },
+  { id: 'b-split',  pct: 60,  label: '−40% code split' },
+  { id: 'b-final',  pct: 50,  label: '−50% compressed' },
+];
+
+function animateBundles() {
+  bundleData.forEach(b => {
+    const el = document.getElementById(b.id);
+    if (el) { el.style.width = '0%'; el.textContent = ''; }
+  });
+  setTimeout(() => {
+    bundleData.forEach((b, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(b.id);
+        if (el) { el.style.width = b.pct + '%'; el.textContent = b.label; }
+      }, i * 200);
+    });
+  }, 100);
+}
+
+// ── Animation demo ──
+const animDefs = {
+  transform: () => {
+    const el = document.getElementById('anim-transform');
+    el.style.transition = 'transform 0.2s ease';
+    el.style.transform = 'scale(1.2) rotate(6deg)';
+    setTimeout(() => { el.style.transform = ''; }, 220);
+  },
+  opacity: () => {
+    const el = document.getElementById('anim-opacity');
+    el.style.transition = 'opacity 0.15s ease';
+    el.style.opacity = '1';
+    setTimeout(() => { el.style.opacity = '0.5'; }, 160);
+  },
+  bgcolor: () => {
+    const el = document.getElementById('anim-bgcolor');
+    el.style.transition = 'background 0.25s ease';
+    el.style.background = 'var(--accent)';
+    setTimeout(() => { el.style.background = 'var(--surface2)'; }, 300);
+  },
+  layout: () => {
+    const el = document.getElementById('anim-layout');
+    el.style.transition = 'width 0.3s, height 0.3s';
+    el.style.width = '80px';
+    el.style.height = '80px';
+    setTimeout(() => { el.style.width = ''; el.style.height = ''; }, 350);
+  },
+};
+
+function playAnim(type) {
+  animDefs[type]();
+}
+
+// ── Quiz ──
+const answers = {
+  q1: { correct: 1, explanation: 'Linear\'s UI reads from local MobX observables. The UI update happens synchronously before any server contact.' },
+  q2: { correct: 2, explanation: 'On rejection, Linear reverts the local state to what it was before the mutation, with minimal disruption.' },
+  q3: { correct: 1, explanation: 'MobX tracks which observable each component reads. When a value changes, only the components that read that exact value are notified.' },
+  q4: { correct: 1, explanation: 'modulepreload makes the browser fetch all declared chunks in parallel from the HTML head, collapsing the JS waterfall.' },
+  q5: { correct: 1, explanation: 'Animating width/height forces the browser to recalculate layout on every frame — called "layout thrashing" or "reflow". It\'s expensive and causes jank.' },
+  q6: { correct: 1, explanation: 'Because data comes from IndexedDB (not the server), there\'s no "server render" to hydrate from. The service worker handles asset caching so subsequent loads are also instant.' },
+};
+
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return; // already answered
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) {
+    const correctIdx = answers[qid].correct;
+    opts.querySelectorAll('.quiz-opt')[correctIdx].classList.add('correct');
+  }
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  answered.add(qid);
+}
+
+// Auto-run race on page load
+window.addEventListener('load', () => {
+  runRace();
+  initTooltips();
+});
+
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.arch-tooltip');
+    if (!tooltip) return;
+
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230;
+      const gap = 12;
+      const rightSpace = window.innerWidth - rect.right - gap;
+      const leftSpace = rect.left - gap;
+
+      tooltip.style.display = 'block';
+      tooltip.style.transform = 'translateY(-50%)';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+
+      if (rightSpace >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (leftSpace >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        // fallback: below the node, centered
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+
+    node.addEventListener('mouseleave', () => {
+      tooltip.style.display = 'none';
+    });
+  });
+}
+</script>
+</body>
+</html>

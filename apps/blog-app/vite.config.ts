@@ -3,7 +3,11 @@
 import analog, { type PrerenderContentFile } from '@analogjs/platform'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { PrerenderRoute } from 'nitropack'
+import { join } from 'node:path'
 import { defineConfig } from 'vite'
+import { learnManifestPlugin } from './src/plugins/learn-manifest.plugin'
+
+const learnDir = join(__dirname, '../../libs/portfolio/shared/learn')
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -38,6 +42,7 @@ export default defineConfig(({ mode }) => {
                 routes: async () => [
                   '/',
                   '/blog',
+                  '/learn',
                   {
                     contentDir: 'src/content',
                     transform: (file: PrerenderContentFile) => {
@@ -103,6 +108,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      learnManifestPlugin(learnDir),
       nxViteTsPaths(),
     ],
     test: {

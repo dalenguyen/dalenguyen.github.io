@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Decoding LLM Model Names — Parameters, MoE, and Active Counts</title>
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --accent: #5e6ad2;
+    --accent-glow: rgba(94,106,210,0.25);
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #7a7a99;
+    --code-bg: #12121a;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--bg); color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6; }
+  .container { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* Hero */
+  .hero { text-align: center; margin-bottom: 40px; padding: 32px 0; }
+  .hero h1 { font-size: 42px; margin: 0 0 12px; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, #fff 0%, #a3a3c2 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .hero p { font-size: 17px; color: var(--muted); margin: 0; max-width: 620px;
+    margin-left: auto; margin-right: auto; }
+  .progress-wrap { display: flex; align-items: center; gap: 12px; max-width: 480px;
+    margin: 28px auto 0; }
+  .progress-bar-track { flex: 1; height: 4px; background: var(--border);
+    border-radius: 99px; overflow: hidden; }
+  .progress-bar-fill { height: 100%; width: 0%; background: var(--accent);
+    border-radius: 99px; transition: width 0.4s ease; }
+  .progress-text { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+  /* Section */
+  .section { margin-bottom: 24px; border: 1px solid var(--border); border-radius: 14px;
+    background: var(--surface); overflow: hidden; transition: border-color 0.2s; }
+  .section.active { border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+  .section-header { padding: 20px 24px; cursor: pointer; display: flex; align-items: center;
+    justify-content: space-between; gap: 16px; user-select: none; }
+  .section-header:hover { background: rgba(94,106,210,0.04); }
+  .section-title { display: flex; align-items: center; gap: 14px; }
+  .section-num { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2);
+    color: var(--muted); display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; transition: all 0.2s; }
+  .section.active .section-num { background: var(--accent); color: #fff; }
+  .section-title h2 { margin: 0; font-size: 18px; font-weight: 600; }
+  .chev { color: var(--muted); transition: transform 0.2s; font-size: 12px; }
+  .section.active .chev { transform: rotate(180deg); color: var(--accent); }
+  .section-body { display: none; padding: 0 24px 24px; }
+  .section.active .section-body { display: block; }
+
+  p { font-size: 15px; }
+  h3 { font-size: 15px; font-weight: 600; margin: 20px 0 8px; color: var(--text); }
+  code { background: var(--code-bg); padding: 2px 6px; border-radius: 4px; font-size: 13px;
+    color: #c5cae9; font-family: 'SF Mono', Monaco, monospace; }
+
+  /* Callout */
+  .callout { border-left: 3px solid var(--accent); background: rgba(94,106,210,0.06);
+    border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14px; margin: 16px 0; }
+  .callout.warn { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+  .callout.good { border-color: var(--green); background: rgba(74,222,128,0.06); }
+
+  /* Key-Value Chips */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+  .kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border);
+    overflow: hidden; font-size: 12px; }
+  .kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted);
+    font-weight: 500; }
+  .kv-chip-val { padding: 4px 9px; color: var(--text); font-family: 'SF Mono', monospace; }
+
+  /* Buttons */
+  .btn { padding: 8px 16px; border-radius: 8px; border: 1px solid var(--accent);
+    background: var(--accent); color: #fff; font-size: 13px; font-weight: 500;
+    cursor: pointer; transition: all 0.2s; }
+  .btn:hover { background: #6b78dd; }
+  .btn-outline { background: transparent; color: var(--accent); }
+  .btn-outline:hover { background: var(--accent-glow); }
+
+  /* Demo container */
+  .demo { background: var(--code-bg); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px; margin: 16px 0; }
+  .demo-label { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 14px; font-weight: 600; }
+
+  /* Model name parser */
+  .parser-input { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .parser-btn { padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--text); font-size: 13px; cursor: pointer;
+    font-family: 'SF Mono', monospace; transition: all 0.15s; }
+  .parser-btn:hover { border-color: var(--accent); }
+  .parser-btn.active { border-color: var(--accent); background: var(--accent-glow); }
+  .parser-display { background: var(--surface); border-radius: 8px; padding: 20px;
+    text-align: center; font-family: 'SF Mono', monospace; font-size: 20px;
+    margin-bottom: 14px; min-height: 60px; display: flex; align-items: center;
+    justify-content: center; flex-wrap: wrap; gap: 4px; }
+  .name-part { padding: 4px 8px; border-radius: 6px; cursor: pointer; transition: all 0.15s; }
+  .name-part:hover { transform: translateY(-1px); }
+  .name-part.family { background: rgba(94,106,210,0.15); color: #a8b1ff; }
+  .name-part.version { background: rgba(251,191,36,0.15); color: var(--amber); }
+  .name-part.total { background: rgba(248,113,113,0.18); color: var(--red); }
+  .name-part.active { background: rgba(74,222,128,0.18); color: var(--green); }
+  .name-part.variant { background: rgba(122,122,153,0.18); color: var(--muted); }
+  .name-part.sep { color: var(--muted); padding: 4px 2px; cursor: default; }
+  .parser-detail { padding: 12px 14px; background: var(--surface2); border-radius: 8px;
+    font-size: 13px; min-height: 50px; border: 1px solid var(--border); }
+  .legend { display: flex; flex-wrap: wrap; gap: 10px; font-size: 11px; margin-top: 10px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; color: var(--muted); }
+  .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+
+  /* Neural network demo */
+  .neuron-grid { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; gap: 20px;
+    align-items: center; padding: 12px 0; }
+  .neuron-col { display: flex; flex-direction: column; gap: 12px; align-items: center; }
+  .neuron { width: 36px; height: 36px; border-radius: 50%; background: var(--surface2);
+    border: 2px solid var(--border); transition: all 0.3s; }
+  .neuron.lit { background: var(--accent); border-color: var(--accent);
+    box-shadow: 0 0 12px var(--accent-glow); }
+  .neuron-arrows { color: var(--muted); font-size: 20px; }
+  .param-counter { text-align: center; margin-top: 16px; font-size: 14px; color: var(--muted); }
+  .param-counter strong { color: var(--green); font-family: 'SF Mono', monospace;
+    font-size: 18px; }
+
+  /* MoE demo */
+  .moe-container { display: flex; flex-direction: column; gap: 14px; }
+  .moe-token { padding: 10px 14px; background: var(--surface2); border-radius: 8px;
+    font-size: 13px; text-align: center; border: 1px solid var(--border); }
+  .moe-router { padding: 8px 12px; background: rgba(94,106,210,0.1); border: 1px solid var(--accent);
+    border-radius: 8px; font-size: 12px; color: var(--accent); text-align: center;
+    font-weight: 600; }
+  .moe-experts { display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px; }
+  .moe-expert { aspect-ratio: 1; border-radius: 6px; background: var(--surface2);
+    border: 1px solid var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 10px; color: var(--muted); transition: all 0.3s; font-family: monospace; }
+  .moe-expert.active { background: rgba(74,222,128,0.15); border-color: var(--green);
+    color: var(--green); box-shadow: 0 0 8px rgba(74,222,128,0.3); }
+  .moe-stats { display: flex; gap: 20px; justify-content: center; padding: 12px;
+    background: var(--surface); border-radius: 8px; }
+  .moe-stat { text-align: center; }
+  .moe-stat-val { font-size: 20px; font-weight: 600; font-family: monospace; }
+  .moe-stat-label { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+  /* Memory race bars */
+  .race-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .race-label { width: 140px; font-size: 13px; }
+  .race-track { flex: 1; height: 30px; background: var(--surface); border-radius: 6px;
+    overflow: hidden; }
+  .race-fill { height: 100%; border-radius: 6px; display: flex; align-items: center;
+    padding-left: 12px; font-size: 12px; font-weight: 600; width: 0%;
+    transition: width 0.9s cubic-bezier(0.22,1,0.36,1); white-space: nowrap; }
+  .race-fill.small { background: linear-gradient(90deg, #4ade8066, #4ade80); color: #052e16; }
+  .race-fill.medium { background: linear-gradient(90deg, #fbbf2466, #fbbf24); color: #1c1003; }
+  .race-fill.large { background: linear-gradient(90deg, #f8717166, #f87171); color: #2d0a0a; }
+
+  /* Bit format viz */
+  .bitfmt { margin-bottom: 14px; }
+  .bitfmt-head { display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 6px; }
+  .bitfmt-name { font-family: 'SF Mono', monospace; font-weight: 700; font-size: 14px; }
+  .bitfmt-size { font-size: 11px; color: var(--muted); }
+  .bitfmt-bits { display: flex; gap: 2px; height: 22px; }
+  .bit { flex: 1; border-radius: 3px; min-width: 8px; transition: transform 0.15s; }
+  .bit:hover { transform: translateY(-2px); }
+  .bit.sign { background: #c084fc; }
+  .bit.exp  { background: #fbbf24; }
+  .bit.mant { background: #4ade80; }
+  .bit.int  { background: #5e6ad2; }
+  .bitfmt-legend { display: flex; gap: 16px; margin-top: 16px; font-size: 11px;
+    color: var(--muted); flex-wrap: wrap; }
+  .bitfmt-legend span::before { content: ''; display: inline-block; width: 10px;
+    height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: middle; }
+  .bitfmt-legend .lg-sign::before { background: #c084fc; }
+  .bitfmt-legend .lg-exp::before { background: #fbbf24; }
+  .bitfmt-legend .lg-mant::before { background: #4ade80; }
+  .bitfmt-legend .lg-int::before { background: #5e6ad2; }
+  .bitfmt-detail { background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 12px 14px; font-size: 13px; min-height: 50px;
+    margin-top: 12px; }
+  .bitfmt.selected .bitfmt-name { color: var(--accent); }
+  .bitfmt-row { cursor: pointer; padding: 8px 10px; border-radius: 8px;
+    border: 1px solid transparent; transition: all 0.15s; }
+  .bitfmt-row:hover { background: rgba(94,106,210,0.05); border-color: var(--border); }
+  .bitfmt-row.selected { background: rgba(94,106,210,0.08); border-color: var(--accent); }
+
+  /* Comparison cards */
+  .compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px; margin: 14px 0; }
+  .compare-card { padding: 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface2); }
+  .compare-card-title { font-size: 13px; font-weight: 600; margin-bottom: 8px; }
+  .compare-card-value { font-size: 24px; font-weight: 700; font-family: monospace;
+    margin-bottom: 4px; }
+  .compare-card-sub { font-size: 11px; color: var(--muted); }
+
+  /* Quiz */
+  .quiz { margin-top: 24px; padding-top: 20px; border-top: 1px solid var(--border); }
+  .quiz-label { font-size: 11px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 10px; font-weight: 600; }
+  .quiz-q { font-size: 15px; font-weight: 500; margin-bottom: 14px; }
+  .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+  .quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border);
+    background: var(--bg); color: var(--text); font-size: 14px; text-align: left;
+    cursor: pointer; transition: all 0.15s; }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08);
+    color: var(--green); }
+  .quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.08);
+    color: var(--red); }
+  .quiz-feedback { font-size: 13px; margin-top: 12px; padding: 10px 14px; border-radius: 7px;
+    display: none; line-height: 1.5; }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+  .quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: #fca5a5; }
+
+  /* Completion banner */
+  .completion { display: none; padding: 30px; border-radius: 14px;
+    background: linear-gradient(135deg, rgba(94,106,210,0.15), rgba(74,222,128,0.08));
+    border: 1px solid var(--accent); text-align: center; margin-top: 32px; }
+  .completion.show { display: block; }
+  .completion h2 { margin: 0 0 8px; font-size: 24px; }
+  .completion p { color: var(--muted); margin: 0; }
+
+  table { width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 13px; }
+  th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+  th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase;
+    letter-spacing: 0.5px; }
+  td code { font-size: 12px; }
+
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px;
+    font-weight: 600; }
+  .pill.dense { background: rgba(94,106,210,0.15); color: #a8b1ff; }
+  .pill.moe { background: rgba(74,222,128,0.15); color: var(--green); }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="hero">
+    <h1>Decoding LLM Model Names</h1>
+    <p>What does "3B" mean? Why is it sometimes "120B" and sometimes "235B-A22B"?
+       Learn how to read modern model names like a pro.</p>
+    <div class="progress-wrap">
+      <span class="progress-text" id="progress-text">0 / 7 sections</span>
+      <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- SECTION 1 — What does "B" mean? -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-title">
+        <div class="section-num">1</div>
+        <h2>What does the "B" in a model name actually mean?</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>The <code>B</code> stands for <strong>billion</strong>, and the number in front of it
+         is the model's <strong>parameter count</strong> — the number of learnable values
+         inside the neural network.</p>
+
+      <div class="chips">
+        <div class="kv-chip"><div class="kv-chip-key">3B</div><div class="kv-chip-val">3,000,000,000 parameters</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">20B</div><div class="kv-chip-val">20,000,000,000 parameters</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">120B</div><div class="kv-chip-val">120,000,000,000 parameters</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">1T</div><div class="kv-chip-val">1,000,000,000,000 parameters</div></div>
+      </div>
+
+      <p>Each parameter is a single floating-point number that the model learned during training.
+         More parameters = more "knobs" the model can use to encode patterns from its training data.</p>
+
+      <div class="callout">
+        <strong>Quick rule:</strong> The number before <code>B</code> is parameters in <em>billions</em>.
+        <code>M</code> = millions, <code>T</code> = trillions. So <code>gpt-oss-20b</code> has 20 billion
+        parameters, and <code>Llama-3.1-405B</code> has 405 billion.
+      </div>
+
+      <div class="demo">
+        <div class="demo-label">Try it — click a model name to decode it</div>
+        <div class="parser-input">
+          <button class="parser-btn" onclick="selectModel('gpt-oss-20b')">gpt-oss-20b</button>
+          <button class="parser-btn" onclick="selectModel('Llama-3.1-70B')">Llama-3.1-70B</button>
+          <button class="parser-btn" onclick="selectModel('Qwen3-30B-A3B')">Qwen3-30B-A3B</button>
+          <button class="parser-btn" onclick="selectModel('Mixtral-8x7B')">Mixtral-8x7B</button>
+          <button class="parser-btn" onclick="selectModel('DeepSeek-V3-671B-A37B')">DeepSeek-V3-671B-A37B</button>
+        </div>
+        <div class="parser-display" id="parser-display">Pick a model above ↑</div>
+        <div class="parser-detail" id="parser-detail">Each colored chunk has a meaning — they break down a model's identity.</div>
+        <div class="legend">
+          <div class="legend-item"><span class="legend-dot" style="background:rgba(94,106,210,0.45)"></span>Family</div>
+          <div class="legend-item"><span class="legend-dot" style="background:rgba(251,191,36,0.45)"></span>Version</div>
+          <div class="legend-item"><span class="legend-dot" style="background:rgba(248,113,113,0.45)"></span>Total params</div>
+          <div class="legend-item"><span class="legend-dot" style="background:rgba(74,222,128,0.45)"></span>Active params</div>
+          <div class="legend-item"><span class="legend-dot" style="background:rgba(122,122,153,0.45)"></span>Variant/structure</div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">A model labeled <code>llama-3.2-3b</code> has how many parameters?</div>
+        <div class="quiz-opts" id="q1-opts">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">3 million</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">3 billion</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">3 thousand</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">3 trillion</button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 2 — What is a parameter? -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-title">
+        <div class="section-num">2</div>
+        <h2>What <em>is</em> a parameter, really?</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>A neural network is made of layers of "neurons." Each connection between neurons has
+         a number called a <strong>weight</strong>. Each neuron also has a <strong>bias</strong>.
+         Weights + biases = parameters.</p>
+
+      <p>When the model processes text, it multiplies your input by these weights, adds biases,
+         and passes the result through the next layer. The values of those weights are what was
+         <em>learned</em> during training — they encode everything the model "knows."</p>
+
+      <div class="demo">
+        <div class="demo-label">A tiny network — every line is one parameter</div>
+        <div class="neuron-grid">
+          <div class="neuron-col">
+            <div class="neuron lit" id="n-i1"></div>
+            <div class="neuron lit" id="n-i2"></div>
+            <div class="neuron lit" id="n-i3"></div>
+          </div>
+          <div class="neuron-arrows">→</div>
+          <div class="neuron-col">
+            <div class="neuron" id="n-h1"></div>
+            <div class="neuron" id="n-h2"></div>
+            <div class="neuron" id="n-h3"></div>
+            <div class="neuron" id="n-h4"></div>
+          </div>
+          <div class="neuron-arrows">→</div>
+          <div class="neuron-col">
+            <div class="neuron" id="n-o1"></div>
+            <div class="neuron" id="n-o2"></div>
+          </div>
+        </div>
+        <div class="param-counter">
+          This toy network: <strong>20</strong> parameters
+          (3×4 weights + 4×2 weights = 20).<br>
+          A 3B model has <strong>3,000,000,000</strong> of these. A 120B model? 40× more.
+        </div>
+        <div style="text-align:center;margin-top:14px;">
+          <button class="btn" onclick="pulseNetwork()">Pulse the network</button>
+        </div>
+      </div>
+
+      <div class="callout good">
+        <strong>Why this matters:</strong> Every parameter takes memory. At common 16-bit precision
+        (FP16/BF16), each parameter = 2 bytes. So a 7B model needs roughly <strong>14 GB</strong>
+        just to hold its weights. A 70B model? <strong>140 GB</strong>.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">What does training actually do to these parameters?</div>
+        <div class="quiz-opts" id="q2-opts">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">It adds more parameters as needed</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">It adjusts the values of the parameters to minimize prediction errors</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">It compresses parameters into smaller numbers</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">It connects parameters to the internet</button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 3 — Total vs Active (MoE) -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-title">
+        <div class="section-num">3</div>
+        <h2>The "A3B" mystery — Total vs Active parameters</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Names like <code>Qwen3-30B-A3B</code> have <em>two</em> numbers. They tell you the model
+         is a <strong>Mixture of Experts (MoE)</strong>.</p>
+
+      <ul style="font-size:15px;">
+        <li><strong>30B</strong> = <em>total</em> parameters (all experts combined)</li>
+        <li><strong>A3B</strong> = <em>active</em> parameters per token (only ~3B run for any given word)</li>
+      </ul>
+
+      <p>An MoE model is split into many small "expert" sub-networks. For each token of input,
+         a tiny <strong>router</strong> picks just a few experts to run. The rest stay idle.</p>
+
+      <div class="demo">
+        <div class="demo-label">MoE in action — only some experts fire per token</div>
+        <div class="moe-container">
+          <div class="moe-token" id="moe-token">Token: <strong>"The"</strong></div>
+          <div class="moe-router">▼ Router decides which experts to use ▼</div>
+          <div class="moe-experts" id="moe-experts"></div>
+          <div class="moe-stats">
+            <div class="moe-stat">
+              <div class="moe-stat-val" style="color:var(--red)">30B</div>
+              <div class="moe-stat-label">Total params loaded</div>
+            </div>
+            <div class="moe-stat">
+              <div class="moe-stat-val" style="color:var(--green)" id="active-count">3B</div>
+              <div class="moe-stat-label">Active this token</div>
+            </div>
+            <div class="moe-stat">
+              <div class="moe-stat-val" style="color:var(--accent)" id="speed-mult">~10×</div>
+              <div class="moe-stat-label">Faster than dense</div>
+            </div>
+          </div>
+        </div>
+        <div style="text-align:center;margin-top:14px;display:flex;gap:8px;justify-content:center;">
+          <button class="btn" onclick="processNextToken()">Process next token</button>
+          <button class="btn btn-outline" onclick="resetMoE()">Reset</button>
+        </div>
+      </div>
+
+      <div class="callout warn">
+        <strong>The tradeoff:</strong> An MoE model gives you the <em>knowledge</em> of a 30B
+        model with the <em>speed and compute</em> of roughly a 3B model — but you still need
+        to load all 30B into VRAM. So it's fast but memory-hungry.
+      </div>
+
+      <h3>How to read these names:</h3>
+      <table>
+        <tr><th>Name</th><th>Total</th><th>Active</th><th>Type</th></tr>
+        <tr><td><code>Qwen3-30B-A3B</code></td><td>30B</td><td>3B</td><td><span class="pill moe">MoE</span></td></tr>
+        <tr><td><code>Qwen3-235B-A22B</code></td><td>235B</td><td>22B</td><td><span class="pill moe">MoE</span></td></tr>
+        <tr><td><code>DeepSeek-V3-671B-A37B</code></td><td>671B</td><td>37B</td><td><span class="pill moe">MoE</span></td></tr>
+        <tr><td><code>Mixtral-8x7B</code></td><td>~47B</td><td>~13B</td><td><span class="pill moe">MoE (8 experts, 2 active)</span></td></tr>
+        <tr><td><code>Llama-3.1-70B</code></td><td>70B</td><td>70B</td><td><span class="pill dense">Dense</span></td></tr>
+        <tr><td><code>gpt-oss-20b</code></td><td>20B</td><td>20B</td><td><span class="pill dense">Dense</span></td></tr>
+      </table>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">If I run <code>Qwen3-235B-A22B</code>, how much VRAM should I plan for?</div>
+        <div class="quiz-opts" id="q3-opts">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Enough to fit 22B params (~44 GB at FP16)</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">Enough to fit 235B params (~470 GB at FP16)</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Only the router needs to fit (~1 GB)</button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 4 — Memory requirements -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-title">
+        <div class="section-num">4</div>
+        <h2>How much memory does each size actually need?</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Memory required ≈ parameter count × bytes-per-parameter. Common formats:</p>
+      <div class="chips">
+        <div class="kv-chip"><div class="kv-chip-key">FP32</div><div class="kv-chip-val">4 bytes/param</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">FP16 / BF16</div><div class="kv-chip-val">2 bytes/param</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">INT8</div><div class="kv-chip-val">1 byte/param</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">INT4 (quantized)</div><div class="kv-chip-val">0.5 bytes/param</div></div>
+      </div>
+
+      <div class="demo">
+        <div class="demo-label">VRAM needed at FP16 — pick a quant level</div>
+        <div style="display:flex;gap:8px;margin-bottom:16px;justify-content:center;">
+          <button class="parser-btn active" id="mode-fp16" onclick="setQuantMode('fp16',this)">FP16 (2B/param)</button>
+          <button class="parser-btn" id="mode-int8" onclick="setQuantMode('int8',this)">INT8 (1B/param)</button>
+          <button class="parser-btn" id="mode-int4" onclick="setQuantMode('int4',this)">INT4 (0.5B/param)</button>
+        </div>
+        <div id="mem-bars"></div>
+        <div style="text-align:center;margin-top:10px;">
+          <button class="btn" onclick="animateMemory()">Animate</button>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Why people quantize:</strong> Going from FP16 → INT4 cuts memory by <strong>4×</strong>
+        with small quality loss. That's how a 70B model fits on a 48 GB GPU instead of needing 140 GB.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">At INT4 quantization, roughly how much VRAM does a 7B model need?</div>
+        <div class="quiz-opts" id="q4-opts">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">~28 GB</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">~14 GB</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">~3.5 GB</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">~700 MB</button>
+        </div>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 5 — Number formats explained -->
+  <div class="section" id="s4b">
+    <div class="section-header" onclick="toggleSection('s4b')">
+      <div class="section-title">
+        <div class="section-num">5</div>
+        <h2>What FP16, BF16, INT8, INT4 actually mean</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Each parameter is a single number. <em>How</em> that number is stored — how many bits
+         it uses and what shape those bits take — determines both <strong>memory size</strong>
+         and <strong>precision</strong>.</p>
+
+      <ul style="font-size:15px;">
+        <li><strong>FP</strong> = Floating Point — like scientific notation. Sign + exponent + mantissa.</li>
+        <li><strong>INT</strong> = Integer — whole numbers in a fixed range, no fractions.</li>
+        <li>The number after = how many <strong>bits</strong> each parameter takes.</li>
+      </ul>
+
+      <div class="demo">
+        <div class="demo-label">Click a format to see how a parameter is stored</div>
+
+        <div class="bitfmt-row selected" onclick="selectFmt('fp32', this)">
+          <div class="bitfmt">
+            <div class="bitfmt-head">
+              <span class="bitfmt-name">FP32</span>
+              <span class="bitfmt-size">32 bits · 4 bytes/param</span>
+            </div>
+            <div class="bitfmt-bits" id="bits-fp32"></div>
+          </div>
+        </div>
+
+        <div class="bitfmt-row" onclick="selectFmt('fp16', this)">
+          <div class="bitfmt">
+            <div class="bitfmt-head">
+              <span class="bitfmt-name">FP16 (half precision)</span>
+              <span class="bitfmt-size">16 bits · 2 bytes/param</span>
+            </div>
+            <div class="bitfmt-bits" id="bits-fp16"></div>
+          </div>
+        </div>
+
+        <div class="bitfmt-row" onclick="selectFmt('bf16', this)">
+          <div class="bitfmt">
+            <div class="bitfmt-head">
+              <span class="bitfmt-name">BF16 (brain float)</span>
+              <span class="bitfmt-size">16 bits · 2 bytes/param</span>
+            </div>
+            <div class="bitfmt-bits" id="bits-bf16"></div>
+          </div>
+        </div>
+
+        <div class="bitfmt-row" onclick="selectFmt('int8', this)">
+          <div class="bitfmt">
+            <div class="bitfmt-head">
+              <span class="bitfmt-name">INT8</span>
+              <span class="bitfmt-size">8 bits · 1 byte/param</span>
+            </div>
+            <div class="bitfmt-bits" id="bits-int8"></div>
+          </div>
+        </div>
+
+        <div class="bitfmt-row" onclick="selectFmt('int4', this)">
+          <div class="bitfmt">
+            <div class="bitfmt-head">
+              <span class="bitfmt-name">INT4 (4-bit quantized)</span>
+              <span class="bitfmt-size">4 bits · 0.5 bytes/param</span>
+            </div>
+            <div class="bitfmt-bits" id="bits-int4"></div>
+          </div>
+        </div>
+
+        <div class="bitfmt-legend">
+          <span class="lg-sign">sign (±)</span>
+          <span class="lg-exp">exponent (range)</span>
+          <span class="lg-mant">mantissa (precision)</span>
+          <span class="lg-int">integer value</span>
+        </div>
+
+        <div class="bitfmt-detail" id="fmt-detail"></div>
+      </div>
+
+      <h3>The key insight</h3>
+      <p>Neural network weights are mostly small numbers clustered around zero. You don't
+         need full FP32 precision to represent them — you can store many of them in 4 or 8 bits
+         with surprisingly little quality loss. That's <strong>quantization</strong>.</p>
+
+      <div class="callout">
+        <strong>FP16 vs BF16:</strong> Both are 2 bytes, but they split the bits differently.
+        BF16 keeps FP32's wide range (8 exponent bits) but cuts precision (7 mantissa bits).
+        FP16 keeps more precision (10 mantissa bits) but has a smaller range (5 exponent bits).
+        BF16 is preferred for training because it can hold the wide range of gradient values
+        without overflowing.
+      </div>
+
+      <div class="callout good">
+        <strong>Why INT4 works:</strong> 4 bits = only 16 possible values. But by storing a
+        scale factor per group of weights (e.g., every 32 weights share one FP16 multiplier),
+        you effectively get many more "virtual" values. Modern formats like GPTQ, AWQ, GGUF
+        Q4_K_M use clever grouping to keep quality high.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">Why is BF16 often preferred over FP16 for training large models?</div>
+        <div class="quiz-opts" id="q4b-opts">
+          <button class="quiz-opt" onclick="answer(this,'q4b',false)">BF16 uses fewer bits than FP16</button>
+          <button class="quiz-opt" onclick="answer(this,'q4b',true)">BF16 has the same wide range as FP32, so gradients don't overflow</button>
+          <button class="quiz-opt" onclick="answer(this,'q4b',false)">BF16 is more precise than FP16</button>
+          <button class="quiz-opt" onclick="answer(this,'q4b',false)">BF16 is an integer format</button>
+        </div>
+        <div class="quiz-feedback" id="q4b-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 — Size vs capability -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-title">
+        <div class="section-num">6</div>
+        <h2>Bigger isn't always better — size vs capability</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Larger models generally know more facts and reason better — but they're slower,
+         pricier to run, and not always smarter on specific tasks. Here's the practical view:</p>
+
+      <div class="compare-grid">
+        <div class="compare-card">
+          <div class="compare-card-title">Small (1B–3B)</div>
+          <div class="compare-card-value" style="color:var(--green)">Phone</div>
+          <div class="compare-card-sub">Runs on laptop/mobile. Great for autocomplete, classification, structured tasks.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-card-title">Mid (7B–13B)</div>
+          <div class="compare-card-value" style="color:#7c86e0">Laptop</div>
+          <div class="compare-card-sub">Runs on consumer GPUs. Solid general chat, code, summarization.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-card-title">Large (30B–70B)</div>
+          <div class="compare-card-value" style="color:var(--amber)">Workstation</div>
+          <div class="compare-card-sub">Needs 1–2 high-end GPUs. Strong reasoning, complex code.</div>
+        </div>
+        <div class="compare-card">
+          <div class="compare-card-title">Frontier (100B+)</div>
+          <div class="compare-card-value" style="color:var(--red)">Data center</div>
+          <div class="compare-card-sub">Multi-GPU clusters. PhD-level reasoning, multimodal, long context.</div>
+        </div>
+      </div>
+
+      <h3>The MoE sweet spot</h3>
+      <p>MoE models like <code>Qwen3-30B-A3B</code> hit a unique tradeoff: knowledge of a large
+         dense model, runtime cost of a small one. The catch is VRAM — you still need to <em>load</em>
+         all the experts, even if only a few run per token.</p>
+
+      <div class="callout good">
+        <strong>Practical takeaway:</strong> Pick the smallest model that does your task well.
+        A well-tuned 7B often beats a generic 70B on narrow jobs, while costing 10× less to serve.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">You want a model for autocomplete in a mobile keyboard app. Best pick?</div>
+        <div class="quiz-opts" id="q5-opts">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">A 405B dense model — maximum quality</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">A 70B MoE — best reasoning</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">A 1B–3B model — fast, small enough to run on-device</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">A 235B MoE — only active params matter</button>
+        </div>
+        <div class="quiz-feedback" id="q5-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SECTION 6 — Reading real names -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-title">
+        <div class="section-num">7</div>
+        <h2>Putting it all together — decoding real model names</h2>
+      </div>
+      <span class="chev">▼</span>
+    </div>
+    <div class="section-body">
+      <p>Real model names cram a lot in. A typical format looks like this:</p>
+      <div class="demo" style="text-align:center;font-family:monospace;font-size:18px;">
+        <span style="color:#a8b1ff">family</span>
+        <span style="color:var(--muted)">-</span>
+        <span style="color:var(--amber)">version</span>
+        <span style="color:var(--muted)">-</span>
+        <span style="color:var(--red)">totalB</span>
+        <span style="color:var(--muted)">-</span>
+        <span style="color:var(--green)">AactiveB</span>
+        <span style="color:var(--muted)">-</span>
+        <span style="color:#7a7a99">variant</span>
+      </div>
+
+      <h3>Common variant tags you'll see</h3>
+      <table>
+        <tr><th>Suffix</th><th>Meaning</th></tr>
+        <tr><td><code>-Instruct</code> / <code>-Chat</code> / <code>-it</code></td><td>Fine-tuned to follow instructions / chat. Use this for assistants.</td></tr>
+        <tr><td><code>-Base</code></td><td>Raw pretrained model. Predicts next token but doesn't follow instructions well.</td></tr>
+        <tr><td><code>-Code</code> / <code>-Coder</code></td><td>Fine-tuned on programming tasks.</td></tr>
+        <tr><td><code>-VL</code> / <code>-Vision</code></td><td>Vision-language: accepts images too.</td></tr>
+        <tr><td><code>-Thinking</code> / <code>-Reasoning</code> / <code>-R1</code></td><td>Optimized for chain-of-thought reasoning.</td></tr>
+        <tr><td><code>-Q4_K_M</code> / <code>-GGUF</code> / <code>-AWQ</code> / <code>-GPTQ</code></td><td>Quantization format. Smaller, faster, slight quality loss.</td></tr>
+      </table>
+
+      <div class="demo">
+        <div class="demo-label">Final test — decode these full names</div>
+        <div class="parser-input">
+          <button class="parser-btn" onclick="selectFullModel('Llama-3.1-70B-Instruct')">Llama-3.1-70B-Instruct</button>
+          <button class="parser-btn" onclick="selectFullModel('Qwen3-235B-A22B-Thinking')">Qwen3-235B-A22B-Thinking</button>
+          <button class="parser-btn" onclick="selectFullModel('DeepSeek-V3-671B-A37B-Base')">DeepSeek-V3-671B-A37B-Base</button>
+          <button class="parser-btn" onclick="selectFullModel('Mistral-7B-Instruct-v0.3-Q4_K_M')">Mistral-7B-Instruct-v0.3-Q4_K_M</button>
+        </div>
+        <div class="parser-display" id="full-display">Pick a name above to fully decode it</div>
+        <div class="parser-detail" id="full-detail">Each part will be color-coded and explained.</div>
+      </div>
+
+      <div class="callout">
+        <strong>Quick mental model:</strong> When you see a new name like
+        <code>SomeModel-X.Y-NNN-AMMb-Instruct</code>:
+        <ul style="margin:8px 0 0;padding-left:20px;">
+          <li><code>NNN</code> = total billions (memory budget)</li>
+          <li><code>AMMb</code> = active billions (speed/compute budget) — only on MoE</li>
+          <li><code>Instruct</code> = it'll respond to questions, not just continue text</li>
+        </ul>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-label">Check your understanding</div>
+        <div class="quiz-q">You see <code>Qwen3-235B-A22B-Thinking-Q4_K_M</code>. Which statement is true?</div>
+        <div class="quiz-opts" id="q6-opts">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It's a dense 235B model that uses 22B for chain-of-thought</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">235B total, 22B active per token, tuned for reasoning, 4-bit quantized</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It has 235B parameters but only loads 22B into memory</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It's a base model with 235 million parameters</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="completion" id="completion-banner">
+    <h2>🎓 You've decoded the naming game</h2>
+    <p>Next time you see <code>Qwen3-30B-A3B</code> or <code>DeepSeek-V3-671B-A37B</code>,
+       you'll know exactly what hardware it needs and how it'll perform.</p>
+  </div>
+
+</div>
+
+<script>
+  // ============== PROGRESS TRACKING ==============
+  const opened = new Set();
+  const totalSections = 7;
+
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) {
+      opened.add(id);
+      const pct = (opened.size / totalSections) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+      if (opened.size === totalSections) {
+        document.getElementById('completion-banner').classList.add('show');
+      }
+    }
+  }
+
+  // ============== QUIZ ==============
+  const answers = {
+    q1: { correct: 1, explanation: 'B = billion. The "3" before "b" is just the parameter count expressed in billions.' },
+    q2: { correct: 1, explanation: 'Training adjusts the parameter values using gradient descent so the model\'s predictions get closer to the truth on training examples.' },
+    q3: { correct: 1, explanation: 'You must load ALL experts into VRAM, even if only 22B run per token. The "A22B" speeds up compute, not memory.' },
+    q4: { correct: 2, explanation: '7B × 0.5 bytes = 3.5 GB. INT4 packs 2 weights per byte, making large models fit on consumer GPUs.' },
+    q4b: { correct: 1, explanation: 'BF16 has 8 exponent bits (same as FP32), giving it the same huge range. FP16 only has 5 exponent bits, so gradient values can overflow during training. BF16 trades precision for range — the right call when training stability matters.' },
+    q5: { correct: 2, explanation: 'Mobile needs models that fit in tight memory budgets and run fast on CPU/NPU. A 1-3B model is the right tier — bigger models would be too slow or won\'t fit.' },
+    q6: { correct: 1, explanation: 'Reading left to right: Qwen3 (family), 235B (total), A22B (22B active per token, so it\'s MoE), Thinking (reasoning-tuned), Q4_K_M (4-bit quantization).' },
+  };
+
+  function answer(btn, qid, isCorrect) {
+    const opts = document.getElementById(qid + '-opts');
+    if (opts.querySelector('.correct, .wrong')) return;
+    opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) {
+      opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+    }
+    const fb = document.getElementById(qid + '-fb');
+    fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+    fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  }
+
+  // ============== MODEL NAME PARSER ==============
+  const modelData = {
+    'gpt-oss-20b': {
+      parts: [
+        { text: 'gpt-oss', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: '20b', class: 'total' },
+      ],
+      detail: '<strong>gpt-oss</strong>: open-source GPT-style family. <strong>20b</strong>: 20 billion total parameters. No active count → it\'s a <em>dense</em> model: all 20B run for every token. Memory: ~40 GB at FP16.',
+    },
+    'Llama-3.1-70B': {
+      parts: [
+        { text: 'Llama', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: '3.1', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '70B', class: 'total' },
+      ],
+      detail: '<strong>Llama</strong>: Meta\'s model family. <strong>3.1</strong>: version 3.1 (newer = better). <strong>70B</strong>: 70 billion total, all active (dense). Memory: ~140 GB at FP16, ~35 GB at INT4.',
+    },
+    'Qwen3-30B-A3B': {
+      parts: [
+        { text: 'Qwen', class: 'family' },
+        { text: '3', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '30B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'A3B', class: 'active' },
+      ],
+      detail: '<strong>Qwen</strong>: Alibaba\'s family. <strong>3</strong>: version. <strong>30B</strong>: 30 billion total params. <strong>A3B</strong>: only 3B active per token (MoE). You get 30B-level knowledge at 3B-level compute speed.',
+    },
+    'Mixtral-8x7B': {
+      parts: [
+        { text: 'Mixtral', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: '8x7B', class: 'variant' },
+      ],
+      detail: '<strong>Mixtral</strong>: Mistral\'s MoE family. <strong>8x7B</strong>: 8 expert sub-networks of ~7B each. About 47B total (shared layers reduce the math), with ~13B active per token (2 experts fire).',
+    },
+    'DeepSeek-V3-671B-A37B': {
+      parts: [
+        { text: 'DeepSeek', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: 'V3', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '671B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'A37B', class: 'active' },
+      ],
+      detail: '<strong>DeepSeek</strong>: family. <strong>V3</strong>: version 3. <strong>671B</strong>: 671 billion params total — a frontier-scale MoE. <strong>A37B</strong>: 37B active per token. Needs ~1.3 TB VRAM at FP16, but runs ~18× faster than a dense 671B would.',
+    },
+  };
+
+  function selectModel(name) {
+    document.querySelectorAll('.parser-input .parser-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent === name);
+    });
+    const data = modelData[name];
+    const display = document.getElementById('parser-display');
+    display.innerHTML = '';
+    data.parts.forEach(p => {
+      const span = document.createElement('span');
+      span.className = 'name-part ' + p.class;
+      span.textContent = p.text;
+      display.appendChild(span);
+    });
+    document.getElementById('parser-detail').innerHTML = data.detail;
+  }
+
+  // ============== FULL MODEL NAME DECODER ==============
+  const fullModelData = {
+    'Llama-3.1-70B-Instruct': {
+      parts: [
+        { text: 'Llama', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: '3.1', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '70B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'Instruct', class: 'variant' },
+      ],
+      detail: 'Meta\'s Llama family, version 3.1, 70 billion params (dense — all active), fine-tuned to follow instructions. Use this for chat/assistant tasks. Needs ~140 GB FP16 or ~35 GB INT4.',
+    },
+    'Qwen3-235B-A22B-Thinking': {
+      parts: [
+        { text: 'Qwen', class: 'family' },
+        { text: '3', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '235B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'A22B', class: 'active' },
+        { text: '-', class: 'sep' },
+        { text: 'Thinking', class: 'variant' },
+      ],
+      detail: 'Alibaba Qwen v3, 235B total params (MoE), 22B active per token, tuned for chain-of-thought reasoning (shows its work). Needs ~470 GB VRAM at FP16 but runs at ~22B compute speed.',
+    },
+    'DeepSeek-V3-671B-A37B-Base': {
+      parts: [
+        { text: 'DeepSeek', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: 'V3', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: '671B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'A37B', class: 'active' },
+        { text: '-', class: 'sep' },
+        { text: 'Base', class: 'variant' },
+      ],
+      detail: 'DeepSeek family, version 3, 671B total (frontier MoE), 37B active per token, <strong>base model</strong> — not instruction-tuned. Predicts next token but won\'t reliably follow prompts. Used for fine-tuning, not direct chat.',
+    },
+    'Mistral-7B-Instruct-v0.3-Q4_K_M': {
+      parts: [
+        { text: 'Mistral', class: 'family' },
+        { text: '-', class: 'sep' },
+        { text: '7B', class: 'total' },
+        { text: '-', class: 'sep' },
+        { text: 'Instruct', class: 'variant' },
+        { text: '-', class: 'sep' },
+        { text: 'v0.3', class: 'version' },
+        { text: '-', class: 'sep' },
+        { text: 'Q4_K_M', class: 'variant' },
+      ],
+      detail: 'Mistral family, 7B dense params, instruction-tuned, v0.3, quantized to ~4-bit (K_M = medium-quality 4-bit). Fits in ~4 GB VRAM — runs comfortably on a laptop GPU.',
+    },
+  };
+
+  function selectFullModel(name) {
+    document.querySelectorAll('#s6 .parser-btn').forEach(b => {
+      b.classList.toggle('active', b.textContent === name);
+    });
+    const data = fullModelData[name];
+    const display = document.getElementById('full-display');
+    display.innerHTML = '';
+    data.parts.forEach(p => {
+      const span = document.createElement('span');
+      span.className = 'name-part ' + p.class;
+      span.textContent = p.text;
+      display.appendChild(span);
+    });
+    document.getElementById('full-detail').innerHTML = data.detail;
+  }
+
+  // ============== NEURAL NETWORK PULSE ==============
+  function pulseNetwork() {
+    const allIds = ['n-i1','n-i2','n-i3','n-h1','n-h2','n-h3','n-h4','n-o1','n-o2'];
+    allIds.forEach(id => document.getElementById(id).classList.remove('lit'));
+    // Light input layer
+    ['n-i1','n-i2','n-i3'].forEach((id, i) => {
+      setTimeout(() => document.getElementById(id).classList.add('lit'), i * 80);
+    });
+    // Light hidden layer
+    ['n-h1','n-h2','n-h3','n-h4'].forEach((id, i) => {
+      setTimeout(() => document.getElementById(id).classList.add('lit'), 400 + i * 80);
+    });
+    // Light output layer
+    ['n-o1','n-o2'].forEach((id, i) => {
+      setTimeout(() => document.getElementById(id).classList.add('lit'), 800 + i * 80);
+    });
+  }
+
+  // ============== MOE DEMO ==============
+  const tokens = ['"The"', '"cat"', '"sat"', '"on"', '"the"', '"mat"'];
+  let tokenIdx = 0;
+
+  function buildMoEExperts() {
+    const grid = document.getElementById('moe-experts');
+    grid.innerHTML = '';
+    for (let i = 0; i < 64; i++) {
+      const e = document.createElement('div');
+      e.className = 'moe-expert';
+      e.id = 'expert-' + i;
+      e.textContent = 'E' + i;
+      grid.appendChild(e);
+    }
+  }
+
+  function processNextToken() {
+    document.querySelectorAll('.moe-expert').forEach(e => e.classList.remove('active'));
+    const token = tokens[tokenIdx % tokens.length];
+    document.getElementById('moe-token').innerHTML = 'Token: <strong>' + token + '</strong>';
+    // Pick 8 random experts out of 64 (mirrors typical MoE top-k routing)
+    const picked = new Set();
+    while (picked.size < 8) picked.add(Math.floor(Math.random() * 64));
+    Array.from(picked).forEach((idx, i) => {
+      setTimeout(() => document.getElementById('expert-' + idx).classList.add('active'), i * 60);
+    });
+    tokenIdx++;
+  }
+
+  function resetMoE() {
+    document.querySelectorAll('.moe-expert').forEach(e => e.classList.remove('active'));
+    tokenIdx = 0;
+    document.getElementById('moe-token').innerHTML = 'Token: <strong>"The"</strong>';
+  }
+
+  // ============== MEMORY BARS ==============
+  const models = [
+    { name: '3B',    params: 3,   class: 'small' },
+    { name: '7B',    params: 7,   class: 'small' },
+    { name: '20B',   params: 20,  class: 'medium' },
+    { name: '70B',   params: 70,  class: 'medium' },
+    { name: '120B',  params: 120, class: 'large' },
+    { name: '405B',  params: 405, class: 'large' },
+  ];
+  let currentQuant = 'fp16';
+  const bytesPerParam = { fp16: 2, int8: 1, int4: 0.5 };
+
+  function buildMemoryBars() {
+    const container = document.getElementById('mem-bars');
+    container.innerHTML = '';
+    models.forEach(m => {
+      const row = document.createElement('div');
+      row.className = 'race-row';
+      row.innerHTML = `
+        <div class="race-label">${m.name} model</div>
+        <div class="race-track">
+          <div class="race-fill ${m.class}" id="mem-${m.name}"></div>
+        </div>`;
+      container.appendChild(row);
+    });
+  }
+
+  function setQuantMode(mode, btn) {
+    currentQuant = mode;
+    document.querySelectorAll('#mem-fp16, #mode-int8, #mode-int4').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.demo .parser-btn').forEach(b => {
+      if (b.id && b.id.startsWith('mode-')) b.classList.remove('active');
+    });
+    btn.classList.add('active');
+    animateMemory();
+  }
+
+  function animateMemory() {
+    const bpp = bytesPerParam[currentQuant];
+    const maxGB = 405 * 2;  // FP16 of largest = reference for 100% bar
+    models.forEach((m, i) => {
+      const gb = m.params * bpp;
+      const pct = Math.min(100, (gb / maxGB) * 100);
+      const el = document.getElementById('mem-' + m.name);
+      el.style.width = '0%';
+      setTimeout(() => {
+        el.style.width = pct + '%';
+        el.textContent = gb + ' GB';
+      }, 100 + i * 100);
+    });
+  }
+
+  // ============== BIT FORMAT VIZ ==============
+  const fmtSpecs = {
+    fp32: {
+      bits: [{ type: 'sign', n: 1 }, { type: 'exp', n: 8 }, { type: 'mant', n: 23 }],
+      detail: '<strong>FP32 — Single precision.</strong> 1 sign bit, 8 exponent bits (range ±10³⁸), 23 mantissa bits (~7 decimal digits of precision). The "default" floating point. Most models are trained in FP32 or BF16, then served in something smaller.',
+    },
+    fp16: {
+      bits: [{ type: 'sign', n: 1 }, { type: 'exp', n: 5 }, { type: 'mant', n: 10 }],
+      detail: '<strong>FP16 — Half precision.</strong> 1 sign, 5 exponent (range only ±65,504), 10 mantissa (~3 decimal digits). Half the memory of FP32, but the limited exponent range means very large or very small gradients can overflow to infinity during training.',
+    },
+    bf16: {
+      bits: [{ type: 'sign', n: 1 }, { type: 'exp', n: 8 }, { type: 'mant', n: 7 }],
+      detail: '<strong>BF16 — Brain Float 16.</strong> 1 sign, 8 exponent (FULL FP32 range), only 7 mantissa (less precision). Designed by Google Brain for ML training: keeps the dynamic range gradients need, sacrifices the precision they don\'t. Now the de-facto training format.',
+    },
+    int8: {
+      bits: [{ type: 'int', n: 8 }],
+      detail: '<strong>INT8 — 8-bit integer.</strong> 256 possible values (e.g. -128 to 127). Combined with a per-tensor or per-group scale factor (a single FP16 multiplier shared across a group of weights), it can represent the real weight values close enough. Cuts memory in half vs FP16.',
+    },
+    int4: {
+      bits: [{ type: 'int', n: 4 }],
+      detail: '<strong>INT4 — 4-bit integer.</strong> Only 16 possible values per weight! But with group quantization (e.g. one scale per 32 weights), modern methods like GPTQ, AWQ, and GGUF Q4_K_M still preserve ~99% of quality. This is how 70B models fit on a 48 GB GPU.',
+    },
+  };
+
+  function buildBitFmts() {
+    Object.entries(fmtSpecs).forEach(([fmt, spec]) => {
+      const el = document.getElementById('bits-' + fmt);
+      if (!el) return;
+      el.innerHTML = '';
+      spec.bits.forEach(group => {
+        for (let i = 0; i < group.n; i++) {
+          const bit = document.createElement('div');
+          bit.className = 'bit ' + group.type;
+          bit.title = group.type;
+          el.appendChild(bit);
+        }
+      });
+    });
+  }
+
+  function selectFmt(fmt, row) {
+    document.querySelectorAll('.bitfmt-row').forEach(r => r.classList.remove('selected'));
+    row.classList.add('selected');
+    document.getElementById('fmt-detail').innerHTML = fmtSpecs[fmt].detail;
+  }
+
+  // ============== INIT ==============
+  window.addEventListener('load', () => {
+    buildMoEExperts();
+    buildMemoryBars();
+    buildBitFmts();
+    setTimeout(animateMemory, 300);
+    selectModel('gpt-oss-20b');
+    selectFullModel('Llama-3.1-70B-Instruct');
+    document.getElementById('fmt-detail').innerHTML = fmtSpecs.fp32.detail;
+  });
+</script>
+</body>
+</html>

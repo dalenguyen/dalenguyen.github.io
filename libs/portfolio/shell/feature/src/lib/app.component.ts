@@ -138,6 +138,13 @@ export class AppComponent {
       icon: 'edit',
     },
     {
+      id: 'learn',
+      label: 'Learning',
+      route: '/learn',
+      fragment: '',
+      icon: 'menu_book',
+    },
+    {
       id: 'portfolio',
       label: 'Digital Portfolio',
       route: '/',

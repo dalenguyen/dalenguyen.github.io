@@ -44,7 +44,7 @@ export class NavComponent implements OnInit {
   }
 
   navigateTo(path: string) {
-    this.activeEl = 'blog'
+    this.activeEl = path
     this.router.navigate([path])
     this.navService.target.next(null)
   }
