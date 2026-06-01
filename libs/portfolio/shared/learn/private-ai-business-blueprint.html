@@ -170,7 +170,7 @@ p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:14px;}
   <p class="hero-sub">RTX 5090 + 32GB VRAM is the inflection point. Law firms and accountants will pay $1,000/mo to keep their data off the cloud — here's the blueprint to deliver it.</p>
   <div class="progress-row">
     <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
-    <span id="progress-text">0 / 5 sections</span>
+    <span id="progress-text">0 / 6 sections</span>
   </div>
 </div>
 
@@ -471,10 +471,67 @@ p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:14px;}
     </div>
   </div>
 
+  <!-- SECTION 6: DOCUMENT LIFECYCLE -->
+  <div class="section" id="sec-6">
+    <div class="section-header" onclick="toggleSection('sec-6')">
+      <div class="section-num">6</div>
+      <div class="section-title">Document Lifecycle — Keeping the Knowledge Base Fresh</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>The vector database doesn't auto-update when source files change. Stale embeddings are the silent killer — the model will confidently cite outdated clauses or reference deleted documents until you explicitly re-sync.</p>
+
+      <div class="tabs" id="dl-tabs">
+        <button class="tab active" onclick="switchTab('dl', 'updated')">Document Updated</button>
+        <button class="tab" onclick="switchTab('dl', 'removed')">Document Removed</button>
+        <button class="tab" onclick="switchTab('dl', 'bulk')">Bulk Nightly Sync</button>
+      </div>
+
+      <div id="dl-tab-updated" class="tab-panel active">
+        <div class="callout warn"><strong>Contract v2 replaces v1</strong><br>Delete the old document's chunks from the vector DB by doc ID / filename, then re-embed the new version. Without this, both versions exist in the DB and the model may cite contradictory clauses from v1 and v2 simultaneously.</div>
+        <div class="kv-row">
+          <div class="kv-chip"><span class="kv-chip-key">Step 1</span><span class="kv-chip-val">Detect mtime change via folder diff</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">Step 2</span><span class="kv-chip-val">Delete old embeddings by doc ID</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">Step 3</span><span class="kv-chip-val">Re-embed updated file</span></div>
+        </div>
+      </div>
+      <div id="dl-tab-removed" class="tab-panel">
+        <div class="callout danger"><strong>Closed case files removed from the drive</strong><br>The model won't "forget" a document just because you deleted the file. You must explicitly delete its embeddings from the vector store by document ID. AnythingLLM and Open WebUI both have per-document delete buttons — or automate it with a folder-watch script.</div>
+        <div class="kv-row">
+          <div class="kv-chip"><span class="kv-chip-key">Step 1</span><span class="kv-chip-val">Diff source folder vs DB metadata</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">Step 2</span><span class="kv-chip-val">Identify orphaned doc IDs</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">Step 3</span><span class="kv-chip-val">Purge embeddings by ID</span></div>
+        </div>
+      </div>
+      <div id="dl-tab-bulk" class="tab-panel">
+        <div class="callout success"><strong>Nightly cron sync — the $1k/mo differentiator</strong><br>A script watches the source folder and diffs filenames + last-modified timestamps against the vector DB's metadata. Only changed/new files are re-embedded; deleted files are purged. LanceDB and Milvus both support metadata filtering so this is targeted, not a full re-index. Include this in your maintenance retainer — manual "re-sync" buttons don't cut it for paying clients.</div>
+      </div>
+
+      <!-- DEMO: Document State Machine -->
+      <div class="demo-box">
+        <div class="demo-label">Demo — Document State Machine (trace the update and delete paths)</div>
+        <div class="sm-graph" id="doc-sm"></div>
+        <div class="sm-log" id="doc-log">Click "Indexed" to start, then follow a document through its lifecycle.</div>
+      </div>
+
+      <!-- QUIZ 6 -->
+      <div class="quiz-block">
+        <div class="quiz-q">A law firm updates a contract PDF. What happens if you don't re-sync the vector database?</div>
+        <div class="quiz-opts" id="q6-opts">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">The model automatically detects the file changed and updates its knowledge</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">The old embeddings are overwritten when the new file is added to the folder</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">Both the old and new version exist in the DB — the model may cite contradictory clauses from both</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">The model refuses to answer questions about that document until it's re-indexed</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- COMPLETION BANNER -->
   <div class="completion-banner" id="completion-banner">
     <h2>Blueprint Complete</h2>
-    <p>You've covered the hardware, software, business models, client workflow, and risk mitigation.<br>The tech is here. Now go find your first law firm.</p>
+    <p>You've covered the hardware, software, business models, client workflow, risk mitigation, and knowledge maintenance.<br>The tech is here. Now go find your first law firm.</p>
   </div>
 
 </div><!-- /main -->
@@ -485,7 +542,7 @@ p{font-size:14px;color:var(--text);line-height:1.7;margin-bottom:14px;}
 <script>
 // ── PROGRESS TRACKING ─────────────────────────────────────────────────────────
 const opened = new Set();
-const TOTAL = 5;
+const TOTAL = 6;
 
 function toggleSection(id) {
   const el = document.getElementById(id);
@@ -516,6 +573,7 @@ const answers = {
   q3: { correct: 2, explanation: 'Cloudflare Tunnels and Tailscale create encrypted private network tunnels. The machine never needs an open port — clients connect through a secure mesh, not the public internet.' },
   q4: { correct: 2, explanation: 'Embedding converts documents into high-dimensional vectors that represent meaning. These are stored locally, enabling semantic search: "find passages similar in meaning to this question."' },
   q5: { correct: 1, explanation: 'LLMs hallucinate confidently. In legal contexts, a fabricated case citation or clause reference could lead to malpractice liability. Citations allow attorneys to verify every claim before acting on it.' },
+  q6: { correct: 2, explanation: 'The vector DB stores embeddings independently of the source files. Both versions accumulate until you explicitly delete the old doc\'s chunks. The model has no awareness that a file changed on disk.' },
 };
 
 function answer(btn, qid, isCorrect) {
@@ -779,11 +837,78 @@ function initTooltips() {
   });
 }
 
+// ── DOCUMENT LIFECYCLE STATE MACHINE ──────────────────────────────────────────
+const docStates = {
+  indexed:      { label: 'Indexed',       icon: '✅', transitions: { updated_file: 'source file modified', deleted_file: 'source file removed' } },
+  updated_file: { label: 'File Updated',  icon: '✏️',  transitions: { stale: 'diff detects mtime change' } },
+  deleted_file: { label: 'File Deleted',  icon: '🗑️',  transitions: { stale: 'diff detects missing file' } },
+  stale:        { label: 'Stale in DB',   icon: '⚠️',  transitions: { purging: 'delete chunks by doc ID' } },
+  purging:      { label: 'Purging DB',    icon: '🔄', transitions: { re_embedding: 'file still exists (update)', clean: 'file was deleted (remove)' } },
+  re_embedding: { label: 'Re-embedding',  icon: '⚙️',  transitions: { indexed: 'new vectors stored' } },
+  clean:        { label: 'Removed',       icon: '🧹', transitions: { indexed: 'new doc added to folder' } },
+};
+
+const docStateInfo = {
+  indexed:      'Document is current — embeddings in the DB match the file on disk. Queries return accurate results.',
+  updated_file: 'The source file changed on disk (e.g. contract v2 saved). The DB still holds v1 embeddings — they are now stale.',
+  deleted_file: 'The file was removed from the source folder. Its embeddings remain in the DB as orphans until explicitly purged.',
+  stale:        'DB has outdated or orphaned embeddings. Queries may return results from deleted/superseded documents. Must be purged.',
+  purging:      'Deleting all chunks for this document by doc ID from the vector store. This targets only this document — no full re-index needed.',
+  re_embedding: 'The updated file is being chunked and embedded. New vectors are stored with the current filename and timestamp as metadata.',
+  clean:        'All embeddings for this document have been removed. The DB is clean. A new file can be indexed fresh from this state.',
+};
+
+let docCurrent = null;
+
+function buildDocSM() {
+  const graph = document.getElementById('doc-sm');
+  Object.entries(docStates).forEach(([id, s]) => {
+    const el = document.createElement('div');
+    el.className = 'sm-node';
+    el.id = 'dsmn-' + id;
+    el.innerHTML = '<span class="sm-icon">' + s.icon + '</span><span class="sm-label">' + s.label + '</span>';
+    el.onclick = () => docTransition(id);
+    graph.appendChild(el);
+  });
+}
+
+function docTransition(toId) {
+  const validFrom = docCurrent ? docStates[docCurrent].transitions : {};
+  const log = document.getElementById('doc-log');
+
+  if (!docCurrent) {
+    docCurrent = toId;
+    log.textContent = docStateInfo[toId] || 'Explore transitions from here.';
+    highlightDocSM();
+    return;
+  }
+  if (toId === docCurrent) return;
+  if (validFrom[toId]) {
+    log.textContent = '→ ' + docStateInfo[toId];
+    docCurrent = toId;
+  } else {
+    log.textContent = '✗ No direct transition from "' + docStates[docCurrent].label + '" to "' + docStates[toId].label + '" — follow a highlighted path.';
+  }
+  highlightDocSM();
+}
+
+function highlightDocSM() {
+  const validTargets = docCurrent ? Object.keys(docStates[docCurrent].transitions) : [];
+  Object.keys(docStates).forEach(id => {
+    const el = document.getElementById('dsmn-' + id);
+    el.classList.remove('sm-current', 'sm-reachable', 'sm-unreachable');
+    if (id === docCurrent)               el.classList.add('sm-current');
+    else if (validTargets.includes(id))  el.classList.add('sm-reachable');
+    else if (docCurrent)                 el.classList.add('sm-unreachable');
+  });
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.addEventListener('load', () => {
   buildTimeline('rag');
   buildTimeline('lf');
   buildRiskSM();
+  buildDocSM();
   updateCalc();
   initTooltips();
   runVramRace();
