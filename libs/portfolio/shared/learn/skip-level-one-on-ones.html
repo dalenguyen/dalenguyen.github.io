@@ -1,0 +1,1162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skip-level One-on-ones: A Leader's Guide</title>
+<meta name="description" content="An interactive learning guide to running effective skip-level one-on-ones — surface blind spots, transfer social risk, and build trust across organizational layers.">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --accent: #5e6ad2;
+    --accent-glow: rgba(94,106,210,0.25);
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #7a7a99;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  a { color: var(--accent); }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 72px 24px 56px;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94,106,210,0.14) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    margin-bottom: 20px;
+    background: var(--surface);
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5.5vw, 54px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--accent), #9aa4ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    max-width: 620px;
+    margin: 18px auto 0;
+    font-size: 16px;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 480px;
+    margin: 36px auto 0;
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #9aa4ff);
+    border-radius: 99px;
+    transition: width 0.45s ease;
+  }
+  #progress-text { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+  main { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── Completion banner ── */
+  .completion-banner { display: none; max-width: 760px; margin: 0 auto 32px; padding: 0 24px; }
+  .completion-banner.show { display: block; }
+  .completion-banner > div {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--green);
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  /* ── Section cards ── */
+  .section {
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .section:hover { border-color: #3a3a52; }
+  .section.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .section-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .section.active .section-num {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .section-title { flex: 1; font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+
+  .section-chevron {
+    color: var(--muted);
+    transition: transform 0.25s ease;
+    font-size: 18px;
+  }
+  .section.active .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 4px 28px 28px;
+  }
+  .section.active .section-body { display: block; }
+
+  .section-body p {
+    margin: 14px 0;
+    color: #d8d8e8;
+  }
+
+  .callout {
+    margin: 18px 0;
+    padding: 14px 16px;
+    border-left: 3px solid var(--accent);
+    background: rgba(94,106,210,0.07);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #cfcfe0;
+  }
+  .callout.amber { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+  .callout.green { border-color: var(--green); background: rgba(74,222,128,0.06); }
+  .callout strong { color: var(--text); }
+
+  /* ── Demo box ── */
+  .demo-box {
+    margin: 22px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--code-bg);
+    overflow: hidden;
+  }
+  .demo-label {
+    background: var(--surface2);
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-inner { padding: 22px; }
+
+  /* ── Buttons ── */
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.05s;
+    font-family: inherit;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--text); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* ── Funnel chart (Demo 1) ── */
+  .funnel { display: flex; flex-direction: column; gap: 8px; }
+  .funnel-row {
+    display: flex; align-items: center; gap: 14px;
+    padding: 4px 0;
+  }
+  .funnel-label {
+    width: 110px; flex-shrink: 0;
+    font-size: 13px; color: var(--muted);
+    text-align: right;
+  }
+  .funnel-track {
+    flex: 1;
+    height: 38px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: border-color 0.2s;
+  }
+  .funnel-track:hover { border-color: var(--accent); }
+  .funnel-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), #9aa4ff);
+    border-radius: 8px;
+    transition: width 0.9s cubic-bezier(.2,.7,.3,1);
+    display: flex; align-items: center; padding-left: 14px;
+    color: #fff; font-weight: 600; font-size: 13px;
+  }
+  .funnel-row.active .funnel-track { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+  .funnel-detail {
+    margin-top: 16px;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    color: #cfcfe0;
+    min-height: 60px;
+  }
+  .funnel-detail .layer-title { color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+  .funnel-detail.empty { color: var(--muted); font-style: italic; }
+
+  /* ── Sequence Timeline (Demo 2) ── */
+  .timeline { display: flex; flex-direction: column; gap: 10px; position: relative; }
+  .timeline::before {
+    content: ''; position: absolute;
+    left: 18px; top: 12px; bottom: 12px;
+    width: 2px; background: var(--border);
+  }
+  .tl-step {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 10px 12px 10px 0;
+    opacity: 0.3;
+    transform: translateX(-6px);
+    transition: opacity 0.5s, transform 0.5s;
+    position: relative;
+  }
+  .tl-step.revealed { opacity: 1; transform: translateX(0); }
+  .tl-num {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 600; color: var(--muted);
+    flex-shrink: 0; z-index: 1;
+    transition: all 0.3s;
+  }
+  .tl-step.revealed .tl-num {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+  .tl-text { flex: 1; padding-top: 6px; }
+  .tl-title { font-weight: 600; font-size: 14px; }
+  .tl-desc { color: var(--muted); font-size: 13px; margin-top: 2px; }
+
+  /* ── State Machine (Demo 3) ── */
+  .sm-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .sm-wrap { grid-template-columns: 1fr; } }
+  .sm-state {
+    padding: 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--surface);
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+  }
+  .sm-state:hover:not(.disabled) { border-color: var(--accent); }
+  .sm-state.disabled { opacity: 0.4; cursor: not-allowed; }
+  .sm-state.current {
+    background: rgba(94,106,210,0.12);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-glow);
+  }
+  .sm-state.terminal-good { border-color: var(--green); background: rgba(74,222,128,0.08); }
+  .sm-state.terminal-bad { border-color: var(--red); background: rgba(248,113,113,0.08); }
+  .sm-name { font-weight: 600; font-size: 14px; }
+  .sm-desc { font-size: 12px; color: var(--muted); margin-top: 4px; }
+  .sm-log {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--code-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-family: 'SF Mono', Menlo, monospace;
+    font-size: 12px;
+    color: var(--muted);
+    max-height: 140px;
+    overflow-y: auto;
+  }
+  .sm-log-entry { padding: 2px 0; }
+  .sm-log-entry .arrow { color: var(--accent); }
+
+  /* ── Race bars (Demo 4) ── */
+  .race { display: flex; flex-direction: column; gap: 14px; }
+  .race-row {
+    display: flex; align-items: center; gap: 14px;
+  }
+  .race-label {
+    width: 170px; flex-shrink: 0;
+    font-size: 13px; color: var(--text);
+  }
+  .race-track {
+    flex: 1;
+    height: 26px;
+    background: rgba(255,255,255,0.02);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+  }
+  .race-fill {
+    height: 100%; width: 0%;
+    border-radius: 6px;
+    transition: width 1.1s cubic-bezier(.2,.7,.3,1);
+    display: flex; align-items: center; justify-content: flex-end;
+    padding-right: 10px;
+    font-size: 12px; font-weight: 600; color: #fff;
+  }
+  .race-fill.low { background: linear-gradient(90deg, #d97757, var(--red)); }
+  .race-fill.mid { background: linear-gradient(90deg, #c97a2a, var(--amber)); }
+  .race-fill.high { background: linear-gradient(90deg, #2f9d6e, var(--green)); }
+
+  /* ── Tabs (Demo 5) ── */
+  .tabs-row { display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 18px; }
+  .tab-btn {
+    padding: 7px 14px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .tab-btn:hover { border-color: var(--accent); color: var(--text); }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: fadeIn 0.35s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+  .tab-progress {
+    margin: 14px 0 18px;
+    height: 6px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .tab-progress-fill {
+    height: 100%; width: 0%;
+    background: linear-gradient(90deg, var(--accent), #9aa4ff);
+    border-radius: 99px;
+    transition: width 0.8s cubic-bezier(.2,.7,.3,1);
+  }
+  .tab-summary { color: #d0d0e0; font-size: 14px; }
+  .tab-summary ul { list-style: none; padding-left: 0; margin-top: 10px; }
+  .tab-summary li {
+    padding: 6px 0 6px 22px;
+    position: relative;
+    color: #cfcfe0;
+    font-size: 14px;
+  }
+  .tab-summary li::before {
+    content: '';
+    position: absolute;
+    left: 4px; top: 14px;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── Calculator (Demo 6) ── */
+  .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+  @media (max-width: 640px) { .calc-grid { grid-template-columns: 1fr; } }
+  .calc-controls { display: flex; flex-direction: column; gap: 18px; }
+  .calc-field { display: flex; flex-direction: column; gap: 6px; }
+  .calc-field label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 600;
+  }
+  .calc-field .val {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .calc-field input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 4px;
+    background: var(--border);
+    border-radius: 99px;
+    outline: none;
+  }
+  .calc-field input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 0 4px rgba(94,106,210,0.2);
+  }
+  .calc-field input[type="range"]::-moz-range-thumb {
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+  }
+  .calc-field select {
+    background: var(--surface);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+  }
+  .calc-field select:focus { border-color: var(--accent); }
+  .calc-output {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 22px;
+    text-align: center;
+  }
+  .calc-output-label {
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .calc-output-value {
+    font-size: 48px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #fff, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 10px 0 4px;
+    line-height: 1;
+  }
+  .calc-output-unit { color: var(--muted); font-size: 13px; }
+  .calc-output-detail {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .calc-output-detail strong { color: var(--text); }
+
+  /* ── Quiz ── */
+  .quiz {
+    margin-top: 26px;
+    padding: 18px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .quiz-question {
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text);
+  }
+  .quiz-opt {
+    padding: 10px 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-size: 13px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-family: inherit;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-opt.correct { background: rgba(74,222,128,0.12); border-color: var(--green); color: var(--green); }
+  .quiz-opt.wrong { background: rgba(248,113,113,0.12); border-color: var(--red); color: var(--red); }
+  .quiz-feedback {
+    margin-top: 10px;
+    font-size: 13px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb {
+    background: rgba(74,222,128,0.1);
+    color: var(--green);
+    border: 1px solid rgba(74,222,128,0.3);
+  }
+  .quiz-feedback.wrong-fb {
+    background: rgba(248,113,113,0.1);
+    color: var(--red);
+    border: 1px solid rgba(248,113,113,0.3);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eyebrow">Engineering Leadership · Series 5 of 5</div>
+  <h1>The <span>Secret</span> to<br>Skip-level One-on-ones</h1>
+  <p class="hero-sub">How senior leaders surface blind spots and build trust across layers — without undermining their direct reports.</p>
+  <div class="progress-row">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div id="completion-banner" class="completion-banner">
+  <div>All sections complete. You now have a framework for skip-level one-on-ones.</div>
+</div>
+
+<main>
+
+  <!-- ════════════ SECTION 1 ════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-num">1</div>
+      <div class="section-title">The Information Gap</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Every leader builds a mental model of how their organization is doing. The problem: that model is built from filtered information. Each layer between you and the ground softens bad news, packages context, and trims nuance — often unconsciously.</p>
+      <p>An engineering manager can appear high-performing while their team quietly deteriorates. By the time numbers shift, the cause may already be months old.</p>
+
+      <div class="callout amber">
+        <strong>Why upward filtering happens:</strong> reports want to be seen as capable, in control, and self-sufficient. Surfacing problems can feel like admitting failure — so the rough edges get sanded off before they reach you.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Information degradation funnel</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Tap a layer to see why truth degrades as it travels upward.</p>
+          <div class="funnel" id="funnel"></div>
+          <div class="funnel-detail empty" id="funnel-detail">Select a layer above to see what gets lost.</div>
+          <div class="btn-row">
+            <button class="btn" onclick="animateFunnel()">Replay animation</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">Why might an EM look high-performing while their team deteriorates?</div>
+        <div id="q1-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Their metrics catch problems before they spread</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">Reports filter and soften upward signals, so problems take longer to surface</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Senior leaders are deliberately kept in the dark</button>
+        </div>
+        <div id="q1-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 2 ════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-num">2</div>
+      <div class="section-title">Social Risk Transfer — the probing technique</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Asking "is everything okay with your manager?" rarely works. The employee bears all the social risk: disloyalty, retaliation, being labeled a complainer. They'll default to "yeah, everything's fine."</p>
+      <p>The fix is a probing pattern that ends with the <strong>leader raising the concern first</strong>. By naming it yourself, you absorb the social cost — the employee only has to confirm or correct, not denounce.</p>
+
+      <div class="callout">
+        <strong>The phrasing matters.</strong> Not: "Is X struggling?" Instead: "I've been worried about delivery on team Y — am I reading that right, or am I off?" You own the claim; they get to validate.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Conversation flow</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Play through the five-step pattern that unlocks honest signal.</p>
+          <div class="timeline" id="timeline"></div>
+          <div class="btn-row">
+            <button class="btn" onclick="playTimeline()">Play sequence</button>
+            <button class="btn ghost" onclick="resetTimeline()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">What does "social risk transfer" actually do?</div>
+        <div id="q2-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Lets the leader avoid awkward conversations</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">Moves the cost of naming the problem from the employee to the leader</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Forces the employee to bring concerns proactively</button>
+        </div>
+        <div id="q2-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 3 ════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-num">3</div>
+      <div class="section-title">Avoiding Confirmation Bias</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Social risk transfer has a sharp edge. By naming a concern, you may anchor the employee's perception — they'll start interpreting events through your frame. One conversation is never enough evidence.</p>
+      <p>Treat each skip-level as a single data point. Validate across multiple <strong>independent</strong> conversations, actively seek disconfirming evidence, and ground claims in concrete examples rather than emotional agreement.</p>
+
+      <div class="callout amber">
+        <strong>Red flag:</strong> if every report you talk to immediately agrees with your framing, you're probably leading the witness. Push back on yourself — ask for specific incidents, not vibes.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Validation state machine</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Click states to walk a concern from raised to confirmed — or disconfirmed.</p>
+          <div class="sm-wrap" id="sm-wrap"></div>
+          <div class="sm-log" id="sm-log"><div class="sm-log-entry">Start at "Open Inquiry" to begin.</div></div>
+          <div class="btn-row">
+            <button class="btn ghost" onclick="resetStateMachine()">Reset flow</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">After one skip-level surfaces a concern, what should you do first?</div>
+        <div id="q3-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Confront the manager directly with the feedback</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">Validate independently across other team members before acting</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Repeat the same framing with another report to see if they agree</button>
+        </div>
+        <div id="q3-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 4 ════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-num">4</div>
+      <div class="section-title">Managing Your Direct Report Relationships</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Skip-levels are powerful but politically expensive. If you go silent after them, your direct reports will assume the worst. If you parrot every quote back to them, you'll burn trust with everyone in the room next time.</p>
+      <p>The art is <strong>strategic transparency</strong> — share insights with managers in a way that preserves anonymity, distinguishes coaching from performance management, and addresses systemic signal loss without retaliation.</p>
+
+      <div class="callout green">
+        <strong>Coaching vs. performance:</strong> a behavior you can correct is coaching. A pattern of character or competence gaps is performance management. Don't confuse them — and don't dodge the second one when it's warranted.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Communication strategies</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Compare effectiveness of three ways to share skip-level insights with managers.</p>
+          <div class="race" id="race"></div>
+          <div class="btn-row">
+            <button class="btn" onclick="runRace()">Run comparison</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">What's the healthiest way to handle insights gathered from skip-levels?</div>
+        <div id="q4-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Keep them private to protect employee trust at all costs</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">Strategic transparency — share themes with managers while protecting individuals</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Forward verbatim feedback to the manager so they can react quickly</button>
+        </div>
+        <div id="q4-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 5 ════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-num">5</div>
+      <div class="section-title">Value Beyond Information</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>If you frame skip-levels purely as truth-gathering, you'll create the exact anxiety you wanted to avoid. The employee will see them as audits. Managers will see them as end-runs.</p>
+      <p>Skip-levels carry three legitimate jobs at once: <strong>coaching</strong>, <strong>context-sharing</strong>, and <strong>information</strong>. Leading with the developmental framing earns the right to do the harder work.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · The three jobs of a skip-level</div>
+        <div class="demo-inner">
+          <div class="tabs-row" id="tabs-row">
+            <button class="tab-btn active" data-tab="info" onclick="showTab('info', this)">Information</button>
+            <button class="tab-btn" data-tab="coach" onclick="showTab('coach', this)">Coaching</button>
+            <button class="tab-btn" data-tab="ctx" onclick="showTab('ctx', this)">Context-sharing</button>
+          </div>
+          <div class="tab-progress"><div class="tab-progress-fill" id="tab-progress-fill"></div></div>
+
+          <div class="tab-panel active" id="tab-info">
+            <div class="tab-summary">
+              Surface ground-level realities that have been filtered through layers of management.
+              <ul>
+                <li>Detect blind spots in delivery, team health, or trust</li>
+                <li>Validate concerns across multiple independent voices</li>
+                <li>Prevent costly surprises that show up later in metrics</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-coach">
+            <div class="tab-summary">
+              Invest in the careers of people two layers down. They will remember it.
+              <ul>
+                <li>Share career and skill development perspectives they can't get from their EM</li>
+                <li>Model how senior leaders think about tradeoffs and ambiguity</li>
+                <li>Build a trust account you can draw on when things get hard</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="tab-panel" id="tab-ctx">
+            <div class="tab-summary">
+              Close the gap between strategy and the people executing it.
+              <ul>
+                <li>Explain the "why" behind business priorities and tradeoffs</li>
+                <li>Connect day-to-day work to broader company direction</li>
+                <li>Reduce rumor-driven anxiety with honest context</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">Why lead with the coaching / developmental framing in skip-levels?</div>
+        <div id="q5-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">It's the only legitimate purpose of a skip-level</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">It defuses the "I'm being audited" tension and earns the right to deeper conversations</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">It satisfies HR requirements for documented career conversations</button>
+        </div>
+        <div id="q5-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 6 ════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-num">6</div>
+      <div class="section-title">The Time Investment Math</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Senior leaders push back on skip-levels because they sound expensive. Run the numbers and they're not — they're a modest, recurring tax that prevents costly blind spots.</p>
+      <p>A quarterly cadence across six teams of six is roughly three hours per week averaged. Add ad-hoc investigation cadence when something specific comes up. Slide the dials below to see your own org's number.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Time investment calculator</div>
+        <div class="demo-inner">
+          <div class="calc-grid">
+            <div class="calc-controls">
+              <div class="calc-field">
+                <label>Number of teams</label>
+                <div class="val" id="calc-teams-val">6</div>
+                <input type="range" id="calc-teams" min="1" max="10" value="6" oninput="updateCalc()">
+              </div>
+              <div class="calc-field">
+                <label>People per team</label>
+                <div class="val" id="calc-people-val">6</div>
+                <input type="range" id="calc-people" min="3" max="10" value="6" oninput="updateCalc()">
+              </div>
+              <div class="calc-field">
+                <label>Cadence</label>
+                <select id="calc-cadence" onchange="updateCalc()">
+                  <option value="monthly">Monthly</option>
+                  <option value="quarterly" selected>Quarterly</option>
+                  <option value="biannual">Bi-annual</option>
+                </select>
+              </div>
+            </div>
+            <div class="calc-output">
+              <div class="calc-output-label">Averaged time</div>
+              <div class="calc-output-value" id="calc-hours">3.0</div>
+              <div class="calc-output-unit">hours / week</div>
+              <div class="calc-output-detail">
+                <strong id="calc-total">36</strong> conversations × 45 min
+                <br><span id="calc-sessions-year">144</span> sessions / year
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">For 6 teams × 6 people on a quarterly cadence with 45-minute sessions, what's the rough weekly average?</div>
+        <div id="q6-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Around 8 hours per week</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">Around 3 hours per week</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Less than 1 hour per week</button>
+        </div>
+        <div id="q6-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://mgrebler.substack.com/p/the-secret-to-skip-level-one-on-ones" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">The Secret to Skip-level One-on-ones — Mark Grebler</a>
+  </div>
+</div>
+
+<script>
+  /* ════════ Progress tracking ════════ */
+  const opened = new Set();
+  const totalSections = 6;
+
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    const wasActive = el.classList.contains('active');
+    el.classList.toggle('active');
+    if (!wasActive) {
+      opened.add(id);
+      updateProgress();
+    }
+  }
+
+  function updateProgress() {
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = opened.size + ' / ' + totalSections + ' sections';
+    if (opened.size === totalSections) {
+      document.getElementById('completion-banner').classList.add('show');
+    }
+  }
+
+  /* ════════ Quiz ════════ */
+  function answer(btn, qid, isCorrect) {
+    const opts = document.getElementById(qid + '-opts').querySelectorAll('.quiz-opt');
+    opts.forEach(o => {
+      o.disabled = true;
+      if (o === btn) {
+        o.classList.add(isCorrect ? 'correct' : 'wrong');
+      } else {
+        // mark correct option green even if user picked wrong
+        if (o.getAttribute('onclick').includes('true')) {
+          o.classList.add('correct');
+        }
+      }
+    });
+    const fb = document.getElementById(qid + '-fb');
+    fb.classList.add('show', isCorrect ? 'correct-fb' : 'wrong-fb');
+    fb.textContent = isCorrect
+      ? 'Correct.'
+      : 'Not quite — the highlighted option is the one to remember.';
+  }
+
+  /* ════════ Demo 1 · Funnel ════════ */
+  const funnelStages = [
+    { label: 'ICs', pct: 100, title: 'Individual Contributors', detail: 'The ground truth — they live the day-to-day reality, see the friction, and know which projects are actually on fire. Full signal exists here.' },
+    { label: 'EM', pct: 65, title: 'Engineering Manager', detail: 'Filters for what matters to the EM\'s own metrics. Bad news may be softened to look "in progress." Some signal already lost to upward management.' },
+    { label: 'Director', pct: 40, title: 'Director', detail: 'Aggregates across multiple teams. Edge cases get smoothed into averages. Specific incidents disappear into trends — and surprises usually arrive late.' },
+    { label: 'VP', pct: 20, title: 'VP / Senior Leader', detail: 'Reading dashboards and curated narratives. By the time signal lands here, it has been filtered three times. Skip-levels bridge this gap directly.' }
+  ];
+
+  function buildFunnel() {
+    const wrap = document.getElementById('funnel');
+    wrap.innerHTML = funnelStages.map((s, i) => `
+      <div class="funnel-row" data-i="${i}">
+        <div class="funnel-label">${s.label}</div>
+        <div class="funnel-track" onclick="showFunnelDetail(${i})">
+          <div class="funnel-fill" data-pct="${s.pct}" style="width:0%">${s.pct}% truth</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function animateFunnel() {
+    const fills = document.querySelectorAll('.funnel-fill');
+    fills.forEach((f, i) => {
+      f.style.width = '0%';
+      setTimeout(() => { f.style.width = f.dataset.pct + '%'; }, 100 + i * 180);
+    });
+  }
+
+  function showFunnelDetail(i) {
+    document.querySelectorAll('.funnel-row').forEach(r => r.classList.remove('active'));
+    document.querySelector(`.funnel-row[data-i="${i}"]`).classList.add('active');
+    const s = funnelStages[i];
+    const el = document.getElementById('funnel-detail');
+    el.classList.remove('empty');
+    el.innerHTML = `<div class="layer-title">${s.title} · ${s.pct}% truth retained</div>${s.detail}`;
+  }
+
+  /* ════════ Demo 2 · Timeline ════════ */
+  const timelineSteps = [
+    { title: 'Start open-ended', desc: '"What\'s on your mind lately?" — give space without leading.' },
+    { title: 'Listen for signals', desc: 'Tone shifts, hesitations, careful phrasing. Note them, don\'t pounce.' },
+    { title: 'Leader surfaces the concern', desc: '"I\'ve been worried about delivery on team Y — am I reading that right?" You own the claim.' },
+    { title: 'Employee confirms or expands', desc: 'Freed of social risk, they fill in detail you couldn\'t have asked for directly.' },
+    { title: 'Validate separately', desc: 'Treat this as one data point. Cross-check independently before acting.' }
+  ];
+
+  function buildTimeline() {
+    document.getElementById('timeline').innerHTML = timelineSteps.map((s, i) => `
+      <div class="tl-step" data-i="${i}">
+        <div class="tl-num">${i + 1}</div>
+        <div class="tl-text">
+          <div class="tl-title">${s.title}</div>
+          <div class="tl-desc">${s.desc}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function playTimeline() {
+    resetTimeline();
+    const steps = document.querySelectorAll('.tl-step');
+    steps.forEach((s, i) => {
+      setTimeout(() => s.classList.add('revealed'), 200 + i * 700);
+    });
+  }
+
+  function resetTimeline() {
+    document.querySelectorAll('.tl-step').forEach(s => s.classList.remove('revealed'));
+  }
+
+  /* ════════ Demo 3 · State Machine ════════ */
+  const smStates = {
+    open: { name: 'Open Inquiry', desc: 'Curious, no anchor yet.', next: ['raised'] },
+    raised: { name: 'Concern Raised', desc: 'Leader surfaces a specific worry.', next: ['cross'] },
+    cross: { name: 'Cross-Validating', desc: 'Talk to other reports independently.', next: ['confirmed', 'disconfirmed'] },
+    confirmed: { name: 'Confirmed', desc: 'Multiple sources, concrete examples.', terminal: 'good', next: [] },
+    disconfirmed: { name: 'Disconfirmed', desc: 'Other voices push back — concern doesn\'t hold.', terminal: 'bad', next: [] }
+  };
+
+  const smTransitionLogs = {
+    raised: 'Leader names the worry, transferring social risk.',
+    cross: 'Now seeking disconfirming evidence from other reports.',
+    confirmed: 'Validated independently — safe to act on the signal.',
+    disconfirmed: 'Honest cross-check killed the false signal. Good outcome.'
+  };
+
+  let smCurrent = null;
+  let smHistory = [];
+
+  function buildStateMachine() {
+    const wrap = document.getElementById('sm-wrap');
+    wrap.innerHTML = Object.entries(smStates).map(([id, s]) => `
+      <div class="sm-state${s.terminal ? ' terminal-' + s.terminal : ''}" id="sm-${id}" onclick="smTransition('${id}')">
+        <div class="sm-name">${s.name}</div>
+        <div class="sm-desc">${s.desc}</div>
+      </div>
+    `).join('');
+    highlightSM();
+  }
+
+  function smTransition(toId) {
+    const target = smStates[toId];
+    if (!target) return;
+
+    // First click — must start at open
+    if (smCurrent === null) {
+      if (toId !== 'open') return;
+      smCurrent = toId;
+      smHistory.push(toId);
+      logSM('Started at Open Inquiry — curious, listening.');
+      highlightSM();
+      return;
+    }
+
+    // If terminal, don't allow more transitions
+    if (smStates[smCurrent].terminal) return;
+
+    // Must be a valid next state
+    if (!smStates[smCurrent].next.includes(toId)) return;
+
+    smCurrent = toId;
+    smHistory.push(toId);
+    if (smTransitionLogs[toId]) logSM(smTransitionLogs[toId]);
+    highlightSM();
+  }
+
+  function highlightSM() {
+    Object.keys(smStates).forEach(id => {
+      const el = document.getElementById('sm-' + id);
+      el.classList.remove('current', 'disabled');
+      // Disable states not reachable from current
+      if (smCurrent === null) {
+        if (id !== 'open') el.classList.add('disabled');
+      } else if (smStates[smCurrent].terminal) {
+        if (id !== smCurrent) el.classList.add('disabled');
+      } else {
+        const allowed = smStates[smCurrent].next.includes(id) || id === smCurrent;
+        if (!allowed) el.classList.add('disabled');
+      }
+      if (id === smCurrent) el.classList.add('current');
+    });
+  }
+
+  function logSM(msg) {
+    const log = document.getElementById('sm-log');
+    const entry = document.createElement('div');
+    entry.className = 'sm-log-entry';
+    entry.innerHTML = '<span class="arrow">›</span> ' + msg;
+    log.appendChild(entry);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function resetStateMachine() {
+    smCurrent = null;
+    smHistory = [];
+    document.getElementById('sm-log').innerHTML = '<div class="sm-log-entry">Start at "Open Inquiry" to begin.</div>';
+    highlightSM();
+  }
+
+  /* ════════ Demo 4 · Race bars ════════ */
+  const raceData = [
+    { label: 'Share nothing', pct: 20, cls: 'low', note: 'Managers feel ambushed when you act on hidden info.' },
+    { label: 'Strategic transparency', pct: 90, cls: 'high', note: 'Themes shared, identities protected, trust preserved.' },
+    { label: 'Share everything raw', pct: 40, cls: 'mid', note: 'Burns trust with reports; managers fixate on attribution.' }
+  ];
+
+  function buildRace() {
+    document.getElementById('race').innerHTML = raceData.map((r, i) => `
+      <div class="race-row" data-i="${i}">
+        <div class="race-label">${r.label}</div>
+        <div class="race-track">
+          <div class="race-fill ${r.cls}" data-pct="${r.pct}" style="width:0%">${r.pct}%</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function runRace() {
+    const fills = document.querySelectorAll('.race-fill');
+    fills.forEach(f => f.style.width = '0%');
+    setTimeout(() => {
+      fills.forEach((f, i) => {
+        setTimeout(() => { f.style.width = f.dataset.pct + '%'; }, i * 250);
+      });
+    }, 50);
+  }
+
+  /* ════════ Demo 5 · Tabs ════════ */
+  const tabProgressMap = { info: 60, coach: 85, ctx: 75 };
+
+  function showTab(id, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + id).classList.add('active');
+    document.getElementById('tab-progress-fill').style.width = tabProgressMap[id] + '%';
+  }
+
+  /* ════════ Demo 6 · Calculator ════════ */
+  function updateCalc() {
+    const teams = parseInt(document.getElementById('calc-teams').value, 10);
+    const people = parseInt(document.getElementById('calc-people').value, 10);
+    const cadence = document.getElementById('calc-cadence').value;
+
+    document.getElementById('calc-teams-val').textContent = teams;
+    document.getElementById('calc-people-val').textContent = people;
+
+    // Sessions per person per year
+    const sessionsPerYear = cadence === 'monthly' ? 12 : cadence === 'quarterly' ? 4 : 2;
+    const totalPeople = teams * people;
+    const totalSessionsYear = totalPeople * sessionsPerYear;
+    const minutesPerYear = totalSessionsYear * 45;
+    const hoursPerWeek = minutesPerYear / 60 / 52;
+
+    document.getElementById('calc-hours').textContent = hoursPerWeek.toFixed(1);
+    document.getElementById('calc-total').textContent = totalPeople;
+    document.getElementById('calc-sessions-year').textContent = totalSessionsYear;
+  }
+
+  /* ════════ Init ════════ */
+  window.addEventListener('load', () => {
+    buildFunnel();
+    setTimeout(animateFunnel, 250);
+    buildTimeline();
+    buildStateMachine();
+    buildRace();
+    setTimeout(runRace, 400);
+    updateCalc();
+    // Open first section so users see something interactive immediately
+    toggleSection('s1');
+  });
+</script>
+
+</body>
+</html>
