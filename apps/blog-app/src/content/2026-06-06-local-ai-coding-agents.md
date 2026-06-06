@@ -1,7 +1,7 @@
 ---
 title: Run Coding Agents on Local AI — Zero Cloud, Full Control
 slug: 2026-06-06-local-ai-coding-agents
-description: A practical guide to replacing cloud AI APIs with a local Ollama server running qwen3-coder:30b — connecting Codex CLI, Claude Code, and Cursor to your own hardware.
+description: A practical guide to replacing cloud AI APIs with a local Ollama server running qwen3-coder:30b — connecting Codex CLI, Claude Code, Cursor, and Pi to your own hardware.
 categories: ['ollama', 'local-ai', 'codex-cli', 'claude-code', 'privacy', 'developer-tools']
 coverImage: https://dalenguyen.me/assets/images/blog/local-ai-coding-agents.png
 profileImage: assets/images/dale-nguyen-avatar.webp
@@ -10,7 +10,7 @@ author: Dale Nguyen
 draft: false
 ---
 
-Coding agents — Codex CLI, Claude Code, and Cursor — are productivity multipliers. But they all assume you are happy sending your code to someone else's servers. For many of us that is a deal-breaker: proprietary codebases, client NDAs, compliance requirements, or just the principle of owning your own compute.
+Coding agents — Codex CLI, Claude Code, Cursor, and Pi — are productivity multipliers. But they all assume you are happy sending your code to someone else's servers. For many of us that is a deal-breaker: proprietary codebases, client NDAs, compliance requirements, or just the principle of owning your own compute.
 
 This guide shows how to swap out every cloud API with a local [Ollama](https://ollama.com) server running **qwen3-coder:30b**. Same tools, same workflows, no data leaving your network.
 
@@ -238,6 +238,54 @@ Cursor has a similar configuration path. In **Settings → Models → OpenAI API
 4. Enter `http://192.168.2.200:11434/v1`.
 5. Enter `ollama` as the API key.
 6. Select or type `qwen3-coder:30b` as the model.
+
+---
+
+## Pi (pi.dev)
+
+[Pi](https://pi.dev) is a minimal agent harness built for extensibility — "adapt Pi to your workflows, not the other way around." It supports 15+ providers and custom local endpoints via a `models.json` file that hot-reloads between sessions.
+
+### Install
+
+```bash
+npm install -g @pi-ag/coding-agent
+```
+
+### Configuration
+
+Add your local Ollama server to `~/.pi/agent/models.json`:
+
+```json
+{
+  "providers": {
+    "ollama_remote": {
+      "baseUrl": "http://192.168.2.200:11434/v1",
+      "api": "openai-completions",
+      "apiKey": "ollama",
+      "models": [
+        {
+          "id": "qwen3-coder:30b",
+          "contextWindow": 262144,
+          "compat": {
+            "supportsDeveloperRole": false,
+            "supportsReasoningEffort": false
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+The `compat` block is important: Ollama doesn't understand the `developer` role or `reasoning_effort` parameter that Pi sends to reasoning-capable models by default. Setting both to `false` routes around those errors.
+
+### Running Pi
+
+```bash
+pi
+```
+
+Select the model with `/model` inside the session — it lists all providers including your custom `ollama_remote` entry. The `models.json` file reloads each time you open `/model`, so you can add or swap models without restarting.
 
 ---
 
