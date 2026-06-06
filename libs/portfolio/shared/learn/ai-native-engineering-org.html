@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Running an AI-Native Engineering Org</title>
+<meta name="description" content="An interactive learning guide to running an AI-native engineering organization — how planning, context gathering, code review, team composition, and metrics shift when agentic coding becomes the default.">
+<style>
+  :root {
+    --bg: #0f0f13;
+    --surface: #1a1a22;
+    --surface2: #22222e;
+    --border: #2e2e3e;
+    --accent: #5e6ad2;
+    --accent-glow: rgba(94,106,210,0.25);
+    --green: #4ade80;
+    --amber: #fbbf24;
+    --red: #f87171;
+    --text: #e8e8f0;
+    --muted: #7a7a99;
+    --code-bg: #12121a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    min-height: 100vh;
+  }
+
+  a { color: var(--accent); }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 72px 24px 56px;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, rgba(94,106,210,0.14) 0%, transparent 70%);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-eyebrow {
+    display: inline-block;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    margin-bottom: 20px;
+    background: var(--surface);
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 5.5vw, 54px);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    background: linear-gradient(135deg, #fff 30%, var(--accent));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-sub {
+    color: var(--muted);
+    max-width: 680px;
+    margin: 18px auto 0;
+    font-size: 16px;
+  }
+
+  .progress-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 480px;
+    margin: 36px auto 0;
+  }
+  .progress-bar-track {
+    flex: 1;
+    height: 5px;
+    background: var(--border);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--accent), #9aa4ff);
+    border-radius: 99px;
+    transition: width 0.45s ease;
+  }
+  #progress-text { color: var(--muted); font-size: 13px; white-space: nowrap; }
+
+  main { max-width: 920px; margin: 0 auto; padding: 40px 24px 80px; }
+
+  /* ── Completion banner ── */
+  .completion-banner { display: none; max-width: 760px; margin: 0 auto 32px; padding: 0 24px; }
+  .completion-banner.show { display: block; }
+  .completion-banner > div {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    padding: 16px 20px;
+    color: var(--green);
+    font-weight: 600;
+    font-size: 15px;
+    text-align: center;
+  }
+
+  /* ── Section cards ── */
+  .section {
+    margin-bottom: 24px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--surface);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .section:hover { border-color: #3a3a52; }
+  .section.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4);
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+
+  .section-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+  .section.active .section-num {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+
+  .section-title { flex: 1; font-weight: 600; font-size: 16px; letter-spacing: -0.01em; }
+
+  .section-chevron {
+    color: var(--muted);
+    transition: transform 0.25s ease;
+    font-size: 18px;
+  }
+  .section.active .section-chevron { transform: rotate(180deg); }
+
+  .section-body {
+    display: none;
+    padding: 4px 28px 28px;
+  }
+  .section.active .section-body { display: block; }
+
+  .section-body p {
+    margin: 14px 0;
+    color: #d8d8e8;
+  }
+
+  .callout {
+    margin: 18px 0;
+    padding: 14px 16px;
+    border-left: 3px solid var(--accent);
+    background: rgba(94,106,210,0.07);
+    border-radius: 0 8px 8px 0;
+    font-size: 14px;
+    color: #cfcfe0;
+  }
+  .callout.amber { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+  .callout.green { border-color: var(--green); background: rgba(74,222,128,0.06); }
+  .callout strong { color: var(--text); }
+
+  /* ── Demo box ── */
+  .demo-box {
+    margin: 22px 0;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--code-bg);
+    overflow: hidden;
+  }
+  .demo-label {
+    background: var(--surface2);
+    padding: 10px 16px;
+    font-size: 11px;
+    color: var(--muted);
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--border);
+  }
+  .demo-inner { padding: 22px; }
+
+  /* ── Buttons ── */
+  .btn {
+    background: var(--accent);
+    color: #fff;
+    border: none;
+    padding: 9px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter 0.15s, transform 0.05s;
+    font-family: inherit;
+  }
+  .btn:hover { filter: brightness(1.1); }
+  .btn:active { transform: translateY(1px); }
+  .btn.ghost {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--text); }
+  .btn-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+
+  /* ── Quiz ── */
+  .quiz {
+    margin-top: 22px;
+    padding: 18px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+  }
+  .quiz-question { font-weight: 600; font-size: 14px; color: var(--text); }
+  .quiz-opt {
+    padding: 10px 14px;
+    border-radius: 7px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 14px;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+  .quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+  .quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+  .quiz-opt:disabled { cursor: default; }
+  .quiz-feedback {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 7px;
+    font-size: 13px;
+    display: none;
+  }
+  .quiz-feedback.show { display: block; }
+  .quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+  .quiz-feedback.wrong-fb   { background: rgba(248,113,113,0.08); color: var(--red);   border: 1px solid rgba(248,113,113,0.3); }
+
+  /* ── State Machine (Section 1) ── */
+  .sm-graph { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .sm-node {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface2); cursor: pointer; transition: all 0.2s;
+    min-width: 110px;
+  }
+  .sm-node:hover { border-color: var(--accent); }
+  .sm-icon { font-size: 22px; }
+  .sm-label { font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
+  .sm-node.sm-current {
+    border-color: var(--accent); background: var(--accent-glow);
+    box-shadow: 0 0 0 1px var(--accent-glow);
+  }
+  .sm-node.sm-current .sm-label { color: var(--accent); }
+  .sm-node.sm-reachable { border-color: var(--green); background: rgba(74,222,128,0.06); }
+  .sm-node.sm-reachable .sm-label { color: var(--green); }
+  .sm-node.sm-unreachable { opacity: 0.32; }
+  .sm-log {
+    padding: 10px 14px; background: var(--surface2); border-radius: 8px;
+    font-size: 13px; color: var(--text); border: 1px solid var(--border);
+    min-height: 38px; line-height: 1.5;
+  }
+
+  /* ── Sequence Timeline (Section 2) ── */
+  .seq-toggle-row { display: flex; gap: 8px; margin-bottom: 18px; }
+  .seq-toggle {
+    flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted); font-size: 13px; cursor: pointer;
+    font-family: inherit; font-weight: 600; transition: all 0.2s;
+  }
+  .seq-toggle.active {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+  .seq-track { position: relative; padding: 24px 0 8px; }
+  .seq-line-bg {
+    position: absolute; top: 36px; left: 20px; right: 20px; height: 3px;
+    background: var(--border); border-radius: 99px;
+  }
+  .seq-line-fill {
+    height: 100%; width: 0%; background: var(--accent); border-radius: 99px;
+    transition: width 0.35s ease;
+  }
+  .seq-steps { display: flex; justify-content: space-between; position: relative; }
+  .seq-step {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    cursor: pointer; opacity: 0.3; transition: opacity 0.3s; min-width: 60px; flex: 1;
+  }
+  .seq-step.seq-revealed { opacity: 1; }
+  .seq-step.seq-selected .seq-dot { box-shadow: 0 0 0 3px var(--accent-glow); }
+  .seq-dot {
+    width: 18px; height: 18px; border-radius: 50%; background: var(--border);
+    border: 2px solid var(--surface2); transition: background 0.3s; flex-shrink: 0;
+  }
+  .seq-dot.seq-dot-active { background: var(--accent); border-color: var(--accent); }
+  .seq-label { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+  .seq-detail {
+    margin-top: 16px; padding: 12px 14px; background: var(--surface2);
+    border-radius: 8px; font-size: 13px; color: var(--text); min-height: 48px;
+    border: 1px solid var(--border); line-height: 1.55;
+  }
+
+  /* ── Review Splitter (Section 3) ── */
+  .split-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 600px) { .split-wrap { grid-template-columns: 1fr; } }
+  .split-col {
+    border: 1px solid var(--border); border-radius: 10px;
+    background: var(--surface2); padding: 16px;
+    min-height: 220px;
+  }
+  .split-col.claude-col { border-color: rgba(94,106,210,0.4); }
+  .split-col.human-col { border-color: rgba(74,222,128,0.4); }
+  .split-col-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .split-col.claude-col .split-col-title { color: var(--accent); }
+  .split-col.human-col  .split-col-title { color: var(--green); }
+  .split-task {
+    padding: 9px 12px; margin-bottom: 8px;
+    border-radius: 7px; border: 1px solid var(--border);
+    background: var(--code-bg); font-size: 13px;
+    transition: all 0.2s; position: relative;
+  }
+  .split-task.assigned-claude { border-color: var(--accent); background: rgba(94,106,210,0.08); }
+  .split-task.assigned-human  { border-color: var(--green);  background: rgba(74,222,128,0.08); }
+  .split-task.assigned-wrong  { border-color: var(--red); background: rgba(248,113,113,0.08); }
+  .split-task .split-hint { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .split-task-btns { display: flex; gap: 6px; margin-top: 8px; }
+  .split-btn {
+    flex: 1; padding: 4px 0; border-radius: 5px; border: 1px solid var(--border);
+    background: transparent; font-size: 11px; font-weight: 600; cursor: pointer;
+    letter-spacing: 0.04em; transition: all 0.15s; color: var(--muted);
+  }
+  .split-btn.claude-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(94,106,210,0.1); }
+  .split-btn.human-btn:hover  { border-color: var(--green);  color: var(--green);  background: rgba(74,222,128,0.1); }
+  .split-task-return {
+    display: inline-block; margin-top: 6px; font-size: 11px; color: var(--muted);
+    cursor: pointer; text-decoration: underline; text-underline-offset: 2px;
+  }
+  .split-task-return:hover { color: var(--text); }
+  .split-bank-title { font-size: 13px; font-weight: 600; color: var(--muted); margin-bottom: 10px; }
+  .split-bank { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--border); }
+  .split-feedback {
+    margin-top: 14px; padding: 10px 14px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border);
+    font-size: 13px; color: var(--text); min-height: 38px;
+  }
+
+  /* ── Role Composition (Section 4) ── */
+  .role-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+    margin-bottom: 16px;
+  }
+  @media (max-width: 600px) { .role-grid { grid-template-columns: 1fr; } }
+  .role-card {
+    padding: 14px; border-radius: 10px; border: 1px solid var(--border);
+    background: var(--surface2); cursor: pointer; transition: all 0.2s;
+    text-align: center;
+  }
+  .role-card:hover { border-color: var(--accent); }
+  .role-card.role-active {
+    border-color: var(--accent); background: var(--accent-glow);
+    box-shadow: 0 0 0 1px var(--accent-glow);
+  }
+  .role-icon { font-size: 28px; margin-bottom: 6px; }
+  .role-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .role-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .role-detail {
+    padding: 14px 16px; background: var(--surface2);
+    border-radius: 8px; border: 1px solid var(--border);
+    font-size: 13px; min-height: 80px; line-height: 1.6;
+  }
+  .role-detail .rd-title {
+    color: var(--accent); font-weight: 600; font-size: 14px; margin-bottom: 6px;
+  }
+  .role-detail ul { margin: 4px 0 0 20px; color: #cfcfe0; }
+  .role-detail li { margin: 4px 0; }
+
+  /* ── Tabs (Section 5) ── */
+  .tabs-row { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+  .tab-btn {
+    padding: 8px 14px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--surface2); color: var(--muted); font-size: 13px;
+    cursor: pointer; font-family: inherit; font-weight: 600; transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--text); border-color: #3a3a52; }
+  .tab-btn.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; animation: tabIn 0.25s ease; }
+  @keyframes tabIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+  .tab-summary {
+    padding: 16px 18px; background: var(--surface2);
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 14px; color: #d8d8e8; line-height: 1.65;
+  }
+  .tab-summary ul { margin: 8px 0 0 22px; }
+  .tab-summary li { margin: 4px 0; }
+  .tab-quote {
+    margin-top: 10px; padding: 10px 14px;
+    border-left: 3px solid var(--accent);
+    background: rgba(94,106,210,0.05);
+    border-radius: 0 6px 6px 0;
+    font-size: 13px; color: var(--muted); font-style: italic;
+  }
+
+  /* ── Race Bars (Section 6) ── */
+  .race-row {
+    display: flex; align-items: center; gap: 14px; margin-bottom: 12px;
+  }
+  .race-row .race-label {
+    width: 150px; flex-shrink: 0;
+    font-size: 13px; color: var(--muted);
+  }
+  .race-track {
+    flex: 1; height: 30px; background: var(--surface2); border-radius: 6px;
+    overflow: hidden; position: relative;
+  }
+  .race-fill {
+    height: 100%; border-radius: 6px; display: flex; align-items: center;
+    padding-left: 10px; font-size: 12px; font-weight: 600; width: 0%;
+    transition: width 0.9s cubic-bezier(0.22,1,0.36,1); white-space: nowrap;
+  }
+  .race-fill.good { background: linear-gradient(90deg, #4ade8044, #4ade80); color: #052e16; }
+  .race-fill.warn { background: linear-gradient(90deg, #fbbf2444, #fbbf24); color: #1c1003; }
+  .race-fill.risk { background: linear-gradient(90deg, #ef444444, #ef4444); color: #fff; }
+
+  /* ── Tooltips (overflow-safe) ── */
+  .tooltip-host { position: relative; cursor: help; }
+  .tooltip-host { border-bottom: 1px dashed var(--muted); }
+  .tooltip {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    pointer-events: none;
+    width: 240px;
+    background: var(--surface2);
+    border: 1px solid var(--accent);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--text);
+    line-height: 1.5;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+
+  /* ── Misc ── */
+  ul.bullet { margin: 14px 0 14px 22px; }
+  ul.bullet li { margin: 6px 0; color: #d8d8e8; }
+  code.inline {
+    background: var(--code-bg);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: #cfcfe0;
+    font-family: 'SF Mono', Menlo, Consolas, monospace;
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="hero-eyebrow">Engineering Leadership</div>
+  <h1>Running an AI-Native Engineering Org</h1>
+  <p class="hero-sub">
+    What changes when agentic coding becomes the default. A walkthrough of the new processes, the killed processes, and the metrics that actually matter — based on how Anthropic's Claude Code team operates.
+  </p>
+  <div class="progress-row">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <div id="progress-text">0 / 6 sections</div>
+  </div>
+</header>
+
+<div class="completion-banner" id="completion-banner">
+  <div>You've explored all six shifts. Now go find your noisiest workflow and ask if it's still serving its purpose.</div>
+</div>
+
+<main>
+
+  <!-- ════════════ SECTION 1 ════════════ -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-num">1</div>
+      <div class="section-title">Just-in-Time Planning</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The six-month roadmap is mostly dead. When prototypes can be built in an afternoon, the cost of writing a design doc that imagines what users want often <strong>exceeds</strong> the cost of just building it and putting it in front of someone.</p>
+      <p>The new ritual: <span class="tooltip-host" data-tooltip="Plan only the next concrete step. Discover the rest by shipping prototypes and watching what happens.">just-in-time decision making</span>. Plans shift from design docs to discussions inside PRs and prototypes.</p>
+
+      <div class="callout">
+        <strong>From Fiona Fung:</strong> "Our planning ritual shifted away from design docs toward discussions in PRs or prototypes."
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Planning loop state machine</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Click a state to walk the JIT loop. Green = valid next steps. Dim = invalid jumps.</p>
+          <div class="sm-graph" id="sm-graph"></div>
+          <div class="sm-log" id="sm-log">Click any state to start the loop.</div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">Why does long-horizon planning lose value in an AI-native org?</div>
+        <div id="q1-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Because designers and PMs no longer add value</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">Because prototypes are now cheaper than the design docs that describe them</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Because Claude refuses to read design docs longer than a page</button>
+        </div>
+        <div id="q1-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 2 ════════════ -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-num">2</div>
+      <div class="section-title">Context Gathering — Claude First</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The default move "go find the person who wrote it" is no longer optimal. The new norm: query Claude first with a specific question, and only escalate to a human when the model's answer hits its limit.</p>
+      <p>This isn't just a speed win — it reframes <strong>what humans should be asked</strong>. Stop interrupting senior engineers with questions Claude can answer from the repo. Save their attention for context Claude doesn't have.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · The two context-gathering loops</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Toggle to see how the same investigation ran before and after.</p>
+          <div class="seq-toggle-row">
+            <button class="seq-toggle" id="seq-old-btn" onclick="setSeqMode('old')">Old loop — find the author</button>
+            <button class="seq-toggle active" id="seq-new-btn" onclick="setSeqMode('new')">New loop — Claude first</button>
+          </div>
+          <div class="seq-track">
+            <div class="seq-line-bg"><div class="seq-line-fill" id="seq-line"></div></div>
+            <div class="seq-steps" id="seq-steps"></div>
+          </div>
+          <div class="seq-detail" id="seq-detail">Press Play to walk the loop.</div>
+          <div class="btn-row">
+            <button class="btn" onclick="playTimeline()">Play sequence</button>
+            <button class="btn ghost" onclick="resetTimeline()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout amber">
+        <strong>The deeper question:</strong> "What do you actually need to know?" Many questions humans get asked are really just requests for synthesis — and synthesis is exactly what Claude is good at.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">When does it still make sense to interrupt a human engineer?</div>
+        <div id="q2-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Whenever you need any context about the codebase</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">When Claude has hit a limit — missing context, ambiguous tradeoff, or a decision only the human knows the why for</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Never — humans should be removed from the context loop entirely</button>
+        </div>
+        <div id="q2-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 3 ════════════ -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-num">3</div>
+      <div class="section-title">Code Review — Recalibrating Human Judgment</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Code review is one of the most expensive engineering rituals. Claude is now a first-pass reviewer that handles the mechanical work — style, linting, common bug patterns, draft PR feedback — leaving humans to focus on the parts where their judgment is irreplaceable.</p>
+
+      <div class="callout green">
+        <strong>The rule of thumb:</strong> if a review comment could have been generated from the diff alone, Claude should generate it. If it requires understanding people, product, or risk, that's a human's job.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Sort review tasks by who owns them</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Use the buttons on each task to route it to Claude or humans. Try to match the team's actual split.</p>
+          <div class="split-wrap">
+            <div class="split-col claude-col">
+              <div class="split-col-title">Claude handles</div>
+              <div id="claude-zone"></div>
+            </div>
+            <div class="split-col human-col">
+              <div class="split-col-title">Humans focus on</div>
+              <div id="human-zone"></div>
+            </div>
+          </div>
+          <div class="split-bank">
+            <div class="split-bank-title">Unassigned — click to route each task</div>
+            <div id="split-bank"></div>
+          </div>
+          <div class="split-feedback" id="split-feedback">Assign all six tasks to see how your split compares.</div>
+          <div class="btn-row">
+            <button class="btn ghost" onclick="resetSplitter()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">Which review concern should a human <em>still</em> own end-to-end?</div>
+        <div id="q3-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Catching unused imports and inconsistent formatting</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">Product judgment — "should we even ship this?"</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Generating the first round of PR review comments</button>
+        </div>
+        <div id="q3-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 4 ════════════ -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-num">4</div>
+      <div class="section-title">Team Composition — Blurred Roles</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>When generating code is no longer the bottleneck, the value of pure "coders" drops and the value of <span class="tooltip-host" data-tooltip="People who can move from idea to working prototype with strong taste — they don't need to wait for a designer or PM to unblock them.">creative builders</span> rises. Roles overlap; the silos thin out.</p>
+      <p>PMs ship code. Engineers ship copy and design. Designers prototype with working data. Hiring shifts: deemphasize raw coding throughput, emphasize product intuition and systems depth.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · How the roles bleed into each other</div>
+        <div class="demo-inner">
+          <p style="font-size: 13px; color: var(--muted); margin: 0 0 14px;">Click a role to see which tasks they now own that they didn't before.</p>
+          <div class="role-grid" id="role-grid"></div>
+          <div class="role-detail" id="role-detail">
+            <div class="rd-title">Pick a role above</div>
+            Each role's expanded surface area is shown when selected.
+          </div>
+        </div>
+      </div>
+
+      <div class="callout">
+        <strong>Hiring shift:</strong> "PMs code a lot now, and engineers take on things like design and content." The implication is that you should hire for product intuition and systems depth — coding output alone is no longer scarce.
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">What changes about hiring priorities in an AI-native org?</div>
+        <div id="q4-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">You hire fewer humans because Claude replaces them</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">You deemphasize coding throughput and emphasize taste, judgment, and systems depth</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Only PMs are worth hiring — engineers can be entirely automated</button>
+        </div>
+        <div id="q4-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 5 ════════════ -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-num">5</div>
+      <div class="section-title">Three Core Team Principles</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>The mechanical processes change, but they're held in place by three operating principles. Drop any one of them and the rest stop working.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · The three principles</div>
+        <div class="demo-inner">
+          <div class="tabs-row">
+            <button class="tab-btn active" data-tab="dog" onclick="showTab('dog', this)">Dogfooding</button>
+            <button class="tab-btn" data-tab="flat" onclick="showTab('flat', this)">Flat structure</button>
+            <button class="tab-btn" data-tab="kill" onclick="showTab('kill', this)">Kill obsolete processes</button>
+          </div>
+
+          <div class="tab-panel active" id="tab-dog">
+            <div class="tab-summary">
+              Everyone uses the product daily as their default tool — not as a demo, not as a side project.
+              <ul>
+                <li>Every team member, including managers, drives Claude Code through real work every day.</li>
+                <li>"100% Claude-assisted commits" is treated as the floor, not the goal.</li>
+                <li>Pain points surface in your own backlog before they reach a customer.</li>
+              </ul>
+            </div>
+            <div class="tab-quote">"Relentless dogfooding" is the cheapest QA signal an AI org has.</div>
+          </div>
+
+          <div class="tab-panel" id="tab-flat">
+            <div class="tab-summary">
+              Managers start as ICs and stay close to the work. Flatness keeps decisions fast and managers calibrated to reality.
+              <ul>
+                <li>Managers begin as individual contributors before taking on people leadership.</li>
+                <li>They keep enough hands-on time to feel the actual engineering experience.</li>
+                <li>Information flows in fewer hops — fewer translations means less signal loss.</li>
+              </ul>
+            </div>
+            <div class="tab-quote">"Managers begin as individual contributors" — so they understand the experience they're managing.</div>
+          </div>
+
+          <div class="tab-panel" id="tab-kill">
+            <div class="tab-summary">
+              Every team member has explicit permission to question and kill processes that no longer serve their purpose.
+              <ul>
+                <li>Status meetings, ritualized planning, gatekept reviews — anything is on the table.</li>
+                <li>The test: "Is this still serving its purpose? Can we automate it?"</li>
+                <li>If the answer is no twice in a row, the process dies — without needing a committee.</li>
+              </ul>
+            </div>
+            <div class="tab-quote">"Identify your noisiest workflow and ask whether it still earns its cost."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">What's the operational test for keeping a process around?</div>
+        <div id="q5-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">It was approved by leadership and hasn't been formally removed</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">It's still serving its purpose and can't reasonably be automated</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">More than half the team attends it regularly</button>
+        </div>
+        <div id="q5-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════ SECTION 6 ════════════ -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-num">6</div>
+      <div class="section-title">Metrics &amp; Where Bottlenecks Move</div>
+      <div class="section-chevron">▾</div>
+    </div>
+    <div class="section-body">
+      <p>Removing the typing bottleneck doesn't remove bottlenecks — it <strong>moves</strong> them. The new metrics watch where pressure shows up: how fast new hires ship, how long PRs take to merge, and how much of the work has Claude in the loop.</p>
+      <p>Hit "Measure" to see the relative pressure on each metric in an AI-native org.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive · Where the new bottlenecks emerge</div>
+        <div class="demo-inner">
+          <div id="race-bars">
+            <div class="race-row">
+              <div class="race-label">Onboarding ramp</div>
+              <div class="race-track"><div class="race-fill good" id="race-onboard">—</div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">PR cycle time</div>
+              <div class="race-track"><div class="race-fill warn" id="race-pr">—</div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">CI / build infra</div>
+              <div class="race-track"><div class="race-fill risk" id="race-ci">—</div></div>
+            </div>
+            <div class="race-row">
+              <div class="race-label">Claude-assisted commits</div>
+              <div class="race-track"><div class="race-fill good" id="race-assist">—</div></div>
+            </div>
+          </div>
+          <div style="margin-top:14px;padding:12px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;line-height:1.6;color:#cfcfe0;">
+            <strong style="color:var(--text);">Read it this way:</strong> <span class="tooltip-host" data-tooltip="Engineers shipping real code within their first week is the new bar. If it takes a month, your onboarding still assumes people learn the codebase manually.">Onboarding</span> and <span class="tooltip-host" data-tooltip="The Claude team reports 100% Claude-assisted commits. Anything less suggests the team hasn't fully internalized agentic workflows yet.">Claude usage</span> are healthy. <span class="tooltip-host" data-tooltip="Code volume goes up, but CI capacity is fixed. Queues form here first.">PR cycle time</span> creeps up as code volume rises. <span class="tooltip-host" data-tooltip="The hidden bottleneck. Pipelines that worked for 5 PRs/day buckle at 50 PRs/day. Invest before it breaks.">Build infrastructure</span> is where the real strain lands.
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="runRace()">Measure</button>
+            <button class="btn ghost" onclick="resetRace()">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz">
+        <div class="quiz-question">When code generation gets cheaper, where does the bottleneck most often move next?</div>
+        <div id="q6-opts" style="display:flex;flex-direction:column;gap:8px;margin-top:12px;">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Designer hiring</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">CI, build infrastructure, and review throughput</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Office space</button>
+        </div>
+        <div id="q6-fb" class="quiz-feedback"></div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- Shared tooltip element for inline tooltip-host spans -->
+<div class="tooltip" id="shared-tooltip"></div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://claude.com/blog/running-an-ai-native-engineering-org" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Running an AI-Native Engineering Org — Fiona Fung, Anthropic</a>
+  </div>
+</div>
+
+<script>
+  /* ════════ Progress tracking ════════ */
+  const opened = new Set();
+  const totalSections = 6;
+
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    const wasActive = el.classList.contains('active');
+    el.classList.toggle('active');
+    if (!wasActive) {
+      opened.add(id);
+      updateProgress();
+    }
+  }
+
+  function updateProgress() {
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) {
+      document.getElementById('completion-banner').classList.add('show');
+    }
+  }
+
+  /* ════════ Quiz ════════ */
+  const quizAnswers = {
+    q1: { correctIdx: 1, expl: 'When prototypes are cheaper than design docs, planning shifts from documents to discussions inside PRs and prototypes.' },
+    q2: { correctIdx: 1, expl: 'Save human attention for the cases Claude can\'t reach — missing context, ambiguous tradeoffs, decisions whose "why" lives in someone\'s head.' },
+    q3: { correctIdx: 1, expl: 'Product judgment, design sense, and risk calls are exactly where human expertise stays irreplaceable.' },
+    q4: { correctIdx: 1, expl: 'Coding throughput is no longer scarce. Taste, product intuition, and deep systems expertise are.' },
+    q5: { correctIdx: 1, expl: 'Every process has to re-earn its existence. If it\'s automatable or no longer serving its purpose, kill it.' },
+    q6: { correctIdx: 1, expl: 'More code per engineer means more PRs, longer CI queues, and reviewers under load. The infra you ignored is the one that breaks first.' },
+  };
+
+  function answer(btn, qid, isCorrect) {
+    const opts = document.getElementById(qid + '-opts');
+    if (opts.querySelector('.correct, .wrong')) return;
+    opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) {
+      opts.querySelectorAll('.quiz-opt')[quizAnswers[qid].correctIdx].classList.add('correct');
+    }
+    const fb = document.getElementById(qid + '-fb');
+    fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + quizAnswers[qid].expl;
+    fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+  }
+
+  /* ════════ Section 1 · Planning State Machine ════════ */
+  const smStates = {
+    sketch:   { label: 'Sketch',        icon: '✏️',  transitions: { build: 'prompt Claude to spike it' } },
+    build:    { label: 'Build',         icon: '🔨', transitions: { deploy: 'open a draft PR', sketch: 'spike disproved the idea' } },
+    deploy:   { label: 'Deploy',        icon: '🚀', transitions: { feedback: 'ship behind a flag to dogfooders' } },
+    feedback: { label: 'Get feedback',  icon: '👂', transitions: { sketch: 're-frame what the problem actually is', build: 'tighten the next iteration' } },
+  };
+  let smCurrent = null;
+
+  function buildStateMachine() {
+    const graph = document.getElementById('sm-graph');
+    Object.entries(smStates).forEach(([id, s]) => {
+      const el = document.createElement('div');
+      el.className = 'sm-node';
+      el.id = 'smn-' + id;
+      el.innerHTML = `<span class="sm-icon">${s.icon}</span><span class="sm-label">${s.label}</span>`;
+      el.onclick = () => smTransition(id);
+      graph.appendChild(el);
+    });
+  }
+
+  function smTransition(toId) {
+    if (!smCurrent) {
+      smCurrent = toId;
+      document.getElementById('sm-log').textContent = `Started at "${smStates[toId].label}". Valid next steps glow green.`;
+      highlightSM();
+      return;
+    }
+    if (toId === smCurrent) return;
+    const validFrom = smStates[smCurrent].transitions;
+    if (validFrom[toId]) {
+      document.getElementById('sm-log').textContent =
+        `✓ "${smStates[smCurrent].label}" → "${smStates[toId].label}" — trigger: ${validFrom[toId]}`;
+      smCurrent = toId;
+    } else {
+      document.getElementById('sm-log').textContent =
+        `✗ Skipping from "${smStates[smCurrent].label}" to "${smStates[toId].label}" breaks the loop. JIT means small steps.`;
+    }
+    highlightSM();
+  }
+
+  function highlightSM() {
+    const validTargets = smCurrent ? Object.keys(smStates[smCurrent].transitions) : [];
+    Object.keys(smStates).forEach(id => {
+      const el = document.getElementById('smn-' + id);
+      el.classList.remove('sm-current', 'sm-reachable', 'sm-unreachable');
+      if (id === smCurrent) el.classList.add('sm-current');
+      else if (validTargets.includes(id)) el.classList.add('sm-reachable');
+      else if (smCurrent) el.classList.add('sm-unreachable');
+    });
+  }
+
+  /* ════════ Section 2 · Context Gathering Sequence ════════ */
+  const seqSets = {
+    old: [
+      { label: 'Question',  icon: '❓', detail: 'You need to understand why a service was built a certain way.' },
+      { label: 'Git blame', icon: '🔍', detail: 'You git-blame the file to find the original author from two years ago.' },
+      { label: 'Find them', icon: '🕵️',  detail: 'You check if they still work here. They do. You DM them on Slack.' },
+      { label: 'Wait',      icon: '⏳', detail: 'They\'re in another timezone or in meetings. Hours pass.' },
+      { label: 'Reply',     icon: '💬', detail: 'They reply with one paragraph of context — most of which is reconstructed from memory.' },
+      { label: 'Decide',    icon: '✅', detail: 'You finally make the call. Total elapsed time: most of a day.' },
+    ],
+    new: [
+      { label: 'Question', icon: '❓', detail: 'Same starting question — why was this service built this way?' },
+      { label: 'Ask Claude', icon: '🤖', detail: 'You prompt Claude with the file and the specific question.' },
+      { label: 'Synthesis', icon: '🧠', detail: 'Claude reads the file, tests, related modules, and recent PRs in seconds.' },
+      { label: 'Answer', icon: '📝', detail: 'You get a synthesized answer with citations — pointers back to the actual code and commits.' },
+      { label: 'Decide', icon: '✅', detail: 'If the answer covers it, you decide and move on. Total elapsed: a few minutes.' },
+      { label: 'Escalate?', icon: '👤', detail: 'Only escalate to a human if Claude hit a real limit — missing context, judgment call, or a "why" no document captures.' },
+    ],
+  };
+  let seqMode = 'new';
+  let seqActive = -1;
+
+  function setSeqMode(mode) {
+    seqMode = mode;
+    document.getElementById('seq-old-btn').classList.toggle('active', mode === 'old');
+    document.getElementById('seq-new-btn').classList.toggle('active', mode === 'new');
+    buildTimeline();
+    resetTimeline();
+  }
+
+  function buildTimeline() {
+    const container = document.getElementById('seq-steps');
+    container.innerHTML = '';
+    seqSets[seqMode].forEach((s, i) => {
+      const el = document.createElement('div');
+      el.className = 'seq-step';
+      el.id = 'seq-step-' + i;
+      el.innerHTML = `<div class="seq-dot" id="seq-dot-${i}"></div><div class="seq-label">${s.icon}<br><span>${s.label}</span></div>`;
+      el.onclick = () => selectStep(i);
+      container.appendChild(el);
+    });
+  }
+
+  function selectStep(i) {
+    if (seqActive === i) {
+      document.getElementById('seq-detail').textContent = 'Click a step to inspect it, or press Play.';
+      seqActive = -1;
+      document.querySelectorAll('.seq-step').forEach(el => el.classList.remove('seq-selected'));
+      return;
+    }
+    seqActive = i;
+    document.getElementById('seq-detail').textContent = seqSets[seqMode][i].detail;
+    document.querySelectorAll('.seq-step').forEach((el, j) => el.classList.toggle('seq-selected', j === i));
+  }
+
+  function playTimeline() {
+    resetTimeline();
+    const steps = seqSets[seqMode];
+    steps.forEach((_, i) => {
+      setTimeout(() => {
+        document.getElementById('seq-dot-' + i).classList.add('seq-dot-active');
+        document.getElementById('seq-step-' + i).classList.add('seq-revealed');
+        document.getElementById('seq-line').style.width = ((i + 1) / steps.length * 100) + '%';
+        document.getElementById('seq-detail').textContent = steps[i].detail;
+      }, i * 420);
+    });
+  }
+
+  function resetTimeline() {
+    seqActive = -1;
+    document.getElementById('seq-line').style.width = '0%';
+    document.getElementById('seq-detail').textContent = 'Press Play to walk the loop, or click any step.';
+    seqSets[seqMode].forEach((_, i) => {
+      const dot = document.getElementById('seq-dot-' + i);
+      const step = document.getElementById('seq-step-' + i);
+      if (dot) dot.classList.remove('seq-dot-active');
+      if (step) step.classList.remove('seq-revealed', 'seq-selected');
+    });
+  }
+
+  /* ════════ Section 3 · Review Splitter ════════ */
+  const splitTasks = [
+    { id: 't1', label: 'Style and linting consistency',         hint: '— spot extra commas, naming patterns, import order', owner: 'claude' },
+    { id: 't2', label: 'Catching common bug patterns',          hint: '— null derefs, off-by-one, missing await',          owner: 'claude' },
+    { id: 't3', label: 'First-pass PR feedback drafts',         hint: '— suggested edits with reasoning',                  owner: 'claude' },
+    { id: 't4', label: 'Security-sensitive changes',            hint: '— auth, crypto, multi-tenant data',                 owner: 'human' },
+    { id: 't5', label: 'Product judgment — "should we ship this?"', hint: '— calls only people with context can make',     owner: 'human' },
+    { id: 't6', label: 'Design and UX sense',                   hint: '— is this interaction actually right?',             owner: 'human' },
+  ];
+  let splitAssignments = {};
+
+  function buildSplitter() {
+    splitAssignments = {};
+    const bank = document.getElementById('split-bank');
+    const claudeZone = document.getElementById('claude-zone');
+    const humanZone = document.getElementById('human-zone');
+    bank.innerHTML = ''; claudeZone.innerHTML = ''; humanZone.innerHTML = '';
+    splitTasks.forEach(t => {
+      bank.appendChild(makeTaskEl(t, true));
+    });
+    const fb = document.getElementById('split-feedback');
+    fb.textContent = 'Use the buttons on each task to route it.';
+    fb.style.color = '';
+  }
+
+  function makeTaskEl(t, inBank) {
+    const el = document.createElement('div');
+    el.className = 'split-task';
+    el.id = 'task-' + t.id;
+    if (inBank) {
+      el.innerHTML = `${t.label}<span class="split-hint">${t.hint}</span>
+        <div class="split-task-btns">
+          <button class="split-btn claude-btn" onclick="assignSplit('${t.id}','claude')">▸ Claude</button>
+          <button class="split-btn human-btn"  onclick="assignSplit('${t.id}','human')">▸ Human</button>
+        </div>`;
+    } else {
+      el.innerHTML = `${t.label}<span class="split-hint">${t.hint}</span>
+        <span class="split-task-return" onclick="returnToBank('${t.id}')">← move back</span>`;
+    }
+    return el;
+  }
+
+  function assignSplit(taskId, dest) {
+    const task = splitTasks.find(t => t.id === taskId);
+    splitAssignments[taskId] = dest;
+    const el = document.getElementById('task-' + taskId);
+    el.parentElement.removeChild(el);
+    const zoneEl = makeTaskEl(task, false);
+    zoneEl.classList.add(dest === task.owner ? ('assigned-' + dest) : 'assigned-wrong');
+    document.getElementById(dest + '-zone').appendChild(zoneEl);
+    updateSplitFeedback();
+  }
+
+  function returnToBank(taskId) {
+    const task = splitTasks.find(t => t.id === taskId);
+    delete splitAssignments[taskId];
+    const el = document.getElementById('task-' + taskId);
+    el.parentElement.removeChild(el);
+    document.getElementById('split-bank').appendChild(makeTaskEl(task, true));
+    updateSplitFeedback();
+  }
+
+  function updateSplitFeedback() {
+    const assignedCount = Object.keys(splitAssignments).length;
+    const fb = document.getElementById('split-feedback');
+    if (assignedCount < splitTasks.length) {
+      fb.textContent = `${assignedCount} / ${splitTasks.length} assigned. Keep going.`;
+      fb.style.color = '';
+      return;
+    }
+    let correct = 0;
+    splitTasks.forEach(t => { if (splitAssignments[t.id] === t.owner) correct++; });
+    if (correct === splitTasks.length) {
+      fb.innerHTML = '✓ All six match the team\'s actual split. Claude takes the mechanical work; humans take the judgment work.';
+      fb.style.color = 'var(--green)';
+    } else {
+      fb.innerHTML = `${correct} / ${splitTasks.length} correct. Tasks in red are routed to the wrong owner. Style, lint, and bug-pattern checks belong to Claude; product, security, and design judgment stay with humans.`;
+      fb.style.color = 'var(--text)';
+    }
+  }
+
+  function resetSplitter() {
+    buildSplitter();
+  }
+
+  /* ════════ Section 4 · Role Composition ════════ */
+  const roles = {
+    pm: {
+      icon: '🧭', title: 'Product Manager', sub: 'now writes code',
+      detail: {
+        title: 'PM — expanded surface',
+        items: [
+          'Builds working prototypes to communicate ideas, not just specs.',
+          'Closes the loop with users without waiting on an engineer.',
+          'Spends less time arbitrating priority, more time validating with real artifacts.',
+        ]
+      }
+    },
+    eng: {
+      icon: '🛠️', title: 'Engineer', sub: 'ships design + copy',
+      detail: {
+        title: 'Engineer — expanded surface',
+        items: [
+          'Drafts UI copy, microcopy, and empty states alongside the code.',
+          'Makes design calls inside the PR with Claude\'s help, rather than queueing for a designer.',
+          'Spends saved time on systems depth — the part Claude can\'t shortcut.',
+        ]
+      }
+    },
+    designer: {
+      icon: '🎨', title: 'Designer', sub: 'prototypes with real data',
+      detail: {
+        title: 'Designer — expanded surface',
+        items: [
+          'Builds clickable prototypes wired to live data, not flat mocks.',
+          'Iterates inside the codebase instead of throwing files over the wall.',
+          'Earlier feedback signal — designs are tested under realistic constraints sooner.',
+        ]
+      }
+    },
+  };
+  let activeRole = null;
+
+  function buildRoles() {
+    const grid = document.getElementById('role-grid');
+    Object.entries(roles).forEach(([id, r]) => {
+      const el = document.createElement('div');
+      el.className = 'role-card';
+      el.id = 'role-' + id;
+      el.innerHTML = `<div class="role-icon">${r.icon}</div><div class="role-title">${r.title}</div><div class="role-sub">${r.sub}</div>`;
+      el.onclick = () => selectRole(id);
+      grid.appendChild(el);
+    });
+  }
+
+  function selectRole(id) {
+    activeRole = id;
+    document.querySelectorAll('.role-card').forEach(el => el.classList.remove('role-active'));
+    document.getElementById('role-' + id).classList.add('role-active');
+    const r = roles[id];
+    const html = `<div class="rd-title">${r.detail.title}</div><ul>${r.detail.items.map(i => `<li>${i}</li>`).join('')}</ul>`;
+    document.getElementById('role-detail').innerHTML = html;
+  }
+
+  /* ════════ Section 5 · Tabs ════════ */
+  function showTab(name, btn) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + name).classList.add('active');
+  }
+
+  /* ════════ Section 6 · Race Bars ════════ */
+  const raceData = [
+    { id: 'race-onboard', pct: 25, label: '~1 week to first shipped PR' },
+    { id: 'race-pr',      pct: 60, label: 'creeping up as volume grows' },
+    { id: 'race-ci',      pct: 88, label: 'hidden bottleneck — invest early' },
+    { id: 'race-assist',  pct: 100, label: '100% Claude-assisted commits' },
+  ];
+
+  function runRace() {
+    resetRace();
+    setTimeout(() => {
+      raceData.forEach((r, i) => setTimeout(() => {
+        const el = document.getElementById(r.id);
+        el.style.width = r.pct + '%';
+        el.textContent = r.label;
+      }, i * 140));
+    }, 100);
+  }
+
+  function resetRace() {
+    raceData.forEach(r => {
+      const el = document.getElementById(r.id);
+      el.style.width = '0%';
+      el.textContent = '—';
+    });
+  }
+
+  /* ════════ Tooltips (overflow-safe via position:fixed) ════════ */
+  function initTooltips() {
+    const tooltip = document.getElementById('shared-tooltip');
+    document.querySelectorAll('.tooltip-host').forEach(host => {
+      const text = host.getAttribute('data-tooltip');
+      if (!text) return;
+      host.addEventListener('mouseenter', () => {
+        tooltip.textContent = text;
+        tooltip.style.display = 'block';
+        const rect = host.getBoundingClientRect();
+        const ttWidth = 240;
+        const gap = 12;
+        // Try below the trigger first (works well for inline text)
+        const belowTop = rect.bottom + gap;
+        const fitsBelow = belowTop + 80 < window.innerHeight;
+        if (fitsBelow) {
+          tooltip.style.top = belowTop + 'px';
+          tooltip.style.left = Math.max(8, Math.min(
+            window.innerWidth - ttWidth - 8,
+            rect.left + rect.width / 2 - ttWidth / 2
+          )) + 'px';
+          tooltip.style.transform = 'none';
+        } else {
+          // place above
+          tooltip.style.top = (rect.top - gap - 80) + 'px';
+          tooltip.style.left = Math.max(8, Math.min(
+            window.innerWidth - ttWidth - 8,
+            rect.left + rect.width / 2 - ttWidth / 2
+          )) + 'px';
+          tooltip.style.transform = 'none';
+        }
+      });
+      host.addEventListener('mouseleave', () => {
+        tooltip.style.display = 'none';
+      });
+    });
+  }
+
+  /* ════════ Init ════════ */
+  window.addEventListener('load', () => {
+    buildStateMachine();
+    buildTimeline();
+    buildSplitter();
+    buildRoles();
+    selectRole('pm');
+    initTooltips();
+  });
+</script>
+
+</body>
+</html>
