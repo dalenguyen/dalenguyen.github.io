@@ -1,8 +1,8 @@
 ---
 title: Run Coding Agents on Local AI — Zero Cloud, Full Control
 slug: 2026-06-06-local-ai-coding-agents
-description: A practical guide to replacing cloud AI APIs with a local Ollama server running qwen3-coder:30b — connecting Codex CLI, Claude Code, and Cline to your own hardware.
-categories: ['ollama', 'local-ai', 'codex-cli', 'claude-code', 'cline', 'privacy', 'developer-tools']
+description: A practical guide to replacing cloud AI APIs with a local Ollama server running qwen3-coder:30b — connecting Codex CLI, Claude Code, and Cursor to your own hardware.
+categories: ['ollama', 'local-ai', 'codex-cli', 'claude-code', 'privacy', 'developer-tools']
 coverImage: https://dalenguyen.me/assets/images/blog/local-ai-coding-agents.png
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2026-06-06T09:00:00.000Z
@@ -10,7 +10,7 @@ author: Dale Nguyen
 draft: false
 ---
 
-Coding agents — Codex CLI, Claude Code, Cursor, Cline — are productivity multipliers. But they all assume you are happy sending your code to someone else's servers. For many of us that is a deal-breaker: proprietary codebases, client NDAs, compliance requirements, or just the principle of owning your own compute.
+Coding agents — Codex CLI, Claude Code, and Cursor — are productivity multipliers. But they all assume you are happy sending your code to someone else's servers. For many of us that is a deal-breaker: proprietary codebases, client NDAs, compliance requirements, or just the principle of owning your own compute.
 
 This guide shows how to swap out every cloud API with a local [Ollama](https://ollama.com) server running **qwen3-coder:30b**. Same tools, same workflows, no data leaving your network.
 
@@ -225,28 +225,6 @@ source ~/.zshrc
 ```
 
 One practical note: Claude Code's system prompts are written for Claude models and include Anthropic-specific formatting expectations. qwen3-coder:30b handles them well, but you may see occasional formatting quirks in responses. They do not affect functionality.
-
----
-
-## Cline (VS Code Extension)
-
-[Cline](https://github.com/cline/cline) is a VS Code extension that brings an agentic coding assistant into the editor. It has a first-class UI for configuring custom OpenAI-compatible providers.
-
-### Configuration
-
-1. Open the Cline panel in VS Code (the robot icon in the sidebar).
-2. Click the settings gear icon.
-3. Set **API Provider** to `OpenAI Compatible`.
-4. Set **Base URL** to `http://192.168.2.200:11434/v1`.
-5. Set **API Key** to `ollama` (any non-empty string).
-6. Set **Model** to `qwen3-coder:30b`.
-
-<figure>
-  <img src="assets/images/blog/local-ai-coding-agents-cline-settings.png" alt="Cline settings panel with Ollama base URL configured" width="100%" height="auto" />
-  <figcaption>Cline settings panel — point the base URL at your local Ollama server</figcaption>
-</figure>
-
-Save the settings. Cline will use your local model for all completions, chat, and agentic tasks.
 
 ---
 
