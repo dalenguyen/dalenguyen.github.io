@@ -42,8 +42,12 @@ function scanLearnDir(dir: string) {
     const html = readFileSync(join(dir, file), 'utf-8')
     const title = html.match(/<title[^>]*>([^<]+)<\/title>/i)?.[1]?.trim() ?? file
     const description =
-      html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i)?.[1]?.trim() ?? ''
-    return { title, description, url: `/learn/${file}` }
+      html.match(/<meta[^>]+name=["']description["'][^>]+content="([^"]+)"/i)?.[1]?.trim() ??
+      html.match(/<meta[^>]+name=["']description["'][^>]+content='([^']+)'/i)?.[1]?.trim() ?? ''
+    const date =
+      html.match(/<meta[^>]+name=["']date["'][^>]+content="([^"]+)"/i)?.[1]?.trim() ??
+      html.match(/<meta[^>]+name=["']date["'][^>]+content='([^']+)'/i)?.[1]?.trim() ?? ''
+    return { title, description, date, url: `/learn/${file}` }
   })
 }
 

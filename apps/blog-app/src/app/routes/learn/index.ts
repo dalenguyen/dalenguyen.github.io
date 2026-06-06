@@ -27,6 +27,9 @@ export const routeMeta: RouteMeta = {
               [href]="page.url"
               class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col p-6 cursor-pointer no-underline"
             >
+              @if (page.date) {
+                <p class="text-xs text-gray-400 mb-2">{{ page.date }}</p>
+              }
               <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-indigo-600 transition-colors">
                 {{ page.title }}
               </h3>
@@ -42,5 +45,5 @@ export const routeMeta: RouteMeta = {
   `,
 })
 export default class LearnComponent {
-  readonly pages = learnPages
+  readonly pages = [...learnPages].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
 }

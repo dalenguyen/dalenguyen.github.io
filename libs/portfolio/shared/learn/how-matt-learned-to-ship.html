@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Non-Engineers Learned to Ship with AI</title>
+<meta name="description" content="How Sentry's growth team migrated 2,500 CMS pages to Git and unlocked AI-native workflows so non-technical contributors could ship like engineers.">
+<meta name="date" content="2026-06-06">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #7a7a99;
+  --code-bg: #12121a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+
+/* Hero */
+.hero { max-width: 920px; margin: 0 auto; padding: 64px 24px 40px; }
+.hero-label { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.hero h1 { font-size: clamp(26px, 5vw, 44px); font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
+.hero-sub { font-size: 17px; color: var(--muted); max-width: 620px; margin-bottom: 36px; }
+.progress-row { display: flex; align-items: center; gap: 14px; }
+.progress-text { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+
+/* Main */
+.main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* Section Cards */
+.section { margin-bottom: 32px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); overflow: hidden; transition: border-color 0.2s; }
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; cursor: pointer; user-select: none; }
+.section-num { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; transition: all 0.2s; }
+.section.active .section-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-chevron { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
+.section.active .section-chevron { transform: rotate(180deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+
+/* Prose */
+p { font-size: 15px; line-height: 1.7; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+/* Callout */
+.callout { border-left: 3px solid var(--accent); background: rgba(94,106,210,0.06); border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14px; margin: 16px 0; line-height: 1.6; }
+.callout.green { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.callout.amber { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.red { border-color: var(--red); background: rgba(248,113,113,0.06); }
+
+/* Tabs */
+.tabs { display: flex; gap: 8px; margin: 16px 0 12px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* KV Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; font-size: 12px; }
+.kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted); font-weight: 500; }
+.kv-chip-val { padding: 4px 9px; color: var(--text); }
+
+/* Demo Box */
+.demo-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 20px 0; }
+.demo-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+
+/* Quiz */
+.quiz-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-top: 20px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; transition: all 0.15s; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; padding: 10px 14px; border-radius: 7px; font-size: 13px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); border: 1px solid rgba(74,222,128,0.3); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); border: 1px solid rgba(248,113,113,0.3); }
+
+/* Completion */
+.completion { display: none; max-width: 920px; margin: 0 auto 48px; padding: 0 24px; }
+.completion.show { display: block; }
+.completion-card { background: linear-gradient(135deg, rgba(94,106,210,0.15), rgba(94,106,210,0.05)); border: 1px solid var(--accent); border-radius: 14px; padding: 32px; text-align: center; }
+.completion-card h2 { font-size: 22px; margin-bottom: 8px; }
+.completion-card p { color: var(--muted); font-size: 15px; }
+
+/* Buttons */
+.btn { padding: 8px 16px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.85; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover { border-color: var(--accent); opacity: 1; }
+
+/* Race Bars */
+.race-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.race-name { font-size: 13px; color: var(--muted); width: 140px; flex-shrink: 0; }
+.race-track { flex: 1; height: 28px; background: var(--code-bg); border-radius: 6px; overflow: hidden; }
+.race-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; width: 0%; transition: width 0.9s cubic-bezier(0.22,1,0.36,1); }
+.race-fill.fast { background: linear-gradient(90deg, #4ade8066, #4ade80); color: #052e16; }
+.race-fill.slow { background: linear-gradient(90deg, #ef444466, #ef4444); color: #fff; }
+
+/* State Machine */
+.sm-graph { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.sm-node { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: all 0.2s; min-width: 90px; }
+.sm-node:hover { border-color: var(--accent); }
+.sm-icon { font-size: 22px; }
+.sm-label { font-size: 12px; font-weight: 600; color: var(--muted); text-align: center; }
+.sm-node.sm-current { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 0 1px var(--accent-glow); }
+.sm-node.sm-current .sm-label { color: var(--accent); }
+.sm-node.sm-reachable { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.sm-node.sm-reachable .sm-label { color: var(--green); }
+.sm-node.sm-unreachable { opacity: 0.3; }
+.sm-node.sm-cms { border-color: rgba(248,113,113,0.5); }
+.sm-log { padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text); border: 1px solid var(--border); min-height: 38px; line-height: 1.5; }
+
+/* Sequence Timeline */
+.seq-track { position: relative; padding: 24px 0 8px; }
+.seq-line-bg { position: absolute; top: 36px; left: 20px; right: 20px; height: 3px; background: var(--border); border-radius: 99px; }
+.seq-line-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.35s ease; }
+.seq-steps { display: flex; justify-content: space-between; position: relative; }
+.seq-step { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.3; transition: opacity 0.3s; min-width: 60px; }
+.seq-step.seq-revealed { opacity: 1; }
+.seq-step.seq-selected .seq-dot { box-shadow: 0 0 0 3px var(--accent-glow); }
+.seq-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--border); border: 2px solid var(--surface2); transition: background 0.3s; flex-shrink: 0; }
+.seq-dot.seq-dot-active { background: var(--accent); border-color: var(--accent); }
+.seq-label { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+.seq-detail { margin-top: 16px; padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text); min-height: 40px; border: 1px solid var(--border); line-height: 1.5; }
+
+/* Funnel */
+.funnel-row { margin-bottom: 10px; }
+.funnel-meta { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+.funnel-label { font-size: 13px; font-weight: 500; flex: 1; }
+.funnel-count { font-size: 12px; color: var(--muted); font-weight: 600; }
+.funnel-track { height: 28px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+.funnel-bar { height: 100%; border-radius: 6px; cursor: pointer; width: 0%; transition: width 0.6s cubic-bezier(0.22,1,0.36,1), opacity 0.2s; }
+.funnel-bar:hover { opacity: 0.85; }
+.funnel-bar.funnel-bar-selected { outline: 2px solid var(--accent); outline-offset: 1px; }
+.funnel-detail { margin-top: 12px; padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text); min-height: 38px; border: 1px solid var(--border); line-height: 1.5; }
+
+/* Skill Interview Demo */
+.skill-interview { background: var(--code-bg); border-radius: 10px; padding: 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.9; min-height: 120px; max-height: 260px; overflow-y: auto; }
+.skill-q { color: var(--accent); }
+.skill-a { color: var(--green); }
+.skill-o { color: var(--amber); }
+.skill-cursor { display: inline-block; width: 8px; height: 14px; background: var(--accent); animation: blink 1s infinite; vertical-align: middle; margin-left: 2px; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+/* Tooltip (position:fixed — escapes overflow:hidden) */
+.tooltip { display: none; position: fixed; z-index: 1000; pointer-events: none; width: 220px; background: var(--surface2); border: 1px solid var(--accent); border-radius: 8px; padding: 10px 14px; font-size: 13px; color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-label">Case Study · AI-Native Workflows</div>
+  <h1>How Non-Engineers Learned to Ship</h1>
+  <p class="hero-sub">Sentry migrated 2,500 CMS pages to Git and taught their entire growth team to open PRs — with Claude Code doing the heavy lifting.</p>
+  <div class="progress-row">
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+    <div class="progress-bar-track">
+      <div class="progress-bar-fill" id="progress-fill"></div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Section 1 -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-num">1</div>
+      <div class="section-title">The CMS Wall</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>The turning point came when Claude Code successfully updated pages stored in GitHub — but "hit a wall" at CMS-protected content. The AI agent could instantly modify half the site, but was completely blocked by the other half.</p>
+      <p>The primary driver for migration wasn't cost savings — it was <strong>velocity and consistency</strong>. An agent that can fix 147 pages in 2 PRs is useless if half the site is locked behind a separate system.</p>
+      <div class="callout">
+        <strong>Key Insight:</strong> The value of AI agents compounds only when they can reach everything. A split content system creates an asymmetry that neutralizes the automation advantage.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Interactive — CMS vs Git: AI Agent Access Map</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Click each content type to see whether AI agents can reach and modify it. Notice how CMS-managed content creates a blocked zone.</p>
+        <div class="sm-graph" id="sm1-graph"></div>
+        <div class="sm-log" id="sm1-log">Select a content type to inspect AI agent access.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What was Sentry's primary reason for migrating away from their CMS?</div>
+        <div class="quiz-opts" id="q1-opts">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">To reduce infrastructure costs</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">To eliminate the asymmetry blocking AI agents from half the site</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">To improve SEO rankings</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Because the CMS vendor was shutting down</button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2 -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-num">2</div>
+      <div class="section-title">The Migration Plan</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>Migrating 2,500 pages isn't a weekend project — but Sentry completed it in two months with 2.5 developers, with Claude Code generating most of the code while engineers focused on planning and direction.</p>
+      <p>The phased approach was deliberate: start with the easiest content, build confidence and tooling, then tackle the complex cases last. The legacy CMS stayed on the free tier throughout — zero downtime, zero risk.</p>
+
+      <div class="chips">
+        <div class="kv-chip"><div class="kv-chip-key">Pages</div><div class="kv-chip-val">~2,500</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Team</div><div class="kv-chip-val">2.5 devs</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Duration</div><div class="kv-chip-val">2 months</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Code gen</div><div class="kv-chip-val">Claude Code</div></div>
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Migration Timeline — Click Each Phase to Inspect</div>
+        <div class="seq-track">
+          <div class="seq-line-bg"><div class="seq-line-fill" id="s2-line"></div></div>
+          <div class="seq-steps" id="s2-steps"></div>
+        </div>
+        <div class="seq-detail" id="s2-detail">Click Play to walk through the phases, or click any step to inspect it.</div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn" onclick="playTimeline2()">Play</button>
+          <button class="btn btn-outline" onclick="resetTimeline2()">Reset</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Why did Sentry migrate docs and marketing pages before blog content?</div>
+        <div class="quiz-opts" id="q2-opts">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Blog posts carry more traffic and require more caution</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Docs don't require SEO metadata</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">They were easiest to template — build confidence before tackling complexity</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">The CMS didn't manage blog content</button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3 -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-num">3</div>
+      <div class="section-title">Technical Wins</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>The migration wasn't just about content access — it unlocked a cascade of technical improvements. Switching from Gatsby to Astro cut build times by 71%, while consolidating 200 custom pages into 3 reusable templates made the codebase dramatically more maintainable.</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('s3','build',this)">Build Speed</button>
+        <button class="tab" onclick="switchTab('s3','quality',this)">Site Quality</button>
+        <button class="tab" onclick="switchTab('s3','structure',this)">Codebase</button>
+      </div>
+
+      <div id="s3-tab-build" class="tab-panel active">
+        <div class="demo-box" style="margin-top:0;">
+          <div class="demo-label">Build Time Race — Gatsby vs Astro</div>
+          <div id="s3-race-rows"></div>
+          <button class="btn" style="margin-top:12px;" onclick="runRace3()">Run Race</button>
+        </div>
+      </div>
+
+      <div id="s3-tab-quality" class="tab-panel">
+        <div class="chips" style="margin-top:14px;">
+          <div class="kv-chip"><div class="kv-chip-key">Web Vitals Before</div><div class="kv-chip-val" style="color:var(--amber);">89</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Web Vitals After</div><div class="kv-chip-val" style="color:var(--green);">97</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Staging Failures</div><div class="kv-chip-val" style="color:var(--green);">↓ 95%</div></div>
+        </div>
+        <div class="callout green" style="margin-top:4px;">The Marketo form cache became one of the highest-impact changes — not just for speed, but for eliminating recurring staging failure modes that nobody initially predicted would matter.</div>
+      </div>
+
+      <div id="s3-tab-structure" class="tab-panel">
+        <div class="chips" style="margin-top:14px;">
+          <div class="kv-chip"><div class="kv-chip-key">Custom Pages Before</div><div class="kv-chip-val" style="color:var(--red);">~200</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Reusable Templates</div><div class="kv-chip-val" style="color:var(--green);">3</div></div>
+        </div>
+        <p style="font-size:14px;color:var(--muted);margin-top:12px;">200 one-off pages reduced to 3 templates means every future page follows the same pattern — and AI agents know exactly what to expect when reading or editing them.</p>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What was Sentry's build time after migrating from Gatsby to Astro?</div>
+        <div class="quiz-opts" id="q3-opts">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">From 14 minutes to 10 minutes</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">From 14 minutes to under 4 minutes</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">From 30 minutes to 14 minutes</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">From 8 minutes to 2 minutes</button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4 -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-num">4</div>
+      <div class="section-title">AI Workflows at Scale</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>Once the migration was complete, the growth team shipped substantially more — and faster. Tasks that would have taken days became hours; hours became minutes. The key wasn't replacing humans — it was giving humans levers.</p>
+      <p>A team member who understands the goal can now direct an AI agent to execute it across hundreds of pages simultaneously.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">What the Team Shipped Post-Migration — Click a Bar to Learn How</div>
+        <div id="s4-funnel"></div>
+        <div class="funnel-detail" id="s4-funnel-detail">Click any bar to learn how it was accomplished.</div>
+        <button class="btn" style="margin-top:12px;" onclick="animateFunnel4()">Animate</button>
+      </div>
+
+      <div class="callout">
+        Running <strong>11 concurrent A/B tests</strong> wasn't possible before. The Git-based workflow makes branching, reviewing, and merging test variants a routine operation rather than an engineering project.
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Sentry's team fixed linking issues across 147 pages. How many PRs did this take?</div>
+        <div class="quiz-opts" id="q4-opts">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">147 PRs — one per page</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">One large PR with all changes</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">2 PRs</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">About 15 PRs grouped by site section</button>
+        </div>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5 -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-num">5</div>
+      <div class="section-title">Skills as AI Templates</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>"Skills" are AI instruction files that encode page-type requirements — structure, SEO metadata, brand patterns, and component libraries. They act as a bridge between what a non-technical team member wants and what the codebase needs.</p>
+      <p>When a growth marketer requests a new landing page, the AI doesn't guess. It follows the skill: interview the user for required fields, then produce properly structured Markdown with a PR ready for review.</p>
+
+      <div class="callout amber">
+        <strong>The Pattern:</strong> Skills encode institutional knowledge. Instead of training every team member on Markdown frontmatter and brand standards, you encode that knowledge once and let the AI enforce it for everyone, every time.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Simulate — AI Skill Interview Flow</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Watch how a "landing-page" skill guides a non-technical user through creating a correctly structured page.</p>
+        <div class="skill-interview" id="s5-terminal"><span class="skill-cursor"></span></div>
+        <div style="display:flex;gap:8px;margin-top:12px;">
+          <button class="btn" onclick="runSkillDemo()">Run Interview</button>
+          <button class="btn btn-outline" onclick="resetSkillDemo()">Reset</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What problem do "Skills" (AI instruction files) primarily solve?</div>
+        <div class="quiz-opts" id="q5-opts">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">They replace human review of PRs entirely</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">They encode page requirements so non-technical users can create correctly structured content via AI</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">They automatically deploy pages without code review</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">They generate visual design mockups from text</button>
+        </div>
+        <div class="quiz-feedback" id="q5-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6 -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-num">6</div>
+      <div class="section-title">Lessons & What's Next</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>The migration surfaced surprises that data migration alone couldn't predict. Design fidelity proved harder than content migration, human error introduced regression, and the most impactful infrastructure change came from an unexpected direction.</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('s6','challenges',this)">Challenges</button>
+        <button class="tab" onclick="switchTab('s6','cookbook',this)">Sentry Cookbook</button>
+        <button class="tab" onclick="switchTab('s6','next',this)">What's Next</button>
+      </div>
+
+      <div id="s6-tab-challenges" class="tab-panel active">
+        <div class="callout red" style="margin-top:14px;"><strong>Design Fidelity:</strong> Migrating data proved far simpler than achieving pixel-perfect design parity. Rendering differences required significant manual work that wasn't budgeted.</div>
+        <div class="callout red"><strong>Human Error:</strong> An email validation rule added during migration tanked key conversion metrics for days before being identified and reversed.</div>
+        <div class="callout amber"><strong>Infrastructure Surprise:</strong> The Marketo form cache became one of the highest-impact changes — not just for build speed, but for eliminating recurring staging failure modes nobody expected.</div>
+        <div class="callout"><strong>Learning Curve:</strong> Real, but smaller than feared. Non-technical team members needed about one month of slower-than-comfortable ramp-up before opening PRs independently.</div>
+      </div>
+
+      <div id="s6-tab-cookbook" class="tab-panel">
+        <p style="margin-top:14px;font-size:14px;">Launched alongside the migration, the <strong>Sentry Cookbook</strong> collects developer recipes like <em>"Debug undefined properties in React Native with Sentry Logs."</em></p>
+        <div class="callout" style="margin-top:14px;">The insight driving it: LLMs and AI Overviews cite <strong>structured, executable content</strong> far more reliably than traditional blog posts. Cookbooks are the SEO strategy of the AI citation era.</div>
+        <div class="chips" style="margin-top:14px;">
+          <div class="kv-chip"><div class="kv-chip-key">Format</div><div class="kv-chip-val">Step-by-step recipes</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Target</div><div class="kv-chip-val">AI citation optimization</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Audience</div><div class="kv-chip-val">Developers</div></div>
+        </div>
+      </div>
+
+      <div id="s6-tab-next" class="tab-panel">
+        <p style="margin-top:14px;font-size:14px;">The team is pursuing <strong>autonomous workflows</strong> — agents running on schedules to handle well-scoped fixes without human initiation. They're also building AI code review to maintain quality across high-volume PR batches.</p>
+        <div class="chips" style="margin-top:14px;">
+          <div class="kv-chip"><div class="kv-chip-key">Next</div><div class="kv-chip-val">Scheduled AI agents</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Next</div><div class="kv-chip-val">AI code review for batch PRs</div></div>
+        </div>
+        <div class="callout amber" style="margin-top:14px;">The trajectory: humans set direction and review outcomes. AI handles execution, scale, and routine corrections — autonomously.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What was unexpectedly impactful about the Marketo form cache change?</div>
+        <div class="quiz-opts" id="q6-opts">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It was planned as a key migration goal from day one</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It only improved build speed, which was expected</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">It eliminated recurring staging failure modes — a benefit nobody anticipated</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">It caused conversion metrics to drop temporarily</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Completion -->
+<div class="completion" id="completion-banner">
+  <div class="completion-card">
+    <h2>Module Complete</h2>
+    <p>You now understand how Sentry used an AI-native Git workflow to unlock shipping velocity for their entire growth team — not just engineers.</p>
+  </div>
+</div>
+
+<!-- Source Reference -->
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://read.technically.dev/p/how-matt-learned-to-ship" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">How Matt Learned to Ship — Technically</a>
+  </div>
+</div>
+
+<script>
+// ---- Progress ----
+const opened = new Set();
+const TOTAL = 6;
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / TOTAL) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').textContent = opened.size + ' / ' + TOTAL + ' sections';
+    if (opened.size === TOTAL) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+// ---- Quiz ----
+const answers = {
+  q1: { correct: 1, explanation: 'Velocity and consistency drove the decision — AI agents could instantly update Git-stored pages but were completely blocked by CMS-protected content, creating an asymmetry that neutralized automation.' },
+  q2: { correct: 2, explanation: 'Docs and marketing pages were most templatable — starting there built confidence and tools before tackling the harder content.' },
+  q3: { correct: 1, explanation: 'Gatsby took 14 minutes; after switching to Astro and implementing a Marketo form cache, builds ran in under 4 minutes — a 71% improvement.' },
+  q4: { correct: 2, explanation: 'Just 2 PRs fixed linking issues across 147 pages. This is only possible when AI agents can operate programmatically across all content.' },
+  q5: { correct: 1, explanation: 'Skills encode institutional knowledge (structure, SEO requirements, brand patterns) so non-technical users can create correctly structured content via AI without knowing the technical requirements.' },
+  q6: { correct: 2, explanation: 'The Marketo cache eliminated recurring staging failure modes — a benefit nobody planned for. Infrastructure surprises are common in large migrations.' },
+};
+
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+// ---- Tabs ----
+function switchTab(section, tab, btn) {
+  document.querySelectorAll('[id^="' + section + '-tab-"]').forEach(p => p.classList.remove('active'));
+  document.getElementById(section + '-tab-' + tab).classList.add('active');
+  btn.closest('.tabs').querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ---- Section 1: CMS vs Git State Machine ----
+const sm1 = {
+  docs_git:  { label: 'Docs (Git)',      icon: '📄', cms: false, detail: '✅ AI agents can read, edit, and create docs pages. Changes are just file edits submitted as PRs — fully programmable.' },
+  mkt_git:   { label: 'Marketing (Git)', icon: '🏠', cms: false, detail: '✅ Marketing pages in Git are fully AI-accessible. Batch edits across 147 pages = 2 PRs. Updates ship same-day.' },
+  blog_git:  { label: 'Blog (Git)',      icon: '✍️', cms: false, detail: '✅ Blog posts as Markdown files mean AI can update metadata, fix links, or repurpose content in bulk without manual CMS access.' },
+  cms_pages: { label: 'CMS Pages',       icon: '🔒', cms: true,  detail: '⛔ CMS-managed pages are inaccessible to AI agents. No programmatic access = no automation. This is the wall Claude Code hit.' },
+};
+
+function buildSM1() {
+  const graph = document.getElementById('sm1-graph');
+  Object.entries(sm1).forEach(([id, s]) => {
+    const el = document.createElement('div');
+    el.className = 'sm-node' + (s.cms ? ' sm-cms' : '');
+    el.id = 'smn1-' + id;
+    el.innerHTML = '<span class="sm-icon">' + s.icon + '</span><span class="sm-label">' + s.label + '</span>';
+    el.onclick = () => sm1Select(id);
+    graph.appendChild(el);
+  });
+}
+
+function sm1Select(id) {
+  Object.keys(sm1).forEach(k => {
+    const el = document.getElementById('smn1-' + k);
+    el.classList.remove('sm-current', 'sm-reachable', 'sm-unreachable');
+    if (k === id) el.classList.add('sm-current');
+    else if (!sm1[k].cms && !sm1[id].cms) el.classList.add('sm-reachable');
+    else el.classList.add('sm-unreachable');
+  });
+  document.getElementById('sm1-log').textContent = sm1[id].detail;
+}
+
+// ---- Section 2: Migration Timeline ----
+const steps2 = [
+  { label: 'Docs', icon: '📄', detail: 'Phase 1: Docs migrated first — highly templatable, low-risk, immediately AI-accessible after move to Git.' },
+  { label: 'Marketing', icon: '🏠', detail: 'Phase 2: Marketing pages follow — slightly more varied templates but still straightforward. Tooling from Phase 1 reused.' },
+  { label: 'Blog', icon: '✍️', detail: 'Phase 3: Blog content — Markdown conversion required more cleanup for rich formatting, but patterns were established.' },
+  { label: 'Interactive', icon: '⚡', detail: 'Phase 4: Complex interactive pages last — highest effort, but confidence and templates from earlier phases helped significantly.' },
+  { label: 'CMS Kept', icon: '🔄', detail: 'Throughout: Legacy CMS maintained on free tier — zero downtime, zero risk. Teams never lost access during the transition.' },
+  { label: 'Done ✅', icon: '🎯', detail: 'Migration complete. 2,500 pages in Git. Every page now accessible to AI agents. Growth team can open PRs independently.' },
+];
+let t2Active = -1;
+
+function buildTimeline2() {
+  const container = document.getElementById('s2-steps');
+  steps2.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'seq-step';
+    el.id = 's2-step-' + i;
+    el.innerHTML = '<div class="seq-dot" id="s2-dot-' + i + '"></div><div class="seq-label">' + s.icon + '<br><span>' + s.label + '</span></div>';
+    el.onclick = () => selectStep2(i);
+    container.appendChild(el);
+  });
+}
+
+function selectStep2(i) {
+  if (t2Active === i) { document.getElementById('s2-detail').textContent = 'Click a step to inspect it.'; t2Active = -1; return; }
+  t2Active = i;
+  document.getElementById('s2-detail').textContent = steps2[i].detail;
+  document.querySelectorAll('#s2-steps .seq-step').forEach((el, j) => el.classList.toggle('seq-selected', j === i));
+}
+
+function playTimeline2() {
+  resetTimeline2();
+  steps2.forEach((_, i) => setTimeout(() => {
+    document.getElementById('s2-dot-' + i).classList.add('seq-dot-active');
+    document.getElementById('s2-step-' + i).classList.add('seq-revealed');
+    document.getElementById('s2-line').style.width = ((i + 1) / steps2.length * 100) + '%';
+  }, i * 420));
+}
+
+function resetTimeline2() {
+  t2Active = -1;
+  document.getElementById('s2-line').style.width = '0%';
+  document.getElementById('s2-detail').textContent = 'Click Play to walk through the phases, or click any step to inspect it.';
+  steps2.forEach((_, i) => {
+    document.getElementById('s2-dot-' + i).classList.remove('seq-dot-active');
+    document.getElementById('s2-step-' + i).classList.remove('seq-revealed', 'seq-selected');
+  });
+}
+
+// ---- Section 3: Race Bars ----
+const race3 = [
+  { id: 'r3-astro',  label: 'Astro (after)',  pct: 27,  text: '~4 min',  cls: 'fast' },
+  { id: 'r3-gatsby', label: 'Gatsby (before)', pct: 100, text: '14 min', cls: 'slow' },
+];
+
+function buildRace3() {
+  const c = document.getElementById('s3-race-rows');
+  race3.forEach(r => {
+    const row = document.createElement('div');
+    row.className = 'race-row';
+    row.innerHTML = '<span class="race-name">' + r.label + '</span><div class="race-track"><div class="race-fill ' + r.cls + '" id="' + r.id + '"></div></div>';
+    c.appendChild(row);
+  });
+}
+
+function runRace3() {
+  race3.forEach(r => { const el = document.getElementById(r.id); el.style.width = '0%'; el.textContent = ''; });
+  setTimeout(() => {
+    race3.forEach((r, i) => setTimeout(() => {
+      const el = document.getElementById(r.id);
+      el.style.width = r.pct + '%';
+      el.textContent = r.text;
+    }, i * 250));
+  }, 100);
+}
+
+// ---- Section 4: Funnel / Bar Chart ----
+const funnel4 = [
+  { label: 'Linking fixes (147 pages)', value: 147, color: 'var(--accent)',
+    detail: 'Fixed in just 2 PRs using AI batch edits across all affected pages simultaneously. Previously a multi-day task.' },
+  { label: 'Legacy redirects cleaned (50)', value: 50, color: '#7c86e0',
+    detail: '50 legacy redirects cleaned up in 5 minutes — a task that would have required CMS access for each one individually.' },
+  { label: 'SEO improvement PRs (116)', value: 116, color: '#a78bfa',
+    detail: '116 internal-link improvement PRs created via automated SEO tooling, reviewed and merged by the team at scale.' },
+  { label: 'Product launch pages (10)', value: 10, color: '#c084fc',
+    detail: '10 pages updated same-day for a product launch — no waiting for a content team sprint cycle or CMS access requests.' },
+  { label: 'Concurrent A/B tests (11)', value: 11, color: 'var(--green)',
+    detail: '11 concurrent A/B tests running simultaneously — previously impossible without Git-based branch management per variant.' },
+];
+
+function buildFunnel4() {
+  const c = document.getElementById('s4-funnel');
+  const max = Math.max(...funnel4.map(s => s.value));
+  funnel4.forEach((s, i) => {
+    const pct = (s.value / max) * 100;
+    const row = document.createElement('div');
+    row.className = 'funnel-row';
+    row.innerHTML = '<div class="funnel-meta"><span class="funnel-label">' + s.label + '</span><span class="funnel-count">' + s.value + '</span></div>'
+      + '<div class="funnel-track"><div class="funnel-bar" id="fb4-' + i + '" data-pct="' + pct + '" style="width:0%;background:' + s.color + ';" onclick="showFunnel4(' + i + ')"></div></div>';
+    c.appendChild(row);
+  });
+}
+
+function animateFunnel4() {
+  funnel4.forEach((_, i) => setTimeout(() => {
+    const bar = document.getElementById('fb4-' + i);
+    bar.style.width = bar.dataset.pct + '%';
+  }, i * 160));
+}
+
+function showFunnel4(i) {
+  document.getElementById('s4-funnel-detail').textContent = funnel4[i].detail;
+  document.querySelectorAll('[id^="fb4-"]').forEach((b, j) => b.classList.toggle('funnel-bar-selected', j === i));
+}
+
+// ---- Section 5: Skill Interview Demo ----
+const skillSteps = [
+  { type: 'q', text: '🤖 [landing-page skill] What is this page for? (product, feature, campaign)' },
+  { type: 'a', text: '👤 User: Our new observability dashboard launch' },
+  { type: 'q', text: '🤖 What is the primary CTA? (e.g. "Start free trial", "Book a demo")' },
+  { type: 'a', text: '👤 User: "See it in action" — links to a video demo' },
+  { type: 'q', text: '🤖 Target audience? (developer, DevOps, CTO, etc.)' },
+  { type: 'a', text: '👤 User: Backend engineers on mid-size teams' },
+  { type: 'q', text: '🤖 Key differentiators to highlight? (3 max)' },
+  { type: 'a', text: '👤 User: Real-time alerts, GitHub integration, zero config' },
+  { type: 'o', text: '🤖 ✓ All required fields collected. Generating page with correct frontmatter, SEO metadata, and brand components...' },
+  { type: 'o', text: '📦 PR #4821 opened → "feat(landing): observability-dashboard-launch"' },
+  { type: 'o', text: '✅ Ready for review. Non-technical user shipped a compliant landing page in 4 minutes.' },
+];
+
+let skillTimer = null;
+let skillStep = 0;
+
+function runSkillDemo() {
+  resetSkillDemo();
+  const t = document.getElementById('s5-terminal');
+
+  function next() {
+    if (skillStep >= skillSteps.length) return;
+    const s = skillSteps[skillStep++];
+    const line = document.createElement('div');
+    line.className = 'skill-' + s.type;
+    line.textContent = s.text;
+    t.insertBefore(line, t.querySelector('.skill-cursor'));
+    t.scrollTop = t.scrollHeight;
+    skillTimer = setTimeout(next, 850);
+  }
+  skillTimer = setTimeout(next, 200);
+}
+
+function resetSkillDemo() {
+  if (skillTimer) clearTimeout(skillTimer);
+  skillStep = 0;
+  document.getElementById('s5-terminal').innerHTML = '<span class="skill-cursor"></span>';
+}
+
+// ---- Tooltip Init ----
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+// ---- Boot ----
+window.addEventListener('load', () => {
+  buildSM1();
+  buildTimeline2();
+  buildRace3();
+  buildFunnel4();
+  initTooltips();
+});
+</script>
+</body>
+</html>
