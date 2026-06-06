@@ -47,7 +47,10 @@ function scanLearnDir(dir: string) {
     const date =
       html.match(/<meta[^>]+name=["']date["'][^>]+content="([^"]+)"/i)?.[1]?.trim() ??
       html.match(/<meta[^>]+name=["']date["'][^>]+content='([^']+)'/i)?.[1]?.trim() ?? ''
-    return { title, description, date, url: `/learn/${file}` }
+    const timestamp =
+      html.match(/<meta[^>]+name=["']timestamp["'][^>]+content="([^"]+)"/i)?.[1]?.trim() ??
+      html.match(/<meta[^>]+name=["']timestamp["'][^>]+content='([^']+)'/i)?.[1]?.trim() ?? ''
+    return { title, description, date, timestamp, url: `/learn/${file}` }
   })
 }
 

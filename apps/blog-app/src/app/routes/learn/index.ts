@@ -45,5 +45,9 @@ export const routeMeta: RouteMeta = {
   `,
 })
 export default class LearnComponent {
-  readonly pages = [...learnPages].sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''))
+  readonly pages = [...learnPages].sort((a, b) => {
+    const dateComp = (b.date ?? '').localeCompare(a.date ?? '')
+    if (dateComp !== 0) return dateComp
+    return (b.timestamp ?? '').localeCompare(a.timestamp ?? '')
+  })
 }

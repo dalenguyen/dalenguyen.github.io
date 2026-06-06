@@ -1,0 +1,1066 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MacBook M4 Pro as a Local AI Powerhouse</title>
+<meta name="description" content="How the MacBook Pro M4 Pro with 48GB unified memory can replace ChatGPT, Cursor, and Midjourney with fully local, private, offline AI tools.">
+<meta name="date" content="2026-06-06">
+<meta name="timestamp" content="2026-06-06T23:00:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #7a7a99;
+  --code-bg: #12121a;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; }
+
+/* Hero */
+.hero { max-width: 920px; margin: 0 auto; padding: 64px 24px 40px; }
+.hero-label { font-size: 12px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 12px; }
+.hero h1 { font-size: clamp(26px, 5vw, 44px); font-weight: 700; line-height: 1.15; margin-bottom: 16px; }
+.hero-sub { font-size: 17px; color: var(--muted); max-width: 620px; margin-bottom: 36px; }
+.progress-row { display: flex; align-items: center; gap: 14px; }
+.progress-text { font-size: 13px; color: var(--muted); white-space: nowrap; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+
+/* Main */
+.main { max-width: 920px; margin: 0 auto; padding: 0 24px 80px; }
+
+/* Section Cards */
+.section { margin-bottom: 32px; border: 1px solid var(--border); border-radius: 14px; background: var(--surface); overflow: hidden; transition: border-color 0.2s; }
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-header { display: flex; align-items: center; gap: 16px; padding: 20px 24px; cursor: pointer; user-select: none; }
+.section-num { width: 28px; height: 28px; border-radius: 50%; background: var(--surface2); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: var(--muted); flex-shrink: 0; transition: all 0.2s; }
+.section.active .section-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-chevron { color: var(--muted); font-size: 12px; transition: transform 0.2s; }
+.section.active .section-chevron { transform: rotate(180deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+
+/* Prose */
+p { font-size: 15px; line-height: 1.7; margin-bottom: 14px; }
+p:last-child { margin-bottom: 0; }
+
+/* Callout */
+.callout { border-left: 3px solid var(--accent); background: rgba(94,106,210,0.06); border-radius: 0 8px 8px 0; padding: 12px 16px; font-size: 14px; margin: 16px 0; line-height: 1.6; }
+.callout.green { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.callout.amber { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.red { border-color: var(--red); background: rgba(248,113,113,0.06); }
+
+/* Tabs */
+.tabs { display: flex; gap: 8px; margin: 16px 0 12px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* KV Chips */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+.kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; font-size: 12px; }
+.kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted); font-weight: 500; }
+.kv-chip-val { padding: 4px 9px; color: var(--text); }
+
+/* Demo Box */
+.demo-box { background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin: 20px 0; }
+.demo-label { font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); margin-bottom: 14px; }
+
+/* Quiz */
+.quiz-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px; padding: 18px; margin-top: 20px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; transition: all 0.15s; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { font-size: 13px; margin-top: 10px; padding: 8px 12px; border-radius: 6px; display: none; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { color: var(--green); background: rgba(74,222,128,0.08); }
+.quiz-feedback.wrong-fb   { color: var(--red);   background: rgba(248,113,113,0.08); }
+
+/* Race bars */
+.race-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.race-name { font-size: 13px; color: var(--muted); width: 110px; flex-shrink: 0; text-align: right; }
+.race-track { flex: 1; height: 28px; background: var(--code-bg); border-radius: 6px; overflow: hidden; }
+.race-fill { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 10px; font-size: 12px; font-weight: 600; width: 0%; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+.race-fill.fast   { background: linear-gradient(90deg, #4ade8066, #4ade80); color: #052e16; }
+.race-fill.medium { background: linear-gradient(90deg, #fbbf2466, #fbbf24); color: #1c1003; }
+.race-fill.slow   { background: linear-gradient(90deg, #ef444466, #ef4444); color: #fff; }
+
+/* Sequence timeline */
+.seq-track { position: relative; padding: 24px 0 8px; }
+.seq-line-bg { position: absolute; top: 36px; left: 20px; right: 20px; height: 3px; background: var(--border); border-radius: 99px; }
+.seq-line-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.35s ease; }
+.seq-steps { display: flex; justify-content: space-between; position: relative; }
+.seq-step { display: flex; flex-direction: column; align-items: center; gap: 8px; cursor: pointer; opacity: 0.3; transition: opacity 0.3s; min-width: 60px; }
+.seq-step.seq-revealed { opacity: 1; }
+.seq-step.seq-selected .seq-dot { box-shadow: 0 0 0 3px var(--accent-glow); }
+.seq-dot { width: 18px; height: 18px; border-radius: 50%; background: var(--border); border: 2px solid var(--surface2); transition: background 0.3s; flex-shrink: 0; }
+.seq-dot.seq-dot-active { background: var(--accent); border-color: var(--accent); }
+.seq-label { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+.seq-detail { margin-top: 16px; padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text); min-height: 40px; border: 1px solid var(--border); line-height: 1.5; }
+
+/* State machine */
+.sm-graph { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+.sm-node { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: pointer; transition: all 0.2s; min-width: 90px; }
+.sm-node:hover { border-color: var(--accent); }
+.sm-icon { font-size: 20px; }
+.sm-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+.sm-node.sm-current { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 0 1px var(--accent-glow); }
+.sm-node.sm-current .sm-label { color: var(--accent); }
+.sm-node.sm-reachable { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.sm-node.sm-reachable .sm-label { color: var(--green); }
+.sm-node.sm-unreachable { opacity: 0.35; }
+.sm-log { padding: 10px 14px; background: var(--surface2); border-radius: 8px; font-size: 13px; color: var(--text); border: 1px solid var(--border); min-height: 38px; line-height: 1.5; }
+
+/* Tooltip */
+.tooltip {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  pointer-events: none;
+  width: 220px;
+  background: var(--surface2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+}
+
+/* Buttons */
+.btn { padding: 8px 18px; border-radius: 8px; border: none; background: var(--accent); color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; transition: opacity 0.15s; }
+.btn:hover { opacity: 0.85; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--muted); }
+.btn-outline:hover { border-color: var(--accent); color: var(--text); opacity: 1; }
+
+/* Completion banner */
+.completion-banner { display: none; margin: 0 0 48px; padding: 24px; background: rgba(74,222,128,0.08); border: 1px solid var(--green); border-radius: 14px; text-align: center; }
+.completion-banner.show { display: block; }
+.completion-banner h3 { font-size: 20px; color: var(--green); margin-bottom: 8px; }
+.completion-banner p { color: var(--muted); font-size: 14px; margin: 0; }
+
+/* Arch nodes for tool cards */
+.arch-node { position: relative; padding: 14px 18px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); cursor: default; transition: border-color 0.2s; }
+.arch-node:hover { border-color: var(--accent); }
+.arch-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin: 16px 0; }
+
+/* Image gen timing bar */
+.gen-bar-wrap { margin: 8px 0; }
+.gen-bar-label { font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.gen-bar-track { height: 22px; background: var(--code-bg); border-radius: 5px; overflow: hidden; }
+.gen-bar-fill { height: 100%; border-radius: 5px; display: flex; align-items: center; padding-left: 10px; font-size: 11px; font-weight: 600; width: 0%; transition: width 0.9s cubic-bezier(0.22,1,0.36,1); }
+
+/* Code snippet */
+.code-block { background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; line-height: 1.6; color: #a9b1d6; overflow-x: auto; margin: 14px 0; }
+.code-block .kw { color: #bb9af7; }
+.code-block .str { color: #9ece6a; }
+.code-block .cm { color: #565f89; }
+
+/* Section divider */
+.section-divider { height: 1px; background: var(--border); margin: 18px 0; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-label">Local AI · Hardware · 2026</div>
+  <h1>MacBook M4 Pro as a Local AI Powerhouse</h1>
+  <p class="hero-sub">How 48 GB of unified memory and Apple Silicon lets you cancel ChatGPT, Cursor, and Midjourney — and run it all privately, offline, for free.</p>
+  <div class="progress-row">
+    <span class="progress-text" id="progress-text">0 / 7 sections</span>
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- Section 1: Why Local AI Now -->
+  <div class="section" id="s1">
+    <div class="section-header" onclick="toggleSection('s1')">
+      <div class="section-num">1</div>
+      <div class="section-title">Why Local AI Is Viable in 2026</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>For years, running frontier AI models locally was impractical — models were too large, hardware was too slow, and quantization quality was too degraded. That changed with Apple Silicon's unified memory architecture. The M4 Pro chip with 48 GB of unified memory keeps the entire model in fast, CPU-adjacent RAM instead of bouncing data between a discrete GPU and system RAM.</p>
+      <p>The practical result: a laptop can now run a 35-billion-parameter model like Qwen3 at speeds that are usable for real development work — not a curiosity, but a daily driver. The author cancelled three paid subscriptions in one week after making this switch.</p>
+
+      <div class="callout amber">
+        The key insight: unified memory is <strong>not</strong> the same as VRAM or system RAM. It is a single, fast pool accessible by both CPU and GPU cores simultaneously — this is what makes large models viable on a laptop.
+      </div>
+
+      <div class="chips">
+        <div class="kv-chip"><div class="kv-chip-key">Chip</div><div class="kv-chip-val">Apple M4 Pro</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Memory</div><div class="kv-chip-val">48 GB unified</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Model</div><div class="kv-chip-val">Qwen3-35B-A22B</div></div>
+        <div class="kv-chip"><div class="kv-chip-key">Quantization</div><div class="kv-chip-val">int4 / Q4_K_M</div></div>
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Token Generation Speed — Local vs Cloud</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Compare throughput across inference backends on M4 Pro hardware.</p>
+
+        <div class="race-row">
+          <div class="race-name">Ollama (MLX)</div>
+          <div class="race-track"><div class="race-fill fast" id="r1">134 t/s</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">LM Studio</div>
+          <div class="race-track"><div class="race-fill medium" id="r2">~80 t/s</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">GPT-4o API</div>
+          <div class="race-track"><div class="race-fill slow" id="r3">~40 t/s</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">oMLX (SSD KV)</div>
+          <div class="race-track"><div class="race-fill fast" id="r4">~120 t/s</div></div>
+        </div>
+
+        <div style="margin-top:14px;display:flex;gap:8px;">
+          <button class="btn" onclick="runSpeedRace()">Run</button>
+          <button class="btn btn-outline" onclick="resetSpeedRace()">Reset</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What architectural feature of Apple Silicon makes large local models practical?</div>
+        <div class="quiz-opts" id="q1-opts">
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">A dedicated 32 GB VRAM GPU</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',true)">Unified memory shared by CPU and GPU at high bandwidth</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">A faster NVMe SSD used as VRAM overflow</button>
+          <button class="quiz-opt" onclick="answer(this,'q1',false)">Hardware-native int4 quantization accelerators</button>
+        </div>
+        <div class="quiz-feedback" id="q1-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 2: Inference Backends -->
+  <div class="section" id="s2">
+    <div class="section-header" onclick="toggleSection('s2')">
+      <div class="section-num">2</div>
+      <div class="section-title">Four Ways to Run Models Locally</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>There is no single "correct" way to run local AI. Four backends serve different user profiles, from no-terminal beginners to Python scripters. Each exposes an OpenAI-compatible API endpoint so your tools (Cline, Claude Code, OpenHands) do not need to change — only the endpoint URL.</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('backends','lmstudio',this)">LM Studio</button>
+        <button class="tab" onclick="switchTab('backends','ollama',this)">Ollama</button>
+        <button class="tab" onclick="switchTab('backends','omlx',this)">oMLX</button>
+        <button class="tab" onclick="switchTab('backends','mlxlm',this)">mlx-lm</button>
+      </div>
+
+      <div id="backends-lmstudio" class="tab-panel active">
+        <div class="callout green">Best for: beginners who want a GUI with no terminal experience required.</div>
+        <p>LM Studio provides a graphical interface to browse, download, and run quantized models. It downloads Qwen3 in Q4_K_M format and immediately exposes a local API on <code>localhost:1234</code>. No configuration files needed.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Interface</div><div class="kv-chip-val">GUI desktop app</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">API</div><div class="kv-chip-val">OpenAI-compatible</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Port</div><div class="kv-chip-val">localhost:1234</div></div>
+        </div>
+      </div>
+
+      <div id="backends-ollama" class="tab-panel">
+        <div class="callout green">Best for: developers comfortable with the terminal who want fast setup.</div>
+        <p>Ollama uses the MLX backend optimized for Apple Silicon. A single <code>ollama run qwen3:30b-a3b-q4_K_M</code> command downloads and starts the model. The author benchmarked <strong>1,851 tokens/sec prefill</strong> and <strong>134 tokens/sec decode</strong> on M4 Pro with int4 quantization.</p>
+        <div class="code-block">
+<span class="cm"># Install</span>
+brew install ollama
+
+<span class="cm"># Pull and run the model</span>
+ollama <span class="kw">run</span> qwen3:30b-a3b-q4_K_M
+
+<span class="cm"># API is live at localhost:11434</span>
+        </div>
+      </div>
+
+      <div id="backends-omlx" class="tab-panel">
+        <div class="callout amber">Best for: agentic workflows where first-token latency matters more than throughput.</div>
+        <p>oMLX is an advanced runner that uses SSD-backed KV caching. Long-context agent sessions no longer need to rebuild the KV cache from scratch on each call. The result: agent time-to-first-token drops from <strong>30–90 seconds down to 1–3 seconds</strong>. This is the biggest practical win for coding agents that iterate on the same codebase repeatedly.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">KV cache</div><div class="kv-chip-val">SSD-backed (persistent)</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">TTFT</div><div class="kv-chip-val">1–3s vs 30–90s</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Use case</div><div class="kv-chip-val">Long agent sessions</div></div>
+        </div>
+      </div>
+
+      <div id="backends-mlxlm" class="tab-panel">
+        <div class="callout green">Best for: scripting, fine-tuning pipelines, and Python integration.</div>
+        <p>mlx-lm is a Python library that gives you direct programmatic access to models running on the MLX framework. It is the foundation for fine-tuning workflows using LoRA adapters. Use it when you need to embed local inference inside a Python script rather than calling an HTTP endpoint.</p>
+        <div class="code-block">
+pip install mlx-lm
+
+<span class="kw">from</span> mlx_lm <span class="kw">import</span> load, generate
+
+model, tokenizer = load(<span class="str">"mlx-community/Qwen3-30B-A3B-4bit"</span>)
+response = generate(model, tokenizer, prompt=<span class="str">"Explain async/await"</span>)
+        </div>
+      </div>
+
+      <!-- Demo: sequence timeline of how a request flows through backends -->
+      <div class="demo-box">
+        <div class="demo-label">Request Flow: Tool → Local Backend → Model</div>
+        <div class="seq-track">
+          <div class="seq-line-bg"><div class="seq-line-fill" id="seq-line-b"></div></div>
+          <div class="seq-steps" id="seq-steps-b"></div>
+        </div>
+        <div class="seq-detail" id="seq-detail-b">Click Play to see how a coding agent request reaches the local model.</div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn" onclick="playBackendTimeline()">Play</button>
+          <button class="btn btn-outline" onclick="resetBackendTimeline()">Reset</button>
+        </div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Which backend is specifically optimized to reduce agent time-to-first-token by caching the KV state between calls?</div>
+        <div class="quiz-opts" id="q2-opts">
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">LM Studio</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">Ollama</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',true)">oMLX</button>
+          <button class="quiz-opt" onclick="answer(this,'q2',false)">mlx-lm</button>
+        </div>
+        <div class="quiz-feedback" id="q2-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 3: Agentic Coding -->
+  <div class="section" id="s3">
+    <div class="section-header" onclick="toggleSection('s3')">
+      <div class="section-num">3</div>
+      <div class="section-title">Replacing Cursor with Local Agentic Coding</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>Cursor's core value is an AI that can read your codebase, propose edits, and run terminal commands — but all of that happens via cloud API calls. The same behavior is achievable locally by pointing a coding agent at your local backend instead.</p>
+      <p>Three agents work well for this. Cline is a VS Code extension. OpenHands is a browser-based agent with a sandboxed environment. Claude Code can be redirected to a local endpoint with an environment variable, allowing it to call Qwen3 instead of Claude on Anthropic's servers.</p>
+
+      <div class="callout">
+        All three agents speak the OpenAI API protocol. Swapping the endpoint URL is the only config change needed — no code changes, no workflow changes.
+      </div>
+
+      <div class="arch-grid">
+        <div class="arch-node">
+          <div style="font-size:20px;margin-bottom:8px;">🧩</div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Cline</div>
+          <div style="font-size:12px;color:var(--muted);">VS Code extension. Set base URL to localhost:11434 in settings. Works inline with your editor.</div>
+          <div class="tooltip"></div>
+        </div>
+        <div class="arch-node">
+          <div style="font-size:20px;margin-bottom:8px;">🤖</div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">OpenHands</div>
+          <div style="font-size:12px;color:var(--muted);">Browser-based agent with Docker sandbox. Best for autonomous multi-step tasks. Runs in isolation.</div>
+          <div class="tooltip"></div>
+        </div>
+        <div class="arch-node">
+          <div style="font-size:20px;margin-bottom:8px;">⌨️</div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Claude Code</div>
+          <div style="font-size:12px;color:var(--muted);">Point ANTHROPIC_BASE_URL env var at your local backend. Uses Qwen3 locally while keeping the CLI UX.</div>
+          <div class="tooltip"></div>
+        </div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="demo-box">
+        <div class="demo-label">Agent Capability Comparison</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Click a capability to see which agents support it.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;" id="cap-buttons">
+          <button class="btn btn-outline" onclick="showCapability('codebase')">Codebase awareness</button>
+          <button class="btn btn-outline" onclick="showCapability('terminal')">Terminal execution</button>
+          <button class="btn btn-outline" onclick="showCapability('mcp')">MCP tool calling</button>
+          <button class="btn btn-outline" onclick="showCapability('vision')">Vision / screenshots</button>
+          <button class="btn btn-outline" onclick="showCapability('sandbox')">Sandboxed environment</button>
+        </div>
+        <div id="cap-result" style="padding:12px 14px;background:var(--surface2);border-radius:8px;font-size:13px;border:1px solid var(--border);min-height:42px;color:var(--muted);">Select a capability above.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">When redirecting Claude Code to a local Qwen3 model, what is the minimum configuration change required?</div>
+        <div class="quiz-opts" id="q3-opts">
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Rewrite Claude Code's source to use a different HTTP client</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Install a special compatibility plugin for Qwen3</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',true)">Set the ANTHROPIC_BASE_URL environment variable to the local endpoint</button>
+          <button class="quiz-opt" onclick="answer(this,'q3',false)">Export the model weights in Anthropic's proprietary format</button>
+        </div>
+        <div class="quiz-feedback" id="q3-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 4: Local Image Generation -->
+  <div class="section" id="s4">
+    <div class="section-header" onclick="toggleSection('s4')">
+      <div class="section-num">4</div>
+      <div class="section-title">Replacing Midjourney with Local Image Generation</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>ComfyUI Desktop is a node-based image generation interface that runs entirely on your Mac. It supports Flux, SDXL, and Z-Image-Turbo models. On M4 Pro hardware, a 1024×1024 image generates in 25–35 seconds — slower than Midjourney's cloud rendering, but free, private, and with full control over the pipeline.</p>
+      <p>The node-based workflow in ComfyUI lets you chain models, apply ControlNet constraints, use IP-Adapter for style transfer, and build reproducible pipelines that cloud tools cannot match for repeatability.</p>
+
+      <div class="callout green">
+        The tradeoff is clear: cloud tools like Midjourney are faster and require no setup, but local generation is free per image, works offline, and keeps your prompts and outputs private.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Image Generation Time by Model — M4 Pro</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Approximate render time for a 1024×1024 image at default steps. Click Animate to see the comparison.</p>
+
+        <div class="gen-bar-wrap">
+          <div class="gen-bar-label">Z-Image-Turbo (4 steps)</div>
+          <div class="gen-bar-track"><div class="gen-bar-fill" id="gbar1" style="background:linear-gradient(90deg,#4ade8066,#4ade80);color:#052e16;">~8s</div></div>
+        </div>
+        <div class="gen-bar-wrap">
+          <div class="gen-bar-label">SDXL Lightning (8 steps)</div>
+          <div class="gen-bar-track"><div class="gen-bar-fill" id="gbar2" style="background:linear-gradient(90deg,#fbbf2466,#fbbf24);color:#1c1003;">~20s</div></div>
+        </div>
+        <div class="gen-bar-wrap">
+          <div class="gen-bar-label">Flux.1-dev (20 steps)</div>
+          <div class="gen-bar-track"><div class="gen-bar-fill" id="gbar3" style="background:linear-gradient(90deg,#ef444466,#ef4444);color:#fff;">~35s</div></div>
+        </div>
+        <div class="gen-bar-wrap">
+          <div class="gen-bar-label">Midjourney v6 (cloud)</div>
+          <div class="gen-bar-track"><div class="gen-bar-fill" id="gbar4" style="background:linear-gradient(90deg,#a78bfa66,#a78bfa);color:#fff;">~12s*</div></div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;">* Cloud time varies; local runs are free and private regardless of speed.</p>
+
+        <div style="margin-top:14px;display:flex;gap:8px;">
+          <button class="btn" onclick="animateGenBars()">Animate</button>
+          <button class="btn btn-outline" onclick="resetGenBars()">Reset</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('imgmodels','flux',this)">Flux</button>
+        <button class="tab" onclick="switchTab('imgmodels','sdxl',this)">SDXL</button>
+        <button class="tab" onclick="switchTab('imgmodels','turbo',this)">Z-Image-Turbo</button>
+      </div>
+
+      <div id="imgmodels-flux" class="tab-panel active">
+        <p>Flux is the highest-quality open model for photorealistic and artistic generation. Flux.1-dev produces images with excellent prompt adherence but takes the longest at around 35 seconds. Flux.1-schnell is a distilled faster variant at the cost of some detail.</p>
+      </div>
+      <div id="imgmodels-sdxl" class="tab-panel">
+        <p>SDXL is a well-established model with a large ecosystem of LoRA fine-tunes, ControlNet adapters, and community checkpoints. The Lightning distilled variant runs in 8 steps, making it a fast middle ground between quality and speed.</p>
+      </div>
+      <div id="imgmodels-turbo" class="tab-panel">
+        <p>Z-Image-Turbo is a heavily distilled model optimized for speed. At 4 steps it produces usable images in under 10 seconds. It trades fine detail and prompt precision for rapid iteration — good for quickly exploring composition ideas before committing to a slower model.</p>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">What is the primary advantage of local image generation over cloud tools like Midjourney?</div>
+        <div class="quiz-opts" id="q4-opts">
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Local models always produce higher quality images</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Generation is always faster than cloud</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',true)">No per-image cost, fully private, and works offline</button>
+          <button class="quiz-opt" onclick="answer(this,'q4',false)">Requires no GPU or specialized hardware</button>
+        </div>
+        <div class="quiz-feedback" id="q4-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 5: Voice, RAG, and Multimodal -->
+  <div class="section" id="s5">
+    <div class="section-header" onclick="toggleSection('s5')">
+      <div class="section-num">5</div>
+      <div class="section-title">Voice, RAG, and Multimodal Workflows</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>Beyond text and images, the M4 Pro handles several other AI workflows locally. Voice transcription via Whisper runs fully offline with no data leaving the device. RAG (retrieval-augmented generation) over private documents keeps sensitive data local. Vision models can analyze screenshots and images without uploading them.</p>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('modalities','voice',this)">Voice</button>
+        <button class="tab" onclick="switchTab('modalities','rag',this)">Document RAG</button>
+        <button class="tab" onclick="switchTab('modalities','vision',this)">Vision</button>
+        <button class="tab" onclick="switchTab('modalities','finetune',this)">Fine-tuning</button>
+      </div>
+
+      <div id="modalities-voice" class="tab-panel active">
+        <p>OpenAI's Whisper model runs on Apple Silicon via whisper.cpp or faster-whisper. It transcribes audio in real time or from files. The M4 Pro runs the medium model at faster-than-realtime speeds, making it suitable for live meeting transcription without any network dependency.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Tool</div><div class="kv-chip-val">whisper.cpp / faster-whisper</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Model size</div><div class="kv-chip-val">Medium (769M params)</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Speed</div><div class="kv-chip-val">>1× realtime on M4 Pro</div></div>
+        </div>
+      </div>
+
+      <div id="modalities-rag" class="tab-panel">
+        <p>RAG over private documents means your PDFs, notes, and internal docs never leave your machine. Tools like LlamaIndex or Chroma running locally embed your documents into a vector store. Queries retrieve relevant chunks and inject them into the context window before the local model answers.</p>
+        <div class="callout amber">
+          This is the critical enterprise use case: sensitive legal, financial, or medical documents that cannot be sent to any cloud API can now be queried with natural language entirely on-device.
+        </div>
+      </div>
+
+      <div id="modalities-vision" class="tab-panel">
+        <p>Multimodal models like LLaVA and Qwen-VL accept images as input alongside text. On the M4 Pro you can feed a screenshot or diagram to the model and ask it to explain, debug, or extract information. Useful for analyzing UI bugs, reading charts, or interpreting error screenshots.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Models</div><div class="kv-chip-val">LLaVA, Qwen-VL, MiniCPM-V</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Input</div><div class="kv-chip-val">Image + text prompt</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Use case</div><div class="kv-chip-val">UI debug, chart analysis</div></div>
+        </div>
+      </div>
+
+      <div id="modalities-finetune" class="tab-panel">
+        <p>mlx-lm supports LoRA fine-tuning directly on Apple Silicon. You can adapt a base model to your codebase's style, your company's writing tone, or a specialized domain. A 35B model can be fine-tuned with 4-bit LoRA on 48 GB of unified memory in hours rather than days.</p>
+        <div class="code-block">
+<span class="cm"># Fine-tune with LoRA using mlx-lm</span>
+python -m mlx_lm.lora \
+  --model mlx-community/Qwen3-30B-A3B-4bit \
+  --data ./my-dataset \
+  --train \
+  --iters 1000 \
+  --batch-size 4
+        </div>
+      </div>
+
+      <!-- Demo: state machine showing local AI pipeline states -->
+      <div class="demo-box">
+        <div class="demo-label">Local AI Pipeline — State Machine</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Click a state to start, then click valid next states to walk through a local RAG query lifecycle.</p>
+        <div class="sm-graph" id="sm-graph-rag"></div>
+        <div class="sm-log" id="sm-log-rag">Select a state to begin.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">Which local AI use case is most critical for handling sensitive enterprise documents?</div>
+        <div class="quiz-opts" id="q5-opts">
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">Voice transcription with Whisper</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',true)">Private document RAG over local vector stores</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">Image generation with ComfyUI</button>
+          <button class="quiz-opt" onclick="answer(this,'q5',false)">Fine-tuning with LoRA adapters</button>
+        </div>
+        <div class="quiz-feedback" id="q5-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 6: Tradeoffs and When to Stay in the Cloud -->
+  <div class="section" id="s6">
+    <div class="section-header" onclick="toggleSection('s6')">
+      <div class="section-num">6</div>
+      <div class="section-title">Tradeoffs — When Local Is Not Enough</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>Qwen3-35B running locally does not match Claude Opus or GPT-4o on every task. The author is explicit about this: for complex reasoning, long multi-step planning, or tasks that genuinely require frontier model capability, cloud APIs still win. Local models excel at the 80% of daily coding tasks that do not require frontier reasoning.</p>
+      <p>The economic argument is also hardware-dependent. The M4 Pro configuration that makes this viable costs significantly more than a MacBook Air. The break-even point against subscription costs depends on how heavily you use AI tools and how long you keep the hardware.</p>
+
+      <div class="callout red">
+        Local AI is not a universal replacement. It is a strong default that removes cloud dependency for most tasks — with the escape hatch of cloud APIs for tasks that demand frontier capability.
+      </div>
+
+      <div class="demo-box">
+        <div class="demo-label">Task Suitability — Local vs Cloud</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Click a task type to see the recommendation.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <button class="btn btn-outline" onclick="showTaskRec('refactor')">Code refactoring</button>
+          <button class="btn btn-outline" onclick="showTaskRec('tests')">Writing tests</button>
+          <button class="btn btn-outline" onclick="showTaskRec('architect')">System architecture</button>
+          <button class="btn btn-outline" onclick="showTaskRec('debug')">Debugging errors</button>
+          <button class="btn btn-outline" onclick="showTaskRec('novel')">Novel research reasoning</button>
+          <button class="btn btn-outline" onclick="showTaskRec('image')">Image generation</button>
+          <button class="btn btn-outline" onclick="showTaskRec('private')">Private document Q&amp;A</button>
+        </div>
+        <div id="task-rec" style="padding:12px 14px;background:var(--surface2);border-radius:8px;font-size:13px;border:1px solid var(--border);min-height:42px;color:var(--muted);">Select a task type above.</div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('tradeoffs','perf',this)">Performance</button>
+        <button class="tab" onclick="switchTab('tradeoffs','cost',this)">Cost</button>
+        <button class="tab" onclick="switchTab('tradeoffs','privacy',this)">Privacy</button>
+      </div>
+
+      <div id="tradeoffs-perf" class="tab-panel active">
+        <p>Qwen3-35B at int4 quantization is competitive with GPT-3.5-class models on coding tasks and approaches GPT-4o on simpler requests. For complex agentic tasks requiring multi-hop reasoning, frontier cloud models still outperform. The gap is narrowing with each model generation.</p>
+      </div>
+      <div id="tradeoffs-cost" class="tab-panel">
+        <p>At heavy usage — say, 500K tokens per day across coding, chat, and image generation — cloud subscriptions add up quickly. A developer running multiple AI tools could spend $60–$150/month on subscriptions. The M4 Pro premium pays off over 18–24 months of heavy local usage at those rates.</p>
+      </div>
+      <div id="tradeoffs-privacy" class="tab-panel">
+        <p>Every prompt sent to a cloud API is processed on external servers. Local inference means zero data exfiltration: your code, your documents, and your prompts stay on your hardware. For regulated industries or developers working on proprietary code, this is not optional — it is a hard requirement that cloud tools cannot satisfy.</p>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">According to the article, which task category should still prefer cloud frontier models over local Qwen3?</div>
+        <div class="quiz-opts" id="q6-opts">
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Writing boilerplate code</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Transcribing recorded meetings</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',true)">Complex multi-step reasoning and novel research tasks</button>
+          <button class="quiz-opt" onclick="answer(this,'q6',false)">Generating images from text prompts</button>
+        </div>
+        <div class="quiz-feedback" id="q6-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section 7: Choosing Your Local Model -->
+  <div class="section" id="s7">
+    <div class="section-header" onclick="toggleSection('s7')">
+      <div class="section-num">7</div>
+      <div class="section-title">Choosing Your Local Model in 2026</div>
+      <div class="section-chevron">▼</div>
+    </div>
+    <div class="section-body">
+      <p>With 48 GB of unified memory, your M4 Pro can run models that were cloud-only a year ago. Four models stand out in 2026 for different purposes — and unlike cloud APIs, you can keep all of them installed locally and switch based on the task at hand.</p>
+
+      <div class="demo-box">
+        <div class="demo-label">RAM Usage by Model — M4 Pro 48 GB</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:16px;">Click Animate to see how each model fits in your unified memory pool.</p>
+
+        <div class="race-row">
+          <div class="race-name">qwen3-coder:30b</div>
+          <div class="race-track"><div class="race-fill fast" id="mr1">~22 GB</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">qwen3.6:35b</div>
+          <div class="race-track"><div class="race-fill fast" id="mr2">~24 GB</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">gpt-oss:20b</div>
+          <div class="race-track"><div class="race-fill medium" id="mr3">~16 GB</div></div>
+        </div>
+        <div class="race-row">
+          <div class="race-name">gemma4:27b</div>
+          <div class="race-track"><div class="race-fill medium" id="mr4">~18 GB</div></div>
+        </div>
+        <p style="font-size:11px;color:var(--muted);margin-top:8px;">All four fit in 48 GB — you can run any one at a time, or mix smaller models simultaneously.</p>
+
+        <div style="margin-top:14px;display:flex;gap:8px;">
+          <button class="btn" onclick="runModelRace()">Animate</button>
+          <button class="btn btn-outline" onclick="resetModelRace()">Reset</button>
+        </div>
+      </div>
+
+      <div class="tabs">
+        <button class="tab active" onclick="switchTab('models','qwen3coder',this)">qwen3-coder:30b</button>
+        <button class="tab" onclick="switchTab('models','qwen36',this)">qwen3.6:35b</button>
+        <button class="tab" onclick="switchTab('models','gptoss',this)">gpt-oss:20b</button>
+        <button class="tab" onclick="switchTab('models','gemma4',this)">gemma4:27b</button>
+      </div>
+
+      <div id="models-qwen3coder" class="tab-panel active">
+        <div class="callout green">Best for: agentic coding — file editing, multi-step reasoning, and read→reason→edit→verify loops.</div>
+        <p>Qwen3-Coder is Alibaba's coding-specialized model, trained on 5.5 trillion code tokens. It beats GPT-4's HumanEval score and wins on SWE-bench for real-world agentic tasks. MoE architecture means only 3.3B parameters are active per token — fast inference despite the 30B total size.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Params</div><div class="kv-chip-val">30B total / 3.3B active</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">RAM</div><div class="kv-chip-val">~22 GB</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Context</div><div class="kv-chip-val">256K tokens</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Multimodal</div><div class="kv-chip-val">Text only</div></div>
+        </div>
+        <div class="code-block">ollama run qwen3-coder:30b</div>
+      </div>
+
+      <div id="models-qwen36" class="tab-panel">
+        <div class="callout green">Best for: general-purpose use — coding, chat, and vision tasks in a single model.</div>
+        <p>Qwen3.6 is Alibaba's general-purpose successor to Qwen3. The 35B variant uses MoE with only 3B active parameters per token. Key advantage over qwen3-coder: it accepts image inputs alongside text, making it useful for analyzing screenshots, diagrams, and UI bugs. A good default if you want one model for everything.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Params</div><div class="kv-chip-val">35B total / 3B active</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">RAM</div><div class="kv-chip-val">~24 GB</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Context</div><div class="kv-chip-val">256K tokens</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Multimodal</div><div class="kv-chip-val">Text + image</div></div>
+        </div>
+        <div class="code-block">ollama run qwen3.6:35b</div>
+      </div>
+
+      <div id="models-gptoss" class="tab-panel">
+        <div class="callout amber">Best for: structured outputs, function calling, and agentic tool use with OpenAI-compatible APIs.</div>
+        <p>GPT-OSS is OpenAI's own open-weight model, released under Apache 2.0. The 20B variant targets low-latency local use. Its strongest differentiator is native function calling and structured output support — ideal when your agent needs reliable JSON schemas or tool invocation. Shorter 128K context than the Qwen models, but the lightest on RAM of the four.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Params</div><div class="kv-chip-val">20B</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">RAM</div><div class="kv-chip-val">~16 GB</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Context</div><div class="kv-chip-val">128K tokens</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Multimodal</div><div class="kv-chip-val">Text only</div></div>
+        </div>
+        <div class="code-block">ollama run gpt-oss:20b</div>
+      </div>
+
+      <div id="models-gemma4" class="tab-panel">
+        <div class="callout green">Best for: reasoning, math, and multimodal tasks — image + text + audio on edge hardware.</div>
+        <p>Google's Gemma 4 launched April 2026 and immediately became the strongest open model for reasoning in the sub-32B range. The 27B MoE variant scores 85.2% on MMLU Pro and 89.2% on AIME 2026 math reasoning — notably ahead of the Qwen models on pure reasoning benchmarks. Supports images across all variants, with edge models also supporting audio.</p>
+        <div class="chips">
+          <div class="kv-chip"><div class="kv-chip-key">Params</div><div class="kv-chip-val">27B MoE / 3.8B active</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">RAM</div><div class="kv-chip-val">~18 GB</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">MMLU Pro</div><div class="kv-chip-val">85.2%</div></div>
+          <div class="kv-chip"><div class="kv-chip-key">Multimodal</div><div class="kv-chip-val">Text + image</div></div>
+        </div>
+        <div class="code-block">ollama run gemma4:27b</div>
+      </div>
+
+      <div class="section-divider"></div>
+
+      <div class="demo-box">
+        <div class="demo-label">Model Selector — Which Should You Run?</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Pick your primary use case to get a recommendation.</p>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+          <button class="btn btn-outline" onclick="showModelRec('coding')">Agentic coding</button>
+          <button class="btn btn-outline" onclick="showModelRec('general')">General chat + vision</button>
+          <button class="btn btn-outline" onclick="showModelRec('tools')">Function calling / tools</button>
+          <button class="btn btn-outline" onclick="showModelRec('math')">Math / reasoning</button>
+          <button class="btn btn-outline" onclick="showModelRec('light')">Lightest RAM footprint</button>
+          <button class="btn btn-outline" onclick="showModelRec('both')">Coding + general use</button>
+        </div>
+        <div id="model-rec" style="padding:12px 14px;background:var(--surface2);border-radius:8px;font-size:13px;border:1px solid var(--border);min-height:42px;color:var(--muted);">Select a use case above.</div>
+      </div>
+
+      <div class="quiz-box">
+        <div class="quiz-q">You need a local model for a coding agent that edits multiple files across a large codebase. Which model is the best fit?</div>
+        <div class="quiz-opts" id="q7-opts">
+          <button class="quiz-opt" onclick="answer(this,'q7',false)">gemma4:27b — strongest reasoning benchmarks</button>
+          <button class="quiz-opt" onclick="answer(this,'q7',true)">qwen3-coder:30b — trained specifically for agentic coding loops</button>
+          <button class="quiz-opt" onclick="answer(this,'q7',false)">gpt-oss:20b — OpenAI's own open model</button>
+          <button class="quiz-opt" onclick="answer(this,'q7',false)">qwen3.6:35b — general model with vision support</button>
+        </div>
+        <div class="quiz-feedback" id="q7-fb"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Completion -->
+  <div class="completion-banner" id="completion-banner">
+    <h3>All sections complete</h3>
+    <p>You now understand how the M4 Pro enables a full local AI stack — inference backends, agentic coding, image generation, voice, RAG, the honest tradeoffs, and how to choose the right model for each task.</p>
+  </div>
+
+</div>
+
+<!-- Source attribution -->
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://medium.com/@shreetejghodekar/i-cancelled-chatgpt-cursor-and-midjourney-this-week-my-macbook-pro-m4-pro-quietly-replaced-all-91cbd7f3c78b" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">I Cancelled ChatGPT, Cursor, and Midjourney This Week — Shreetej Ghodekar</a>
+  </div>
+</div>
+
+<script>
+// ── Progress tracking ──────────────────────────────────────────────
+const opened = new Set();
+const totalSections = 7;
+
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) {
+      document.getElementById('completion-banner').classList.add('show');
+    }
+  }
+}
+
+// ── Tab switching ──────────────────────────────────────────────────
+function switchTab(group, panel, btn) {
+  document.querySelectorAll(`[id^="${group}-"]`).forEach(p => p.classList.remove('active'));
+  document.getElementById(`${group}-${panel}`).classList.add('active');
+  btn.closest('.section-body, .main').querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── Quiz ───────────────────────────────────────────────────────────
+const answers = {
+  q1: { correct: 1, explanation: 'Unified memory is a single high-bandwidth pool shared by CPU and GPU — no PCIe bottleneck means large models fit and run efficiently.' },
+  q2: { correct: 2, explanation: 'oMLX uses SSD-backed persistent KV caching, eliminating the need to rebuild the attention cache from scratch on every agent call.' },
+  q3: { correct: 2, explanation: 'Setting ANTHROPIC_BASE_URL to the local backend endpoint is enough — the OpenAI-compatible API protocol handles the rest.' },
+  q4: { correct: 2, explanation: 'Local generation has no per-image cost, keeps all prompts and outputs private, and works without an internet connection.' },
+  q5: { correct: 1, explanation: 'Private document RAG keeps sensitive legal, financial, or medical data entirely on-device — cloud RAG services cannot guarantee this.' },
+  q6: { correct: 2, explanation: 'The author explicitly notes that complex multi-step reasoning and tasks requiring frontier capability still favour cloud models over local Qwen3.' },
+  q7: { correct: 1, explanation: 'qwen3-coder:30b is specifically trained for the agentic coding loop — read, reason, edit, verify — making it the best fit for multi-file codebase work.' },
+};
+
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+// ── Section 1: Speed race ──────────────────────────────────────────
+const speedData = [
+  { id: 'r1', pct: 88, label: '134 t/s' },
+  { id: 'r2', pct: 55, label: '~80 t/s' },
+  { id: 'r3', pct: 28, label: '~40 t/s' },
+  { id: 'r4', pct: 82, label: '~120 t/s' },
+];
+
+function runSpeedRace() {
+  speedData.forEach(r => { const el = document.getElementById(r.id); el.style.width = '0%'; el.textContent = ''; });
+  setTimeout(() => {
+    speedData.forEach((r, i) => setTimeout(() => {
+      const el = document.getElementById(r.id);
+      el.style.width = r.pct + '%';
+      el.textContent = r.label;
+    }, i * 150));
+  }, 100);
+}
+
+function resetSpeedRace() {
+  speedData.forEach(r => { const el = document.getElementById(r.id); el.style.width = '0%'; el.textContent = ''; });
+}
+
+// ── Section 2: Backend sequence timeline ───────────────────────────
+const backendSteps = [
+  { label: 'Cline /\nOpenHands', icon: '🧩', detail: 'Coding agent generates a completion request using the OpenAI API protocol.' },
+  { label: 'HTTP\nRequest', icon: '📡', detail: 'POST request sent to localhost endpoint — no network round-trip to any cloud server.' },
+  { label: 'Backend\n(Ollama)', icon: '⚙️', detail: 'Backend receives the request, tokenizes the prompt, and queues it for the model.' },
+  { label: 'MLX\nKernel', icon: '🧠', detail: 'Apple MLX framework dispatches matrix multiplications to the GPU cores in the M4 Pro.' },
+  { label: 'Qwen3\nModel', icon: '🤖', detail: 'Model generates tokens autoregressively using unified memory — no VRAM bottleneck.' },
+  { label: 'Response\nStreamed', icon: '📦', detail: 'Tokens stream back to the coding agent over the local HTTP connection as they are generated.' },
+];
+
+let backendTimelineActive = -1;
+
+function buildBackendTimeline() {
+  const container = document.getElementById('seq-steps-b');
+  backendSteps.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'seq-step';
+    el.id = 'bstep-' + i;
+    el.innerHTML = `<div class="seq-dot" id="bdot-${i}"></div><div class="seq-label">${s.icon}<br><span>${s.label.replace('\n','<br>')}</span></div>`;
+    el.onclick = () => selectBackendStep(i);
+    container.appendChild(el);
+  });
+}
+
+function selectBackendStep(i) {
+  if (backendTimelineActive === i) {
+    document.getElementById('seq-detail-b').textContent = 'Click Play to see how a coding agent request reaches the local model.';
+    backendTimelineActive = -1;
+    document.querySelectorAll('[id^="bstep-"]').forEach(el => el.classList.remove('seq-selected'));
+    return;
+  }
+  backendTimelineActive = i;
+  document.getElementById('seq-detail-b').textContent = backendSteps[i].detail;
+  document.querySelectorAll('[id^="bstep-"]').forEach((el, j) => el.classList.toggle('seq-selected', j === i));
+}
+
+function playBackendTimeline() {
+  resetBackendTimeline();
+  const total = backendSteps.length;
+  backendSteps.forEach((_, i) => {
+    setTimeout(() => {
+      document.getElementById('bdot-' + i).classList.add('seq-dot-active');
+      document.getElementById('bstep-' + i).classList.add('seq-revealed');
+      document.getElementById('seq-line-b').style.width = ((i + 1) / total * 100) + '%';
+    }, i * 420);
+  });
+}
+
+function resetBackendTimeline() {
+  backendTimelineActive = -1;
+  document.getElementById('seq-line-b').style.width = '0%';
+  document.getElementById('seq-detail-b').textContent = 'Click Play to see how a coding agent request reaches the local model.';
+  backendSteps.forEach((_, i) => {
+    document.getElementById('bdot-' + i).classList.remove('seq-dot-active');
+    document.getElementById('bstep-' + i).classList.remove('seq-revealed', 'seq-selected');
+  });
+}
+
+// ── Section 3: Capability comparison ──────────────────────────────
+const capabilityMap = {
+  codebase: '✓ All three agents (Cline, OpenHands, Claude Code) support codebase-aware context — they read your project files and maintain awareness across multi-file edits.',
+  terminal: '✓ Cline and Claude Code run terminal commands natively in your shell. OpenHands uses a Docker sandbox for isolated command execution.',
+  mcp:      '✓ Claude Code has first-class MCP (Model Context Protocol) tool calling. Cline also supports MCP extensions. OpenHands uses its own tool system.',
+  vision:   '✓ All three can process screenshots when using a multimodal model (e.g., Qwen-VL or LLaVA) as the backend instead of a text-only model.',
+  sandbox:  '⚠ OpenHands runs inside Docker, giving full process isolation. Cline and Claude Code run in your host environment — use with appropriate care for destructive commands.',
+};
+
+function showCapability(key) {
+  document.getElementById('cap-result').textContent = capabilityMap[key];
+  document.getElementById('cap-result').style.color = 'var(--text)';
+}
+
+// ── Section 4: Image generation bars ──────────────────────────────
+const genBars = [
+  { id: 'gbar1', pct: 23 },
+  { id: 'gbar2', pct: 57 },
+  { id: 'gbar3', pct: 100 },
+  { id: 'gbar4', pct: 34 },
+];
+
+function animateGenBars() {
+  genBars.forEach(b => { document.getElementById(b.id).style.width = '0%'; });
+  setTimeout(() => {
+    genBars.forEach((b, i) => setTimeout(() => {
+      document.getElementById(b.id).style.width = b.pct + '%';
+    }, i * 180));
+  }, 100);
+}
+
+function resetGenBars() {
+  genBars.forEach(b => { document.getElementById(b.id).style.width = '0%'; });
+}
+
+// ── Section 5: RAG state machine ──────────────────────────────────
+const ragStates = {
+  idle:      { label: 'Idle',       icon: '⬜', transitions: { embed: 'user loads documents' } },
+  embed:     { label: 'Embedding',  icon: '🔄', transitions: { indexed: 'vectors written to store' } },
+  indexed:   { label: 'Indexed',    icon: '🗄️',  transitions: { retrieve: 'user submits query' } },
+  retrieve:  { label: 'Retrieving', icon: '🔍', transitions: { generate: 'top-k chunks found' } },
+  generate:  { label: 'Generating', icon: '🤖', transitions: { done: 'model produces answer' } },
+  done:      { label: 'Done',       icon: '✅', transitions: { retrieve: 'user asks another query', idle: 'session reset' } },
+};
+
+let ragCurrent = null;
+
+function buildRagStateMachine() {
+  const graph = document.getElementById('sm-graph-rag');
+  Object.entries(ragStates).forEach(([id, s]) => {
+    const el = document.createElement('div');
+    el.className = 'sm-node';
+    el.id = 'rsmn-' + id;
+    el.innerHTML = `<span class="sm-icon">${s.icon}</span><span class="sm-label">${s.label}</span>`;
+    el.onclick = () => ragTransition(id);
+    graph.appendChild(el);
+  });
+}
+
+function ragTransition(toId) {
+  const validFrom = ragCurrent ? ragStates[ragCurrent].transitions : {};
+  if (!ragCurrent) {
+    ragCurrent = toId;
+    document.getElementById('sm-log-rag').textContent = `Started in "${ragStates[toId].label}" state.`;
+    highlightRag();
+    return;
+  }
+  if (toId === ragCurrent) return;
+  if (validFrom[toId]) {
+    document.getElementById('sm-log-rag').textContent =
+      `✓ "${ragStates[ragCurrent].label}" → "${ragStates[toId].label}" — trigger: ${validFrom[toId]}`;
+    ragCurrent = toId;
+  } else {
+    document.getElementById('sm-log-rag').textContent =
+      `✗ Cannot go from "${ragStates[ragCurrent].label}" to "${ragStates[toId].label}" — invalid transition.`;
+  }
+  highlightRag();
+}
+
+function highlightRag() {
+  const validTargets = ragCurrent ? Object.keys(ragStates[ragCurrent].transitions) : [];
+  Object.keys(ragStates).forEach(id => {
+    const el = document.getElementById('rsmn-' + id);
+    el.classList.remove('sm-current', 'sm-reachable', 'sm-unreachable');
+    if (id === ragCurrent) el.classList.add('sm-current');
+    else if (validTargets.includes(id)) el.classList.add('sm-reachable');
+    else if (ragCurrent) el.classList.add('sm-unreachable');
+  });
+}
+
+// ── Section 6: Task recommendation ────────────────────────────────
+const taskRecs = {
+  refactor:  '✓ Local — Code refactoring is well within Qwen3-35B capability. Keep it local for privacy and zero cost.',
+  tests:     '✓ Local — Writing unit and integration tests is routine for local models. Fast, private, and free.',
+  architect: '⚠ Consider cloud — System architecture decisions benefit from frontier reasoning. Qwen3 can help, but verify critical decisions with Claude Opus or GPT-4o.',
+  debug:     '✓ Local — Debugging error messages and stack traces works well locally. Most bugs are pattern-matching problems, not frontier reasoning.',
+  novel:     '☁ Cloud preferred — Novel research reasoning, complex proofs, or multi-hop planning tasks favour frontier models where local models noticeably underperform.',
+  image:     '✓ Local — ComfyUI with Flux or SDXL runs fully offline. Free per image, fully private. Use cloud only if speed is critical.',
+  private:   '✓ Local — Private document Q&A must stay local. Use local embeddings + a local vector store + Qwen3. Never send sensitive documents to a cloud API.',
+};
+
+function showTaskRec(key) {
+  const el = document.getElementById('task-rec');
+  el.textContent = taskRecs[key];
+  el.style.color = taskRecs[key].startsWith('☁') ? 'var(--amber)'
+    : taskRecs[key].startsWith('⚠') ? 'var(--amber)'
+    : 'var(--text)';
+}
+
+// ── Tooltips ───────────────────────────────────────────────────────
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+// ── Section 7: Model RAM race ──────────────────────────────────────
+const modelRaceData = [
+  { id: 'mr1', pct: 46, label: '~22 GB' },
+  { id: 'mr2', pct: 50, label: '~24 GB' },
+  { id: 'mr3', pct: 33, label: '~16 GB' },
+  { id: 'mr4', pct: 38, label: '~18 GB' },
+];
+
+function runModelRace() {
+  modelRaceData.forEach(r => { const el = document.getElementById(r.id); el.style.width = '0%'; el.textContent = ''; });
+  setTimeout(() => {
+    modelRaceData.forEach((r, i) => setTimeout(() => {
+      const el = document.getElementById(r.id);
+      el.style.width = r.pct + '%';
+      el.textContent = r.label;
+    }, i * 180));
+  }, 100);
+}
+
+function resetModelRace() {
+  modelRaceData.forEach(r => { const el = document.getElementById(r.id); el.style.width = '0%'; el.textContent = ''; });
+}
+
+// ── Section 7: Model selector ──────────────────────────────────────
+const modelRecs = {
+  coding:  '✓ qwen3-coder:30b — purpose-built for agentic coding. Trained on 5.5T code tokens, wins on SWE-bench. Run: ollama run qwen3-coder:30b',
+  general: '✓ qwen3.6:35b — text + image input, strong general reasoning. One model for chat, vision, and coding. Run: ollama run qwen3.6:35b',
+  tools:   '✓ gpt-oss:20b — OpenAI\'s own open model, best for reliable JSON structured outputs and function/tool calling schemas. Run: ollama run gpt-oss:20b',
+  math:    '✓ gemma4:27b — leads on MMLU Pro (85.2%) and AIME 2026 math (89.2%). Best local model for reasoning and proof tasks. Run: ollama run gemma4:27b',
+  light:   '✓ gpt-oss:20b — smallest RAM footprint at ~16 GB. Good choice if you need headroom for other processes alongside the model.',
+  both:    '✓ Run both: qwen3-coder:30b for coding sessions (22 GB) + qwen3.6:35b for general use (24 GB). Switch with ollama run — both fit in 48 GB, just not simultaneously.',
+};
+
+function showModelRec(key) {
+  const el = document.getElementById('model-rec');
+  el.textContent = modelRecs[key];
+  el.style.color = 'var(--text)';
+}
+
+// ── Init ───────────────────────────────────────────────────────────
+window.addEventListener('load', () => {
+  buildBackendTimeline();
+  buildRagStateMachine();
+  initTooltips();
+});
+</script>
+</body>
+</html>

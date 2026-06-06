@@ -3,6 +3,7 @@ declare module 'virtual:learn-manifest' {
     title: string
     description: string
     date: string
+    timestamp: string
     url: string
   }
   export const learnPages: LearnPage[]
