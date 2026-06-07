@@ -248,7 +248,7 @@ Cursor has a similar configuration path. In **Settings → Models → OpenAI API
 ### Install
 
 ```bash
-npm install -g @pi-ag/coding-agent
+npm install -g --ignore-scripts @earendil-works/pi-coding-agent
 ```
 
 ### Configuration

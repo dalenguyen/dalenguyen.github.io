@@ -98,11 +98,15 @@ You are an expert Analog (Angular) blog content manager with deep expertise in m
 
 ## After Creating a New Post
 
-After writing a new blog post file, always run the following command from the workspace root to clear the Vite cache — this is required for the dev server to pick up the new content file:
+After writing a new blog post file:
+
+1. Clear the Vite cache so the dev server picks up the new content file:
 
 ```bash
 rm -rf node_modules/.vite
 ```
+
+2. Always invoke the `blog-hero-image` skill to generate the cover image for the post. Pass the post slug and title so the skill can produce the correct output file and coverImage path.
 
 ## Self-Verification
 
