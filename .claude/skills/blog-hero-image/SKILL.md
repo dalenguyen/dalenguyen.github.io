@@ -122,6 +122,32 @@ for i, c in enumerate([DOT_RED, DOT_YEL, DOT_GRN]):
     d.ellipse([cx-6, TY+13, cx+6, TY+25], fill=c)
 ```
 
+## Rendering Syntax-Highlighted Code Lines
+
+**Never split a key-value pair across two lines to apply different colors.** It looks broken in the output (value drops to the next line visually).
+
+Instead, represent each line as a list of `(text, color)` segments and render them inline:
+
+```python
+# Each entry is a list of (text, color) tuples — one per line
+code_lines = [
+    [('// comment', FG_DIM)],
+    [('{', FG_HI)],
+    [('  "key": ', C_BLUE), ('"value",', C_STR)],   # ✅ inline, two colors
+    [('  "flag": ', C_BLUE), ('true,', FG_HI)],
+]
+
+cy = TY + 48
+for segments in code_lines:
+    cx = TX + 16
+    for text, color in segments:
+        d.text((cx, cy), text, font=f_code, fill=color)
+        cx += d.textlength(text, font=f_code)  # advance x after each segment
+    cy += line_h
+```
+
+This keeps key and value on the same line with distinct colors. Use `d.textlength(text, font=f_code)` to advance `cx` after each segment.
+
 ## Series Consistency
 
 For a post series, keep all posts visually consistent:
