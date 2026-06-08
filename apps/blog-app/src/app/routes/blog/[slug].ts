@@ -5,6 +5,7 @@ import {
   AfterViewInit,
   Component,
   computed,
+  effect,
   ElementRef,
   inject,
   Injector,
@@ -185,6 +186,34 @@ export default class BlogPostComponent implements AfterViewInit {
 
   ngAfterViewInit() {
     this.loadGiscusScript()
+    effect(() => {
+      if (this.post()) {
+        setTimeout(() => this.addCopyButtons())
+      }
+    }, { injector: this.injector })
+  }
+
+  private addCopyButtons() {
+    const doc = this.document
+    doc.querySelectorAll('pre').forEach((pre) => {
+      const wrapper = doc.createElement('div')
+      wrapper.style.cssText = 'position:relative'
+      pre.parentNode!.insertBefore(wrapper, pre)
+      wrapper.appendChild(pre)
+
+      const btn = doc.createElement('button')
+      btn.textContent = 'Copy'
+      btn.style.cssText =
+        'position:absolute;top:0.5rem;right:0.5rem;padding:0.2rem 0.5rem;font-size:0.75rem;background:#e0e0e0;border:none;border-radius:3px;cursor:pointer;opacity:0.7'
+      btn.addEventListener('click', () => {
+        const code = pre.querySelector('code')?.innerText ?? pre.innerText
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied!'
+          setTimeout(() => (btn.textContent = 'Copy'), 2000)
+        })
+      })
+      wrapper.appendChild(btn)
+    })
   }
 
   private loadGiscusScript() {

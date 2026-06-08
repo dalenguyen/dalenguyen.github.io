@@ -4,6 +4,7 @@
 
 @import 'prismjs/themes/prism.css';
 @import 'prismjs/plugins/diff-highlight/prism-diff-highlight.css';
+@import 'prismjs/plugins/toolbar/prism-toolbar.css';
 
 html,
 body {
