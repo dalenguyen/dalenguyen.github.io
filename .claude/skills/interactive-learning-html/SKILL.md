@@ -15,9 +15,9 @@ Convert a static article or URL into a self-contained single-file HTML learning 
 
 Files live at: `libs/portfolio/shared/learn/<kebab-slug>.html`
 
-The `learnManifestPlugin` (vite) auto-injects the site nav bar at `<body>` at build/dev time — **do not include a nav in the HTML file itself**. The plugin also reads `<title>` and `<meta name="description">` to populate the `/learn` index page — both are required.
+The `learnManifestPlugin` (vite) auto-injects the site nav bar at `<body>` at build/dev time — **do not include a nav in the HTML file itself**. The plugin reads `<title>`, `<meta name="description">`, `<meta name="date">`, and `<meta name="timestamp">` to populate the `/learn` index page. The index **sorts by date descending, then timestamp descending** as a tiebreaker — missing both pushes the page to the bottom. Always set both.
 
-Verify in dev server at: `http://localhost:4200/learn/<filename>.html`
+Verify in dev server at: `http://localhost:3000/learn/<filename>.html` (blog-app runs on port 3000)
 
 ## Workflow
 
@@ -30,7 +30,7 @@ Verify in dev server at: `http://localhost:4200/learn/<filename>.html`
 ## Page Structure
 
 ```
-hero          — title, subtitle, progress bar (X / N sections)
+hero          — title, subtitle, hero-label (topic · CURRENT_YEAR — the year the page is written, not the source article's year), progress bar (X / N sections)
 section[N]    — collapsible card per concept
   ├─ tabs     — for multi-facet concepts
   ├─ demo     — live interactive simulation
@@ -70,7 +70,7 @@ Every page must end with a source attribution block just before `</body>`:
 
 - [ ] WebFetch called on source URL
 - [ ] File saved to `libs/portfolio/shared/learn/<slug>.html`
-- [ ] `<title>` and `<meta name="description">` set (required for /learn index)
+- [ ] `<title>`, `<meta name="description">`, `<meta name="date" content="YYYY-MM-DD">`, and `<meta name="timestamp" content="YYYY-MM-DDTHH:MM:SS">` set in `<head>` — all required; index sorts by date then timestamp descending
 - [ ] No `<nav>` in the file — plugin injects it automatically
 - [ ] Tooltips use `position: fixed` + `initTooltips()` JS
 - [ ] Each section has a live demo
