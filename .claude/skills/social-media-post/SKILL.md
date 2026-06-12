@@ -83,6 +83,8 @@ Before reporting done:
 - [ ] All `{{PLACEHOLDER}}` markers have been replaced
 - [ ] Infographic chunks fit on one line (use `white-space: nowrap` if needed)
 - [ ] 3–6 colors used consistently between formula, legend, and examples
+- [ ] LinkedIn post uses plain text only — NO markdown syntax (`**bold**`, `_italic_`, etc)
+- [ ] LinkedIn post uses emoji bullets (🔵 🟡 🔴 🟢 🟣) and line breaks for structure
 - [ ] LinkedIn post ends with an engagement question
 - [ ] X thread has numbered tweets (1/, 2/, etc.) and a strong hook
 - [ ] Signature `@dale_nguyen` appears in footer

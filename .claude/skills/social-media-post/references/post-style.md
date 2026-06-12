@@ -17,11 +17,17 @@
 
 **Voice**: professional but warm. First person. Conversational, not corporate.
 
+**Formatting**:
+- LinkedIn does NOT support markdown (`**bold**`, `_italic_`, etc). Use plain text only.
+- Use emoji bullets (🔵 🟡 🔴 🟢 🟣) and line breaks for structure.
+- When pasted into LinkedIn, use the native text editor to manually bold key phrases if needed.
+
 **Avoid**:
 - "Excited to share..." (cringe)
 - Walls of text without bullets
 - More than 5 hashtags
 - Self-promotion in the first 3 lines
+- Markdown syntax — LinkedIn strips it and looks ugly when pasted
 
 **Example opening lines that work**:
 - "Ever wondered what the second number in `Qwen3-30B-A3B` actually means?"
