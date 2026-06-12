@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How GitHub Apps Work — Build a Bot You Can @Mention</title>
+<meta name="description" content="Interactive guide to GitHub Apps: app identity, JWTs, installation tokens, user OAuth, webhooks, and the full architecture for a bot that creates and reviews PRs when you @mention it on an issue.">
+<meta name="date" content="2026-06-11">
+<meta name="timestamp" content="2026-06-11T12:00:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #7a7a99;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 640px; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; cursor: pointer; user-select: none;
+}
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+pre.code {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; font-size: 12.5px; line-height: 1.65; overflow-x: auto;
+  margin: 12px 0; color: #d6d6e7;
+}
+.tok-k { color: #82aaff; } .tok-s { color: #c3e88d; } .tok-c { color: #697098; } .tok-n { color: #f78c6c; } .tok-f { color: #c792ea; }
+.kv-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; font-size: 12px; }
+.kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted); font-weight: 500; white-space: nowrap; }
+.kv-chip-val { padding: 4px 9px; color: var(--text); font-family: ui-monospace, Menlo, monospace; }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin: 14px 0;
+}
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 8px; margin: 16px 0 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-weight: 500; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- S1: actor comparison ---------- */
+.actor-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.actor-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 14px; cursor: pointer; transition: border-color 0.2s, transform 0.1s; text-align: left; color: var(--text); font-family: inherit;
+}
+.actor-card:hover { border-color: var(--accent); }
+.actor-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.actor-icon { font-size: 22px; margin-bottom: 6px; }
+.actor-name { font-size: 13px; font-weight: 700; }
+.actor-tag { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.blast-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+.blast-name { width: 110px; font-size: 12px; color: var(--muted); flex-shrink: 0; }
+.race-track { flex: 1; height: 26px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+.race-fill  { height: 100%; border-radius: 6px; width: 0%; transition: width 0.8s cubic-bezier(0.22,1,0.36,1); }
+.race-fill.fast   { background: linear-gradient(90deg, #4ade8066, #4ade80); }
+.race-fill.medium { background: linear-gradient(90deg, #fbbf2466, #fbbf24); }
+.race-fill.slow   { background: linear-gradient(90deg, #ef444466, #ef4444); }
+.blast-val { width: 190px; flex-shrink: 0; font-size: 11.5px; font-weight: 600; color: var(--muted); }
+.blast-val.fast   { color: var(--green); }
+.blast-val.medium { color: var(--amber); }
+.blast-val.slow   { color: var(--red); }
+
+/* ---------- S2: token console ---------- */
+.token-card {
+  display: none; border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px;
+  background: var(--surface2); margin-top: 10px; font-size: 12.5px;
+}
+.token-card.show { display: block; animation: pop 0.25s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.token-card .t-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.token-card .t-val { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: var(--green); word-break: break-all; }
+.token-card .t-meta { color: var(--muted); font-size: 11.5px; margin-top: 6px; }
+
+/* ---------- S3: install simulator ---------- */
+.repo-pick { display: flex; flex-direction: column; gap: 8px; margin: 12px 0; }
+.repo-opt {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 8px; background: var(--surface2);
+  cursor: pointer; font-size: 13px;
+}
+.repo-opt input { accent-color: var(--accent); }
+.repo-opt:hover { border-color: var(--accent); }
+
+/* ---------- S4: webhook inspector ---------- */
+.comment-presets { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.payload-view {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 8px;
+  padding: 14px; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+  line-height: 1.7; overflow-x: auto; white-space: pre; display: none;
+}
+.payload-view.show { display: block; }
+.hl-green { background: rgba(74,222,128,0.15); color: var(--green); border-radius: 3px; padding: 0 3px; }
+.hl-accent { background: rgba(94,106,210,0.2); color: #aab4ff; border-radius: 3px; padding: 0 3px; }
+.hl-amber { background: rgba(251,191,36,0.15); color: var(--amber); border-radius: 3px; padding: 0 3px; }
+.sig-toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); margin: 12px 0 0; cursor: pointer; user-select: none; }
+.sig-toggle input { accent-color: var(--red); }
+
+/* ---------- S5: sequence timeline ---------- */
+.seq-track    { position: relative; padding: 24px 0 8px; }
+.seq-line-bg  { position: absolute; top: 32px; left: 20px; right: 20px; height: 3px;
+                background: var(--border); border-radius: 99px; }
+.seq-line-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px;
+                 transition: width 0.35s ease; }
+.seq-steps    { display: flex; justify-content: space-between; position: relative; }
+.seq-step     { display: flex; flex-direction: column; align-items: center; gap: 8px;
+                cursor: pointer; opacity: 0.3; transition: opacity 0.3s; min-width: 52px; }
+.seq-step.seq-revealed  { opacity: 1; }
+.seq-step.seq-selected .seq-dot { box-shadow: 0 0 0 3px var(--accent-glow); }
+.seq-dot      { width: 18px; height: 18px; border-radius: 50%; background: var(--border);
+                border: 2px solid var(--surface2); transition: background 0.3s; flex-shrink: 0; }
+.seq-dot.seq-dot-active { background: var(--accent); border-color: var(--accent); }
+.seq-label    { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+.seq-detail   { margin-top: 16px; padding: 10px 14px; background: var(--surface2);
+                border-radius: 8px; font-size: 13px; color: var(--text); min-height: 40px;
+                border: 1px solid var(--border); line-height: 1.5; }
+
+/* ---------- S6: architecture ---------- */
+.arch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+.arch-node {
+  position: relative; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 14px 10px; text-align: center; cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+}
+.arch-node .a-icon { font-size: 22px; margin-bottom: 4px; }
+.arch-node .a-name { font-size: 12px; font-weight: 700; }
+.arch-node .a-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.arch-node.lit { border-color: var(--amber); background: rgba(251,191,36,0.1); }
+.arch-tooltip {
+  display: none; position: fixed; z-index: 1000; pointer-events: none;
+  width: 230px; background: var(--surface2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: left; line-height: 1.5;
+}
+
+/* ---------- Quiz ---------- */
+.quiz { margin-top: 22px; border-top: 1px dashed var(--border); padding-top: 18px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-q::before { content: "QUIZ"; display: inline-block; font-size: 10px; letter-spacing: 1.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 5px; padding: 1px 7px; margin-right: 10px; vertical-align: 1px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; font-family: inherit; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 7px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); }
+
+/* ---------- Completion ---------- */
+.completion {
+  display: none; text-align: center; padding: 36px 24px; margin: 40px 0;
+  border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05);
+}
+.completion.show { display: block; animation: pop 0.4s ease; }
+.completion h2 { color: var(--green); font-size: 22px; margin-bottom: 8px; }
+.completion p { color: var(--muted); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .actor-cards { grid-template-columns: 1fr; }
+  .blast-name { width: 80px; }
+  .blast-val { width: 120px; font-size: 10.5px; }
+  .arch-grid { grid-template-columns: repeat(2, 1fr); }
+  .seq-label span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <span class="hero-label">GitHub Apps · Bot Architecture · 2026</span>
+  <h1>How <span class="grad">GitHub Apps</span> Work</h1>
+  <p>The complete mental model for building a bot you can <strong style="color:var(--text)">@mention on an issue</strong> to create a PR or review one — app identity, the three tokens, installations, webhooks, and the full server architecture.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">Why a GitHub App (and not a PAT or OAuth App)?</div>
+      <div class="section-sub">Three ways to call the GitHub API — only one gives your bot its own identity</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>There are three ways your server can act on GitHub. A <strong>personal access token</strong> is a human's credential — everything the bot does shows up as <em>you</em>, and a leak exposes everything you can touch. An <strong>OAuth App</strong> can only ever act <em>as a signed-in user</em>, with coarse scopes and long-lived tokens. A <strong>GitHub App</strong> is a first-class actor: it has its own identity (<code>prbot[bot]</code>), fine-grained permissions, per-repository installation, short-lived tokens, and built-in webhooks.</p>
+    <div class="callout">For your use case — a bot users can tag on an issue to open or review PRs — a GitHub App is the only good fit: comments and PRs are attributed to the <strong>bot</strong>, not to you or the user, and each customer grants it access to <strong>only their chosen repos</strong>.</div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — pick an actor, compare the blast radius of a leaked credential</div>
+      <div class="actor-cards">
+        <button class="actor-card" id="actor-pat" onclick="pickActor('pat')">
+          <div class="actor-icon">🔑</div>
+          <div class="actor-name">Personal Access Token</div>
+          <div class="actor-tag">acts as: you, the human</div>
+        </button>
+        <button class="actor-card" id="actor-oauth" onclick="pickActor('oauth')">
+          <div class="actor-icon">👤</div>
+          <div class="actor-name">OAuth App</div>
+          <div class="actor-tag">acts as: the signed-in user</div>
+        </button>
+        <button class="actor-card" id="actor-app" onclick="pickActor('app')">
+          <div class="actor-icon">🤖</div>
+          <div class="actor-name">GitHub App</div>
+          <div class="actor-tag">acts as: itself (a bot)</div>
+        </button>
+      </div>
+      <div style="margin-top:16px;">
+        <div class="blast-row"><div class="blast-name">Token lifetime</div><div class="race-track"><div class="race-fill" id="blast-life"></div></div><div class="blast-val" id="blast-life-val"></div></div>
+        <div class="blast-row"><div class="blast-name">Repo reach</div><div class="race-track"><div class="race-fill" id="blast-reach"></div></div><div class="blast-val" id="blast-reach-val"></div></div>
+        <div class="blast-row"><div class="blast-name">Permission grain</div><div class="race-track"><div class="race-fill" id="blast-perm"></div></div><div class="blast-val" id="blast-perm-val"></div></div>
+      </div>
+      <div class="demo-log" id="actor-log">Click an actor card to see its leak blast radius.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Your bot comments on an issue. With a GitHub App, who does the comment appear to come from?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">The user who installed the app</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">The app's own bot identity, e.g. <code>prbot[bot]</code></button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">The repository owner</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">The Three Tokens</div>
+      <div class="section-sub">App JWT · installation access token (ghs_) · user access token (ghu_)</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Everything in a GitHub App reduces to <strong>which of three credentials you're holding</strong>. Mixing them up is the #1 source of confusion.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tok-jwt')">1 · App JWT</button>
+      <button class="tab" onclick="switchTab(this,'tok-inst')">2 · Installation token</button>
+      <button class="tab" onclick="switchTab(this,'tok-user')">3 · User token</button>
+    </div>
+    <div class="tab-panel active" id="tok-jwt">
+      <p>A JWT you sign yourself with the app's <strong>RSA private key</strong> (downloaded once when you register the app). It proves "I am app #12345". Max lifetime <strong>10 minutes</strong> (<code>exp</code> claim), <code>iss</code> = your app ID. It can <em>only</em> call app-management endpoints — list installations, mint tokens. It <strong>cannot touch repo content</strong>.</p>
+      <pre class="code"><span class="tok-c">// payload of the JWT you sign with the private key (RS256)</span>
+{ <span class="tok-k">"iat"</span>: <span class="tok-n">1718100000</span>, <span class="tok-k">"exp"</span>: <span class="tok-n">1718100600</span>, <span class="tok-c">// ≤ 10 min</span>
+  <span class="tok-k">"iss"</span>: <span class="tok-s">"12345"</span> } <span class="tok-c">// your App ID</span></pre>
+    </div>
+    <div class="tab-panel" id="tok-inst">
+      <p>The workhorse. Exchange your JWT at <code>POST /app/installations/{installation_id}/access_tokens</code> to get a <code>ghs_…</code> token that lives <strong>1 hour</strong> and is scoped to <strong>that installation's repos and permissions</strong>. This is the token your bot uses to create branches, open PRs, and post reviews. Activity is attributed to <code>yourapp[bot]</code>.</p>
+      <pre class="code"><span class="tok-f">POST</span> /app/installations/<span class="tok-n">42183077</span>/access_tokens
+Authorization: Bearer <span class="tok-s">&lt;your JWT&gt;</span>
+
+<span class="tok-c">// → { "token": "ghs_abc…", "expires_at": "+1h" }</span></pre>
+    </div>
+    <div class="tab-panel" id="tok-user">
+      <p>For "user signs in on my server". Standard web flow: redirect to <code>github.com/login/oauth/authorize</code>, exchange the callback <code>code</code> at <code>/login/oauth/access_token</code>. You get a <code>ghu_…</code> token (<strong>8 hours</strong>) plus a <code>ghr_…</code> refresh token (<strong>6 months</strong>). Its effective permission is the <strong>intersection</strong> of what the app may do and what the user may do — the app can never escalate past the user.</p>
+      <pre class="code"><span class="tok-c">// 1. redirect the browser</span>
+https://github.com/login/oauth/authorize?client_id=…&amp;state=…
+<span class="tok-c">// 2. exchange code server-side</span>
+<span class="tok-f">POST</span> https://github.com/login/oauth/access_token
+<span class="tok-c">// → { "access_token": "ghu_…", "refresh_token": "ghr_…" }</span></pre>
+    </div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — mint the bot's credentials in order</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" id="mint-jwt" onclick="mintJwt()">1 · Sign JWT</button>
+        <button class="btn" id="mint-inst" onclick="mintInst()" disabled>2 · Exchange for installation token</button>
+        <button class="btn btn-outline" id="mint-wrong" onclick="mintWrong()" disabled>3 · Try creating a PR with the JWT</button>
+        <button class="btn btn-outline" onclick="mintReset()">Reset</button>
+      </div>
+      <div class="token-card" id="card-jwt">
+        <div class="t-name">🔏 App JWT</div>
+        <div class="t-val">eyJhbGciOiJSUzI1NiJ9.eyJpc3MiOiIxMjM0NSJ9.sig…</div>
+        <div class="t-meta">expires in ≤ 10 min · proves app identity · app-management endpoints only</div>
+      </div>
+      <div class="token-card" id="card-inst">
+        <div class="t-name">🎫 Installation access token</div>
+        <div class="t-val">ghs_16C7e42F292c6912E7710c838347Ae178B4a</div>
+        <div class="t-meta">expires in 1 hour · scoped to installation 42183077 · this is what the bot acts with</div>
+      </div>
+      <div class="demo-log" id="mint-log">Your server holds the app's private key. Start by signing a JWT.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Your bot needs to open a PR on a customer's repo. Which credential goes in the <code>Authorization</code> header?</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">The app JWT signed with the private key</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">The user's <code>ghu_</code> access token</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">An installation access token (<code>ghs_</code>) minted for that repo's installation</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Installation: How Your Bot Gets Access to a Repo</div>
+      <div class="section-sub">Users install the app on chosen repos — you store the installation_id</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Registering the app gives it an identity, but zero access. Access comes when a user <strong>installs</strong> the app on their account or org and picks <em>all repositories</em> or <em>only select repositories</em>. GitHub reviews the app's requested permissions (e.g. <em>Contents: read &amp; write</em>, <em>Pull requests: read &amp; write</em>, <em>Issues: read &amp; write</em>) at install time.</p>
+    <p>Each install creates an <strong>installation</strong> with a numeric <code>installation_id</code>. Your server learns it from the <code>installation.created</code> webhook (or <code>GET /repos/{owner}/{repo}/installation</code>) and should persist the mapping <em>account → installation_id → repos</em> — it's the key you'll need every time you mint a <code>ghs_</code> token.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — install "prbot" like a customer would</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px;">prbot requests: <span class="hl-accent">Contents: R/W</span> <span class="hl-accent">Pull requests: R/W</span> <span class="hl-accent">Issues: R/W</span> · subscribe: <span class="hl-amber">issue_comment</span> <span class="hl-amber">pull_request</span></div>
+      <div class="repo-pick">
+        <label class="repo-opt"><input type="radio" name="scope" value="all" onchange="scopeChange()"> All repositories in <strong>acme-corp</strong></label>
+        <label class="repo-opt"><input type="radio" name="scope" value="select" checked onchange="scopeChange()"> Only select repositories:</label>
+        <div id="repo-checks" style="display:flex;flex-direction:column;gap:8px;margin-left:24px;">
+          <label class="repo-opt"><input type="checkbox" value="acme-corp/web-app" checked> 📦 acme-corp/web-app</label>
+          <label class="repo-opt"><input type="checkbox" value="acme-corp/api-server"> 📦 acme-corp/api-server</label>
+          <label class="repo-opt"><input type="checkbox" value="acme-corp/docs"> 📦 acme-corp/docs</label>
+        </div>
+      </div>
+      <button class="btn" onclick="doInstall()">Install prbot</button>
+      <div class="demo-log" id="install-log">Choose repos, then install.</div>
+    </div>
+
+    <div class="callout warn"><strong>Store it.</strong> If you don't persist <code>installation_id</code> when the webhook arrives, you can still recover it later via <code>GET /repos/{owner}/{repo}/installation</code> (authenticated with your JWT) — but your webhook handler shouldn't need a lookup on the hot path: every event payload from an installed repo carries <code>installation.id</code>.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">A customer installs your app on 3 of their 40 repos. What can your bot reach?</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">All 40 repos — installation is account-wide</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">Only the 3 selected repos, with only the permissions the app requested</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Whatever the installing user can personally access</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Webhooks: Hearing the @Mention</div>
+      <div class="section-sub">issue_comment events, HMAC signature verification, finding the trigger</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Your app subscribes to events at registration time. For an @mention bot you want <code>issue_comment</code> (fires for comments on both issues <em>and</em> PRs — PRs are issues underneath) and <code>pull_request</code>. When someone comments, GitHub POSTs a JSON payload to your webhook URL.</p>
+    <p>Two things matter in the handler:</p>
+    <p><strong>1. Verify the signature.</strong> GitHub sends <code>X-Hub-Signature-256: sha256=…</code>, an HMAC-SHA256 of the raw body using your <strong>webhook secret</strong>. Compute it yourself and compare with a constant-time check — otherwise anyone who finds your URL can puppet your bot.</p>
+    <p><strong>2. Respond fast, work async.</strong> Reply 2xx within ~10 seconds and push the real work (cloning, reviewing, PR creation) onto a queue.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — post a comment, inspect what hits your server</div>
+      <div class="comment-presets">
+        <button class="btn btn-outline" onclick="fireWebhook(0)">💬 "@prbot create a PR for this"</button>
+        <button class="btn btn-outline" onclick="fireWebhook(1)">💬 "@prbot review please"</button>
+        <button class="btn btn-outline" onclick="fireWebhook(2)">💬 "nice work 👍"</button>
+      </div>
+      <label class="sig-toggle"><input type="checkbox" id="tamper" onchange="if(lastWebhook>=0)fireWebhook(lastWebhook)"> Simulate attacker: payload sent <strong>without knowing your webhook secret</strong></label>
+      <div class="payload-view" id="payload-view" style="margin-top:12px;"></div>
+      <div class="demo-log" id="hook-log">Click a comment to deliver its <code>issue_comment</code> webhook.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">How does your server know a webhook really came from GitHub and not an attacker?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">Check that the request's User-Agent is "GitHub-Hookshot"</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">Recompute the HMAC-SHA256 of the raw body with the webhook secret and compare to <code>X-Hub-Signature-256</code></button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">Webhook URLs are secret, so receiving the request is proof enough</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Acting: Create a PR, Review a PR</div>
+      <div class="section-sub">From webhook to bot-authored pull request or review</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Once the @mention is detected and verified, the worker mints a <code>ghs_</code> token for <code>payload.installation.id</code> and drives the REST API. Everything it does appears as <code>prbot[bot]</code>.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'act-pr')">Create a PR</button>
+      <button class="tab" onclick="switchTab(this,'act-review')">Review a PR</button>
+    </div>
+
+    <div class="tab-panel active" id="act-pr">
+      <div class="demo-box" style="margin-top:0;">
+        <div class="demo-label">Demo — play the create-PR pipeline, click any step to inspect</div>
+        <div class="seq-track">
+          <div class="seq-line-bg"><div class="seq-line-fill" id="seq-line"></div></div>
+          <div class="seq-steps" id="seq-steps"></div>
+        </div>
+        <div class="seq-detail" id="seq-detail">Click a step to inspect it.</div>
+        <div style="display:flex;gap:8px;margin-top:14px;">
+          <button class="btn" onclick="playTimeline()">Play</button>
+          <button class="btn btn-outline" onclick="resetTimeline()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="act-review">
+      <p>For "review their PRs": pull the diff, generate feedback, then submit one review with inline comments.</p>
+      <pre class="code"><span class="tok-c">// 1. what changed?</span>
+<span class="tok-f">GET</span> /repos/acme-corp/web-app/pulls/88/files
+
+<span class="tok-c">// 2. submit the review — body + inline comments in one shot</span>
+<span class="tok-f">POST</span> /repos/acme-corp/web-app/pulls/88/reviews
+{ <span class="tok-k">"event"</span>: <span class="tok-s">"COMMENT"</span>,  <span class="tok-c">// or REQUEST_CHANGES / APPROVE</span>
+  <span class="tok-k">"body"</span>: <span class="tok-s">"Overall solid — two issues below."</span>,
+  <span class="tok-k">"comments"</span>: [{ <span class="tok-k">"path"</span>: <span class="tok-s">"src/auth.ts"</span>, <span class="tok-k">"line"</span>: <span class="tok-n">42</span>,
+                  <span class="tok-k">"body"</span>: <span class="tok-s">"This token is logged in plaintext."</span> }] }</pre>
+      <div class="callout warn">GitHub blocks <code>APPROVE</code>/<code>REQUEST_CHANGES</code> on a PR authored by the same identity — your bot can't formally approve its own PRs, and many orgs restrict bot approvals. <code>COMMENT</code> reviews always work.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">The webhook arrived 50 minutes ago and sat in a slow queue. The worker's earlier <code>ghs_</code> token now fails with 401. Why?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">The installation was automatically suspended after inactivity</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">Installation tokens expire after 1 hour — workers should mint a fresh one when a job starts</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">The JWT used to mint it expired, which retroactively kills the token</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">The Full Architecture of Your Service</div>
+      <div class="section-sub">User sign-in + installation + @mention → PR, end to end</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Putting it together, your service uses <strong>two of the three tokens for two different jobs</strong>: the <code>ghu_</code> user token to know <em>who</em> is signing in on your site (and gate who may trigger the bot), and <code>ghs_</code> installation tokens for everything the bot <em>does</em>. The JWT exists only to mint the latter.</p>
+    <ol style="font-size:14.5px;color:#c9c9da;margin:0 0 12px 20px;line-height:1.8;">
+      <li><strong>Onboard</strong> — user signs in via the app's OAuth flow (<code>ghu_</code>), then installs the app on their repos (you store <code>installation_id</code>).</li>
+      <li><strong>Trigger</strong> — user comments <code>@prbot review</code>; GitHub delivers an <code>issue_comment</code> webhook.</li>
+      <li><strong>Authorize</strong> — verify the HMAC signature, then check <em>your</em> rules: is <code>comment.user</code> a registered customer / repo collaborator?</li>
+      <li><strong>Act</strong> — worker mints a <code>ghs_</code> token from <code>installation.id</code>, creates the PR or posts the review, and replies on the thread.</li>
+    </ol>
+    <div class="callout good">Hover the boxes below for each component's responsibilities, then hit <strong>Play full flow</strong>.</div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — your service, end to end</div>
+      <div class="arch-grid">
+        <div class="arch-node" id="an-user">
+          <div class="a-icon">🧑‍💻</div><div class="a-name">User</div><div class="a-sub">signs in · installs · @mentions</div>
+          <div class="arch-tooltip">Authenticates on your site via the app's OAuth web flow, installs the app on their repos, and triggers work by commenting <b>@prbot …</b> on an issue or PR.</div>
+        </div>
+        <div class="arch-node" id="an-github">
+          <div class="a-icon">🐙</div><div class="a-name">GitHub</div><div class="a-sub">events · identity</div>
+          <div class="arch-tooltip">Hosts the repos, runs the OAuth flow, enforces installation permissions, and pushes signed webhook events (issue_comment, pull_request) to your server.</div>
+        </div>
+        <div class="arch-node" id="an-server">
+          <div class="a-icon">🖥️</div><div class="a-name">Your Server</div><div class="a-sub">webhook + auth + queue</div>
+          <div class="arch-tooltip">Verifies X-Hub-Signature-256, parses the mention, checks the commenter against your user DB, responds 200 immediately, and enqueues a job. Holds the app's private key + webhook secret.</div>
+        </div>
+        <div class="arch-node" id="an-worker">
+          <div class="a-icon">⚙️</div><div class="a-name">Worker</div><div class="a-sub">mints ghs_ · calls API</div>
+          <div class="arch-tooltip">Pops the job, signs a JWT, exchanges it for an installation token (ghs_, 1h), then creates branches/PRs or posts reviews as prbot[bot].</div>
+        </div>
+      </div>
+      <button class="btn" onclick="playArch()" id="arch-btn">Play full flow</button>
+      <div class="demo-log" id="arch-log">Hover a component, or play the flow.</div>
+    </div>
+
+    <div class="callout warn"><strong>Don't skip the authorize step.</strong> Anyone who can comment on a public repo's issues can type <code>@prbot create a PR</code>. The signature check proves the event came from GitHub — it says nothing about whether the <em>commenter</em> should command your bot. Gate on your own user records (that's what the sign-in on your server is for) and/or check their repo permission via <code>GET /repos/{o}/{r}/collaborators/{user}/permission</code>.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">In this architecture, what is the user's <code>ghu_</code> OAuth token actually used for?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Creating the PRs — so they're attributed to the user</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Verifying webhook signatures from GitHub</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">Identifying the user on your site so you can decide who is allowed to trigger the bot</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🤖 You can build prbot now</h2>
+  <p>Register the app → users sign in (ghu_) and install it (installation_id) → verify webhooks → mint ghs_ → ship PRs and reviews as your bot.</p>
+</div>
+
+</div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://docs.github.com/en/apps/overview" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">GitHub Apps Documentation</a>
+    <span>·</span>
+    <a href="https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/about-authentication-with-a-github-app" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Authenticating with a GitHub App</a>
+  </div>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- tabs ---------- */
+function switchTab(btn, panelId) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById(panelId);
+  let sib = group.nextElementSibling;
+  while (sib && sib.classList.contains('tab-panel')) { sib.classList.remove('active'); sib = sib.nextElementSibling; }
+  panel.classList.add('active');
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'A GitHub App is its own actor. Comments, commits, and PRs show up as the app\'s bot account (prbot[bot]) — not as you, not as the installer.' },
+  q2: { correct: 2, explanation: 'Repo actions need an installation access token. The JWT can only hit app-management endpoints, and using the user\'s ghu_ token would attribute the PR to the user instead of the bot.' },
+  q3: { correct: 1, explanation: 'Installations are scoped: the bot reaches only the repos the customer selected, and only with the fine-grained permissions the app declared (e.g. Contents R/W, Pull requests R/W).' },
+  q4: { correct: 1, explanation: 'GitHub HMAC-signs the raw body with your shared webhook secret and sends it as X-Hub-Signature-256. Recompute and compare in constant time; headers and URL secrecy are spoofable.' },
+  q5: { correct: 1, explanation: 'ghs_ tokens live exactly 1 hour. Mint per job at execution time — the 10-minute JWT lifetime only limits when you can mint, not how long the minted token lives.' },
+  q6: { correct: 2, explanation: 'The bot never acts with the user token here. It exists so your server knows which GitHub user is which customer — the authorization gate deciding who may command the bot.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- S1: actor blast radius ---------- */
+const actorData = {
+  pat: {
+    life:  { pct: 95, cls: 'slow',   label: 'months–no expiry' },
+    reach: { pct: 95, cls: 'slow',   label: 'everything YOU can touch' },
+    perm:  { pct: 80, cls: 'slow',   label: 'coarse classic scopes' },
+    log: '🔑 <b>PAT leak:</b> the attacker IS you — every repo, org, and gist your account reaches, until you notice and revoke. Bot activity also pollutes your personal audit trail.'
+  },
+  oauth: {
+    life:  { pct: 70, cls: 'medium', label: 'long-lived by default' },
+    reach: { pct: 75, cls: 'medium', label: 'all repos the user\'s scopes allow' },
+    perm:  { pct: 70, cls: 'medium', label: 'scopes (repo = everything)' },
+    log: '👤 <b>OAuth App leak:</b> attacker acts as that user across every repo the granted scopes cover — the classic "repo" scope is all-or-nothing. And the app can never act as itself.'
+  },
+  app: {
+    life:  { pct: 12, cls: 'fast',   label: 'ghs_ dies in 1 hour' },
+    reach: { pct: 18, cls: 'fast',   label: 'only installed repos' },
+    perm:  { pct: 15, cls: 'fast',   label: 'fine-grained per-resource' },
+    log: '🤖 <b>GitHub App leak:</b> a stolen ghs_ token covers one installation\'s chosen repos, only the declared permissions, and self-destructs within the hour. (Guard the private key, though — that mints new ones.)'
+  },
+};
+function pickActor(key) {
+  ['pat','oauth','app'].forEach(k => document.getElementById('actor-' + k).classList.toggle('selected', k === key));
+  const d = actorData[key];
+  [['blast-life', d.life], ['blast-reach', d.reach], ['blast-perm', d.perm]].forEach(([id, v]) => {
+    const el = document.getElementById(id);
+    const val = document.getElementById(id + '-val');
+    el.className = 'race-fill ' + v.cls;
+    el.style.width = '0%';
+    val.className = 'blast-val ' + v.cls;
+    val.textContent = v.label;
+    requestAnimationFrame(() => requestAnimationFrame(() => { el.style.width = v.pct + '%'; }));
+  });
+  document.getElementById('actor-log').innerHTML = d.log;
+}
+
+/* ---------- S2: token minting ---------- */
+let jwtMinted = false;
+function mintJwt() {
+  jwtMinted = true;
+  document.getElementById('card-jwt').classList.add('show');
+  document.getElementById('mint-inst').disabled = false;
+  document.getElementById('mint-wrong').disabled = false;
+  document.getElementById('mint-log').innerHTML = '🔏 Signed RS256 JWT with the app private key (<code>iss: 12345</code>, <code>exp: now+10m</code>). This proves "I am the app" — nothing more.';
+}
+function mintInst() {
+  if (!jwtMinted) return;
+  document.getElementById('card-inst').classList.add('show');
+  document.getElementById('mint-log').innerHTML = '🎫 <code>POST /app/installations/42183077/access_tokens</code> with <code>Authorization: Bearer &lt;JWT&gt;</code> → <code>ghs_…</code>, valid 1 hour, scoped to that installation. The bot is now armed.';
+}
+function mintWrong() {
+  if (!jwtMinted) return;
+  document.getElementById('mint-log').innerHTML = '❌ <code>POST /repos/acme-corp/web-app/pulls</code> with the JWT → <b style="color:var(--red)">401 Unauthorized</b>. The JWT is app identity only — repo APIs demand an installation token. This trips up almost everyone once.';
+}
+function mintReset() {
+  jwtMinted = false;
+  document.getElementById('card-jwt').classList.remove('show');
+  document.getElementById('card-inst').classList.remove('show');
+  document.getElementById('mint-inst').disabled = true;
+  document.getElementById('mint-wrong').disabled = true;
+  document.getElementById('mint-log').innerHTML = 'Your server holds the app\'s private key. Start by signing a JWT.';
+}
+
+/* ---------- S3: install simulator ---------- */
+function scopeChange() {
+  const all = document.querySelector('input[name="scope"]:checked').value === 'all';
+  document.getElementById('repo-checks').style.opacity = all ? 0.35 : 1;
+  document.querySelectorAll('#repo-checks input').forEach(c => c.disabled = all);
+}
+function doInstall() {
+  const all = document.querySelector('input[name="scope"]:checked').value === 'all';
+  const repos = all
+    ? ['acme-corp/* (all current + future repos)']
+    : [...document.querySelectorAll('#repo-checks input:checked')].map(c => c.value);
+  if (!repos.length) {
+    document.getElementById('install-log').innerHTML = '⚠️ Select at least one repository.';
+    return;
+  }
+  document.getElementById('install-log').innerHTML =
+    '✅ Installed! GitHub fired an <code>installation.created</code> webhook:<br>' +
+    '<code>installation.id: <b style="color:var(--green)">42183077</b></code> · account: <code>acme-corp</code><br>' +
+    'repos: <code>' + repos.join('</code>, <code>') + '</code><br>' +
+    '💾 Your server stores: <code>{ account: "acme-corp", installation_id: 42183077 }</code> — the key for minting every future <code>ghs_</code> token.';
+}
+
+/* ---------- S4: webhook inspector ---------- */
+const hookComments = [
+  { body: '@prbot create a PR for this', mention: true,  intent: 'create-pr' },
+  { body: '@prbot review please',        mention: true,  intent: 'review' },
+  { body: 'nice work 👍',                mention: false, intent: null },
+];
+let lastWebhook = -1;
+function fireWebhook(i) {
+  lastWebhook = i;
+  const c = hookComments[i];
+  const tampered = document.getElementById('tamper').checked;
+  const sig = tampered ? 'sha256=<span class="hl-amber">9f2c…wrong…b1a0</span>' : 'sha256=<span class="hl-green">756f…valid…e3d2</span>';
+  const view = document.getElementById('payload-view');
+  view.classList.add('show');
+  view.innerHTML =
+`<span class="tok-c">POST /webhooks/github   X-GitHub-Event: issue_comment</span>
+<span class="tok-c">X-Hub-Signature-256: ${sig}</span>
+{
+  "action": "<span class="hl-accent">created</span>",
+  "comment": {
+    "body": "<span class="${c.mention ? 'hl-green' : 'hl-amber'}">${c.body}</span>",
+    "user": { "login": "octocat" }
+  },
+  "issue": { "number": 17, "title": "Login broken on Safari" },
+  "repository": { "full_name": "acme-corp/web-app" },
+  "installation": { "id": <span class="hl-green">42183077</span> }
+}`;
+  const log = document.getElementById('hook-log');
+  if (tampered) {
+    log.innerHTML = '🛑 <b style="color:var(--red)">Signature mismatch → 401, body discarded.</b> The sender didn\'t know the webhook secret, so the HMAC doesn\'t match. Nothing else is even parsed.';
+  } else if (c.mention) {
+    log.innerHTML = `✅ Signature valid → 200 OK. Mention detected → enqueue <code>{ intent: "${c.intent}", repo: "acme-corp/web-app", issue: 17, installation_id: 42183077 }</code>. Note the payload hands you <code>installation.id</code> for free.`;
+  } else {
+    log.innerHTML = '✅ Signature valid → 200 OK… but no <code>@prbot</code> in <code>comment.body</code>. Ignore and exit — your endpoint receives <i>every</i> comment on installed repos, so cheap filtering matters.';
+  }
+}
+
+/* ---------- S5: create-PR timeline ---------- */
+const timelineSteps = [
+  { label: 'Webhook',   icon: '📨', detail: 'issue_comment arrives: "@prbot create a PR for this" on issue #17. Signature verified, job enqueued, 200 returned in milliseconds.' },
+  { label: 'Mint ghs_', icon: '🎫', detail: 'Worker signs a fresh JWT and calls POST /app/installations/42183077/access_tokens → ghs_ token valid 1 hour, scoped to acme-corp/web-app.' },
+  { label: 'Base SHA',  icon: '🔍', detail: 'GET /repos/acme-corp/web-app/git/ref/heads/main → the commit SHA the bot will branch from.' },
+  { label: 'Branch',    icon: '🌿', detail: 'POST /repos/…/git/refs with { ref: "refs/heads/prbot/fix-17", sha: <base> } — the bot\'s working branch.' },
+  { label: 'Commit',    icon: '✍️', detail: 'PUT /repos/…/contents/src/login.ts commits the fix onto prbot/fix-17. (Or the lower-level Git Data API: blobs → tree → commit → update ref.)' },
+  { label: 'Open PR',   icon: '🔀', detail: 'POST /repos/…/pulls with { head: "prbot/fix-17", base: "main", body: "Fixes #17" }. Author: prbot[bot].' },
+  { label: 'Reply',     icon: '💬', detail: 'POST /repos/…/issues/17/comments → "Opened #88 for this 🎉" — closing the loop with the human who mentioned the bot.' },
+];
+let timelineActive = -1;
+function buildTimeline() {
+  const container = document.getElementById('seq-steps');
+  timelineSteps.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'seq-step';
+    el.id = 'seq-step-' + i;
+    el.innerHTML = `<div class="seq-dot" id="seq-dot-${i}"></div><div class="seq-label">${s.icon}<br><span>${s.label}</span></div>`;
+    el.onclick = () => selectStep(i);
+    container.appendChild(el);
+  });
+}
+function selectStep(i) {
+  if (timelineActive === i) {
+    document.getElementById('seq-detail').textContent = 'Click a step to inspect it.';
+    timelineActive = -1;
+    document.querySelectorAll('.seq-step').forEach(el => el.classList.remove('seq-selected'));
+    return;
+  }
+  timelineActive = i;
+  document.getElementById('seq-detail').textContent = timelineSteps[i].detail;
+  document.querySelectorAll('.seq-step').forEach((el, j) => el.classList.toggle('seq-selected', j === i));
+}
+function playTimeline() {
+  resetTimeline();
+  const total = timelineSteps.length;
+  timelineSteps.forEach((_, i) => {
+    setTimeout(() => {
+      document.getElementById('seq-dot-' + i).classList.add('seq-dot-active');
+      document.getElementById('seq-step-' + i).classList.add('seq-revealed');
+      document.getElementById('seq-line').style.width = ((i + 1) / total * 100) + '%';
+    }, i * 380);
+  });
+}
+function resetTimeline() {
+  timelineActive = -1;
+  document.getElementById('seq-line').style.width = '0%';
+  document.getElementById('seq-detail').textContent = 'Click a step to inspect it.';
+  timelineSteps.forEach((_, i) => {
+    document.getElementById('seq-dot-' + i).classList.remove('seq-dot-active');
+    document.getElementById('seq-step-' + i).classList.remove('seq-revealed', 'seq-selected');
+  });
+}
+
+/* ---------- S6: architecture play ---------- */
+const archScript = [
+  { node: 'an-user',   msg: '1 · User signs in on your site via the app\'s OAuth flow (ghu_) and installs prbot on acme-corp/web-app.' },
+  { node: 'an-github', msg: '2 · Later: user comments "@prbot review" on PR #88. GitHub signs the payload and POSTs it to your webhook URL.' },
+  { node: 'an-server', msg: '3 · Your server verifies X-Hub-Signature-256, sees the mention, confirms octocat is a registered customer, responds 200, enqueues the job.' },
+  { node: 'an-worker', msg: '4 · Worker mints a ghs_ token from installation 42183077 and fetches the PR diff.' },
+  { node: 'an-github', msg: '5 · Worker POSTs the review — it lands on PR #88 as prbot[bot], and the user gets notified. Loop closed. 🎉' },
+];
+let archPlaying = false;
+function playArch() {
+  if (archPlaying) return;
+  archPlaying = true;
+  document.getElementById('arch-btn').disabled = true;
+  document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+  archScript.forEach((step, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+      document.getElementById(step.node).classList.add('lit');
+      document.getElementById('arch-log').textContent = step.msg;
+      if (i === archScript.length - 1) {
+        setTimeout(() => {
+          document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+          document.getElementById('arch-btn').disabled = false;
+          archPlaying = false;
+        }, 1600);
+      }
+    }, i * 1500);
+  });
+}
+
+/* ---------- tooltips (overflow-safe: position fixed) ---------- */
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.arch-tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+window.addEventListener('load', () => {
+  buildTimeline();
+  initTooltips();
+  scopeChange();
+});
+</script>
+</body>
+</html>
