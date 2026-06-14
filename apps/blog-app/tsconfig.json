@@ -16,6 +16,9 @@
   ],
   "compilerOptions": {
     "target": "es2020",
+    // AnalogJS 2.x exposes subpaths (e.g. @analogjs/router/server) via the
+    // package "exports" field, which classic "node" resolution can't read.
+    "moduleResolution": "bundler",
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "noImplicitOverride": true,

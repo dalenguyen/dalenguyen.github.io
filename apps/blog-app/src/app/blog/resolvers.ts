@@ -5,8 +5,14 @@ import { PostAttributes } from './models'
 
 // temporary
 function injectActivePostAttributes(route: ActivatedRouteSnapshot): PostAttributes {
+  const slug = route.params['slug']
   return injectContentFiles<PostAttributes>().find(
-    (contentFile) => contentFile.filename === `/src/content/${route.params['slug']}.md`,
+    (contentFile) =>
+      // match by frontmatter slug (works for any path/extension), falling back
+      // to the filename for posts without an explicit slug
+      contentFile.attributes.slug === slug ||
+      contentFile.filename === `/src/content/${slug}.md` ||
+      contentFile.filename === `/src/content/${slug}.agx`,
   )!.attributes
 }
 
