@@ -3,11 +3,63 @@
 import analog, { type PrerenderContentFile } from '@analogjs/platform'
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin'
 import { PrerenderRoute } from 'nitropack'
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import { learnManifestPlugin } from './src/plugins/learn-manifest.plugin'
 
 const learnDir = join(__dirname, '../../libs/portfolio/shared/learn')
+
+// Candidate roots that hold the built client assets at prerender time.
+const clientAssetDirs = [
+  join(__dirname, '../../dist/apps/blog-app/client'),
+  join(__dirname, '../../.vercel/output/static'),
+]
+const inlineCssCache = new Map<string, string>()
+
+function readClientAsset(href: string): string | null {
+  for (const base of clientAssetDirs) {
+    const p = join(base, href)
+    if (existsSync(p)) return readFileSync(p, 'utf-8')
+  }
+  return null
+}
+
+// Critical-path tuning applied to every prerendered page:
+//  1. Inline the global stylesheet — it's tiny (~9 KB brotli), so removing the
+//     extra render-blocking request (one RTT on slow mobile) beats keeping it
+//     external. Falls back to leaving the <link> if the asset can't be read.
+//  2. Preload the LCP cover image (first <picture>) so the browser starts the
+//     fetch during head parse instead of after reaching the <img> in the body.
+//     Prefers the WebP <source>; uses the <img> src for external/non-WebP covers.
+function tuneCriticalPath(html: string): string {
+  html = html.replace(
+    /<link[^>]*rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/g,
+    (tag: string, href: string) => {
+      let css = inlineCssCache.get(href)
+      if (css === undefined) {
+        css = readClientAsset(href) ?? ''
+        inlineCssCache.set(href, css)
+      }
+      return css ? `<style>${css}</style>` : tag
+    },
+  )
+
+  const picture = html.match(/<picture>[\s\S]*?<\/picture>/)
+  if (picture && html.includes('</head>')) {
+    const block = picture[0]
+    const webp = block.match(/<source[^>]*type="image\/webp"[^>]*srcset="([^"]+)"/)
+    const img = block.match(/<img[^>]*\ssrc="([^"]+)"/)
+    let preload = ''
+    if (webp) {
+      preload = `<link rel="preload" as="image" type="image/webp" imagesrcset="${webp[1]}" fetchpriority="high">`
+    } else if (img) {
+      preload = `<link rel="preload" as="image" href="${img[1]}" fetchpriority="high">`
+    }
+    if (preload) html = html.replace('</head>', `${preload}</head>`)
+  }
+  return html
+}
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -104,6 +156,9 @@ export default defineConfig(({ mode }) => {
               </script>
             `
                     route.contents = route.contents?.concat(gTag)
+                    if (route.contents) {
+                      route.contents = tuneCriticalPath(route.contents)
+                    }
                   },
                 ],
                 sitemap: {
