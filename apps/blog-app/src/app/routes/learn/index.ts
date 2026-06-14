@@ -10,13 +10,11 @@ export const routeMeta: RouteMeta = {
 @Component({
   standalone: true,
   template: `
-    <div class="bg-gradient-to-b from-gray-50 to-white py-16 px-4 sm:px-6 lg:px-8">
+    <div class="bg-bg py-16 px-4 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <div class="text-center mb-16">
-          <h1 class="text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
-            <span class="block">Learning Resources</span>
-          </h1>
-          <p class="mt-4 max-w-2xl mx-auto text-xl text-gray-500">
+        <div class="text-center mb-12">
+          <h1 class="text-4xl font-bold tracking-tight text-fg sm:text-5xl">Learning Resources</h1>
+          <p class="mt-4 max-w-2xl mx-auto text-lg text-fg-muted">
             Standalone interactive pages for exploring ideas and concepts.
           </p>
         </div>
@@ -25,18 +23,18 @@ export const routeMeta: RouteMeta = {
           @for (page of pages; track page.url) {
             <a
               [href]="page.url"
-              class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 flex flex-col p-6 cursor-pointer no-underline"
+              class="group relative flex flex-col rounded-2xl border border-border bg-surface p-6 no-underline transition duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-glow"
             >
               @if (page.date) {
-                <p class="text-xs text-gray-400 mb-2">{{ page.date }}</p>
+                <p class="mb-2 text-xs font-medium text-fg-muted">{{ page.date }}</p>
               }
-              <h3 class="text-xl font-bold text-gray-900 mb-3 hover:text-indigo-600 transition-colors">
+              <h3 class="mb-3 text-xl font-bold text-fg transition-colors group-hover:text-accent">
                 {{ page.title }}
               </h3>
               @if (page.description) {
-                <p class="text-gray-600 line-clamp-3">{{ page.description }}</p>
+                <p class="line-clamp-3 text-fg-muted">{{ page.description }}</p>
               }
-              <span class="mt-auto pt-4 text-indigo-600 text-sm font-medium">Open →</span>
+              <span class="mt-auto pt-4 text-sm font-medium text-accent">Open →</span>
             </a>
           }
         </div>

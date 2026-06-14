@@ -6,10 +6,100 @@
 @import 'prismjs/plugins/diff-highlight/prism-diff-highlight.css';
 @import 'prismjs/plugins/toolbar/prism-toolbar.css';
 
+/* ============================================================================
+   Design tokens — dark is the default (:root); .light overrides on <html>.
+   Channels are space-separated RGB so Tailwind's `rgb(var(--x) / <alpha>)`
+   mapping (see tailwind.config.cjs) supports opacity utilities.
+   Every text/background pairing below is chosen to meet WCAG AA (>=4.5:1 for
+   body text, >=3:1 for large text) in both themes.
+   ========================================================================= */
+:root {
+  /* surfaces */
+  --bg: 10 11 16; /* #0a0b10 page */
+  --surface: 20 22 29; /* #14161d cards */
+  --surface-2: 28 31 42; /* #1c1f2a elevated / insets */
+  --border: 38 43 54; /* #262b36 */
+
+  /* text */
+  --fg: 230 237 243; /* #e6edf3 ~14:1 on bg */
+  --fg-muted: 154 167 181; /* #9aa7b5 ~7:1 on bg */
+
+  /* accent */
+  --accent: 129 140 248; /* #818cf8 indigo-400 — links/text, ~6:1 on bg */
+  --accent-fill: 94 106 210; /* #5e6ad2 — fills/glow (matches learn pages) */
+  --accent-fg: 8 17 31; /* #08111f — text on accent fill */
+
+  /* code (GitHub-dark inspired, verified on --code-bg) */
+  --code-bg: 22 27 34; /* #161b22 */
+  --code-fg: 230 237 243; /* #e6edf3 */
+  --code-border: 48 54 61; /* #30363d */
+  --tok-comment: 139 148 158; /* #8b949e */
+  --tok-punct: 201 209 217; /* #c9d1d9 */
+  --tok-keyword: 255 123 114; /* #ff7b72 */
+  --tok-string: 126 231 135; /* #7ee787 */
+  --tok-function: 210 168 255; /* #d2a8ff */
+  --tok-number: 121 192 255; /* #79c0ff */
+  --tok-class: 255 166 87; /* #ffa657 */
+
+  /* In-post chart widget (ShadowDom). Custom properties inherit through the
+     shadow boundary, so the chart re-themes from these. Hex (no alpha needed). */
+  --chart-card: #161b22;
+  --chart-border: #30363d;
+  --chart-fg: #e6edf3;
+  --chart-muted: #9aa7b5;
+  --chart-axis: #6e7b8a;
+  --chart-toggle: #0b0f16;
+
+  color-scheme: dark;
+}
+
+.light {
+  --bg: 255 255 255;
+  --surface: 255 255 255;
+  --surface-2: 249 250 251; /* #f9fafb */
+  --border: 229 231 235; /* #e5e7eb */
+
+  --fg: 17 24 39; /* #111827 */
+  --fg-muted: 75 85 99; /* #4b5563 ~7:1 on white */
+
+  --accent: 79 70 229; /* #4f46e5 indigo-600 — AA on white */
+  --accent-fill: 79 70 229;
+  --accent-fg: 255 255 255;
+
+  /* code — high-contrast palette tuned for the light #f6f8fa background */
+  --code-bg: 246 248 250; /* #f6f8fa */
+  --code-fg: 31 35 40; /* #1f2328 */
+  --code-border: 224 224 224; /* #e0e0e0 */
+  --tok-comment: 87 96 106; /* #57606a */
+  --tok-punct: 36 41 47; /* #24292f */
+  --tok-keyword: 207 34 46; /* #cf222e */
+  --tok-string: 10 110 49; /* #0a6e31 */
+  --tok-function: 102 57 186; /* #6639ba */
+  --tok-number: 5 80 174; /* #0550ae */
+  --tok-class: 149 56 0; /* #953800 */
+
+  /* In-post chart widget — light variant */
+  --chart-card: #ffffff;
+  --chart-border: #e5e7eb;
+  --chart-fg: #111827;
+  --chart-muted: #4b5563;
+  --chart-axis: #6b7280;
+  --chart-toggle: #f3f4f6;
+
+  color-scheme: light;
+}
+
 html,
 body {
   height: 100%;
   scroll-behavior: smooth;
+}
+
+body {
+  background-color: rgb(var(--bg));
+  color: rgb(var(--fg));
+  /* Smooth theme switch, but never animate the page on first paint. */
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* Ensure the app container takes full height */
@@ -29,12 +119,14 @@ h1 {
   font-size: 2rem;
   font-weight: 600;
   margin-bottom: 1rem;
+  letter-spacing: -0.02em;
 }
 
 h2 {
   font-size: 1.5rem;
   font-weight: 500;
   margin: 1rem 0;
+  letter-spacing: -0.01em;
 }
 
 h3 {
@@ -55,8 +147,61 @@ img:not([width]):not([height]) {
   aspect-ratio: 16 / 9;
 }
 
+/* Themed selection + accent-tinted scrollbar */
+::selection {
+  background: rgb(var(--accent-fill) / 0.35);
+  color: rgb(var(--fg));
+}
+
+/* Unclassed links inside content (e.g. markdown routes like /about, /contact)
+   get the accent treatment. Classed links (nav, buttons) keep their own styles. */
+main a:not([class]) {
+  color: rgb(var(--accent));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+/* ============================================================================
+   Scroll-reveal — progressive enhancement. SSR/no-JS renders fully visible;
+   the [dalReveal] directive adds `.reveal` (browser-only) to opt elements into
+   the hidden->visible transition, then `.is-visible` when they enter view.
+   ========================================================================= */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ============================================================================
+   Markdown article content
+   ========================================================================= */
 .analog-markdown {
   text-align: left;
+  color: rgb(var(--fg));
 
   p {
     padding: 1rem 0;
@@ -65,11 +210,16 @@ img:not([width]):not([height]) {
   /* Ensure images in markdown content maintain aspect ratio */
   img {
     display: block;
+    border-radius: 0.5rem;
   }
 
   a {
     text-decoration: underline;
-    color: #4632de;
+    text-underline-offset: 2px;
+    color: rgb(var(--accent));
+  }
+  a:hover {
+    text-decoration-thickness: 2px;
   }
 
   ul {
@@ -85,36 +235,35 @@ img:not([width]):not([height]) {
 
   /* Inline code */
   code {
-    background-color: #f5f5f5;
+    background-color: rgb(var(--code-bg));
+    color: rgb(var(--code-fg));
     padding: 0.2rem 0.4rem;
-    border-radius: 3px;
-    font-size: 1rem;
-    font-family: 'Courier New', Courier, monospace;
+    border-radius: 4px;
+    font-size: 0.95rem;
+    font-family: 'SFMono-Regular', ui-monospace, 'Courier New', Courier, monospace;
   }
 
   /* Code blocks */
   pre {
     display: block;
-    background-color: #f5f5f5;
+    background-color: rgb(var(--code-bg));
     padding: 1rem;
-    border-radius: 5px;
+    border-radius: 10px;
     overflow-x: auto;
     margin: 1rem 0;
-    border: 1px solid #e0e0e0;
+    border: 1px solid rgb(var(--code-border));
   }
 
   pre code {
     background-color: transparent;
     padding: 0;
     border-radius: 0;
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.6;
   }
 
   /* Responsive tables: scroll horizontally within their own box on narrow
-     viewports instead of overflowing the article and breaking mobile layout.
-     Font is dialed down from the article's text-lg so the data reads as a
-     table rather than oversized body copy. */
+     viewports instead of overflowing the article and breaking mobile layout. */
   table {
     display: block;
     width: max-content;
@@ -126,19 +275,25 @@ img:not([width]):not([height]) {
     line-height: 1.4;
   }
 
-  th, td {
-    border: 1px solid #e0e0e0;
+  th,
+  td {
+    border: 1px solid rgb(var(--border));
     padding: 0.5rem 0.75rem;
     text-align: left;
   }
 
   th {
-    background-color: #f5f5f5;
+    background-color: rgb(var(--surface-2));
     font-weight: 600;
   }
 
   tr:nth-child(even) {
-    background-color: #fafafa;
+    background-color: rgb(var(--surface) / 0.5);
+  }
+
+  strong {
+    color: rgb(var(--fg));
+    font-weight: 600;
   }
 }
 
@@ -147,37 +302,37 @@ figure {
   text-align: center;
   figcaption {
     font-size: 0.8rem;
-    color: #666;
+    color: rgb(var(--fg-muted));
   }
 }
 
 blockquote {
-  background-color: #f0f0f0;
+  background-color: rgb(var(--surface-2));
+  color: rgb(var(--fg));
   padding: 1rem;
-  border-left: 4px solid #4632de;
+  border-left: 4px solid rgb(var(--accent-fill));
+  border-radius: 0 8px 8px 0;
 }
 
-/*
- * High-contrast Prism syntax palette.
- * The default prism.css theme renders many tokens (comments, punctuation,
- * keywords, functions, numbers) below the WCAG AA 4.5:1 ratio on the light
- * #f5f5f5 code background, failing Lighthouse's color-contrast audit. Every
- * color below is verified >= 4.5:1 against that background. Placed after the
- * prism @import so these win on equal specificity.
- */
+/* ============================================================================
+   Prism syntax highlighting — theme-aware via the --tok-* tokens above, so
+   both dark and light meet WCAG AA against their respective code backgrounds.
+   Placed after the prism @import so these win on equal specificity.
+   ========================================================================= */
 code[class*='language-'],
 pre[class*='language-'] {
-  color: #1f2328;
+  color: rgb(var(--code-fg));
   text-shadow: none;
+  background: none;
 }
 .token.comment,
 .token.prolog,
 .token.doctype,
 .token.cdata {
-  color: #57606a;
+  color: rgb(var(--tok-comment));
 }
 .token.punctuation {
-  color: #24292f;
+  color: rgb(var(--tok-punct));
 }
 .token.property,
 .token.tag,
@@ -186,7 +341,7 @@ pre[class*='language-'] {
 .token.constant,
 .token.symbol,
 .token.deleted {
-  color: #0550ae;
+  color: rgb(var(--tok-number));
 }
 .token.selector,
 .token.attr-name,
@@ -194,27 +349,27 @@ pre[class*='language-'] {
 .token.char,
 .token.builtin,
 .token.inserted {
-  color: #0a6e31;
+  color: rgb(var(--tok-string));
 }
 .token.operator,
 .token.entity,
 .token.url,
 .language-css .token.string,
 .style .token.string {
-  color: #953800;
+  color: rgb(var(--tok-keyword));
   background: none;
 }
 .token.atrule,
 .token.attr-value,
 .token.keyword {
-  color: #cf222e;
+  color: rgb(var(--tok-keyword));
 }
 .token.function,
 .token.class-name {
-  color: #6639ba;
+  color: rgb(var(--tok-function));
 }
 .token.regex,
 .token.important,
 .token.variable {
-  color: #953800;
+  color: rgb(var(--tok-class));
 }

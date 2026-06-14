@@ -19,89 +19,91 @@ interface BucketListItem {
   standalone: true,
   imports: [CommonModule, FormsModule],
   template: `
-    <div class="min-h-screen bg-gradient-to-b from-blue-50 to-white py-12 px-4 sm:px-6 lg:px-8">
-      <header class="text-center mb-12">
-        <h1 class="text-4xl font-extrabold text-gray-900 mb-3">100 Things To Do Before I Leave This Earth</h1>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+    <div class="min-h-screen bg-bg py-12 px-4 sm:px-6 lg:px-8">
+      <header class="text-center mb-10">
+        <h1 class="text-4xl font-bold tracking-tight text-fg mb-3 sm:text-5xl">
+          100 Things To Do Before I Leave This Earth
+        </h1>
+        <p class="text-lg text-fg-muted max-w-3xl mx-auto">
           My personal bucket list of experiences, adventures, and achievements
         </p>
       </header>
 
       <div class="max-w-5xl mx-auto">
-        <div class="bg-white rounded-xl shadow-xl overflow-hidden mb-8">
-          <div class="p-6 bg-gradient-to-r from-blue-500 to-indigo-600">
-            <div class="flex justify-between items-center">
-              <h2 class="text-2xl font-bold text-white">My Bucket List</h2>
-              <div class="text-white">
-                <span class="font-medium">{{ completedCount() }}</span> of
-                <span class="font-medium">{{ totalCount() }}</span> completed
-              </div>
+        <!-- Progress visualization -->
+        <div class="rounded-2xl border border-border bg-surface p-6 mb-8">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-lg font-semibold text-fg">My Progress</h2>
+            <div class="text-fg-muted">
+              <span class="font-semibold text-fg">{{ completedCount() }}</span> of
+              <span class="font-semibold text-fg">{{ totalCount() }}</span> completed
             </div>
           </div>
+          <div class="h-3 w-full overflow-hidden rounded-full bg-surface-2" role="progressbar" [attr.aria-valuenow]="completionPct()" aria-valuemin="0" aria-valuemax="100">
+            <div
+              class="h-full rounded-full bg-gradient-to-r from-accent-fill to-accent transition-[width] duration-700"
+              [style.width.%]="completionPct()"
+            ></div>
+          </div>
+          <p class="mt-2 text-sm text-fg-muted">{{ completionPct() }}% complete</p>
+        </div>
 
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              <div
-                *ngFor="let item of sortedBucketListItems(); let i = index"
-                class="transform transition-all duration-300 hover:scale-105"
-              >
-                <div
-                  class="border rounded-lg overflow-hidden shadow-sm h-full flex flex-col"
-                  [ngClass]="{
-                    'bg-green-50 border-green-200': item.completed,
-                    'bg-white border-gray-200': !item.completed
-                  }"
-                >
-                  <div class="p-4 flex items-start gap-3 flex-grow">
-                    <div class="flex-shrink-0 pt-1">
-                      <input
-                        type="checkbox"
-                        [id]="'item-' + i"
-                        [checked]="item.completed"
-                        (change)="toggleComplete(item)"
-                        class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 cursor-pointer"
-                      />
-                    </div>
-                    <label
-                      [for]="'item-' + i"
-                      class="cursor-pointer flex-grow"
-                      [ngClass]="{ 'line-through text-gray-500': item.completed, 'text-gray-800': !item.completed }"
-                    >
-                      <div class="font-medium mb-1">
-                        <span class="mr-1">{{ i + 1 }}.</span>
-                        <a
-                          *ngIf="item.link"
-                          [href]="item.link"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="hover:text-blue-600 hover:underline inline items-center"
-                          (click)="$event.stopPropagation()"
-                        >
-                          {{ item.text }}
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            class="h-4 w-4 ml-1 inline"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                            />
-                          </svg>
-                        </a>
-                        <span *ngIf="!item.link">{{ item.text }}</span>
-                      </div>
-                    </label>
-                  </div>
-                  <div *ngIf="item.completed" class="bg-green-100 px-4 py-2 text-green-800 text-sm font-medium">
-                    Completed! 🎉
-                  </div>
-                </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div
+            *ngFor="let item of sortedBucketListItems(); let i = index"
+            class="h-full flex flex-col overflow-hidden rounded-xl border transition duration-300 hover:-translate-y-0.5"
+            [ngClass]="{
+              'border-accent/40 bg-accent-fill/10': item.completed,
+              'border-border bg-surface hover:border-accent': !item.completed
+            }"
+          >
+            <div class="p-4 flex items-start gap-3 flex-grow">
+              <div class="flex-shrink-0 pt-1">
+                <input
+                  type="checkbox"
+                  [id]="'item-' + i"
+                  [checked]="item.completed"
+                  (change)="toggleComplete(item)"
+                  class="h-5 w-5 rounded border-border bg-surface-2 accent-indigo-600 focus:ring-2 focus:ring-accent cursor-pointer"
+                />
               </div>
+              <label
+                [for]="'item-' + i"
+                class="cursor-pointer flex-grow"
+                [ngClass]="{ 'line-through text-fg-muted': item.completed, 'text-fg': !item.completed }"
+              >
+                <div class="font-medium mb-1">
+                  <span class="mr-1">{{ i + 1 }}.</span>
+                  <a
+                    *ngIf="item.link"
+                    [href]="item.link"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-accent hover:underline underline-offset-2 inline items-center"
+                    (click)="$event.stopPropagation()"
+                  >
+                    {{ item.text }}
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      class="h-4 w-4 ml-1 inline"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                  <span *ngIf="!item.link">{{ item.text }}</span>
+                </div>
+              </label>
+            </div>
+            <div *ngIf="item.completed" class="border-t border-accent/20 px-4 py-2 text-sm font-medium text-accent">
+              Completed! 🎉
             </div>
           </div>
         </div>
@@ -129,6 +131,11 @@ export default class BucketListComponent implements OnInit {
 
   totalCount = computed(() => {
     return this.bucketListItems().length
+  })
+
+  completionPct = computed(() => {
+    const total = this.totalCount()
+    return total ? Math.round((this.completedCount() / total) * 100) : 0
   })
 
   ngOnInit(): void {

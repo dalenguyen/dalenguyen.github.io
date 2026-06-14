@@ -1,9 +1,5 @@
-
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { MatButtonModule } from '@angular/material/button'
-import { MatCardModule } from '@angular/material/card'
-import { MatChipsModule } from '@angular/material/chips'
-import { MatIconModule } from '@angular/material/icon'
+import { RevealDirective } from '@dalenguyen/portfolio/shell/ui'
 
 interface PortfolioItem {
   id: number
@@ -17,65 +13,60 @@ interface PortfolioItem {
 @Component({
   selector: 'dalenguyen-portfolio',
   standalone: true,
-  imports: [MatCardModule, MatButtonModule, MatIconModule, MatChipsModule],
+  imports: [RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section id="portfolio" class="py-12">
-      <div class="max-w-7xl mx-auto px-4">
+    <section id="portfolio" class="py-16 sm:py-20 bg-surface/30">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <header class="text-center mb-12">
-          <h2 class="text-4xl font-bold mb-4 text-gray-800">Project Gallery</h2>
-          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-fg">Project Gallery</h2>
+          <p class="mt-3 text-lg text-fg-muted max-w-2xl mx-auto">
             I create user-centered digital experiences that blend innovative technology with strategic design, focusing
             on intuitive interfaces that drive engagement and deliver measurable business outcomes.
           </p>
         </header>
-    
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          @for (project of portfolioItems; track project) {
-            <mat-card
-              class="h-full flex flex-col overflow-hidden rounded-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              >
-              <img mat-card-image [src]="project.imageUrl" [alt]="project.title" class="h-48 w-full object-cover" />
-              <mat-card-content class="flex-grow p-6">
-                <h3 class="text-2xl font-semibold my-3 text-gray-800">
+          @for (project of portfolioItems; track project.id) {
+            <div
+              dalReveal
+              class="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface transition duration-300 hover:-translate-y-1 hover:border-accent hover:shadow-glow"
+            >
+              <div class="relative h-48 overflow-hidden">
+                <img
+                  [src]="project.imageUrl"
+                  [alt]="project.title"
+                  loading="lazy"
+                  class="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                />
+                <div class="absolute inset-0 bg-gradient-to-t from-surface/80 to-transparent"></div>
+              </div>
+              <div class="flex flex-grow flex-col p-6">
+                <h3 class="text-xl font-semibold text-fg">
                   <a
                     [href]="project.projectUrl"
                     target="_blank"
-                    class="hover:text-primary transition-colors duration-300 hover:underline"
-                    >
+                    rel="noopener"
+                    class="transition-colors duration-300 after:absolute after:inset-0 hover:text-accent"
+                  >
                     {{ project.title }}
                   </a>
                 </h3>
-                <p class="text-gray-600 mb-6 leading-relaxed">{{ project.description }}</p>
-                <div class="mb-4 flex flex-wrap gap-2">
-                  @for (tech of project.technologies; track tech) {
-                    <div
-                      class="inline-flex items-center px-3 py-1 rounded-full text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors duration-200"
-                      >
-                      <mat-icon class="h-4 w-4 mr-1 text-gray-600">{{ tech.icon }}</mat-icon>
-                      <span>{{ tech.name }}</span>
-                    </div>
+                <p class="mt-2 flex-grow leading-relaxed text-fg-muted">{{ project.description }}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  @for (tech of project.technologies; track tech.name) {
+                    <span class="rounded-full border border-border bg-surface-2 px-2.5 py-0.5 text-xs font-medium text-fg-muted">
+                      {{ tech.name }}
+                    </span>
                   }
                 </div>
-              </mat-card-content>
-            </mat-card>
+              </div>
+            </div>
           }
         </div>
       </div>
     </section>
-    `,
-  styles: [
-    `
-      mat-icon {
-        font-size: 16px;
-        height: 16px;
-        width: 16px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-      }
-    `,
-  ],
+  `,
 })
 export class PortfolioComponent {
   portfolioItems: PortfolioItem[] = [

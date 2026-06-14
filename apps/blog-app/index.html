@@ -5,7 +5,22 @@
     <title>Dale Nguyen's Blog</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark light" />
+    <meta name="theme-color" content="#0a0b10" />
     <link rel="icon" type="image/x-icon" href="/src/favicon.ico" />
+
+    <!-- Apply the saved theme before first paint to avoid a flash. Dark is the
+         default (no class); only an explicit `light` choice adds the class. -->
+    <script>
+      ;(function () {
+        try {
+          if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.add('light')
+          }
+        } catch (e) {}
+      })()
+    </script>
+
     <link rel="stylesheet" href="/src/styles.css" />
 
     <!-- Logichat — loaded on first user interaction to keep its SDK off the critical path -->

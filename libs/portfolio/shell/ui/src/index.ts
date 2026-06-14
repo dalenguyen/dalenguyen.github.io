@@ -1,3 +1,5 @@
 export * from './lib/footer/footer.component'
 export * from './lib/nav/nav.component'
 export * from './lib/nav/nav.service'
+export * from './lib/theme-toggle/theme-toggle.component'
+export * from './lib/reveal/reveal.directive'

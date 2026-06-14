@@ -19,6 +19,7 @@ import {
 } from '@angular/core'
 import { toSignal } from '@angular/core/rxjs-interop'
 import { RouterLink } from '@angular/router'
+import { readingTimes } from 'virtual:reading-time-manifest'
 import { PostAttributes } from '../../blog/models'
 import { postMetaResolver, postTitleResolver } from '../../blog/resolvers'
 
@@ -31,11 +32,11 @@ export const routeMeta: RouteMeta = {
   standalone: true,
   imports: [CommonModule, MarkdownComponent, RouterLink],
   template: `
-      <div class="relative px-6 lg:px-8">
+      <div class="relative mx-auto max-w-3xl px-6 lg:px-8">
         <nav class="flex py-4" aria-label="Breadcrumb">
           <ol class="inline-flex items-center space-x-1 md:space-x-3">
             <li class="inline-flex items-center">
-              <a routerLink="/" class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-blue-600">
+              <a routerLink="/" class="inline-flex items-center text-sm font-medium text-fg-muted hover:text-accent transition-colors">
                 <svg class="w-3 h-3 mr-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
                   <path d="m19.707 9.293-2-2-7-7a1 1 0 0 0-1.414 0l-7 7-2 2a1 1 0 0 0 1.414 1.414L2 10.414V18a2 2 0 0 0 2 2h3a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h3a2 2 0 0 0 2-2v-7.586l.293.293a1 1 0 0 0 1.414-1.414Z"/>
                 </svg>
@@ -44,18 +45,18 @@ export const routeMeta: RouteMeta = {
             </li>
             <li>
               <div class="flex items-center">
-                <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <svg class="w-3 h-3 text-fg-muted mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                 </svg>
-                <a routerLink="/blog" class="ml-1 text-sm font-medium text-gray-700 hover:text-blue-600 md:ml-2">Blog</a>
+                <a routerLink="/blog" class="ml-1 text-sm font-medium text-fg-muted hover:text-accent md:ml-2 transition-colors">Blog</a>
               </div>
             </li>
             <li aria-current="page" *ngIf="post()as post">
               <div class="flex items-center">
-                <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                <svg class="w-3 h-3 text-fg-muted mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                   <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                 </svg>
-                <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2 truncate whitespace-nowrap overflow-hidden max-w-[120px] sm:max-w-[180px] md:max-w-[240px]">{{ post.attributes.title }}</span>
+                <span class="ml-1 text-sm font-medium text-fg md:ml-2 truncate whitespace-nowrap overflow-hidden max-w-[120px] sm:max-w-[180px] md:max-w-[240px]">{{ post.attributes.title }}</span>
               </div>
             </li>
           </ol>
@@ -66,7 +67,7 @@ export const routeMeta: RouteMeta = {
 
             <!-- Feature image display (LCP). Serve a WebP variant when the cover
                  is a local PNG; the PNG stays the fallback and the og:image. -->
-            <div class="mb-8 rounded-lg overflow-hidden shadow-lg">
+            <div class="mb-8 rounded-2xl overflow-hidden shadow-lg ring-1 ring-border">
               <picture>
                 @if (coverWebp()) {
                   <source type="image/webp" [srcset]="coverWebp()" />
@@ -81,12 +82,12 @@ export const routeMeta: RouteMeta = {
               </picture>
             </div>
 
-            <h1>{{ post.attributes.title }}</h1>
+            <h1 class="text-fg">{{ post.attributes.title }}</h1>
 
             <!-- Categories display -->
             <div class="flex flex-wrap justify-center gap-2 mb-6">
               @for (category of post.attributes.categories; track category) {
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-600/15 text-accent ring-1 ring-border">
                   {{ category | titlecase }}
                 </span>
               }
@@ -97,38 +98,46 @@ export const routeMeta: RouteMeta = {
               <div class="flex items-center">
                 <img
                   [src]="post.attributes.profileImage"
-                  [alt]="'Photo of ' + post.attributes.author.firstName"
-                  class="w-10 h-10 rounded-full border-2 border-gray-200 mr-3"
+                  [alt]="'Photo of ' + post.attributes.author"
+                  class="w-10 h-10 rounded-full ring-2 ring-border mr-3"
                 />
                 <div class="text-left">
-                  <div class="font-medium text-gray-900">
-                    {{ post.attributes.author.firstName }} {{ post.attributes.author.lastName }}
+                  <div class="font-medium text-fg">
+                    {{ post.attributes.author }}
                   </div>
-                  <div class="text-sm text-gray-500 flex items-center">
-                    <span class="mr-1">
+                  <div class="text-sm text-fg-muted flex items-center gap-3">
+                    <span class="inline-flex items-center gap-1">
                       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
+                      <time [attr.datetime]="post.attributes.published">
+                        {{ post.attributes.published | date: 'longDate' }}
+                      </time>
                     </span>
-                    <time [attr.datetime]="post.attributes.published">
-                      {{ post.attributes.published | date: 'longDate' }}
-                    </time>
+                    @if (readingMinutes(); as mins) {
+                      <span class="inline-flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{ mins }} min read
+                      </span>
+                    }
                   </div>
                 </div>
               </div>
             </div>
 
             @if (series()) {
-            <div class="text-center mb-8 border rounded-lg p-4">
-              <h3 class="text-xl font-bold text-gray-700 mb-2">{{ series()!.name }} ({{ series()!.count }} Part Series)</h3>
+            <div class="text-center mb-8 border border-border rounded-xl bg-surface p-4">
+              <h3 class="text-xl font-bold text-fg mb-2">{{ series()!.name }} ({{ series()!.count }} Part Series)</h3>
               <div class="text-left mx-auto max-w-md text-base">
                 @for (post of series()!.posts; track post.slug; let i = $index) {
                   <div class="my-2">
-                      <span class="mr-2 font-medium bg-indigo-100 text-indigo-800 px-2 py-1 rounded-full">{{ i + 1 }}</span>
+                      <span class="mr-2 font-medium bg-indigo-600/15 text-accent px-2 py-1 rounded-full">{{ i + 1 }}</span>
                       @if (post.isCurrent) {
-                        <span class="font-semibold text-indigo-700">{{ post.displayTitle }}</span>
+                        <span class="font-semibold text-accent">{{ post.displayTitle }}</span>
                       } @else {
-                        <a [routerLink]="['/blog', post.slug]" class="text-indigo-600 hover:text-indigo-800 hover:underline">
+                        <a [routerLink]="['/blog', post.slug]" class="text-accent hover:underline underline-offset-2">
                           <span>{{ post.displayTitle }}</span>
                         </a>
                       }
@@ -160,6 +169,9 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   private chartRefs: ComponentRef<unknown>[] = []
   private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
+
+  // Estimated reading time (minutes) from the build-time manifest.
+  readonly readingMinutes = computed(() => readingTimes[this.post()?.attributes.slug ?? ''] ?? 0)
 
   // WebP srcset for the cover image, but only for local blog PNGs (which have a
   // generated .webp sibling). External covers (e.g. ButterCMS) and covers that
@@ -266,7 +278,7 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
       const btn = doc.createElement('button')
       btn.textContent = 'Copy'
       btn.style.cssText =
-        'position:absolute;top:0.5rem;right:0.5rem;padding:0.2rem 0.5rem;font-size:0.75rem;background:#e0e0e0;border:none;border-radius:3px;cursor:pointer;opacity:0.7'
+        'position:absolute;top:0.5rem;right:0.5rem;padding:0.25rem 0.6rem;font-size:0.75rem;background:rgb(var(--surface-2));color:rgb(var(--fg-muted));border:1px solid rgb(var(--border));border-radius:6px;cursor:pointer;opacity:0.85'
       btn.addEventListener('click', () => {
         const code = pre.querySelector('code')?.innerText ?? pre.innerText
         navigator.clipboard.writeText(code).then(() => {

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, inject, Injectable, signal } from '@angular/core'
 import { RouterLink, RouterModule } from '@angular/router'
-import { FooterComponent, NavService } from '@dalenguyen/portfolio/shell/ui'
+import { FooterComponent, NavService, ThemeToggleComponent } from '@dalenguyen/portfolio/shell/ui'
 
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
@@ -17,36 +17,34 @@ export class SentryErrorHandler implements ErrorHandler {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-root',
-  imports: [RouterModule, RouterLink, FooterComponent],
+  imports: [RouterModule, RouterLink, FooterComponent, ThemeToggleComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
   <div class="flex flex-col min-h-screen">
     <!-- Header Navigation -->
-    <header class="bg-slate-800 shadow-lg">
+    <header class="sticky top-0 z-40 border-b border-border bg-bg/80 backdrop-blur-md supports-[backdrop-filter]:bg-bg/60">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+        <div class="flex justify-between items-center h-16 gap-4">
           <!-- Logo and Brand -->
-          <div class="flex items-center">
-            <div class="flex-shrink-0 flex items-center">
-              <a routerLink="/" class="flex items-center">
-                <img class="h-8 w-8 rounded-full" src="/assets/images/dale-nguyen-avatar.webp" alt="Dale Nguyen" />
-              </a>
-            </div>
-          </div>
+          <a routerLink="/" class="flex items-center gap-2.5 shrink-0 group">
+            <img class="h-8 w-8 rounded-full ring-1 ring-border transition group-hover:ring-accent" src="/assets/images/dale-nguyen-avatar.webp" alt="Dale Nguyen" />
+            <span class="hidden sm:block text-sm font-semibold tracking-tight text-fg">Dale Nguyen</span>
+          </a>
 
           <!-- Desktop Navigation -->
-          <nav class="hidden md:flex items-center space-x-4">
+          <nav class="hidden lg:flex items-center gap-1">
             @for (item of navItems; track item) {
               <a
                 [id]="item.id + '-link'"
                 [routerLink]="item.route"
                 [fragment]="item.fragment"
-                [class.text-white]="isActive(item.id)"
-                [class.text-slate-300]="!isActive(item.id)"
-                class="px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
+                [class.text-fg]="isActive(item.id)"
+                [class.bg-surface-2]="isActive(item.id)"
+                [class.text-fg-muted]="!isActive(item.id)"
+                class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
                 (click)="setActive(item.id)"
                 >
-                <svg class="w-5 h-5 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
                 </svg>
                 {{ item.label }}
@@ -54,22 +52,21 @@ export class SentryErrorHandler implements ErrorHandler {
             }
           </nav>
 
-          <!-- Mobile menu button -->
-          <div class="flex md:hidden items-center">
+          <!-- Right side: theme toggle + mobile menu button -->
+          <div class="flex items-center gap-2">
+            <dalenguyen-theme-toggle />
             <button
               type="button"
-              class="inline-flex items-center justify-center p-2 rounded-md text-slate-400 hover:text-white hover:bg-slate-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              class="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border text-fg-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-colors"
               (click)="toggleMobileMenu()"
               [attr.aria-expanded]="isMobileMenuOpen()"
               aria-label="Toggle mobile menu"
               >
-              <!-- Icon when menu is closed -->
               @if (!isMobileMenuOpen()) {
                 <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
                 </svg>
               }
-              <!-- Icon when menu is open -->
               @if (isMobileMenuOpen()) {
                 <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -83,20 +80,20 @@ export class SentryErrorHandler implements ErrorHandler {
 
       <!-- Mobile menu, show/hide based on menu state -->
       @if (isMobileMenuOpen()) {
-        <div class="md:hidden">
+        <div class="lg:hidden border-t border-border bg-bg/95 backdrop-blur-md">
           <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             @for (item of navItems; track item) {
               <a
                 [id]="item.id + '-mobile-link'"
                 [routerLink]="item.route"
                 [fragment]="item.fragment"
-                [class.bg-slate-900]="isActive(item.id)"
-                [class.text-white]="isActive(item.id)"
-                [class.text-slate-300]="!isActive(item.id)"
-                class="px-3 py-2 rounded-md text-base font-medium hover:bg-slate-700 hover:text-white transition duration-150 ease-in-out flex items-center"
+                [class.bg-surface-2]="isActive(item.id)"
+                [class.text-fg]="isActive(item.id)"
+                [class.text-fg-muted]="!isActive(item.id)"
+                class="px-3 py-2 rounded-lg text-base font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-2"
                 (click)="setActive(item.id); toggleMobileMenu()"
                 >
-                <svg class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
                 </svg>
                 {{ item.label }}
@@ -112,21 +109,12 @@ export class SentryErrorHandler implements ErrorHandler {
       <router-outlet />
     </main>
 
-    <!-- Footer - Using @defer to load after main content -->
+    <!-- Footer rendered directly: it's lightweight (text + one link), so eager
+         render keeps it in the SSR HTML and avoids a placeholder→footer layout
+         shift. -->
     <footer>
-      @defer (on immediate) {
       <dalenguyen-footer/>
-      } @placeholder {
-      <!-- Empty placeholder with same height to prevent layout shift -->
-      <div class="h-20 mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8 flex items-center justify-center">
-        <div class="border-t border-slate-900/5 w-full">
-          <p class="text-center text-sm leading-6 text-slate-500">
-            Dale Nguyen © 2025 - By using Angular 20
-          </p>
-        </div>
-      </div>
-    }
-  </footer>
+    </footer>
   </div>
   `,
 })

@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TurboQuant: Vector Quantization for LLM Efficiency</title>
+  <meta name="description" content="Learn how TurboQuant compresses high-dimensional vectors using two-stage quantization and random rotation, with real-world applications in LLM key-value cache compression.">
+  <meta name="date" content="2026-06-12">
+  <meta name="timestamp" content="2026-06-12T12:00:00">
+  <style>
+    :root {
+      --bg-primary: #0a0a0a;
+      --bg-secondary: #1a1a2e;
+      --bg-tertiary: #25254a;
+      --text-primary: #f5f5f5;
+      --text-secondary: #a0a0b0;
+      --accent: #5e6ad2;
+      --accent-hover: #7281e0;
+      --success: #4ade80;
+      --error: #f87171;
+      --border: #2e2e3e;
+      --border-light: #3e3e50;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .hero {
+      padding: 80px 0 40px;
+      text-align: center;
+    }
+
+    .hero-label {
+      display: inline-block;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      color: var(--accent);
+      margin-bottom: 16px;
+      text-transform: uppercase;
+    }
+
+    .hero h1 {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      background: linear-gradient(135deg, #5e6ad2 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero p {
+      font-size: 18px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .progress-bar {
+      height: 4px;
+      background-color: var(--border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #5e6ad2 0%, #a78bfa 100%);
+      transition: width 0.3s ease;
+    }
+
+    .progress-text {
+      font-size: 12px;
+      color: var(--text-secondary);
+      text-align: center;
+      margin-top: 8px;
+    }
+
+    .sections {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      padding: 40px 0;
+    }
+
+    .section {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: all 0.2s ease;
+    }
+
+    .section-header {
+      padding: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      user-select: none;
+      transition: background-color 0.2s ease;
+      gap: 16px;
+    }
+
+    .section-header:hover {
+      background-color: var(--bg-tertiary);
+    }
+
+    .section-title-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .section-number {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      background-color: var(--accent);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--bg-primary);
+    }
+
+    .section-toggle {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+      color: var(--text-secondary);
+    }
+
+    .section.open .section-toggle {
+      transform: rotate(180deg);
+    }
+
+    .section-content {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease;
+    }
+
+    .section.open .section-content {
+      max-height: 2000px;
+    }
+
+    .section-body {
+      padding: 24px;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-text {
+      color: var(--text-secondary);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .callout {
+      background-color: var(--bg-tertiary);
+      border-left: 4px solid var(--accent);
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 24px;
+      font-size: 14px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-button {
+      padding: 12px 16px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .tab-button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .demo {
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .demo-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .demo-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .demo-controls {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
+      flex-wrap: wrap;
+    }
+
+    .demo-button {
+      padding: 10px 16px;
+      background-color: var(--accent);
+      color: var(--bg-primary);
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+      transition: background-color 0.2s ease;
+    }
+
+    .demo-button:hover {
+      background-color: var(--accent-hover);
+    }
+
+    .demo-slider {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, var(--border) 0%, var(--accent) 50%, var(--border) 100%);
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      margin-top: 12px;
+    }
+
+    .demo-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+    }
+
+    .demo-slider::-moz-range-thumb {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: var(--accent);
+      cursor: pointer;
+      border: none;
+    }
+
+    .demo-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .stat-box {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      padding: 12px;
+      border-radius: 6px;
+      text-align: center;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-bottom: 4px;
+    }
+
+    .stat-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+
+    .quiz {
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+      margin-top: 24px;
+    }
+
+    .quiz-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 16px;
+    }
+
+    .quiz-question {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin-bottom: 16px;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      padding: 12px;
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-size: 14px;
+      color: var(--text-primary);
+    }
+
+    .quiz-option:hover {
+      border-color: var(--accent);
+      background-color: var(--bg-secondary);
+    }
+
+    .quiz-option.selected {
+      border-color: var(--accent);
+      background-color: var(--bg-tertiary);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success);
+      background-color: rgba(74, 222, 128, 0.1);
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error);
+      background-color: rgba(248, 113, 113, 0.1);
+    }
+
+    .quiz-feedback {
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      display: none;
+    }
+
+    .quiz-feedback.show {
+      display: block;
+    }
+
+    .quiz-feedback.success {
+      background-color: rgba(74, 222, 128, 0.1);
+      border: 1px solid var(--success);
+      color: var(--success);
+    }
+
+    .quiz-feedback.error {
+      background-color: rgba(248, 113, 113, 0.1);
+      border: 1px solid var(--error);
+      color: var(--error);
+    }
+
+    .completion {
+      text-align: center;
+      padding: 60px 24px;
+      display: none;
+    }
+
+    .completion.show {
+      display: block;
+    }
+
+    .completion-icon {
+      font-size: 64px;
+      margin-bottom: 24px;
+    }
+
+    .completion h2 {
+      font-size: 32px;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #5e6ad2 0%, #a78bfa 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .completion p {
+      font-size: 16px;
+      color: var(--text-secondary);
+      margin-bottom: 32px;
+    }
+
+    .tooltip {
+      position: fixed;
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--text-secondary);
+      pointer-events: none;
+      z-index: 1000;
+      white-space: nowrap;
+      display: none;
+    }
+
+    .tooltip.show {
+      display: block;
+    }
+
+    .tooltip-arrow {
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      background-color: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      transform: rotate(45deg);
+    }
+
+    @media (max-width: 600px) {
+      .hero h1 {
+        font-size: 32px;
+      }
+
+      .hero p {
+        font-size: 16px;
+      }
+
+      .section-header {
+        flex-direction: row;
+      }
+
+      .demo-stats {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <span class="hero-label">Compression · 2026</span>
+      <h1>TurboQuant: Vector Quantization for LLM Efficiency</h1>
+      <p>Learn how to compress high-dimensional vectors into low-bitwidth representations while preserving geometric properties—essential for optimizing LLM key-value cache and vector search.</p>
+      <div class="progress-bar">
+        <div class="progress-fill" style="width: 0%"></div>
+      </div>
+      <div class="progress-text"><span class="progress-count">0</span> / 5 sections completed</div>
+    </div>
+
+    <div class="sections">
+      <!-- Section 1: What is Vector Quantization -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-number">1</span><span class="section-title">What is Vector Quantization?</span>
+          </div>
+          <div class="section-toggle">▼</div>
+        </div>
+        <div class="section-content">
+          <div class="section-body">
+            <p class="section-text">
+              Vector quantization is the process of mapping vectors from a high-dimensional continuous space into a discrete set of codewords. Think of it as lossy compression: you're replacing precise floating-point coordinates with indices into a smaller "codebook."
+            </p>
+
+            <div class="callout">
+              <strong>Why it matters:</strong> In LLMs, key-value caches during inference can consume massive amounts of memory. For a 70B parameter model, this can be 30–50% of peak memory usage. Vector quantization reduces this without severely degrading model quality.
+            </div>
+
+            <p class="section-text">
+              Traditional quantization methods often fail to preserve geometric properties that matter for downstream tasks. You need the <em>distances</em> and <em>inner products</em> between vectors to remain approximately correct after quantization—especially for retrieval-based systems.
+            </p>
+
+            <div class="demo">
+              <div class="demo-title">Interactive Demo: Vector Compression Trade-off</div>
+              <svg class="demo-canvas" viewBox="0 0 500 300" style="height: 250px;">
+                <!-- Background -->
+                <rect width="500" height="300" fill="#1a1a2e"/>
+
+                <!-- Axes -->
+                <line x1="60" y1="250" x2="480" y2="250" stroke="#2e2e3e" stroke-width="2"/>
+                <line x1="60" y1="20" x2="60" y2="250" stroke="#2e2e3e" stroke-width="2"/>
+                <text x="490" y="270" font-size="12" fill="#a0a0b0">Bitwidth (bits)</text>
+                <text x="20" y="15" font-size="12" fill="#a0a0b0">Error Rate (%)</text>
+
+                <!-- Grid lines -->
+                <line x1="60" y1="170" x2="480" y2="170" stroke="#25254a" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="60" y1="90" x2="480" y2="90" stroke="#25254a" stroke-width="1" stroke-dasharray="4"/>
+
+                <!-- Curve for quantization error -->
+                <path d="M 80 50 Q 200 100 400 200" stroke="none" fill="url(#grad)" opacity="0.3"/>
+                <polyline points="80,50 150,80 220,120 290,160 360,190 400,210" stroke="#5e6ad2" stroke-width="2" fill="none"/>
+
+                <!-- Points on curve -->
+                <circle cx="80" cy="50" r="5" fill="#5e6ad2" class="demo-point"/>
+                <circle cx="150" cy="80" r="5" fill="#5e6ad2" class="demo-point"/>
+                <circle cx="220" cy="120" r="5" fill="#5e6ad2" class="demo-point"/>
+                <circle cx="290" cy="160" r="5" fill="#5e6ad2" class="demo-point"/>
+                <circle cx="360" cy="190" r="5" fill="#5e6ad2" class="demo-point"/>
+
+                <!-- Axis labels -->
+                <text x="100" y="270" font-size="11" fill="#9696b0">1</text>
+                <text x="180" y="270" font-size="11" fill="#9696b0">2</text>
+                <text x="260" y="270" font-size="11" fill="#9696b0">4</text>
+                <text x="360" y="270" font-size="11" fill="#9696b0">8</text>
+                <text x="420" y="270" font-size="11" fill="#9696b0">16</text>
+
+                <text x="35" y="260" font-size="11" fill="#9696b0">0%</text>
+                <text x="35" y="180" font-size="11" fill="#9696b0">25%</text>
+                <text x="35" y="100" font-size="11" fill="#9696b0">50%</text>
+
+                <defs>
+                  <linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:#5e6ad2;stop-opacity:0.3" />
+                    <stop offset="100%" style="stop-color:#5e6ad2;stop-opacity:0" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="demo-stats">
+                <div class="stat-box">
+                  <div class="stat-label">Compression Ratio</div>
+                  <div class="stat-value" id="compressionRatio">4x</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Memory Saved</div>
+                  <div class="stat-value" id="memorySaved">75%</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Error Rate</div>
+                  <div class="stat-value" id="errorRate">~20%</div>
+                </div>
+              </div>
+              <input type="range" min="1" max="16" value="4" class="demo-slider" id="bitwidthSlider"/>
+              <div style="font-size: 12px; color: #9696b0; margin-top: 8px; text-align: center;">Slide to adjust bitwidth</div>
+            </div>
+
+            <div class="quiz">
+              <div class="quiz-title">Check Your Understanding</div>
+              <div class="quiz-question">Why is preserving inner products important in vector quantization for LLMs?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" data-correct="false">To ensure the quantized codebook is sorted</div>
+                <div class="quiz-option" data-correct="true">Because inner products determine relevance scores in attention mechanisms and retrieval</div>
+                <div class="quiz-option" data-correct="false">To reduce the computational cost of quantization itself</div>
+                <div class="quiz-option" data-correct="false">It's only important for very large models</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 2: Two-Stage Quantization -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-number">2</span><span class="section-title">The Two-Stage Quantization Approach</span>
+          </div>
+          <div class="section-toggle">▼</div>
+        </div>
+        <div class="section-content">
+          <div class="section-body">
+            <p class="section-text">
+              TurboQuant doesn't use a single quantizer for all objectives. Instead, it creates two independent quantizers: one optimized for mean-squared error (MSE), and another specifically designed to preserve inner products.
+            </p>
+
+            <div class="callout">
+              <strong>Key insight:</strong> MSE loss and inner product preservation require different codebook designs. MSE minimizes coordinate-wise errors, while inner product preservation must account for how all coordinates interact.
+            </div>
+
+            <div class="tabs">
+              <button class="tab-button active" data-tab="stage1">Stage 1: MSE Quantizer</button>
+              <button class="tab-button" data-tab="stage2">Stage 2: Inner Product Quantizer</button>
+            </div>
+
+            <div id="stage1" class="tab-content active">
+              <p class="section-text">
+                The first stage uses a standard scalar quantizer optimized for MSE. Each coordinate is independently quantized to a discrete level, minimizing reconstruction error. This produces a first approximation of the original vector.
+              </p>
+            </div>
+
+            <div id="stage2" class="tab-content">
+              <p class="section-text">
+                The second stage quantizes the <em>residuals</em> (difference between original and Stage 1 output) using a 1-bit Quantized Johnson-Lindenstrauss transform. This focuses on preserving the directional information critical for inner products, not the magnitude.
+              </p>
+            </div>
+
+            <div class="demo">
+              <div class="demo-title">Interactive Demo: Two-Stage Decomposition</div>
+              <svg class="demo-canvas" viewBox="0 0 500 280" style="height: 280px;">
+                <!-- Background -->
+                <rect width="500" height="280" fill="#1a1a2e"/>
+
+                <!-- Stage 1 -->
+                <g>
+                  <rect x="30" y="20" width="180" height="80" fill="none" stroke="#5e6ad2" stroke-width="2" stroke-dasharray="4"/>
+                  <text x="50" y="45" font-size="14" font-weight="600" fill="#5e6ad2">Stage 1: MSE</text>
+                  <text x="50" y="70" font-size="12" fill="#a0a0b0">Codebook: 256 levels</text>
+                  <text x="50" y="90" font-size="12" fill="#a0a0b0">Loss: MSE</text>
+                </g>
+
+                <!-- Arrow -->
+                <path d="M 220 60 L 260 60" stroke="#a0a0b0" stroke-width="2" fill="none" marker-end="url(#arrowhead)"/>
+
+                <!-- Stage 2 -->
+                <g>
+                  <rect x="280" y="20" width="180" height="80" fill="none" stroke="#a78bfa" stroke-width="2" stroke-dasharray="4"/>
+                  <text x="300" y="45" font-size="14" font-weight="600" fill="#a78bfa">Stage 2: Inner Product</text>
+                  <text x="300" y="70" font-size="12" fill="#a0a0b0">Codebook: 2 levels (1-bit)</text>
+                  <text x="300" y="90" font-size="12" fill="#a0a0b0">Loss: Unbiased IP estimate</text>
+                </g>
+
+                <!-- Input vector -->
+                <g>
+                  <text x="50" y="140" font-size="12" font-weight="600" fill="#5e6ad2">Input Vector</text>
+                  <rect x="30" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.3"/>
+                  <rect x="55" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.3"/>
+                  <rect x="80" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.3"/>
+                  <rect x="105" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.3"/>
+                  <rect x="130" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.3"/>
+                </g>
+
+                <!-- After Stage 1 -->
+                <g>
+                  <text x="280" y="140" font-size="12" font-weight="600" fill="#5e6ad2">After Stage 1</text>
+                  <rect x="280" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.7"/>
+                  <rect x="305" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.7"/>
+                  <rect x="330" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.7"/>
+                  <rect x="355" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.7"/>
+                  <rect x="380" y="150" width="20" height="20" fill="#5e6ad2" opacity="0.7"/>
+                </g>
+
+                <!-- After Stage 2 -->
+                <g>
+                  <text x="280" y="220" font-size="12" font-weight="600" fill="#a78bfa">After Stage 2</text>
+                  <rect x="280" y="230" width="20" height="20" fill="#a78bfa" opacity="0.7"/>
+                  <rect x="305" y="230" width="20" height="20" fill="#a78bfa" opacity="0.7"/>
+                  <rect x="330" y="230" width="20" height="20" fill="#a78bfa" opacity="0.7"/>
+                  <rect x="355" y="230" width="20" height="20" fill="#a78bfa" opacity="0.7"/>
+                  <rect x="380" y="230" width="20" height="20" fill="#a78bfa" opacity="0.7"/>
+                </g>
+
+                <defs>
+                  <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                    <polygon points="0 0, 10 3, 0 6" fill="#a0a0b0"/>
+                  </marker>
+                </defs>
+              </svg>
+              <div class="demo-stats">
+                <div class="stat-box">
+                  <div class="stat-label">Stage 1 Error</div>
+                  <div class="stat-value" id="stage1Error">3.2%</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Stage 2 Bits</div>
+                  <div class="stat-value" id="stage2Bits">1</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Total Bitwidth</div>
+                  <div class="stat-value" id="totalBits">9</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz">
+              <div class="quiz-title">Check Your Understanding</div>
+              <div class="quiz-question">Why does Stage 2 only use 1 bit per dimension, while Stage 1 uses 256 levels?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" data-correct="true">Because Stage 2 only needs to encode the sign of residuals for directional information, not precise magnitude</div>
+                <div class="quiz-option" data-correct="false">Because Stage 2 is always applied to smaller vectors</div>
+                <div class="quiz-option" data-correct="false">1-bit quantization is always faster than multi-bit</div>
+                <div class="quiz-option" data-correct="false">Stage 2 is optional and can be skipped for small models</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Random Rotation & Coordinate Independence -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-number">3</span><span class="section-title">Random Rotation & Coordinate Independence</span>
+          </div>
+          <div class="section-toggle">▼</div>
+        </div>
+        <div class="section-content">
+          <div class="section-body">
+            <p class="section-text">
+              The trick that makes TurboQuant work is applying a <strong>random orthogonal rotation</strong> to the input vectors before quantization. After rotation, each coordinate approximately follows a Beta distribution that converges to Gaussian in high dimensions, making coordinates nearly independent.
+            </p>
+
+            <div class="callout">
+              <strong>Why this matters:</strong> Independent coordinates can be quantized separately using scalar quantizers, which are both theoretically optimal and computationally efficient. Correlated coordinates would require expensive vector quantizers.
+            </div>
+
+            <p class="section-text">
+              Since the rotation is random and fixed per model, it can be applied once during preprocessing. Quantization then happens coordinate-by-coordinate, with each scalar quantizer optimized independently.
+            </p>
+
+            <div class="demo">
+              <div class="demo-title">Interactive Demo: Effect of Random Rotation</div>
+              <svg class="demo-canvas" viewBox="0 0 500 380" style="height: 380px;">
+                <!-- Background -->
+                <rect width="500" height="380" fill="#1a1a2e"/>
+
+                <!-- Left plot: Original correlated data -->
+                <g>
+                  <text x="40" y="25" font-size="13" font-weight="600" fill="#5e6ad2">Original Vectors</text>
+                  <rect x="20" y="40" width="200" height="160" fill="none" stroke="#2e2e3e" stroke-width="1"/>
+
+                  <!-- Correlated data cloud -->
+                  <circle cx="70" cy="130" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="75" cy="125" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="80" cy="120" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="85" cy="115" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="90" cy="110" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="100" cy="100" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="110" cy="90" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="120" cy="80" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="130" cy="70" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="140" cy="60" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="150" cy="50" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="160" cy="80" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="170" cy="70" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="180" cy="60" r="3" fill="#5e6ad2" opacity="0.6"/>
+                  <circle cx="190" cy="50" r="3" fill="#5e6ad2" opacity="0.6"/>
+
+                  <text x="40" y="215" font-size="11" fill="#9696b0">High correlation</text>
+                  <text x="40" y="230" font-size="11" fill="#9696b0">between dims</text>
+                </g>
+
+                <!-- Right plot: After rotation -->
+                <g>
+                  <text x="280" y="25" font-size="13" font-weight="600" fill="#a78bfa">After Random Rotation</text>
+                  <rect x="260" y="40" width="200" height="160" fill="none" stroke="#2e2e3e" stroke-width="1"/>
+
+                  <!-- Independent data cloud -->
+                  <circle cx="310" cy="100" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="320" cy="130" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="330" cy="70" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="340" cy="110" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="350" cy="150" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="300" cy="80" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="315" cy="160" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="325" cy="90" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="335" cy="140" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="345" cy="60" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="310" cy="120" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="320" cy="50" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="330" cy="140" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="340" cy="80" r="3" fill="#a78bfa" opacity="0.6"/>
+                  <circle cx="350" cy="110" r="3" fill="#a78bfa" opacity="0.6"/>
+
+                  <text x="280" y="215" font-size="11" fill="#9696b0">Nearly independent</text>
+                  <text x="280" y="230" font-size="11" fill="#9696b0">dimensions</text>
+                </g>
+
+                <!-- Distribution plots -->
+                <g>
+                  <text x="40" y="280" font-size="11" font-weight="600" fill="#5e6ad2">Dimension 1</text>
+                  <rect x="20" y="295" width="200" height="50" fill="none" stroke="#2e2e3e" stroke-width="1"/>
+                  <path d="M 30 330 Q 50 310 70 305 Q 90 305 110 310 Q 130 320 150 330 Q 170 335 190 330" stroke="#5e6ad2" stroke-width="2" fill="none"/>
+                </g>
+
+                <g>
+                  <text x="280" y="280" font-size="11" font-weight="600" fill="#a78bfa">After Rotation</text>
+                  <rect x="260" y="295" width="200" height="50" fill="none" stroke="#2e2e3e" stroke-width="1"/>
+                  <path d="M 270 325 Q 290 310 310 305 Q 330 305 350 310 Q 370 320 390 325 Q 410 320 430 315" stroke="#a78bfa" stroke-width="2" fill="none"/>
+                </g>
+              </svg>
+              <div class="demo-stats">
+                <div class="stat-box">
+                  <div class="stat-label">Correlation Before</div>
+                  <div class="stat-value" id="corrBefore">0.87</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Correlation After</div>
+                  <div class="stat-value" id="corrAfter">0.02</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Quantization Efficiency</div>
+                  <div class="stat-value" id="efficiency">92%</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz">
+              <div class="quiz-title">Check Your Understanding</div>
+              <div class="quiz-question">Why is a random orthogonal rotation preferred over other decorrelation methods?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" data-correct="false">It's faster than PCA</div>
+                <div class="quiz-option" data-correct="true">It doesn't require learning from data, preserves distances (orthogonal), and can be fixed during training</div>
+                <div class="quiz-option" data-correct="false">It guarantees perfect independence between all coordinates</div>
+                <div class="quiz-option" data-correct="false">It reduces the dimension of the vectors</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 4: Theoretical Guarantees -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-number">4</span><span class="section-title">Theoretical Guarantees & Bounds</span>
+          </div>
+          <div class="section-toggle">▼</div>
+        </div>
+        <div class="section-content">
+          <div class="section-body">
+            <p class="section-text">
+              TurboQuant comes with rigorous theoretical analysis. The paper proves that the method achieves distortion within a <strong>constant factor (~2.7×)</strong> of the information-theoretic lower bounds. This means you're not far from the theoretical optimum.
+            </p>
+
+            <div class="callout">
+              <strong>What this means:</strong> No algorithm can do better than certain theoretical bounds. TurboQuant's guarantee of 2.7× overhead is quite good—it's close enough to be nearly optimal across all bit-widths.
+            </div>
+
+            <p class="section-text">
+              The lower bounds come from rate-distortion theory: the number of bits required to compress a vector to a given error level. TurboQuant's theoretical guarantees hold for both MSE and inner product preservation objectives.
+            </p>
+
+            <div class="demo">
+              <div class="demo-title">Interactive Demo: Distortion vs Information-Theoretic Bounds</div>
+              <svg class="demo-canvas" viewBox="0 0 500 300" style="height: 280px;">
+                <!-- Background -->
+                <rect width="500" height="300" fill="#1a1a2e"/>
+
+                <!-- Axes -->
+                <line x1="60" y1="250" x2="480" y2="250" stroke="#2e2e3e" stroke-width="2"/>
+                <line x1="60" y1="30" x2="60" y2="250" stroke="#2e2e3e" stroke-width="2"/>
+                <text x="490" y="270" font-size="12" fill="#a0a0b0">Bitwidth (bits/dim)</text>
+                <text x="10" y="25" font-size="12" fill="#a0a0b0">Distortion (log scale)</text>
+
+                <!-- Grid -->
+                <line x1="60" y1="180" x2="480" y2="180" stroke="#25254a" stroke-width="1" stroke-dasharray="4"/>
+                <line x1="60" y1="110" x2="480" y2="110" stroke="#25254a" stroke-width="1" stroke-dasharray="4"/>
+
+                <!-- Lower bound (optimal) -->
+                <polyline points="80,220 150,180 220,150 290,120 360,100 420,80" stroke="#4ade80" stroke-width="2" fill="none" stroke-dasharray="6"/>
+                <text x="430" y="75" font-size="11" fill="#4ade80">Lower Bound</text>
+
+                <!-- TurboQuant curve (2.7x overhead) -->
+                <polyline points="80,185 150,155 220,125 290,100 360,80 420,65" stroke="#5e6ad2" stroke-width="3" fill="none"/>
+                <text x="300" y="45" font-size="11" fill="#5e6ad2">TurboQuant (2.7x)</text>
+
+                <!-- Other method (higher overhead) -->
+                <polyline points="80,160 150,130 220,100 290,75 360,55 420,40" stroke="#f87171" stroke-width="2" fill="none" stroke-dasharray="4"/>
+                <text x="360" y="30" font-size="11" fill="#f87171">Other Methods (4x+)</text>
+
+                <!-- Axis labels -->
+                <text x="85" y="270" font-size="11" fill="#9696b0">1</text>
+                <text x="165" y="270" font-size="11" fill="#9696b0">2</text>
+                <text x="245" y="270" font-size="11" fill="#9696b0">4</text>
+                <text x="325" y="270" font-size="11" fill="#9696b0">8</text>
+                <text x="405" y="270" font-size="11" fill="#9696b0">16</text>
+              </svg>
+              <div class="demo-stats">
+                <div class="stat-box">
+                  <div class="stat-label">Optimality Gap</div>
+                  <div class="stat-value" id="optGap">2.7x</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Bitwidth</div>
+                  <div class="stat-value" id="demoBitwidth">4</div>
+                </div>
+                <div class="stat-box">
+                  <div class="stat-label">Distortion</div>
+                  <div class="stat-value" id="demoDistortion">0.125</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz">
+              <div class="quiz-title">Check Your Understanding</div>
+              <div class="quiz-question">What does it mean that TurboQuant achieves ~2.7× the information-theoretic lower bound?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" data-correct="true">No algorithm can compress better than the lower bound; TurboQuant is only 2.7× worse, which is nearly optimal</div>
+                <div class="quiz-option" data-correct="false">TurboQuant performs 2.7× worse than any other quantization method</div>
+                <div class="quiz-option" data-correct="false">The method requires 2.7× more bits than alternatives</div>
+                <div class="quiz-option" data-correct="false">This guarantee only holds for very high bitwidths</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: Real-World Applications -->
+      <div class="section">
+        <div class="section-header">
+          <div class="section-title-wrapper">
+            <span class="section-number">5</span><span class="section-title">Real-World Applications</span>
+          </div>
+          <div class="section-toggle">▼</div>
+        </div>
+        <div class="section-content">
+          <div class="section-body">
+            <p class="section-text">
+              TurboQuant's practical impact is massive. The paper demonstrates 4–5× compression of LLM key-value caches with minimal quality loss, and 2.5–3.5 bits per channel on LongBench tasks. This directly translates to reduced memory requirements and faster inference.
+            </p>
+
+            <div class="callout">
+              <strong>Real impact:</strong> For a 70B-parameter model serving long-context requests, KV cache compression can reduce memory by 30–50%, allowing longer context windows or higher batch sizes on the same hardware.
+            </div>
+
+            <p class="section-text">
+              Additionally, TurboQuant outperforms Product Quantization (PQ) in nearest neighbor search while requiring negligible indexing time. This makes it ideal for vector databases and semantic search applications.
+            </p>
+
+            <div class="tabs">
+              <button class="tab-button active" data-tab="kvcache">KV Cache Compression</button>
+              <button class="tab-button" data-tab="search">Vector Search</button>
+            </div>
+
+            <div id="kvcache" class="tab-content active">
+              <div class="demo">
+                <div class="demo-title">LLM KV Cache Compression Results</div>
+                <svg class="demo-canvas" viewBox="0 0 500 280" style="height: 280px;">
+                  <!-- Background -->
+                  <rect width="500" height="280" fill="#1a1a2e"/>
+
+                  <!-- Title -->
+                  <text x="50" y="30" font-size="14" font-weight="600" fill="#5e6ad2">Memory Usage by Quantization Level</text>
+
+                  <!-- Bars -->
+                  <g>
+                    <!-- Uncompressed -->
+                    <rect x="40" y="80" width="40" height="140" fill="#5e6ad2" opacity="0.3"/>
+                    <text x="45" y="230" font-size="12" fill="#5e6ad2" font-weight="600">FP32</text>
+                    <text x="30" y="75" font-size="11" fill="#a0a0b0">100%</text>
+
+                    <!-- 4x compression -->
+                    <rect x="110" y="150" width="40" height="70" fill="#5e6ad2" opacity="0.6"/>
+                    <text x="110" y="230" font-size="12" fill="#5e6ad2" font-weight="600">4-bit TQ</text>
+                    <text x="105" y="145" font-size="11" fill="#a0a0b0">50%</text>
+
+                    <!-- 5x compression -->
+                    <rect x="180" y="160" width="40" height="60" fill="#a78bfa" opacity="0.6"/>
+                    <text x="175" y="230" font-size="12" fill="#a78bfa" font-weight="600">2.5-bit TQ</text>
+                    <text x="170" y="155" font-size="11" fill="#a0a0b0">40%</text>
+
+                    <!-- PQ baseline -->
+                    <rect x="250" y="130" width="40" height="90" fill="#f87171" opacity="0.4"/>
+                    <text x="250" y="230" font-size="12" fill="#f87171" font-weight="600">4-bit PQ</text>
+                    <text x="245" y="125" font-size="11" fill="#a0a0b0">60%</text>
+                  </g>
+
+                  <!-- Y-axis label -->
+                  <text x="20" y="220" font-size="11" fill="#9696b0">0%</text>
+                  <text x="10" y="85" font-size="11" fill="#9696b0">100%</text>
+
+                  <!-- Legend -->
+                  <circle cx="60" cy="260" r="3" fill="#5e6ad2"/>
+                  <text x="70" y="264" font-size="11" fill="#a0a0b0">TurboQuant</text>
+
+                  <circle cx="270" cy="260" r="3" fill="#f87171"/>
+                  <text x="280" y="264" font-size="11" fill="#a0a0b0">Product Quantization</text>
+                </svg>
+                <div class="demo-stats">
+                  <div class="stat-box">
+                    <div class="stat-label">4-bit Compression</div>
+                    <div class="stat-value" id="compression4bit">4x</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-label">Quality Loss</div>
+                    <div class="stat-value" id="qualityLoss">~2%</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-label">Max Context Length</div>
+                    <div class="stat-value" id="contextLength">4x</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="search" class="tab-content">
+              <div class="demo">
+                <div class="demo-title">Vector Search Performance Comparison</div>
+                <svg class="demo-canvas" viewBox="0 0 500 280" style="height: 280px;">
+                  <!-- Background -->
+                  <rect width="500" height="280" fill="#1a1a2e"/>
+
+                  <!-- Metric 1: Recall -->
+                  <g>
+                    <text x="50" y="30" font-size="12" font-weight="600" fill="#a0a0b0">Recall@10</text>
+                    <rect x="40" y="50" width="50" height="100" fill="#5e6ad2" opacity="0.7"/>
+                    <text x="45" y="160" font-size="11" fill="#5e6ad2">TQ: 0.95</text>
+
+                    <rect x="110" y="55" width="50" height="95" fill="#f87171" opacity="0.6"/>
+                    <text x="110" y="160" font-size="11" fill="#f87171">PQ: 0.93</text>
+                  </g>
+
+                  <!-- Metric 2: Index Time -->
+                  <g>
+                    <text x="220" y="30" font-size="12" font-weight="600" fill="#a0a0b0">Index Time (ms)</text>
+                    <rect x="200" y="120" width="50" height="30" fill="#5e6ad2" opacity="0.7"/>
+                    <text x="205" y="160" font-size="11" fill="#5e6ad2">TQ: 8ms</text>
+
+                    <rect x="270" y="80" width="50" height="70" fill="#f87171" opacity="0.6"/>
+                    <text x="270" y="160" font-size="11" fill="#f87171">PQ: 20ms</text>
+                  </g>
+
+                  <!-- Metric 3: Memory -->
+                  <g>
+                    <text x="380" y="30" font-size="12" font-weight="600" fill="#a0a0b0">Memory (MB)</text>
+                    <rect x="360" y="70" width="50" height="80" fill="#5e6ad2" opacity="0.7"/>
+                    <text x="360" y="160" font-size="11" fill="#5e6ad2">TQ: 120</text>
+
+                    <rect x="430" y="65" width="50" height="85" fill="#f87171" opacity="0.6"/>
+                    <text x="425" y="160" font-size="11" fill="#f87171">PQ: 130</text>
+                  </g>
+
+                  <!-- Y-axis -->
+                  <line x1="190" y1="150" x2="190" y2="200" stroke="#2e2e3e" stroke-width="1"/>
+                </svg>
+                <div class="demo-stats">
+                  <div class="stat-box">
+                    <div class="stat-label">Recall Improvement</div>
+                    <div class="stat-value" id="recallImprovement">+2%</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-label">Indexing Speedup</div>
+                    <div class="stat-value" id="speedup">2.5x</div>
+                  </div>
+                  <div class="stat-box">
+                    <div class="stat-label">Memory Savings</div>
+                    <div class="stat-value" id="memorySavings">8%</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="quiz">
+              <div class="quiz-title">Check Your Understanding</div>
+              <div class="quiz-question">What is the primary benefit of TurboQuant for LLM serving infrastructure?</div>
+              <div class="quiz-options">
+                <div class="quiz-option" data-correct="true">Reducing KV cache memory consumption, enabling longer context or higher batch sizes</div>
+                <div class="quiz-option" data-correct="false">Completely eliminating the need for key-value caching</div>
+                <div class="quiz-option" data-correct="false">Accelerating the transformer attention mechanism itself</div>
+                <div class="quiz-option" data-correct="false">Improving model accuracy on downstream tasks</div>
+              </div>
+              <div class="quiz-feedback"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion">
+      <div class="completion-icon">🎓</div>
+      <h2>You've mastered TurboQuant!</h2>
+      <p>You now understand how vector quantization preserves geometric properties, the two-stage approach, random rotation for coordinate independence, theoretical guarantees, and real-world applications.</p>
+    </div>
+
+    <div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+      <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#9696b0;">
+        <span>Learning Reference</span>
+        <span>·</span>
+        <a href="https://arxiv.org/html/2504.19874v1" target="_blank" rel="noopener"
+           style="color:#5e6ad2;text-decoration:none;font-weight:500;">TurboQuant: Online Vector Quantization (arXiv:2504.19874)</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Progress tracking
+    const sections = document.querySelectorAll('.section');
+    const progressFill = document.querySelector('.progress-fill');
+    const progressCount = document.querySelector('.progress-count');
+    const completion = document.querySelector('.completion');
+
+    function updateProgress() {
+      const openSections = document.querySelectorAll('.section.open').length;
+      const totalSections = sections.length;
+      const percentage = (openSections / totalSections) * 100;
+
+      progressFill.style.width = percentage + '%';
+      progressCount.textContent = openSections;
+
+      if (openSections === totalSections) {
+        completion.classList.add('show');
+      } else {
+        completion.classList.remove('show');
+      }
+    }
+
+    // Section collapse/expand
+    sections.forEach(section => {
+      const header = section.querySelector('.section-header');
+      header.addEventListener('click', () => {
+        section.classList.toggle('open');
+        updateProgress();
+      });
+    });
+
+    // Tab switching
+    document.querySelectorAll('.tab-button').forEach(button => {
+      button.addEventListener('click', () => {
+        const tab = button.dataset.tab;
+        const parent = button.closest('.section-body');
+
+        parent.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+        parent.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+        button.classList.add('active');
+        parent.querySelector(`#${tab}`).classList.add('active');
+      });
+    });
+
+    // Quiz functionality
+    document.querySelectorAll('.quiz-option').forEach(option => {
+      option.addEventListener('click', () => {
+        const quiz = option.closest('.quiz');
+        const feedback = quiz.querySelector('.quiz-feedback');
+        const isCorrect = option.dataset.correct === 'true';
+
+        quiz.querySelectorAll('.quiz-option').forEach(o => {
+          o.classList.remove('selected', 'correct', 'incorrect');
+        });
+
+        option.classList.add('selected');
+        option.classList.add(isCorrect ? 'correct' : 'incorrect');
+
+        feedback.textContent = isCorrect
+          ? '✓ Correct! Well done.'
+          : '✗ Not quite. Try another option or re-read the explanation.';
+        feedback.classList.add('show', isCorrect ? 'success' : 'error');
+      });
+    });
+
+    // Bitwidth slider demo
+    const bitwidthSlider = document.getElementById('bitwidthSlider');
+    if (bitwidthSlider) {
+      bitwidthSlider.addEventListener('input', (e) => {
+        const bitwidth = parseInt(e.target.value);
+        const compressionRatio = (32 / bitwidth).toFixed(1);
+        const memorySaved = ((1 - bitwidth / 32) * 100).toFixed(0);
+        const errorRate = (Math.pow(bitwidth / 8, -0.5) * 30).toFixed(0);
+
+        document.getElementById('compressionRatio').textContent = compressionRatio + 'x';
+        document.getElementById('memorySaved').textContent = memorySaved + '%';
+        document.getElementById('errorRate').textContent = '~' + errorRate + '%';
+      });
+    }
+
+    // Initialize on load
+    updateProgress();
+  </script>
+</body>
+</html>

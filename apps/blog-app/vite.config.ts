@@ -7,8 +7,10 @@ import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import { learnManifestPlugin } from './src/plugins/learn-manifest.plugin'
+import { readingTimeManifestPlugin } from './src/plugins/reading-time-manifest.plugin'
 
 const learnDir = join(__dirname, '../../libs/portfolio/shared/learn')
+const contentDir = join(__dirname, 'src/content')
 
 // Candidate roots that hold the built client assets at prerender time.
 const clientAssetDirs = [
@@ -193,6 +195,7 @@ export default defineConfig(({ mode }) => {
         },
       }),
       learnManifestPlugin(learnDir),
+      readingTimeManifestPlugin(contentDir),
       nxViteTsPaths(),
     ],
     test: {

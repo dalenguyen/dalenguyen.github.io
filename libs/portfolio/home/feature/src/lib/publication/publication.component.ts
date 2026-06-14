@@ -1,8 +1,5 @@
-
 import { ChangeDetectionStrategy, Component } from '@angular/core'
-import { MatButtonModule } from '@angular/material/button'
-import { MatCardModule } from '@angular/material/card'
-import { MatIconModule } from '@angular/material/icon'
+import { RevealDirective } from '@dalenguyen/portfolio/shell/ui'
 
 interface Book {
   title: string
@@ -15,46 +12,49 @@ interface Book {
 
 @Component({
   selector: 'dalenguyen-publication',
-  imports: [MatCardModule, MatButtonModule, MatIconModule],
+  standalone: true,
+  imports: [RevealDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <section id="publication" class="py-12 bg-gray-50">
-      <div class="max-w-7xl mx-auto px-4">
+    <section id="publication" class="py-16 sm:py-20 bg-bg">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <header class="text-center mb-12">
-          <h2 class="text-4xl font-bold mb-4 text-gray-800">Publications</h2>
-          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+          <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-fg">Publications</h2>
+          <p class="mt-3 text-lg text-fg-muted max-w-2xl mx-auto">
             Sharing knowledge and expertise through technical writing and publications.
           </p>
         </header>
 
-        <div class="max-w-4xl mx-auto">
-          <div class="bg-white rounded-lg shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl">
-            <a [href]="book.amazonUrl" rel="noopener follow" target="_blank" class="flex flex-col md:flex-row">
-              <div class="md:w-1/3 flex justify-center items-center bg-gray-50">
-                <img [src]="book.imageUrl" alt="Book cover" class="object-contain h-full" loading="lazy" />
+        <div class="max-w-4xl mx-auto" dalReveal>
+          <a
+            [href]="book.amazonUrl"
+            rel="noopener follow"
+            target="_blank"
+            class="group block overflow-hidden rounded-2xl border border-border bg-surface transition duration-300 hover:border-accent hover:shadow-glow"
+          >
+            <div class="flex flex-col md:flex-row">
+              <div class="flex items-center justify-center bg-surface-2 p-6 md:w-1/3">
+                <img [src]="book.imageUrl" alt="Book cover" class="h-56 w-auto object-contain rounded shadow-lg" loading="lazy" />
               </div>
-              <div class="md:w-2/3 p-6 flex flex-col justify-between">
+              <div class="flex flex-col justify-between p-6 md:w-2/3">
                 <div>
-                  <h4
-                    class="text-xl font-semibold mb-3 text-gray-800 hover:text-primary transition-colors duration-300"
-                  >
+                  <h3 class="text-xl font-semibold text-fg transition-colors duration-300 group-hover:text-accent">
                     {{ book.title }}
-                  </h4>
-                  <p class="text-gray-600 mb-4">{{ book.description }}</p>
+                  </h3>
+                  <p class="mt-3 text-fg-muted">{{ book.description }}</p>
                 </div>
-                <div class="flex items-center justify-between">
-                  <div class="flex items-center text-sm text-gray-500">
-                    <span>{{ book.year }}</span>
-                    <span class="mx-2">·</span>
-                    <span>{{ book.author }}</span>
-                  </div>
-                  <div class="flex items-center">
-                    <mat-icon class="text-gray-600">open_in_new</mat-icon>
-                  </div>
+                <div class="mt-5 flex items-center justify-between text-sm text-fg-muted">
+                  <span>{{ book.year }} · {{ book.author }}</span>
+                  <span class="inline-flex items-center gap-1 text-accent">
+                    View on Amazon
+                    <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                    </svg>
+                  </span>
                 </div>
               </div>
-            </a>
-          </div>
+            </div>
+          </a>
         </div>
       </div>
     </section>

@@ -5,6 +5,11 @@ export const routeMeta: RouteMeta = {
   title: 'Home | Dale Nguyen',
 
   meta: [
+    {
+      name: 'description',
+      content:
+        'Dale Nguyen — a Toronto-based software engineer and digital architect building for the web and the agentic era, from Angular and GCP to production AI agents and the Model Context Protocol.',
+    },
     { name: 'og:title', content: 'Home | Dale Nguyen' },
     {
       name: 'og:description',

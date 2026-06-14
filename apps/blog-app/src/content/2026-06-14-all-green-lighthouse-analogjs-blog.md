@@ -296,7 +296,7 @@ providers: [provideZonelessChangeDetection() /* … */]
 
 This is safe only if the app is signal- and event-driven: any view that refreshes from a bare `setTimeout`, `addEventListener`, or RxJS `subscribe` (rather than a signal or a template `(event)`) will silently stop updating under zoneless — audit for those first. While I was at it I also moved `@angular/material` off the critical path (the header icons became inline SVG, dropping the Material Icons web font) and lazy-loaded `@sentry/browser`. Net effect: **eager JS for the post fell from 658 KB to 583 KB, mobile Total Blocking Time dropped to ~20 ms, and mobile Performance went 66 → 77.**
 
-**WebP cover images — the LCP follow-up.** With the framework cost gone, the largest remaining mobile cost was the cover image (the LCP element), shipped as a PNG. I generated a WebP variant for every local cover and serve it through a `<picture>`, keeping the PNG as both the `<img>` fallback and the `og:image`:
+**WebP cover images — the LCP follow-up.** With the framework cost gone, the largest remaining mobile cost was the cover image (the LCP element), shipped as a PNG. I generated a WebP variant for every local cover and serve it through a `&lt;picture&gt;`, keeping the PNG as both the `&lt;img&gt;` fallback and the `og:image`:
 
 ```html
 <picture>
@@ -307,7 +307,7 @@ This is safe only if the app is signal- and event-driven: any view that refreshe
 </picture>
 ```
 
-The WebP source is **root-relative** on purpose: a `<source>` does not fall back to the `<img>` on a 404, so an absolute prod URL would break the hero on preview builds. Across 25 covers this cut **12.2 MB → 0.9 MB (~92%)** — the interactive-charts cover went 92 KB → 36 KB — taking mobile LCP from 5.8 s to ~4.8 s and Performance to **78**.
+The WebP source is **root-relative** on purpose: a `&lt;source&gt;` does not fall back to the `&lt;img&gt;` on a 404, so an absolute prod URL would break the hero on preview builds. Across 25 covers this cut **12.2 MB → 0.9 MB (~92%)** — the interactive-charts cover went 92 KB → 36 KB — taking mobile LCP from 5.8 s to ~4.8 s and Performance to **78**.
 
 **Inline the CSS + preload the LCP image — the step that actually broke the ceiling.** Mobile was stuck in the high-70s with LCP ~4.8 s. I assumed I'd need classic *critical-CSS extraction* (inline above-the-fold, async the rest). Measuring first saved the effort: the entire stylesheet is only **~9 KB brotli**, already Tailwind-purged. So extraction was pointless — the cost wasn't bytes, it was the extra **render-blocking request** (a full round-trip on Slow 4G) plus discovering the cover image late. Two small `postRenderingHooks` fixed both:
 
@@ -351,7 +351,7 @@ Eight failing audits across four Lighthouse categories, now zero. The fixes in r
 5. **Add `/llms.txt`** — Agentic Browsing 33 → 100.
 6. **Lazy-load Giscus + `fetchpriority` on LCP image** — zero third-party scripts on initial load, LCP stays green.
 7. **Zoneless change detection + trim the eager bundle** (drop `zone.js`, inline-SVG icons instead of Angular Material, lazy Sentry) — mobile Performance 66 → 77, eager JS 658 → 583 KB, TBT ~20 ms.
-8. **WebP cover images via `<picture>`** — covers 92% smaller (12.2 MB → 0.9 MB), mobile 77 → 78, LCP 5.8 s → ~4.8 s.
+8. **WebP cover images via `&lt;picture&gt;`** — covers 92% smaller (12.2 MB → 0.9 MB), mobile 77 → 78, LCP 5.8 s → ~4.8 s.
 9. **Inline the global CSS + preload the LCP image** — FCP 2.1 s → 0.9 s, LCP 4.8 s → 1.2 s, mobile Performance 78 → **100**.
 
 The audit fixes were small and surgical; going zoneless was the biggest single TBT win; but the real surprise was the last step — **mobile 78 → 100 from inlining a 9 KB stylesheet and preloading one image**. The recurring lesson: *measure before reaching for the heavy tool.* Scroll-gated deferral failed because audit tools auto-scroll; critical-CSS extraction was unnecessary because the CSS was tiny. The page that started at 90/77/92/33 desktop now sits at a perfect **100/100/100/100 on both desktop and mobile**.
