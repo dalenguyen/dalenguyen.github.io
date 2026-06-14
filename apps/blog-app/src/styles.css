@@ -111,8 +111,13 @@ img:not([width]):not([height]) {
     line-height: 1.6;
   }
 
+  /* Responsive tables: scroll horizontally within their own box on narrow
+     viewports instead of overflowing the article and breaking mobile layout. */
   table {
-    width: 100%;
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
     border-collapse: collapse;
     margin: 1rem 0;
   }

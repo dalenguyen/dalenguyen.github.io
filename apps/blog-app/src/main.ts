@@ -1,6 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser'
 import { AppComponent } from '@dalenguyen/portfolio/shell/feature'
-import 'zone.js'
 
 import { appConfig } from './app/app.config'
 

@@ -1,12 +1,11 @@
 import { CommonModule, Location } from '@angular/common'
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core'
-import { MatIconModule } from '@angular/material/icon'
 import { Router } from '@angular/router'
 import { NavService } from './nav.service'
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-nav',
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule],
   templateUrl: './nav.component.html',
 })
 export class NavComponent implements OnInit {
