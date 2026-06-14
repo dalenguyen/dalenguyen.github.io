@@ -1186,6 +1186,7 @@
         feedback.textContent = isCorrect
           ? '✓ Correct! Well done.'
           : '✗ Not quite. Try another option or re-read the explanation.';
+        feedback.classList.remove('success', 'error');
         feedback.classList.add('show', isCorrect ? 'success' : 'error');
       });
     });
