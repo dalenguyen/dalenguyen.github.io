@@ -64,15 +64,21 @@ export const routeMeta: RouteMeta = {
 
           <ng-container *ngIf="post() as post">
 
-            <!-- Feature image display -->
+            <!-- Feature image display (LCP). Serve a WebP variant when the cover
+                 is a local PNG; the PNG stays the fallback and the og:image. -->
             <div class="mb-8 rounded-lg overflow-hidden shadow-lg">
-              <img
-                [src]="post.attributes.coverImage"
-                [alt]="post.attributes.title"
-                fetchpriority="high"
-                decoding="async"
-                class="w-full h-auto object-cover max-h-[400px]"
-              />
+              <picture>
+                @if (coverWebp()) {
+                  <source type="image/webp" [srcset]="coverWebp()" />
+                }
+                <img
+                  [src]="post.attributes.coverImage"
+                  [alt]="post.attributes.title"
+                  fetchpriority="high"
+                  decoding="async"
+                  class="w-full h-auto object-cover max-h-[400px]"
+                />
+              </picture>
             </div>
 
             <h1>{{ post.attributes.title }}</h1>
@@ -154,6 +160,18 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   private chartRefs: ComponentRef<unknown>[] = []
   private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
+
+  // WebP srcset for the cover image, but only for local blog PNGs (which have a
+  // generated .webp sibling). External covers (e.g. ButterCMS) and covers that
+  // are already .webp fall through to the plain <img>. The path is made
+  // root-relative so the <source> loads from whatever origin serves the page
+  // (preview or prod) — an absolute prod URL would 404 on preview builds, and a
+  // <source> does not fall back to the <img> on a load error.
+  readonly coverWebp = computed(() => {
+    const url = this.post()?.attributes.coverImage
+    const match = url?.match(/\/assets\/images\/blog\/[A-Za-z0-9_.-]+\.png$/)
+    return match ? match[0].replace(/\.png$/, '.webp') : null
+  })
 
   readonly series = computed(() => {
     const series = this.post()?.attributes.series
