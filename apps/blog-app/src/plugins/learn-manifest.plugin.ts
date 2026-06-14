@@ -25,10 +25,49 @@ const NAV_HTML = `<link href="https://fonts.googleapis.com/icon?family=Material+
   <a href="/#contact"><span class="material-icons">email</span><span class="nav-label">Contact</span></a>
 </nav>`
 
+// Keyboard-accessibility enhancement injected into every learn page. The
+// generated accordion headers are <div>s (class `section-header` or
+// `section-head`), so this gives them button semantics (role + tabindex),
+// Enter/Space activation, an aria-expanded state synced to the section's
+// open/active class, and a visible focus ring. One place fixes all current and
+// future learn pages without editing the generated HTML.
+const A11Y_ADDON = `<!-- learn-a11y-start -->
+<style>.section-header:focus-visible,.section-head:focus-visible{outline:2px solid #818cf8;outline-offset:2px;border-radius:8px;}</style>
+<script>
+(function () {
+  function isOpen(h) {
+    for (var n = h; n && n !== document.body; n = n.parentElement) {
+      if (n.classList && (n.classList.contains('open') || n.classList.contains('active'))) return true;
+    }
+    return false;
+  }
+  function enhance() {
+    document.querySelectorAll('.section-header, .section-head').forEach(function (h) {
+      if (h.dataset.a11yEnhanced) return;
+      h.dataset.a11yEnhanced = '1';
+      h.setAttribute('role', 'button');
+      h.setAttribute('tabindex', '0');
+      h.setAttribute('aria-expanded', String(isOpen(h)));
+      h.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); h.click(); }
+      });
+      h.addEventListener('click', function () {
+        setTimeout(function () { h.setAttribute('aria-expanded', String(isOpen(h))); }, 0);
+      });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', enhance);
+  else enhance();
+})();
+</script>
+<!-- learn-a11y-end -->`
+
 function injectNav(html: string): string {
-  // Remove any previously injected nav to avoid duplicates
-  const cleaned = html.replace(/<link[^>]+Material\+Icons[^>]*>\s*<style>\s*#learn-app-nav[\s\S]*?<\/nav>/m, '')
-  return cleaned.replace('<body>', `<body>\n${NAV_HTML}`)
+  // Remove any previously injected nav/a11y blocks to avoid duplicates (dev re-injection)
+  const cleaned = html
+    .replace(/<link[^>]+Material\+Icons[^>]*>\s*<style>\s*#learn-app-nav[\s\S]*?<\/nav>/m, '')
+    .replace(/<!-- learn-a11y-start -->[\s\S]*?<!-- learn-a11y-end -->/m, '')
+  return cleaned.replace('<body>', `<body>\n${NAV_HTML}\n${A11Y_ADDON}`)
 }
 
 function scanLearnDir(dir: string) {
