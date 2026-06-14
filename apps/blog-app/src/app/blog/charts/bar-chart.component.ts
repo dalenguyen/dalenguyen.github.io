@@ -219,7 +219,9 @@ export class BarChartComponent {
     const iw = W - pad.l - pad.r
     const ih = H - pad.t - pad.b
     const allVals = grouped ? m.series!.flatMap((s) => s.vals) : m.single!
-    const max = m.max ?? Math.max(...allVals) * (grouped ? 1.12 : 1.15)
+    const rawMax = m.max ?? Math.max(...allVals) * (grouped ? 1.12 : 1.15)
+    // guard against an all-zero metric so `v / max` never produces NaN geometry
+    const max = rawMax > 0 ? rawMax : 1
 
     const grid: { y: number; label: string }[] = []
     const ticks = 5

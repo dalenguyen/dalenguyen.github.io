@@ -5,12 +5,14 @@ import {
   AfterViewInit,
   ApplicationRef,
   Component,
+  ComponentRef,
   computed,
   effect,
   ElementRef,
   EnvironmentInjector,
   inject,
   Injector,
+  OnDestroy,
   PLATFORM_ID,
   runInInjectionContext,
   viewChild,
@@ -141,12 +143,13 @@ export const routeMeta: RouteMeta = {
       </div>
   `,
 })
-export default class BlogPostComponent implements AfterViewInit {
+export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   private readonly document = inject(DOCUMENT)
   private readonly injector = inject(Injector)
   private readonly envInjector = inject(EnvironmentInjector)
   private readonly appRef = inject(ApplicationRef)
   private readonly platformId = inject(PLATFORM_ID)
+  private chartRefs: ComponentRef<unknown>[] = []
   readonly post = toSignal(injectContent<PostAttributes>())
 
   readonly series = computed(() => {
@@ -196,10 +199,14 @@ export default class BlogPostComponent implements AfterViewInit {
       if (this.post()) {
         setTimeout(() => {
           this.addCopyButtons()
-          this.mountCharts()
+          void this.mountCharts().catch((error) => console.error('Failed to mount charts', error))
         })
       }
     }, { injector: this.injector })
+  }
+
+  ngOnDestroy() {
+    this.destroyMountedCharts()
   }
 
   // Mount interactive Angular chart components into any `<div data-chart="…">`
@@ -210,7 +217,18 @@ export default class BlogPostComponent implements AfterViewInit {
     const slug = this.post()?.attributes.slug
     if (!slug || !this.document.querySelector('[data-chart]')) return
     const { mountInteractiveCharts } = await import('../../blog/charts/mount-charts')
-    mountInteractiveCharts(this.document, this.envInjector, this.appRef, slug)
+    this.destroyMountedCharts()
+    this.chartRefs = await mountInteractiveCharts(this.document, this.envInjector, this.appRef, slug)
+  }
+
+  // Detach and destroy any charts mounted by a previous render so their views
+  // don't leak on the ApplicationRef across navigations.
+  private destroyMountedCharts() {
+    for (const ref of this.chartRefs) {
+      this.appRef.detachView(ref.hostView)
+      ref.destroy()
+    }
+    this.chartRefs = []
   }
 
   private addCopyButtons() {

@@ -6,14 +6,18 @@ import { PostAttributes } from './models'
 // temporary
 function injectActivePostAttributes(route: ActivatedRouteSnapshot): PostAttributes {
   const slug = route.params['slug']
-  return injectContentFiles<PostAttributes>().find(
+  const contentFile = injectContentFiles<PostAttributes>().find(
     (contentFile) =>
       // match by frontmatter slug (works for any path/extension), falling back
       // to the filename for posts without an explicit slug
       contentFile.attributes.slug === slug ||
       contentFile.filename === `/src/content/${slug}.md` ||
       contentFile.filename === `/src/content/${slug}.agx`,
-  )!.attributes
+  )
+  if (!contentFile) {
+    throw new Error(`Blog post not found for slug "${slug}"`)
+  }
+  return contentFile.attributes
 }
 
 export const postTitleResolver: ResolveFn<string> = (route) => injectActivePostAttributes(route).title
