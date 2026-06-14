@@ -149,6 +149,14 @@ ngOnDestroy() {
 }
 ```
 
+## The mounting process, step by step
+
+Here is the whole pipeline in one interactive view. Step through it — or hit **Play** — and watch a placeholder turn into a live component:
+
+<div data-chart="mount-flow">Interactive diagram of the six stages that turn a chart placeholder into a mounted Angular component. Enable JavaScript to view.</div>
+
+Fittingly, that diagram is itself one of these mounted components — a bespoke `MountFlowComponent` registered under the `mount-flow` key in this post's `charts.ts`.
+
 ## Gotcha 1 — tsconfig must include content TypeScript files
 
 The `charts.ts` and component files you drop under `src/content/` are not part of the default TypeScript program. They are discovered only at runtime via `import.meta.glob`, which Vite resolves — but the TypeScript compiler (used for type-checking and the Nx build) needs to know about them too.

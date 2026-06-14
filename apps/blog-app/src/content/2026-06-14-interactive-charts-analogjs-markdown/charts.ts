@@ -5,10 +5,12 @@ import { BarChartComponent } from '../../app/blog/charts/bar-chart.component'
 import { ChartManifest } from '../../app/blog/charts/mount-charts'
 import { demoBarsConfig } from './demo.data'
 import { DemoSliderComponent } from './kv-slider.component'
+import { MountFlowComponent } from './mount-flow.component'
 
 const manifest: ChartManifest = {
   'demo-bars': { component: BarChartComponent, inputs: { config: demoBarsConfig } },
   'slider-demo': { component: DemoSliderComponent },
+  'mount-flow': { component: MountFlowComponent },
 }
 
 export default manifest
