@@ -240,7 +240,7 @@ main a:not([class]) {
     padding: 0.2rem 0.4rem;
     border-radius: 4px;
     font-size: 0.95rem;
-    font-family: 'SFMono-Regular', ui-monospace, 'Courier New', Courier, monospace;
+    font-family: SFMono-Regular, ui-monospace, 'Courier New', Courier, monospace;
   }
 
   /* Code blocks */

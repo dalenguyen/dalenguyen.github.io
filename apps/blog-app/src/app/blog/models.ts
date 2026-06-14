@@ -8,4 +8,5 @@ export interface PostAttributes {
   profileImage: string
   author: string
   series?: string
+  draft?: boolean
 }

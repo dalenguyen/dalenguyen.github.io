@@ -63,11 +63,11 @@ interface YearBar {
 
         <!-- Category filters -->
         <div class="mb-12 flex flex-wrap justify-center gap-2">
-          <button type="button" [class]="chipClass(null)" (click)="select(null)">
+          <button type="button" [class]="chipClass(null)" [attr.aria-pressed]="selectedCategory() === null" (click)="select(null)">
             All <span class="opacity-70">{{ allPosts.length }}</span>
           </button>
           @for (c of categories; track c.name) {
-            <button type="button" [class]="chipClass(c.name)" (click)="select(c.name)">
+            <button type="button" [class]="chipClass(c.name)" [attr.aria-pressed]="selectedCategory() === c.name" (click)="select(c.name)">
               {{ c.name | titlecase }} <span class="opacity-70">{{ c.count }}</span>
             </button>
           }
@@ -170,8 +170,8 @@ interface YearBar {
   `,
 })
 export default class BlogComponent {
-  readonly allPosts = injectContentFiles<PostAttributes>((contentFile) =>
-    contentFile.filename.includes('/src/content'),
+  readonly allPosts = injectContentFiles<PostAttributes>(
+    (contentFile) => contentFile.filename.includes('/src/content') && !contentFile.attributes.draft,
   ).sort((a, b) => b.attributes.published.localeCompare(a.attributes.published))
 
   readonly selectedCategory = signal<string | null>(null)

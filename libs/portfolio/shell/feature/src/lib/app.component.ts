@@ -109,12 +109,10 @@ export class SentryErrorHandler implements ErrorHandler {
       <router-outlet />
     </main>
 
-    <!-- Footer rendered directly: it's lightweight (text + one link), so eager
-         render keeps it in the SSR HTML and avoids a placeholder→footer layout
-         shift. -->
-    <footer>
-      <dalenguyen-footer/>
-    </footer>
+    <!-- Footer rendered directly (lightweight) so it stays in the SSR HTML and
+         avoids a placeholder→footer layout shift. The component renders its own
+         <footer> landmark, so there is no wrapper here (avoids nested landmarks). -->
+    <dalenguyen-footer/>
   </div>
   `,
 })

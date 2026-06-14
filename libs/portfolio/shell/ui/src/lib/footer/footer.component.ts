@@ -14,7 +14,7 @@ import { ChangeDetectionStrategy, Component, VERSION } from '@angular/core'
           <a
             href="https://analogjs.org/"
             target="_blank"
-            rel="noopener"
+            rel="noopener noreferrer"
             class="text-accent underline underline-offset-2"
             >Analog</a
           >
