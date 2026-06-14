@@ -18,12 +18,11 @@ const W = 720
 const H = 340
 
 /**
- * Dark-themed bar chart for the Qwen benchmark post. Handles both grouped
- * (MLX vs Ollama) and single-series (KV variant) charts, with an optional
- * metric toggle and hover tooltips. Ported from the standalone visualization.
+ * Dark-themed, input-driven bar chart. Handles both grouped (multi-series)
+ * and single-series charts, with an optional metric toggle and hover tooltips.
  */
 @Component({
-  selector: 'qwen-bar-chart',
+  selector: 'blog-bar-chart',
   standalone: true,
   encapsulation: ViewEncapsulation.ShadowDom,
   template: `
