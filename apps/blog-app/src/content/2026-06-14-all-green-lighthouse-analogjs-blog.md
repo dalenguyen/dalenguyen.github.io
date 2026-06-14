@@ -30,8 +30,8 @@ I ran [PageSpeed Insights](https://pagespeed.web.dev/) against the live "before"
 </figure>
 
 <figure>
-  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-desktop.png" alt="PageSpeed Insights desktop report after optimization: Performance 99, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
-  <figcaption>Desktop, after: 99 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-desktop.png" alt="PageSpeed Insights desktop report after optimization: Performance 100, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
+  <figcaption>Desktop, after: 100 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
 </figure>
 
 Mobile — before, then after:
@@ -42,18 +42,20 @@ Mobile — before, then after:
 </figure>
 
 <figure>
-  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 99, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
-  <figcaption>Mobile, after: 99 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 100, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
+  <figcaption>Mobile, after: 100 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
 </figure>
 
 | PageSpeed (Google-hosted Lighthouse) | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
 | Desktop — before | 91 | 90 | 100 | 92 |
-| Desktop — after | **99** | **100** | 100 | **100** |
+| Desktop — after | **100** | **100** | 100 | **100** |
 | Mobile — before | 59 | 90 | 100 | 92 |
-| Mobile — after | **99** | **100** | 100 | **100** |
+| Mobile — after | **100** | **100** | 100 | **100** |
 
-Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance climbed 59 → 99**, in stages: deferring third-party JS got it to 66, going **zoneless** took it to 77 (Total Blocking Time down to ~20 ms), **WebP covers** nudged it to 78, and finally **inlining the CSS + preloading the cover image** collapsed FCP (2.1 s → 0.9 s) and LCP (4.8 s → 1.4 s) to land at **99**. The last step was the surprise: the real mobile bottleneck was never the framework or image bytes — it was the render-blocking CSS round-trip and late image discovery on Slow 4G. (Desktop sits at 99/100/100/100; all figures measured on the deployed production site.)
+Run it yourself: [PageSpeed Insights for this page](https://pagespeed.web.dev/analysis?url=https%3A%2F%2Fdalenguyen.me%2Fblog%2F2026-06-14-interactive-charts-analogjs-markdown) · [the predecessor "interactive charts" post](/blog/2026-06-14-interactive-charts-analogjs-markdown).
+
+Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance climbed 59 → 100**, in stages: deferring third-party JS got it to 66, going **zoneless** took it to 77 (Total Blocking Time down to ~20 ms), **WebP covers** nudged it to 78, and finally **inlining the CSS + preloading the cover image** collapsed FCP (2.1 s → 0.9 s) and LCP (4.8 s → 1.2 s) to land at a perfect **100**. The last step was the surprise: the real mobile bottleneck was never the framework or image bytes — it was the render-blocking CSS round-trip and late image discovery on Slow 4G. (Desktop is 100/100/100/100 too; all figures measured on the deployed production site.)
 
 One more subtlety: **the same page scores differently depending on which Lighthouse build runs it.** PageSpeed Insights (Google-hosted) reports Best Practices 100 and has no "Agentic Browsing" category. The newer Lighthouse bundled in Chrome DevTools — which I used for the per-fix breakdown below — adds Agentic Browsing and weights the third-party-cookie issue far more harshly, so it scored the *same* page Best Practices 77 and Agentic Browsing 33. I optimized against the stricter build, so the fixes satisfy both.
 
@@ -318,15 +320,15 @@ html = html.replace(/<link[^>]*rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)
 //    <link rel="preload" as="image" type="image/webp" imagesrcset="…" fetchpriority="high">
 ```
 
-The effect on mobile was dramatic: **FCP 2.1 s → 0.9 s**, **LCP 4.8 s → 1.4 s**, and Performance **78 → 99**. The lesson: don't reach for the heavy tool (critical-CSS extraction) before measuring — for a small stylesheet, inlining the whole thing is simpler and just as effective.
+The effect on mobile was dramatic: **FCP 2.1 s → 0.9 s**, **LCP 4.8 s → 1.2 s**, and Performance **78 → 100**. The lesson: don't reach for the heavy tool (critical-CSS extraction) before measuring — for a small stylesheet, inlining the whole thing is simpler and just as effective.
 
 **Core Web Vitals (lab measurements, deployed production site):**
 
 | Metric | Before | After |
 |---|---|---|
-| Mobile Performance | 59 | **99** |
+| Mobile Performance | 59 | **100** |
 | FCP (mobile) | 2.1 s | **0.9 s** |
-| LCP (mobile) | 4.8 s | **1.4 s** |
+| LCP (mobile) | 4.8 s | **1.2 s** |
 | Total Blocking Time (mobile) | — | **~20 ms** |
 | Cover image (LCP element) | 92 KB PNG | **36 KB WebP** |
 | Eager JS on the post | 658 KB | **583 KB** |
@@ -334,7 +336,7 @@ The effect on mobile was dramatic: **FCP 2.1 s → 0.9 s**, **LCP 4.8 s → 1.4 
 | CLS | 0.00 | 0.00 |
 | 3rd-party scripts on initial load | 4 (GA + Clarity + Logichat + Giscus) | **0** |
 
-CLS was 0.00 throughout. The combined effect — zoneless framework, zero third-party on load, WebP covers, inlined CSS, preloaded LCP image — took **mobile from 59 to 99**, matching desktop's 99/100/100/100. There was no real "framework ceiling"; the mobile gap was a render-blocking CSS round-trip and a late-discovered image all along.
+CLS was 0.00 throughout. The combined effect — zoneless framework, zero third-party on load, WebP covers, inlined CSS, preloaded LCP image — took **mobile from 59 to a perfect 100**, matching desktop's 100/100/100/100. There was no real "framework ceiling"; the mobile gap was a render-blocking CSS round-trip and a late-discovered image all along.
 
 ---
 
@@ -350,6 +352,6 @@ Eight failing audits across four Lighthouse categories, now zero. The fixes in r
 6. **Lazy-load Giscus + `fetchpriority` on LCP image** — zero third-party scripts on initial load, LCP stays green.
 7. **Zoneless change detection + trim the eager bundle** (drop `zone.js`, inline-SVG icons instead of Angular Material, lazy Sentry) — mobile Performance 66 → 77, eager JS 658 → 583 KB, TBT ~20 ms.
 8. **WebP cover images via `<picture>`** — covers 92% smaller (12.2 MB → 0.9 MB), mobile 77 → 78, LCP 5.8 s → ~4.8 s.
-9. **Inline the global CSS + preload the LCP image** — FCP 2.1 s → 0.9 s, LCP 4.8 s → 1.4 s, mobile Performance 78 → **99**.
+9. **Inline the global CSS + preload the LCP image** — FCP 2.1 s → 0.9 s, LCP 4.8 s → 1.2 s, mobile Performance 78 → **100**.
 
-The audit fixes were small and surgical; going zoneless was the biggest single TBT win; but the real surprise was the last step — **mobile 78 → 99 from inlining a 9 KB stylesheet and preloading one image**. The recurring lesson: *measure before reaching for the heavy tool.* Scroll-gated deferral failed because audit tools auto-scroll; critical-CSS extraction was unnecessary because the CSS was tiny. The page that started at 90/77/92/33 desktop now sits at **99/100/100/100 on both desktop and mobile**.
+The audit fixes were small and surgical; going zoneless was the biggest single TBT win; but the real surprise was the last step — **mobile 78 → 100 from inlining a 9 KB stylesheet and preloading one image**. The recurring lesson: *measure before reaching for the heavy tool.* Scroll-gated deferral failed because audit tools auto-scroll; critical-CSS extraction was unnecessary because the CSS was tiny. The page that started at 90/77/92/33 desktop now sits at a perfect **100/100/100/100 on both desktop and mobile**.
