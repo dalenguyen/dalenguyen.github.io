@@ -24,7 +24,7 @@
           "mode": "production"
         }
       },
-      "outputs": ["{workspaceRoot}/dist/apps/blog-app"]
+      "outputs": ["{workspaceRoot}/dist/apps/blog-app", "{workspaceRoot}/.vercel/output"]
     },
     "serve": {
       "executor": "@analogjs/platform:vite-dev-server",
