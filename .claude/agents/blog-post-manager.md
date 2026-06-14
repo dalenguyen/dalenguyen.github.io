@@ -57,6 +57,12 @@ You are an expert Analog (Angular) blog content manager with deep expertise in m
   ```
 - The `coverImage` frontmatter field uses a full absolute URL: `https://dalenguyen.me/assets/images/blog/<filename>`
 
+**Interactive Content (charts, sliders, diagrams, widgets)**:
+
+- When a post should include anything the reader can interact with — live charts, a slider/calculator, a toggle, an animated or step-through diagram, or any custom widget — **invoke the `interactive-blog-content` skill and follow it**. Do NOT hand-roll a mounting mechanism or rely on inline `<script>` (inline scripts never run in the rendered markdown).
+- That skill documents the project's architecture: a `<div data-chart="key">fallback</div>` placeholder in the markdown, a co-located `src/content/<slug>/charts.ts` manifest, glob auto-discovery, and dynamic component mounting — plus the reusable `BarChartComponent` and the critical gotchas (escape raw tags as `&lt;`/`&gt;` inside inline code or the post truncates; use `ViewEncapsulation.ShadowDom` with the dark palette; keep it SSR-safe; clean up timers in `ngOnDestroy`).
+- Keep each post self-contained: every component, data file, and the manifest live in the co-located `src/content/<slug>/` folder. No central registry needs editing.
+
 **Content Quality Standards**:
 
 - Use clear, concise, and technically accurate language
