@@ -20,6 +20,22 @@ This post documents the follow-up audit: eight failing checks across four catego
 
 One important caveat: the Chrome DevTools Lighthouse tool returns Accessibility, Best Practices, SEO, and Agentic Browsing scores. Performance is reported via Core Web Vitals from a separate performance trace (LCP, CLS). So the table below covers those four measurable Lighthouse categories. The post ends with the CWV results.
 
+### Where it started: PageSpeed Insights
+
+Here is the live "before" baseline straight from [PageSpeed Insights](https://pagespeed.web.dev/) — desktop first, then mobile:
+
+<figure>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-before-desktop.png" alt="PageSpeed Insights desktop report before optimization: Performance 91, Accessibility 90, Best Practices 100, SEO 92" width="100%" height="auto" />
+  <figcaption>PageSpeed Insights — desktop, before: 91 Performance / 90 Accessibility / 100 Best Practices / 92 SEO.</figcaption>
+</figure>
+
+<figure>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-before-mobile.png" alt="PageSpeed Insights mobile report before optimization: Performance 59, Accessibility 90, Best Practices 100, SEO 92" width="100%" height="auto" />
+  <figcaption>PageSpeed Insights — mobile, before: 59 Performance / 90 Accessibility / 100 Best Practices / 92 SEO. Mobile Performance is where most of the headroom was.</figcaption>
+</figure>
+
+A subtle but important detail: **the same page scores differently depending on which Lighthouse build runs it.** PageSpeed Insights (Google-hosted) gives Best Practices 100 and has no "Agentic Browsing" category at all. The newer Lighthouse bundled in Chrome DevTools — which I used for the audit below — adds Agentic Browsing and weights the third-party-cookie issue far more harshly, so it scored the *same* page Best Practices 77 and Agentic Browsing 33. I optimized against the stricter build, so the fixes satisfy both. (PageSpeed also reports a Performance score the DevTools tool does not expose — 91 on desktop, 59 on mobile — which is exactly why the Core Web Vitals work at the end matters most on mobile.)
+
 ## Results
 
 <div data-chart="lighthouse-scores">Chart: Lighthouse category scores before and after optimization. Enable JavaScript to view.</div>
