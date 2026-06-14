@@ -1,0 +1,18 @@
+# robots.txt for dalenguyen.me
+User-agent: *
+Allow: /
+
+# Block access to specific folders
+Disallow: /private/
+Disallow: /admin/
+Disallow: /drafts/
+
+# Sitemap location
+Sitemap: https://dalenguyen.me/sitemap.xml
+
+# Crawl delay for heavy bots
+User-agent: AhrefsBot
+Crawl-delay: 10
+
+User-agent: SemrushBot
+Crawl-delay: 10

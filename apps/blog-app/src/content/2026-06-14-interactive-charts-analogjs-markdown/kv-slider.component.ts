@@ -32,7 +32,9 @@ const fmtCtx = (n: number): string => (n >= 1000 ? Math.round(n / 1000) + 'K' : 
           min="512"
           max="131072"
           step="512"
+          aria-label="Context length in tokens"
           [value]="ctx()"
+          [attr.aria-valuetext]="ctxLabel() + ' tokens'"
           (input)="ctx.set(+$any($event.target).value)"
         />
         <span class="ctx-label">{{ ctxLabel() }} tokens</span>

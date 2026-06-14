@@ -86,7 +86,7 @@ const STEPS: Step[] = [
 
       <div class="body">
         <div class="panel">
-          <h4>{{ step().title }}</h4>
+          <p class="panel-title">{{ step().title }}</p>
           <pre class="code">{{ step().code }}</pre>
           <p class="desc">{{ step().desc }}</p>
         </div>
@@ -215,9 +215,10 @@ const STEPS: Step[] = [
           grid-template-columns: 1fr;
         }
       }
-      .panel h4 {
+      .panel .panel-title {
         margin: 0 0 8px;
         font-size: 14px;
+        font-weight: 700;
         color: #7c9cff;
       }
       .code {
@@ -266,7 +267,7 @@ const STEPS: Step[] = [
         font-size: 10.5px;
         letter-spacing: 0.04em;
         text-transform: uppercase;
-        color: #6e7b8a;
+        color: #8b98a8;
       }
       .ph {
         font-family: ui-monospace, Menlo, Consolas, monospace;
@@ -276,7 +277,7 @@ const STEPS: Step[] = [
       .fallback {
         font-size: 12.5px;
         font-style: italic;
-        color: #6e7b8a;
+        color: #8b98a8;
       }
       .hint {
         font-size: 12px;
