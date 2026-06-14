@@ -19,20 +19,37 @@
       <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
     </noscript>
 
-    <!-- Logichat -->
-    <script src="https://sdk.logichat.io/js/widget.js?appId=lg_czNzY4OD" defer id="logichat-sdk"></script>
-
+    <!-- Logichat — loaded on first user interaction to keep its SDK off the critical path -->
     <script>
-      // SDK events
-      const eventTypes = ['sdkLoaded', 'iframeResized']
-
-      // Global callback
+      // Global callback used by the Logichat SDK once it loads
       function onLogichatEvent(event) {
         if (event.type === 'sdkLoaded') {
           const element = $logichat.V1.createElement('faq', {})
           element.mount('#logichat-faq-widget')
         }
       }
+      ;(function () {
+        var loaded = false
+        function loadLogichat() {
+          if (loaded) return
+          loaded = true
+          var s = document.createElement('script')
+          s.src = 'https://sdk.logichat.io/js/widget.js?appId=lg_czNzY4OD'
+          s.defer = true
+          s.id = 'logichat-sdk'
+          document.head.appendChild(s)
+        }
+        var events = ['click', 'keydown', 'touchstart']
+        function onFirst() {
+          loadLogichat()
+          events.forEach(function (e) {
+            window.removeEventListener(e, onFirst)
+          })
+        }
+        events.forEach(function (e) {
+          window.addEventListener(e, onFirst, { once: true, passive: true })
+        })
+      })()
     </script>
     <!-- End Logichat -->
   </head>

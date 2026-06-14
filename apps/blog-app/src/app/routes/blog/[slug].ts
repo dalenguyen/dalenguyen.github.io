@@ -69,6 +69,8 @@ export const routeMeta: RouteMeta = {
               <img
                 [src]="post.attributes.coverImage"
                 [alt]="post.attributes.title"
+                fetchpriority="high"
+                decoding="async"
                 class="w-full h-auto object-cover max-h-[400px]"
               />
             </div>
@@ -194,7 +196,7 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   giscusContainer = viewChild<ElementRef>('giscusContainer')
 
   ngAfterViewInit() {
-    this.loadGiscusScript()
+    this.lazyLoadGiscus()
     effect(() => {
       if (this.post()) {
         setTimeout(() => {
@@ -255,15 +257,36 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
     })
   }
 
-  private loadGiscusScript() {
-    // Get the element reference from the signal
+  // Defer the giscus comments embed until the reader scrolls near it. Giscus
+  // pulls in a third-party script + iframe; loading it eagerly added blocking
+  // work to first load. An IntersectionObserver loads it just-in-time, so it
+  // costs nothing for readers who never reach the comments (and during audits).
+  private lazyLoadGiscus() {
+    if (!isPlatformBrowser(this.platformId)) return
     const container = this.giscusContainer()?.nativeElement
-
     if (!container) {
       console.error('Giscus container not found')
       return
     }
 
+    if (!('IntersectionObserver' in window)) {
+      this.injectGiscus(container)
+      return
+    }
+
+    const observer = new IntersectionObserver(
+      (entries, obs) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          obs.disconnect()
+          this.injectGiscus(container)
+        }
+      },
+      { rootMargin: '600px 0px' },
+    )
+    observer.observe(container)
+  }
+
+  private injectGiscus(container: HTMLElement) {
     const script = this.document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'dalenguyen/dalenguyen.github.io')

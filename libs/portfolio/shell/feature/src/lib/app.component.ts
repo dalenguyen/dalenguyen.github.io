@@ -59,7 +59,6 @@ export class SentryErrorHandler implements ErrorHandler {
               [attr.aria-expanded]="isMobileMenuOpen()"
               aria-label="Toggle mobile menu"
               >
-              <span class="sr-only">Open main menu</span>
               <!-- Icon when menu is closed -->
               @if (!isMobileMenuOpen()) {
                 <mat-icon class="block h-6 w-6" aria-hidden="true">menu</mat-icon>

@@ -147,3 +147,65 @@ blockquote {
   padding: 1rem;
   border-left: 4px solid #4632de;
 }
+
+/*
+ * High-contrast Prism syntax palette.
+ * The default prism.css theme renders many tokens (comments, punctuation,
+ * keywords, functions, numbers) below the WCAG AA 4.5:1 ratio on the light
+ * #f5f5f5 code background, failing Lighthouse's color-contrast audit. Every
+ * color below is verified >= 4.5:1 against that background. Placed after the
+ * prism @import so these win on equal specificity.
+ */
+code[class*='language-'],
+pre[class*='language-'] {
+  color: #1f2328;
+  text-shadow: none;
+}
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #57606a;
+}
+.token.punctuation {
+  color: #24292f;
+}
+.token.property,
+.token.tag,
+.token.boolean,
+.token.number,
+.token.constant,
+.token.symbol,
+.token.deleted {
+  color: #0550ae;
+}
+.token.selector,
+.token.attr-name,
+.token.string,
+.token.char,
+.token.builtin,
+.token.inserted {
+  color: #0a6e31;
+}
+.token.operator,
+.token.entity,
+.token.url,
+.language-css .token.string,
+.style .token.string {
+  color: #953800;
+  background: none;
+}
+.token.atrule,
+.token.attr-value,
+.token.keyword {
+  color: #cf222e;
+}
+.token.function,
+.token.class-name {
+  color: #6639ba;
+}
+.token.regex,
+.token.important,
+.token.variable {
+  color: #953800;
+}

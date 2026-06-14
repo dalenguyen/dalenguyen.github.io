@@ -1,0 +1,21 @@
+# Dale Nguyen
+
+> Software Engineer based in Toronto, Canada. Personal site, technical blog, and digital portfolio covering Angular, AnalogJS, TypeScript, frontend architecture, and applied AI.
+
+This site is a statically prerendered AnalogJS (Angular) application. The blog publishes in-depth, hands-on engineering write-ups; the learning section hosts interactive explainers.
+
+## Main pages
+
+- [Home](https://dalenguyen.me/): Biography, architectural philosophy, and digital portfolio.
+- [Blog](https://dalenguyen.me/blog): Technical articles on web development and AI.
+- [Learning](https://dalenguyen.me/learn): Interactive explainers and notes.
+
+## Resources
+
+- [Sitemap](https://dalenguyen.me/sitemap.xml): Full list of crawlable URLs.
+
+## Contact
+
+- Email: dale@dalenguyen.me
+- [GitHub](https://github.com/dalenguyen)
+- [LinkedIn](https://www.linkedin.com/in/dalenguyenblogger/)
