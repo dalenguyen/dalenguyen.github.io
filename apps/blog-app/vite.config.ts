@@ -87,6 +87,10 @@ export default defineConfig(({ mode }) => {
               }
             : undefined,
         content: {
+          // AnalogJS 2.x: the highlighter must be declared here (was app.config-only
+          // in 1.x). Without it, contentPlugin skips the markdown frontmatter/content
+          // transforms and .md imports fail to parse.
+          highlighter: 'prism',
           prismOptions: {
             additionalLangs: [
               'diff',

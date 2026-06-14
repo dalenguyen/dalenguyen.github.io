@@ -1,14 +1,19 @@
 import { injectContent, injectContentFiles, MarkdownComponent } from '@analogjs/content'
 import { RouteMeta } from '@analogjs/router'
-import { CommonModule, DOCUMENT } from '@angular/common'
+import { CommonModule, DOCUMENT, isPlatformBrowser } from '@angular/common'
 import {
   AfterViewInit,
+  ApplicationRef,
   Component,
+  ComponentRef,
   computed,
   effect,
   ElementRef,
+  EnvironmentInjector,
   inject,
   Injector,
+  OnDestroy,
+  PLATFORM_ID,
   runInInjectionContext,
   viewChild,
 } from '@angular/core'
@@ -138,9 +143,13 @@ export const routeMeta: RouteMeta = {
       </div>
   `,
 })
-export default class BlogPostComponent implements AfterViewInit {
+export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   private readonly document = inject(DOCUMENT)
   private readonly injector = inject(Injector)
+  private readonly envInjector = inject(EnvironmentInjector)
+  private readonly appRef = inject(ApplicationRef)
+  private readonly platformId = inject(PLATFORM_ID)
+  private chartRefs: ComponentRef<unknown>[] = []
   readonly post = toSignal(injectContent<PostAttributes>())
 
   readonly series = computed(() => {
@@ -188,12 +197,42 @@ export default class BlogPostComponent implements AfterViewInit {
     this.loadGiscusScript()
     effect(() => {
       if (this.post()) {
-        setTimeout(() => this.addCopyButtons())
+        setTimeout(() => {
+          this.addCopyButtons()
+          void this.mountCharts().catch((error) => console.error('Failed to mount charts', error))
+        })
       }
     }, { injector: this.injector })
   }
 
+  ngOnDestroy() {
+    this.destroyMountedCharts()
+  }
+
+  // Mount interactive Angular chart components into any `<div data-chart="…">`
+  // placeholders in the rendered markdown. Lazy-loaded so only posts that use
+  // charts pull the chart code in. Browser-only.
+  private async mountCharts() {
+    if (!isPlatformBrowser(this.platformId)) return
+    const slug = this.post()?.attributes.slug
+    if (!slug || !this.document.querySelector('[data-chart]')) return
+    const { mountInteractiveCharts } = await import('../../blog/charts/mount-charts')
+    this.destroyMountedCharts()
+    this.chartRefs = await mountInteractiveCharts(this.document, this.envInjector, this.appRef, slug)
+  }
+
+  // Detach and destroy any charts mounted by a previous render so their views
+  // don't leak on the ApplicationRef across navigations.
+  private destroyMountedCharts() {
+    for (const ref of this.chartRefs) {
+      this.appRef.detachView(ref.hostView)
+      ref.destroy()
+    }
+    this.chartRefs = []
+  }
+
   private addCopyButtons() {
+    if (!isPlatformBrowser(this.platformId)) return
     const doc = this.document
     doc.querySelectorAll('pre').forEach((pre) => {
       const wrapper = doc.createElement('div')
