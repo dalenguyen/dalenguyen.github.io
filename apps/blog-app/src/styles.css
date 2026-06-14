@@ -112,7 +112,9 @@ img:not([width]):not([height]) {
   }
 
   /* Responsive tables: scroll horizontally within their own box on narrow
-     viewports instead of overflowing the article and breaking mobile layout. */
+     viewports instead of overflowing the article and breaking mobile layout.
+     Font is dialed down from the article's text-lg so the data reads as a
+     table rather than oversized body copy. */
   table {
     display: block;
     width: max-content;
@@ -120,6 +122,8 @@ img:not([width]):not([height]) {
     overflow-x: auto;
     border-collapse: collapse;
     margin: 1rem 0;
+    font-size: 0.9rem;
+    line-height: 1.4;
   }
 
   th, td {
