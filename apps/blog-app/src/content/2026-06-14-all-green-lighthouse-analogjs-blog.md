@@ -22,7 +22,7 @@ One important caveat: the Chrome DevTools Lighthouse tool returns Accessibility,
 
 ### PageSpeed Insights: before and after
 
-I ran [PageSpeed Insights](https://pagespeed.web.dev/) against the live "before" page and again against the deployed "after" preview. Desktop — before, then after:
+I ran [PageSpeed Insights](https://pagespeed.web.dev/) against the live "before" page and again against the deployed "after" production site. Desktop — before, then after:
 
 <figure>
   <img src="assets/images/blog/all-green-lighthouse-pagespeed-before-desktop.png" alt="PageSpeed Insights desktop report before optimization: Performance 91, Accessibility 90, Best Practices 100, SEO 92" width="100%" height="auto" />
@@ -30,8 +30,8 @@ I ran [PageSpeed Insights](https://pagespeed.web.dev/) against the live "before"
 </figure>
 
 <figure>
-  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-desktop.png" alt="PageSpeed Insights desktop report after optimization: Performance 96, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
-  <figcaption>Desktop, after: 96 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-desktop.png" alt="PageSpeed Insights desktop report after optimization: Performance 99, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
+  <figcaption>Desktop, after: 99 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
 </figure>
 
 Mobile — before, then after:
@@ -42,18 +42,18 @@ Mobile — before, then after:
 </figure>
 
 <figure>
-  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 65, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
-  <figcaption>Mobile, after: 65 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 66, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
+  <figcaption>Mobile, after: 66 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
 </figure>
 
 | PageSpeed (Google-hosted Lighthouse) | Performance | Accessibility | Best Practices | SEO |
 |---|---|---|---|---|
 | Desktop — before | 91 | 90 | 100 | 92 |
-| Desktop — after | **96** | **100** | 100 | **100** |
+| Desktop — after | **99** | **100** | 100 | **100** |
 | Mobile — before | 59 | 90 | 100 | 92 |
-| Mobile — after | **65** | **100** | 100 | **100** |
+| Mobile — after | **66** | **100** | 100 | **100** |
 
-Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance moved only 59 → 65**: deferring third-party JS helped, but the dominant remaining cost is Angular's hydration under heavy mobile CPU throttling — a framework characteristic that no amount of analytics deferral can fix. That is an honest ceiling worth knowing before you chase a green mobile Performance gauge on a hydrated SSG.
+Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance moved only 59 → 66**: deferring third-party JS helped, but the dominant remaining cost is Angular's hydration under heavy mobile CPU throttling — a framework characteristic that no amount of analytics deferral can fix. That is an honest ceiling worth knowing before you chase a green mobile Performance gauge on a hydrated SSG. (Measured on the deployed production site; desktop landed at 99.)
 
 One more subtlety: **the same page scores differently depending on which Lighthouse build runs it.** PageSpeed Insights (Google-hosted) reports Best Practices 100 and has no "Agentic Browsing" category. The newer Lighthouse bundled in Chrome DevTools — which I used for the per-fix breakdown below — adds Agentic Browsing and weights the third-party-cookie issue far more harshly, so it scored the *same* page Best Practices 77 and Agentic Browsing 33. I optimized against the stricter build, so the fixes satisfy both.
 
