@@ -157,7 +157,7 @@ print(json.dumps({'models': [m]}, indent=2))
 " > ~/.codex/model_catalog.json
 ```
 
-The two critical fields are `supported_reasoning_levels: []` and `supports_reasoning_summaries: false`. Without them, Codex sends a `thinking` parameter that Ollama rejects with `does not support thinking`. Note that `qwen3-coder:30b` does support chain-of-thought reasoning — Qwen3 models reason internally via `<think>` tags. Disabling this API parameter just stops Codex from requesting it in an OpenAI-specific format that Ollama doesn't accept.
+The two critical fields are `supported_reasoning_levels: []` and `supports_reasoning_summaries: false`. Without them, Codex sends a `thinking` parameter that Ollama rejects with `does not support thinking`. Note that `qwen3-coder:30b` does support chain-of-thought reasoning — Qwen3 models reason internally via `&lt;think&gt;` tags. Disabling this API parameter just stops Codex from requesting it in an OpenAI-specific format that Ollama doesn't accept.
 
 Verify the catalog loaded correctly:
 

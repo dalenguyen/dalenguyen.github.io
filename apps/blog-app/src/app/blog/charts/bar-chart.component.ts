@@ -78,12 +78,12 @@ const H = 340
       :host {
         display: block;
         text-align: left;
-        color: #e6edf3;
+        color: var(--chart-fg, #e6edf3);
         font: 16px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       }
       .card {
-        background: #161b22;
-        border: 1px solid #30363d;
+        background: var(--chart-card, #161b22);
+        border: 1px solid var(--chart-border, #30363d);
         border-radius: 14px;
         padding: 20px;
         margin: 22px 0;
@@ -101,7 +101,7 @@ const H = 340
         gap: 16px;
         flex-wrap: wrap;
         font-size: 13px;
-        color: #9aa7b5;
+        color: var(--chart-muted, #9aa7b5);
       }
       .legend span {
         display: inline-flex;
@@ -116,15 +116,15 @@ const H = 340
       }
       .toggle {
         display: inline-flex;
-        background: #0b0f16;
-        border: 1px solid #30363d;
+        background: var(--chart-toggle, #0b0f16);
+        border: 1px solid var(--chart-border, #30363d);
         border-radius: 10px;
         padding: 3px;
       }
       .toggle button {
         background: none;
         border: none;
-        color: #9aa7b5;
+        color: var(--chart-muted, #9aa7b5);
         padding: 6px 13px;
         border-radius: 8px;
         cursor: pointer;
@@ -143,18 +143,18 @@ const H = 340
         overflow: visible;
       }
       .axis-line {
-        stroke: #30363d;
+        stroke: var(--chart-border, #30363d);
       }
       .axis-text {
-        fill: #6e7b8a;
+        fill: var(--chart-axis, #6e7b8a);
         font-size: 12px;
       }
       .glab {
-        fill: #9aa7b5;
+        fill: var(--chart-muted, #9aa7b5);
         font-size: 12.5px;
       }
       .vlab {
-        fill: #e6edf3;
+        fill: var(--chart-fg, #e6edf3);
         font-size: 11.5px;
         font-weight: 600;
       }
@@ -169,27 +169,28 @@ const H = 340
         opacity: 0.82;
       }
       .note {
-        color: #9aa7b5;
+        color: var(--chart-muted, #9aa7b5);
         font-size: 13.5px;
         margin: 8px 0 0;
       }
       .note b {
-        color: #e6edf3;
+        color: var(--chart-fg, #e6edf3);
       }
       .tip {
         position: fixed;
         pointer-events: none;
-        background: rgba(0, 0, 0, 0.88);
-        border: 1px solid #30363d;
+        background: var(--chart-card, #161b22);
+        box-shadow: 0 6px 20px rgb(0 0 0 / 0.3);
+        border: 1px solid var(--chart-border, #30363d);
         border-radius: 9px;
         padding: 8px 11px;
         font-size: 12.5px;
-        color: #e6edf3;
+        color: var(--chart-fg, #e6edf3);
         z-index: 50;
         max-width: 240px;
       }
       .tip b {
-        color: #fff;
+        color: var(--chart-fg, #e6edf3);
       }
     `,
   ],

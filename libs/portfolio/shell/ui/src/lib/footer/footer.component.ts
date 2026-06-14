@@ -4,13 +4,20 @@ import { ChangeDetectionStrategy, Component, VERSION } from '@angular/core'
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-footer',
   template: `
-    <footer
-      class="border-t border-slate-900/5 mx-auto w-full max-w-container px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-center"
-    >
-      <div class=" w-full">
-        <p class="text-center text-sm leading-6 text-slate-500">
-          Dale Nguyen © {{ currentYear }} - By using Angular {{ angularVersion }} &
-          <a href="https://analogjs.org/" target="_blank" rel="noopener">Analogjs</a>
+    <footer class="border-t border-border bg-bg">
+      <div class="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-3">
+        <p class="text-sm leading-6 text-fg-muted">
+          Dale Nguyen © {{ currentYear }}
+        </p>
+        <p class="text-xs leading-6 text-fg-muted">
+          Built with Angular {{ angularVersion }} &amp;
+          <a
+            href="https://analogjs.org/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-accent underline underline-offset-2"
+            >Analog</a
+          >
         </p>
       </div>
     </footer>

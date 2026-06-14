@@ -6,9 +6,7 @@ export interface PostAttributes {
   categories: string[]
   published: string
   profileImage: string
-  author: {
-    firstName: string
-    lastName: string
-  }
+  author: string
   series?: string
+  draft?: boolean
 }
