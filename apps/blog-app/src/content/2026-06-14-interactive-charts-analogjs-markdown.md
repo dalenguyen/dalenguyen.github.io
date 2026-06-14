@@ -226,6 +226,15 @@ export class DemoSliderComponent {
 
 The `mem` and `pct` computed signals recalculate every time `ctx` changes, so the number and bar reflow on every slider tick — no imperative event handling, no manual DOM writes.
 
+## Does it stay fast?
+
+Yes — and that is the whole point of the SSR-safe, lazy design. The fallback text is what prerenders, the chart code is loaded only in the browser and only on posts that actually use it, and each widget's styles are scoped behind a shadow boundary. So the interactivity costs almost nothing on first paint. Here is this very page on PageSpeed Insights (desktop):
+
+<figure>
+  <img src="assets/images/blog/interactive-charts-pagespeed-insights.png" alt="PageSpeed Insights desktop report for this post showing Performance 97, Accessibility 90, Best Practices 100, and SEO 92" width="100%" height="auto" />
+  <figcaption>PageSpeed Insights (desktop) for this very page: 97 Performance, 90 Accessibility, 100 Best Practices, 92 SEO — three live widgets and no performance tax.</figcaption>
+</figure>
+
 ## Adding your own interactive widget — the full recipe
 
 1. In your markdown, write `&lt;div data-chart="my-key"&gt;Fallback text for no-JS readers.&lt;/div&gt;`.
