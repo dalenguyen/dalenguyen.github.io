@@ -42,8 +42,8 @@ Mobile — before, then after:
 </figure>
 
 <figure>
-  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 78, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
-  <figcaption>Mobile, after: 78 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
+  <img src="assets/images/blog/all-green-lighthouse-pagespeed-after-mobile.png" alt="PageSpeed Insights mobile report after optimization: Performance 99, Accessibility 100, Best Practices 100, SEO 100" width="100%" height="auto" />
+  <figcaption>Mobile, after: 99 Performance / 100 Accessibility / 100 Best Practices / 100 SEO.</figcaption>
 </figure>
 
 | PageSpeed (Google-hosted Lighthouse) | Performance | Accessibility | Best Practices | SEO |
@@ -51,9 +51,9 @@ Mobile — before, then after:
 | Desktop — before | 91 | 90 | 100 | 92 |
 | Desktop — after | **99** | **100** | 100 | **100** |
 | Mobile — before | 59 | 90 | 100 | 92 |
-| Mobile — after | **78** | **100** | 100 | **100** |
+| Mobile — after | **99** | **100** | 100 | **100** |
 
-Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance climbed 59 → 78**: deferring third-party JS got it to 66, going **zoneless** took it to 77 (Total Blocking Time down to ~20 ms — the big jump), and serving **WebP cover images** trimmed LCP for the final point. What's left holding mobile in the high-70s is LCP at ~4.8 s — no longer the framework or image bytes, but render-blocking CSS and image-discovery timing on Slow 4G. (Desktop landed at 99; all figures measured on the deployed production site.)
+Two things stand out. **Accessibility and SEO both reached 100 here too**, confirming the contrast, label, and `robots.txt` fixes hold on Google's infrastructure — not just on my localhost run. And **mobile Performance climbed 59 → 99**, in stages: deferring third-party JS got it to 66, going **zoneless** took it to 77 (Total Blocking Time down to ~20 ms), **WebP covers** nudged it to 78, and finally **inlining the CSS + preloading the cover image** collapsed FCP (2.1 s → 0.9 s) and LCP (4.8 s → 1.4 s) to land at **99**. The last step was the surprise: the real mobile bottleneck was never the framework or image bytes — it was the render-blocking CSS round-trip and late image discovery on Slow 4G. (Desktop sits at 99/100/100/100; all figures measured on the deployed production site.)
 
 One more subtlety: **the same page scores differently depending on which Lighthouse build runs it.** PageSpeed Insights (Google-hosted) reports Best Practices 100 and has no "Agentic Browsing" category. The newer Lighthouse bundled in Chrome DevTools — which I used for the per-fix breakdown below — adds Agentic Browsing and weights the third-party-cookie issue far more harshly, so it scored the *same* page Best Practices 77 and Agentic Browsing 33. I optimized against the stricter build, so the fixes satisfy both.
 
@@ -307,18 +307,34 @@ This is safe only if the app is signal- and event-driven: any view that refreshe
 
 The WebP source is **root-relative** on purpose: a `<source>` does not fall back to the `<img>` on a 404, so an absolute prod URL would break the hero on preview builds. Across 25 covers this cut **12.2 MB → 0.9 MB (~92%)** — the interactive-charts cover went 92 KB → 36 KB — taking mobile LCP from 5.8 s to ~4.8 s and Performance to **78**.
 
+**Inline the CSS + preload the LCP image — the step that actually broke the ceiling.** Mobile was stuck in the high-70s with LCP ~4.8 s. I assumed I'd need classic *critical-CSS extraction* (inline above-the-fold, async the rest). Measuring first saved the effort: the entire stylesheet is only **~9 KB brotli**, already Tailwind-purged. So extraction was pointless — the cost wasn't bytes, it was the extra **render-blocking request** (a full round-trip on Slow 4G) plus discovering the cover image late. Two small `postRenderingHooks` fixed both:
+
+```ts
+// 1) Swap the render-blocking <link> for an inline <style> (no extra request)
+html = html.replace(/<link[^>]*rel="stylesheet"[^>]*href="(\/assets\/[^"]+\.css)"[^>]*>/g,
+  (tag, href) => { const css = readClientAsset(href); return css ? `<style>${css}</style>` : tag })
+
+// 2) Preload the cover (first <picture>) so it fetches during head parse
+//    <link rel="preload" as="image" type="image/webp" imagesrcset="…" fetchpriority="high">
+```
+
+The effect on mobile was dramatic: **FCP 2.1 s → 0.9 s**, **LCP 4.8 s → 1.4 s**, and Performance **78 → 99**. The lesson: don't reach for the heavy tool (critical-CSS extraction) before measuring — for a small stylesheet, inlining the whole thing is simpler and just as effective.
+
 **Core Web Vitals (lab measurements, deployed production site):**
 
 | Metric | Before | After |
 |---|---|---|
-| LCP (desktop) | 194 ms | 102 ms |
+| Mobile Performance | 59 | **99** |
+| FCP (mobile) | 2.1 s | **0.9 s** |
+| LCP (mobile) | 4.8 s | **1.4 s** |
 | Total Blocking Time (mobile) | — | **~20 ms** |
 | Cover image (LCP element) | 92 KB PNG | **36 KB WebP** |
 | Eager JS on the post | 658 KB | **583 KB** |
+| Render-blocking CSS requests | 1 | **0** |
 | CLS | 0.00 | 0.00 |
 | 3rd-party scripts on initial load | 4 (GA + Clarity + Logichat + Giscus) | **0** |
 
-CLS was 0.00 throughout and did not need fixing. With zone.js, the third-party scripts, and the PNG cover all off the critical path, mobile Performance settled at **78**; the remaining gap to the 90s is **LCP at ~4.8 s** — now bounded by render-blocking CSS and image-discovery timing on Slow 4G, not by the framework or image bytes. Critical-CSS inlining is the next lever.
+CLS was 0.00 throughout. The combined effect — zoneless framework, zero third-party on load, WebP covers, inlined CSS, preloaded LCP image — took **mobile from 59 to 99**, matching desktop's 99/100/100/100. There was no real "framework ceiling"; the mobile gap was a render-blocking CSS round-trip and a late-discovered image all along.
 
 ---
 
@@ -334,5 +350,6 @@ Eight failing audits across four Lighthouse categories, now zero. The fixes in r
 6. **Lazy-load Giscus + `fetchpriority` on LCP image** — zero third-party scripts on initial load, LCP stays green.
 7. **Zoneless change detection + trim the eager bundle** (drop `zone.js`, inline-SVG icons instead of Angular Material, lazy Sentry) — mobile Performance 66 → 77, eager JS 658 → 583 KB, TBT ~20 ms.
 8. **WebP cover images via `<picture>`** — covers 92% smaller (12.2 MB → 0.9 MB), mobile 77 → 78, LCP 5.8 s → ~4.8 s.
+9. **Inline the global CSS + preload the LCP image** — FCP 2.1 s → 0.9 s, LCP 4.8 s → 1.4 s, mobile Performance 78 → **99**.
 
-Most of the audit fixes were small and surgical; the one structural change — going zoneless — was the biggest single mobile win (TBT to ~20 ms). The most *thinking* went into understanding why scroll deferral does not work for analytics (audit tools auto-scroll). Mobile finished at **78** on the deployed site, with the remaining ceiling being render-blocking CSS / LCP timing — a critical-CSS round, not the framework.
+The audit fixes were small and surgical; going zoneless was the biggest single TBT win; but the real surprise was the last step — **mobile 78 → 99 from inlining a 9 KB stylesheet and preloading one image**. The recurring lesson: *measure before reaching for the heavy tool.* Scroll-gated deferral failed because audit tools auto-scroll; critical-CSS extraction was unnecessary because the CSS was tiny. The page that started at 90/77/92/33 desktop now sits at **99/100/100/100 on both desktop and mobile**.
