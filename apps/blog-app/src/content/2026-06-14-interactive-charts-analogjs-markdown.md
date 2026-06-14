@@ -10,23 +10,23 @@ author: Dale Nguyen
 draft: false
 ---
 
-Static markdown is great for most blog posts. But occasionally you want a reader to *interact* with the content — drag a slider, toggle between metrics, hover a bar to see the exact value. AnalogJS does not ship that capability out of the box, but the pieces are all there. This post documents the architecture that powers the live charts you see on this blog, and shows you exactly how to add your own.
+Static markdown is great for most blog posts. But occasionally you want a reader to *interact* with the content — drag a slider, hover a bar to see the exact value. AnalogJS does not ship that capability out of the box, but the pieces are all there. This post documents the architecture that powers the live charts you see on this blog, and shows you exactly how to add your own.
 
-The two widgets below are live — drag the slider, hover the bars.
+The two widgets below are live — hover the bars, drag the slider.
 
-<div data-chart="demo-bars">Chart: page render time comparison across front-end frameworks (median vs p95). Enable JavaScript to view.</div>
+<div data-chart="demo-bars">Chart: median render time across three frameworks. Enable JavaScript to view.</div>
 
-<div data-chart="slider-demo">Interactive widget: KV-cache memory estimator — drag the slider to see how much memory different model sizes need at your chosen context length. Enable JavaScript to view.</div>
+<div data-chart="slider-demo">Interactive widget: KV-cache memory estimator — drag the slider to see how memory grows with context length. Enable JavaScript to view.</div>
 
-## The problem: `<script>` tags don't work in markdown
+## The problem: `&lt;script&gt;` tags don't work in markdown
 
-Analog renders markdown via the `<analog-markdown>` component. Raw HTML in the markdown source *does* survive — Analog passes it through Angular's `bypassSecurityTrustHtml` — so a bare `<div>` or `<figure>` will land in the DOM. But inline `<script>` tags are stripped before they reach the page; even if they weren't, a second script tag injected into an already-bootstrapped Angular app won't execute.
+Analog renders markdown via the `&lt;analog-markdown&gt;` component. Raw HTML in the markdown source *does* survive — Analog passes it through Angular's `bypassSecurityTrustHtml` — so a bare `&lt;div&gt;` or `&lt;figure&gt;` will land in the DOM. But inline `&lt;script&gt;` tags never run; even if they did, a script injected into an already-bootstrapped Angular app won't execute.
 
 The solution is to leave an empty **placeholder element** in the markdown and mount a real Angular component into it *after* the markdown has rendered.
 
 ## Step 1 — Write a placeholder in the markdown
 
-In your `.md` file, drop an empty `<div>` with a `data-chart` attribute and a plain-text fallback. The fallback is shown when JavaScript is off or before the component mounts:
+In your `.md` file, drop an empty `&lt;div&gt;` with a `data-chart` attribute and a plain-text fallback. The fallback is shown when JavaScript is off or before the component mounts:
 
 ```html
 <div data-chart="speed">Chart: decode speed by prompt length.</div>
@@ -36,7 +36,7 @@ The value of `data-chart` is your **key**. You can have as many as you like per 
 
 ## Step 2 — Create a co-located manifest
 
-Next to your markdown file `src/content/<slug>.md`, create a folder `src/content/<slug>/` and put a `charts.ts` inside it. Its default export maps every `data-chart` key to an Angular component — and optional `inputs` to pass to it:
+Next to your markdown file `src/content/&lt;slug&gt;.md`, create a folder `src/content/&lt;slug&gt;/` and put a `charts.ts` inside it. Its default export maps every `data-chart` key to an Angular component — and optional `inputs` to pass to it:
 
 ```ts
 // src/content/my-post/charts.ts
@@ -96,7 +96,7 @@ export async function mountInteractiveCharts(
 }
 ```
 
-`createComponent` with a `hostElement` turns the placeholder `<div>` into the component's host node. `setInput` applies any `inputs` from the manifest. `appRef.attachView` registers the view with Angular's change-detection tree. The `data-mounted` flag prevents double-mounting if the effect fires more than once.
+`createComponent` with a `hostElement` turns the placeholder div into the component's host node. `setInput` applies any `inputs` from the manifest. `appRef.attachView` registers the view with Angular's change-detection tree. The `data-mounted` flag prevents double-mounting if the effect fires more than once.
 
 ## Step 4 — How the route triggers the mounter
 
@@ -167,7 +167,20 @@ The `charts.ts` and component files you drop under `src/content/` are not part o
 
 Without `"src/content/**/*.ts"` the compiler treats those files as orphaned, serves them untranspiled, and you get runtime errors like `Missing initializer in const declaration` when the browser tries to parse raw TypeScript.
 
-## Gotcha 2 — Shadow DOM isolates chart styles from the article
+## Gotcha 2 — write tags as entities in inline code
+
+This bit the live demo while writing this very post. The markdown renderer passes inline-code content through **unescaped**, so a single-backtick span containing a script tag emits a real element into the DOM. The browser treats it as a raw-text element and swallows the rest of the article — the post silently cuts off.
+
+The fix: inside inline code, write angle brackets as HTML entities. Compare what you type in the markdown *source*:
+
+```text
+Bad:   `<script>`        becomes a live element, truncates the post
+Good:  `&lt;script&gt;`   renders as the visible text <script>, safe
+```
+
+Fenced code blocks like this one are highlighted by Prism and escaped automatically, so multi-line examples are safe as-is — this only affects single-backtick spans.
+
+## Gotcha 3 — Shadow DOM isolates chart styles from the article
 
 Chart components use `encapsulation: ViewEncapsulation.ShadowDom`:
 
@@ -186,7 +199,7 @@ The tradeoff: global Tailwind utilities cannot cross that boundary either, so th
 
 ## A bespoke per-post component
 
-You are not limited to the shared `BarChartComponent`. Any standalone Angular component works. The `kv-slider.component.ts` file in this post's folder is a self-contained example — under 120 lines, no external dependencies, signal-based reactivity:
+You are not limited to the shared `BarChartComponent`. Any standalone Angular component works. The `kv-slider.component.ts` file in this post's folder is a self-contained example — no external dependencies, signal-based reactivity. It is the second widget at the top of this post:
 
 ```ts
 @Component({
@@ -197,32 +210,18 @@ You are not limited to the shared `BarChartComponent`. Any standalone Angular co
 })
 export class DemoSliderComponent {
   readonly ctx = signal(8192)
-
   readonly ctxLabel = computed(() => fmtCtx(this.ctx()))
-
-  readonly rows = computed(() => {
-    const n = this.ctx()
-    const maxBytes = MODELS[MODELS.length - 1].bpt * n
-    return MODELS.map((m) => {
-      const bytes = m.bpt * n
-      return {
-        label: m.label,
-        shortLabel: m.label.split(' ')[0],
-        mem: fmtMem(bytes),
-        pct: (bytes / maxBytes) * 100,
-        color: m.color,
-      }
-    })
-  })
+  readonly mem = computed(() => fmtMem(BYTES_PER_TOKEN * this.ctx()))
+  readonly pct = computed(() => (this.ctx() / MAX_CTX) * 100)
 }
 ```
 
-The `rows` computed signal recalculates every time `ctx` changes, so the bars reflow on every slider tick with no imperative event handling.
+The `mem` and `pct` computed signals recalculate every time `ctx` changes, so the number and bar reflow on every slider tick — no imperative event handling, no manual DOM writes.
 
 ## Adding your own interactive widget — the full recipe
 
-1. In your markdown, write `<div data-chart="my-key">Fallback text for no-JS readers.</div>`.
-2. Create `src/content/<your-slug>/charts.ts` with a default export mapping `"my-key"` to your component (and any `inputs`).
+1. In your markdown, write `&lt;div data-chart="my-key"&gt;Fallback text for no-JS readers.&lt;/div&gt;`.
+2. Create `src/content/&lt;your-slug&gt;/charts.ts` with a default export mapping `"my-key"` to your component (and any `inputs`).
 3. That is it. The `import.meta.glob` in `mount-charts.ts` discovers the new manifest automatically — no shared file needs editing.
 
 If you are reusing the shared `BarChartComponent`, put your data in a co-located `*.data.ts` file that exports a `BarChartConfig`. If you are building something custom, write a standalone component with `ViewEncapsulation.ShadowDom`, drop it in the same folder, and reference it in the manifest.
