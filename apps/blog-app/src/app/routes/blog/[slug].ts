@@ -152,6 +152,7 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   private readonly appRef = inject(ApplicationRef)
   private readonly platformId = inject(PLATFORM_ID)
   private chartRefs: ComponentRef<unknown>[] = []
+  private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
 
   readonly series = computed(() => {
@@ -208,6 +209,8 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
   }
 
   ngOnDestroy() {
+    this.giscusObserver?.disconnect()
+    this.giscusObserver = undefined
     this.destroyMountedCharts()
   }
 
@@ -274,16 +277,17 @@ export default class BlogPostComponent implements AfterViewInit, OnDestroy {
       return
     }
 
-    const observer = new IntersectionObserver(
+    this.giscusObserver = new IntersectionObserver(
       (entries, obs) => {
         if (entries.some((entry) => entry.isIntersecting)) {
           obs.disconnect()
+          this.giscusObserver = undefined
           this.injectGiscus(container)
         }
       },
       { rootMargin: '600px 0px' },
     )
-    observer.observe(container)
+    this.giscusObserver.observe(container)
   }
 
   private injectGiscus(container: HTMLElement) {
