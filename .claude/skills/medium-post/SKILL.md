@@ -65,6 +65,16 @@ html_body = blog.evaluate("""() => {
     spans[i].replaceWith(document.createTextNode(spans[i].textContent));
   }
 
+  // Make relative body image URLs absolute — Medium silently DROPS relative
+  // srcs (e.g. assets/images/blog/x.png) and only imports absolute ones.
+  var bodyImgs = clone.querySelectorAll('img');
+  for (var i = 0; i < bodyImgs.length; i++) {
+    var src = bodyImgs[i].getAttribute('src') || '';
+    if (src && !/^https?:\\/\\//.test(src)) {
+      bodyImgs[i].setAttribute('src', 'https://dalenguyen.me/' + src.replace(/^\\//, ''));
+    }
+  }
+
   // Remove heading IDs (not needed on Medium)
   var hs = clone.querySelectorAll('h1,h2,h3,h4,h5,h6');
   for (var i = 0; i < hs.length; i++) hs[i].removeAttribute('id');
@@ -127,18 +137,28 @@ context.browser.close()
 
 ### Step 3: Confirm and report to user
 
-After the script runs:
-- Confirm the URL is `/p/<id>/edit` (not `/new-story`)
-- Tell the user the draft URL
-- List the topics to add manually from the publish panel
+After the script runs, **verify by re-opening the draft — do not trust the printed URL.** The script reads `page.url` a few seconds after paste, and Medium often still shows `/new-story` then (it redirects to `/p/<id>/edit` only after the first auto-save). A `/new-story` print is NOT proof of failure.
+
+To verify, open `https://medium.com/me/stories/drafts`, find the draft by title, then open `https://medium.com/p/<id>/edit` and count content in the `article`:
+- **Images** = 1 (cover) + every in-body image. If you only see 1, the body images were dropped — check that Fix 1 (absolute URLs) ran.
+- Headings, code blocks, paragraphs, and char count are non-zero and the body runs intro-to-conclusion.
+
+Then report to the user:
+- The real draft URL (`/p/<id>/edit`)
+- The topics to add manually from the publish panel
+- The **canonical link** to set (publish panel → "Advanced settings → Customize canonical link"): `https://dalenguyen.me/blog/<slug>` — points SEO at the original blog post
+- That **tables won't render** on Medium (see Notes) if the post has any
 - Remind them to click Publish after reviewing
+
+If you created a corrected replacement draft, **delete the flawed one** so the user can't publish it by mistake: on the drafts page each row has a hover-hidden "Toggle actions menu" button — click it via JS (`el.click()`, not `page.click`, which fails on the hidden element), choose "Delete story", then click "Delete" in the confirmation dialog (scope the query to `[role="dialog"]` so you don't hit a stray button). Create the replacement first, then delete — Medium draft deletion is permanent.
 
 ## Notes
 
 - **Always save as draft** — do not click Publish
 - Medium auto-saves continuously; no explicit save button needed
 - **Topics** must be added manually from the publish panel (click "Publish" → add topics)
-- **Tables** in the blog post will not render in Medium (Medium doesn't support tables) — leave as-is
+- **Tables** in the blog post will not render in Medium (Medium doesn't support tables) — leave as-is, or tell the user to paste table data as screenshots
+- **Relative image URLs are silently dropped.** Blog body images often use relative srcs (`assets/images/blog/x.png`); Medium only imports absolute (`https://…`) URLs. Step 2's extraction rewrites them — without it, only the cover (already absolute) survives and before/after screenshots vanish. Always confirm the final image count matches expectations
 - The `<figure><figcaption>` pattern is the correct way to embed cover image + caption in one paste — `<img><br>` causes the following text to be misinterpreted as the caption
 - CloakBrowser passes Medium's bot detection reliably
 - **`DataTransfer` + `ClipboardEvent` does NOT work** in Medium's editor — the paste event fires but Medium ignores it. Use `navigator.clipboard.write()` with `ClipboardItem` + a real `Meta+v` keystroke instead
