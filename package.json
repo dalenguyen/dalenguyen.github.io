@@ -52,7 +52,7 @@
     "@angular/material": "20.2.8",
     "@angular/platform-browser": "20.3.4",
     "@angular/platform-browser-dynamic": "20.3.4",
-    "@angular/platform-server": "~20.3.4",
+    "@angular/platform-server": "~20.3.24",
     "@angular/router": "20.3.4",
     "@angular/ssr": "20.3.5",
     "@google-cloud/functions-framework": "^3.2.0",
