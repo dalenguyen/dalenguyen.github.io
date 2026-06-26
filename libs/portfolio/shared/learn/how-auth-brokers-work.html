@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Auth Brokers Work — Connecting Services with Stytch & Composio</title>
+<meta name="description" content="Interactive guide to auth middleware: how a service like Composio or Stytch brokers OAuth between apps — the four roles, the authorization-code flow, connected accounts, automatic token refresh, and consumer vs. provider architectures.">
+<meta name="date" content="2026-06-17">
+<meta name="timestamp" content="2026-06-17T12:00:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #9696b0;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 660px; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; cursor: pointer; user-select: none;
+}
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+pre.code {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; font-size: 12.5px; line-height: 1.65; overflow-x: auto;
+  margin: 12px 0; color: #d6d6e7;
+}
+.tok-k { color: #82aaff; } .tok-s { color: #c3e88d; } .tok-c { color: #697098; } .tok-n { color: #f78c6c; } .tok-f { color: #c792ea; }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin: 14px 0;
+}
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 8px; margin: 16px 0 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-weight: 500; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- S1: credential sprawl ---------- */
+.mode-toggle { display: flex; gap: 8px; margin-bottom: 14px; }
+.svc-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 16px; }
+.svc-chip {
+  display: flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+  font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.svc-chip:hover { border-color: var(--accent); }
+.svc-chip.on { border-color: var(--green); background: rgba(74,222,128,0.1); color: var(--green); }
+.svc-chip .svc-ico { font-size: 16px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-card { border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); padding: 14px; }
+.stat-num { font-size: 30px; font-weight: 800; line-height: 1; }
+.stat-num.bad { color: var(--red); } .stat-num.good { color: var(--green); }
+.stat-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+/* ---------- S2: role cards ---------- */
+.role-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.role-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 14px 12px; cursor: pointer; transition: border-color 0.2s, transform 0.1s;
+  text-align: left; color: var(--text); font-family: inherit;
+}
+.role-card:hover { border-color: var(--accent); }
+.role-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.role-icon { font-size: 22px; margin-bottom: 6px; }
+.role-name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+.role-tag { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+/* ---------- S3: sequence timeline ---------- */
+.seq-track    { position: relative; padding: 24px 0 8px; }
+.seq-line-bg  { position: absolute; top: 32px; left: 20px; right: 20px; height: 3px;
+                background: var(--border); border-radius: 99px; }
+.seq-line-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px;
+                 transition: width 0.35s ease; }
+.seq-steps    { display: flex; justify-content: space-between; position: relative; }
+.seq-step     { display: flex; flex-direction: column; align-items: center; gap: 8px;
+                cursor: pointer; opacity: 0.3; transition: opacity 0.3s; min-width: 48px; }
+.seq-step.seq-revealed  { opacity: 1; }
+.seq-step.seq-selected .seq-dot { box-shadow: 0 0 0 3px var(--accent-glow); }
+.seq-dot      { width: 18px; height: 18px; border-radius: 50%; background: var(--border);
+                border: 2px solid var(--surface2); transition: background 0.3s; flex-shrink: 0; }
+.seq-dot.seq-dot-active { background: var(--accent); border-color: var(--accent); }
+.seq-label    { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
+.seq-detail   { margin-top: 16px; padding: 10px 14px; background: var(--surface2);
+                border-radius: 8px; font-size: 13px; color: var(--text); min-height: 40px;
+                border: 1px solid var(--border); line-height: 1.5; }
+
+/* ---------- S4: token vault ---------- */
+.vault-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 14px 16px; font-size: 12.5px; margin-bottom: 12px;
+}
+.vault-row { display: flex; justify-content: space-between; gap: 12px; padding: 5px 0; border-bottom: 1px dashed var(--border); }
+.vault-row:last-child { border-bottom: none; }
+.vault-key { color: var(--muted); white-space: nowrap; }
+.vault-val { font-family: ui-monospace, Menlo, monospace; color: var(--text); word-break: break-all; text-align: right; }
+.vault-val.tok { color: var(--green); }
+.badge { display: inline-block; padding: 2px 9px; border-radius: 99px; font-size: 11px; font-weight: 700; }
+.badge.ok   { background: rgba(74,222,128,0.12); color: var(--green); border: 1px solid var(--green); }
+.badge.exp  { background: rgba(248,113,113,0.12); color: var(--red);   border: 1px solid var(--red); }
+
+/* ---------- S5: direction flow ---------- */
+.flow-row { display: flex; align-items: stretch; gap: 6px; margin: 14px 0; flex-wrap: wrap; }
+.flow-node {
+  flex: 1; min-width: 92px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 12px 8px; text-align: center; transition: all 0.2s;
+}
+.flow-node.lit { border-color: var(--amber); background: rgba(251,191,36,0.1); }
+.flow-node .f-ico { font-size: 20px; }
+.flow-node .f-name { font-size: 11.5px; font-weight: 700; margin-top: 3px; }
+.flow-node .f-sub { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.35; }
+.flow-arrow { display: flex; align-items: center; color: var(--muted); font-size: 16px; flex-shrink: 0; }
+
+/* ---------- S6: architecture ---------- */
+.arch-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 14px 0; }
+.arch-node {
+  position: relative; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 14px 10px; text-align: center; cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+}
+.arch-node .a-icon { font-size: 22px; margin-bottom: 4px; }
+.arch-node .a-name { font-size: 12px; font-weight: 700; }
+.arch-node .a-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.arch-node.lit { border-color: var(--amber); background: rgba(251,191,36,0.1); }
+.arch-tooltip {
+  display: none; position: fixed; z-index: 1000; pointer-events: none;
+  width: 230px; background: var(--surface2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: left; line-height: 1.5;
+}
+
+/* ---------- Quiz ---------- */
+.quiz { margin-top: 22px; border-top: 1px dashed var(--border); padding-top: 18px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-q::before { content: "QUIZ"; display: inline-block; font-size: 10px; letter-spacing: 1.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 5px; padding: 1px 7px; margin-right: 10px; vertical-align: 1px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; font-family: inherit; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 7px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); }
+
+/* ---------- Completion ---------- */
+.completion {
+  display: none; text-align: center; padding: 36px 24px; margin: 40px 0;
+  border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05);
+}
+.completion.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.completion h2 { color: var(--green); font-size: 22px; margin-bottom: 8px; }
+.completion p { color: var(--muted); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .role-cards { grid-template-columns: repeat(2, 1fr); }
+  .arch-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-grid { grid-template-columns: 1fr; }
+  .seq-label span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <span class="hero-label">Auth Brokers · Stytch &amp; Composio · 2026</span>
+  <h1>How a Middle Service <span class="grad">Connects Auth</span> Between Apps</h1>
+  <p>The mental model behind tools like <strong style="color:var(--text)">Composio</strong> and <strong style="color:var(--text)">Stytch</strong>: how one service brokers OAuth so your app — or your AI agent — can act across Gmail, Slack, GitHub and 500 others, without ever touching a raw credential. Roles, the handshake, connected accounts, token refresh, and the full architecture.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">Why a Middle Service? The N×M Credential Problem</div>
+      <div class="section-sub">Every new integration multiplies the OAuth flows, token stores, and refresh jobs you own</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Say your app (or agent) needs to read a user's Gmail, post to their Slack, and open GitHub PRs for them. Each one is a <strong>separate OAuth integration</strong>: register an app with the provider, build the redirect/consent flow, securely store the returned tokens, and run a job to refresh them before they expire — <em>per provider, per user</em>. Add a fourth service and you do it all again.</p>
+    <p>A <strong>middle service</strong> — an auth broker like Composio (for consuming others' APIs) or Stytch (for issuing your own) — collapses that. You integrate with <strong>the broker once</strong>; it owns each provider's OAuth dance, encrypts and stores the tokens, and refreshes them silently. Your code goes from "maintain N integrations" to "call one API."</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — connect some services, then flip on the broker</div>
+      <div class="mode-toggle">
+        <button class="btn" id="mode-diy" onclick="setMode('diy')">🛠️ Do it yourself</button>
+        <button class="btn btn-outline" id="mode-broker" onclick="setMode('broker')">🧩 Use an auth broker</button>
+      </div>
+      <div class="svc-grid" id="svc-grid"></div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num bad" id="stat-flows">0</div>
+          <div class="stat-cap" id="stat-flows-cap">OAuth flows you build &amp; maintain</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num bad" id="stat-refresh">0</div>
+          <div class="stat-cap" id="stat-refresh-cap">Token-refresh jobs you own</div>
+        </div>
+      </div>
+      <div class="demo-log" id="sprawl-log">Click services to connect them, then toggle the mode and watch what <em>you</em> have to maintain.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Once you adopt an auth broker, why does adding a 5th third-party integration cost almost nothing?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Brokers cache every provider's data so no integration is needed</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">You integrate once with the broker; it already owns each provider's OAuth flow, token storage, and refresh</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">OAuth providers stop requiring per-app registration after the first one</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">The Four Roles in Every OAuth Handshake</div>
+      <div class="section-sub">Resource owner · client · authorization server · resource server — and where the broker sits</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Everything a broker does is just <strong>OAuth 2.0</strong> played well. OAuth defines four roles. The whole point is <strong>delegated access</strong>: the user lets a client act on their behalf <em>without</em> handing over their password — the provider issues a scoped token instead.</p>
+    <p>The mental unlock: the <strong>broker plays the "client" role</strong>. It holds the OAuth <code>client_id</code>/<code>client_secret</code> registered with each provider and drives the flow so your app or agent doesn't have to.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — click each role to see who it is in "agent reads your Gmail"</div>
+      <div class="role-cards">
+        <button class="role-card" id="role-owner" onclick="pickRole('owner')">
+          <div class="role-icon">🧑</div>
+          <div class="role-name">Resource Owner</div>
+          <div class="role-tag">owns the data</div>
+        </button>
+        <button class="role-card" id="role-client" onclick="pickRole('client')">
+          <div class="role-icon">🧩</div>
+          <div class="role-name">Client</div>
+          <div class="role-tag">wants access</div>
+        </button>
+        <button class="role-card" id="role-as" onclick="pickRole('as')">
+          <div class="role-icon">🛂</div>
+          <div class="role-name">Authorization Server</div>
+          <div class="role-tag">issues tokens</div>
+        </button>
+        <button class="role-card" id="role-rs" onclick="pickRole('rs')">
+          <div class="role-icon">📬</div>
+          <div class="role-name">Resource Server</div>
+          <div class="role-tag">holds the API</div>
+        </button>
+      </div>
+      <div class="demo-log" id="role-log">Click a role card.</div>
+    </div>
+
+    <div class="callout">A <strong>scope</strong> is the leash: when the broker (client) starts the flow it asks only for what it needs — e.g. <code>gmail.send</code>, not <code>mail.google.com/</code> full access. The provider shows the user exactly those scopes on the consent screen, and the token can never exceed them.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">When the broker runs the flow so your agent can send mail as the user, which OAuth role does the <em>broker</em> play?</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">The resource owner — it owns the Gmail account</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">The client — it's the party requesting delegated access on the user's behalf</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">The authorization server — it issues the access tokens</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">The Authorization-Code Flow: The Actual Handshake</div>
+      <div class="section-sub">From "Connect Gmail" to a stored token — one redirect, one code, one server-side exchange</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>This is the choreography the broker performs the first time a user connects a service. The clever bit is the <strong>authorization code</strong>: the browser only ever carries a short-lived, single-use code — the real tokens are fetched <strong>server-to-server</strong> using the client secret, so they never ride in a URL or sit in the browser.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — play the flow, or click any step to inspect it</div>
+      <div class="seq-track">
+        <div class="seq-line-bg"><div class="seq-line-fill" id="seq-line"></div></div>
+        <div class="seq-steps" id="seq-steps"></div>
+      </div>
+      <div class="seq-detail" id="seq-detail">Click a step to inspect it.</div>
+      <div style="display:flex;gap:8px;margin-top:14px;">
+        <button class="btn" onclick="playTimeline()">Play</button>
+        <button class="btn btn-outline" onclick="resetTimeline()">Reset</button>
+      </div>
+    </div>
+
+    <pre class="code"><span class="tok-c">// Step 5 — the broker's SERVER exchanges the code (client secret never leaves the backend)</span>
+<span class="tok-f">POST</span> https://oauth2.googleapis.com/token
+{ <span class="tok-k">"grant_type"</span>: <span class="tok-s">"authorization_code"</span>,
+  <span class="tok-k">"code"</span>: <span class="tok-s">"4/0Ax…single-use…"</span>,
+  <span class="tok-k">"client_id"</span>: <span class="tok-s">"&lt;broker's id&gt;"</span>,
+  <span class="tok-k">"client_secret"</span>: <span class="tok-s">"&lt;broker's secret&gt;"</span> }
+<span class="tok-c">// → { "access_token": "ya29.…", "refresh_token": "1//0e…", "expires_in": 3599 }</span></pre>
+
+    <div class="callout warn"><strong>The <code>state</code> parameter</strong> the broker sends in step 2 comes back in step 4. It ties the redirect to the request that started it — without it, an attacker could trick a user into completing a flow the attacker began (CSRF). Brokers handle this for you.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">At the redirect (step 4) the provider hands back a code — not the access token. Why?</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">The access token isn't generated until the user logs out</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">The code is short-lived and single-use; the token is fetched server-side with the client secret, so it never rides in the browser URL</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Codes are smaller than tokens and fit in a URL more easily</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Connected Accounts: Where the Tokens Live (and Refresh)</div>
+      <div class="section-sub">One encrypted record per user-per-service — and silent refresh the agent never sees</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>After the handshake, the broker stores the result as a <strong>connected account</strong>: an encrypted record keyed by <em>your</em> user id + the service, holding the access token, the refresh token, the granted scopes, and an expiry. (Composio calls this exactly that — a "connected account"; one user can even have several on the same toolkit.)</p>
+    <p>Access tokens are deliberately short-lived (~1 hour). The magic that makes a broker feel seamless: when your agent makes a call and the token is stale, the broker <strong>silently swaps in a fresh one using the refresh token</strong>, then completes the call. The agent never handles, sees, or refreshes a token.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — the broker's vault for user_42's Gmail. Make calls, expire the token, watch it self-heal</div>
+      <div class="vault-card" id="vault">
+        <div class="vault-row"><span class="vault-key">owner</span><span class="vault-val">user_42</span></div>
+        <div class="vault-row"><span class="vault-key">toolkit</span><span class="vault-val">gmail</span></div>
+        <div class="vault-row"><span class="vault-key">access_token</span><span class="vault-val tok" id="v-access">ya29.a0Af_Hq3…8xQk</span></div>
+        <div class="vault-row"><span class="vault-key">refresh_token</span><span class="vault-val tok">1//0eXa…long-lived…rT9</span></div>
+        <div class="vault-row"><span class="vault-key">scopes</span><span class="vault-val">gmail.send</span></div>
+        <div class="vault-row"><span class="vault-key">status</span><span class="vault-val"><span class="badge ok" id="v-badge">valid · ~59m left</span></span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="agentCall()">🤖 Agent: send an email</button>
+        <button class="btn btn-outline" onclick="expireToken()">⏩ Fast-forward 1 hour</button>
+        <button class="btn btn-outline" onclick="resetVault()">Reset</button>
+      </div>
+      <div class="demo-log" id="vault-log">The agent just wants to "send an email." It never asks about tokens — that's the broker's job.</div>
+    </div>
+
+    <div class="callout good"><strong>Security payoff.</strong> Tokens live encrypted in the broker, scoped to the minimum, and are revocable per connected account. A leak in your app code exposes <em>no</em> long-lived provider credentials — your code only ever held a broker handle, never Google's refresh token.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">An agent calls "send email," but the stored access token expired 5 minutes ago. With a good broker, what happens?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">The call fails with 401 and the agent must restart the OAuth flow</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">The agent is handed the refresh token and refreshes it itself</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">The broker silently uses the refresh token to mint a new access token, then completes the call — the agent never notices</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Two Directions: Consuming APIs vs. Becoming the Provider</div>
+      <div class="section-sub">Composio holds tokens to call others for you · Stytch makes your app the OAuth provider</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>"Middle service" covers two mirror-image jobs. Both broker OAuth — but the tokens flow in opposite directions, and that's the cleanest way to tell Composio and Stytch apart.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'dir-consume')">⬅️ Consume (Composio)</button>
+      <button class="tab" onclick="switchTab(this,'dir-provide')">➡️ Provide (Stytch)</button>
+    </div>
+
+    <div class="tab-panel active" id="dir-consume">
+      <p>Your agent wants to <strong>act on other services</strong>. The broker holds the <em>downstream</em> tokens (from Gmail, Slack, GitHub…) and exposes them as clean, typed tools your LLM can call. This is the <strong>Composio</strong> model: managed auth for 500+ apps, just-in-time tool calls, native function calling.</p>
+      <div class="flow-row" id="consume-flow">
+        <div class="flow-node"><div class="f-ico">🤖</div><div class="f-name">Your Agent</div><div class="f-sub">calls a tool</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="f-ico">🧩</div><div class="f-name">Composio</div><div class="f-sub">holds user's tokens</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="f-ico">🌐</div><div class="f-name">Gmail / Slack / GitHub</div><div class="f-sub">others' APIs</div></div>
+      </div>
+      <button class="btn" onclick="traceFlow('consume-flow','consume-log',consumeMsgs)">▶ Trace a tool call</button>
+      <div class="demo-log" id="consume-log">The agent never sees a token — it just calls <code>GMAIL_SEND_EMAIL</code> and the broker does the rest.</div>
+    </div>
+
+    <div class="tab-panel" id="dir-provide">
+      <p>You flip around and let <strong>others act on you</strong>. With <strong>Stytch Connected Apps</strong>, your app becomes a fully compliant OAuth 2.0 / OIDC <em>provider</em> — so other apps (and AI agents over MCP) get a "Log in with Your App" button and you issue <em>them</em> scoped tokens. Stytch runs the authorization-code handling, JWT issuance/verification via JWKS, refresh, and revocation.</p>
+      <div class="flow-row" id="provide-flow">
+        <div class="flow-node"><div class="f-ico">🧠</div><div class="f-name">Their Agent / App</div><div class="f-sub">"Log in with You"</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="f-ico">🛂</div><div class="f-name">Stytch + Your App</div><div class="f-sub">issues tokens</div></div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-node"><div class="f-ico">📬</div><div class="f-name">Your API</div><div class="f-sub">scoped access</div></div>
+      </div>
+      <button class="btn" onclick="traceFlow('provide-flow','provide-log',provideMsgs)">▶ Trace a login</button>
+      <div class="demo-log" id="provide-log">Now <em>you</em> are the authorization server from Section 2 — issuing tokens others present to your API.</div>
+    </div>
+
+    <div class="callout">Same protocol, opposite vantage point. <strong>Consuming:</strong> the broker is a <em>client</em> to many providers. <strong>Providing:</strong> the broker turns you <em>into</em> the provider. Plenty of stacks use both — consume others' tools <em>and</em> expose your own.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">What's the core architectural difference between Composio and Stytch Connected Apps?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Composio uses OAuth; Stytch uses a completely different protocol</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">Composio holds tokens so you can call others' APIs (consumer); Stytch turns your app into an OAuth provider that issues tokens so others can call you</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Composio is only for humans; Stytch is only for AI agents</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">The Full Architecture, End to End</div>
+      <div class="section-sub">"Post to Slack" → broker resolves the connected account, handles the token, calls the API</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Put the pieces together. The agent issues a <strong>plain intent</strong> ("post this to Slack"). The broker splits into two responsibilities you saw earlier: an <strong>auth layer</strong> that resolves which connected account to use and refreshes its token if stale (Sections 3–4), and the outbound call to the real <strong>service API</strong>. The agent holds no secret — only a broker handle + the target user id.</p>
+    <div class="callout good">Hover each component for its job, then hit <strong>Play full flow</strong>.</div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — one request, end to end</div>
+      <div class="arch-grid">
+        <div class="arch-node" id="an-agent">
+          <div class="a-icon">🤖</div><div class="a-name">Agent / App</div><div class="a-sub">"post to Slack"</div>
+          <div class="arch-tooltip">Calls a typed tool with a plain intent and the target user id. Never sees a client secret or a provider token — it only holds a broker API key.</div>
+        </div>
+        <div class="arch-node" id="an-broker">
+          <div class="a-icon">🧩</div><div class="a-name">Auth Broker</div><div class="a-sub">resolves + authorizes</div>
+          <div class="arch-tooltip">Looks up the connected account for (user_42, slack), checks scopes, and decides whether the access token is still valid. Holds the OAuth client_id/secret for each provider.</div>
+        </div>
+        <div class="arch-node" id="an-vault">
+          <div class="a-icon">🗄️</div><div class="a-name">Token Vault</div><div class="a-sub">encrypted tokens</div>
+          <div class="arch-tooltip">Stores access + refresh tokens encrypted, keyed per user-per-service. If the access token expired, the broker uses the refresh token here to mint a fresh one — silently.</div>
+        </div>
+        <div class="arch-node" id="an-api">
+          <div class="a-icon">🌐</div><div class="a-name">Service API</div><div class="a-sub">Slack</div>
+          <div class="arch-tooltip">The resource server. Accepts the bearer access token, performs the action (chat.postMessage), and returns the result — which the broker passes back to the agent.</div>
+        </div>
+      </div>
+      <button class="btn" onclick="playArch()" id="arch-btn">Play full flow</button>
+      <div class="demo-log" id="arch-log">Hover a component, or play the flow.</div>
+    </div>
+
+    <div class="callout warn"><strong>The broker is now your blast radius.</strong> Since it concentrates every user's tokens for every service, treat your broker API key like a master key — scope it, rotate it, and never ship it to a browser or an untrusted agent. Per-user scoping in the broker limits what any single key or session can reach.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">When the agent says "post to Slack," what does the agent itself actually send and receive?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">The user's Slack OAuth token, which it attaches to the Slack API call directly</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">A plain tool call (intent + user id) and a result — never the raw token; the broker resolves the account, handles the token, and calls Slack</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">The client secret, so Slack can verify the agent is authorized</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🧩 You've got the broker model</h2>
+  <p>One integration replaces N. OAuth's four roles → the code flow → connected accounts + silent refresh → consume (Composio) or provide (Stytch) → an agent that acts everywhere and holds nothing.</p>
+</div>
+
+</div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#9696b0;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://docs.composio.dev/docs/managed-authentication" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Composio — Managed Authentication</a>
+    <span>·</span>
+    <a href="https://stytch.com/blog/stytch-connected-apps/" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Stytch — Connected Apps</a>
+    <span>·</span>
+    <a href="https://www.rfc-editor.org/rfc/rfc6749.html" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">RFC 6749 — OAuth 2.0</a>
+  </div>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- tabs ---------- */
+function switchTab(btn, panelId) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById(panelId);
+  let sib = group.nextElementSibling;
+  while (sib && sib.classList.contains('tab-panel')) { sib.classList.remove('active'); sib = sib.nextElementSibling; }
+  panel.classList.add('active');
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'The broker has already built and operates every provider\'s OAuth flow, encrypted token store, and refresh logic. Your side is a single integration, so the 1st and the 50th service cost you the same.' },
+  q2: { correct: 1, explanation: 'The broker is the OAuth "client" — the party requesting delegated access on the user\'s behalf. It holds the client_id/secret with each provider. The user is the resource owner; the provider is the authorization server.' },
+  q3: { correct: 1, explanation: 'The browser only carries a short-lived, single-use authorization code. The broker\'s backend exchanges it for the real tokens using the client secret, so tokens never appear in a URL, browser history, or referrer header.' },
+  q4: { correct: 2, explanation: 'That transparent refresh is exactly what makes a broker feel seamless: it detects the stale access token, swaps in a new one via the refresh token, and completes the call. The agent only ever issued an intent.' },
+  q5: { correct: 1, explanation: 'Consumer vs. provider. Composio holds downstream tokens so your agent can call Gmail/Slack/GitHub. Stytch Connected Apps turns your app into an OAuth 2.0/OIDC provider so other apps and agents can "Log in with Your App" and call you.' },
+  q6: { correct: 1, explanation: 'The agent sends a plain intent + user id and gets a result. The broker resolves the connected account, refreshes the token if needed, and calls Slack. Keeping the raw token out of the agent is the whole security win.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- S1: credential sprawl ---------- */
+const svcList = [
+  { name: 'Gmail',      ico: '📧' },
+  { name: 'Slack',      ico: '💬' },
+  { name: 'GitHub',     ico: '🐙' },
+  { name: 'Notion',     ico: '📓' },
+  { name: 'Salesforce', ico: '☁️' },
+];
+const connectedSvc = new Set();
+let brokerMode = false;
+function buildSprawl() {
+  const grid = document.getElementById('svc-grid');
+  svcList.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'svc-chip';
+    b.id = 'svc-' + s.name;
+    b.innerHTML = `<span class="svc-ico">${s.ico}</span>${s.name}`;
+    b.onclick = () => toggleService(s.name);
+    grid.appendChild(b);
+  });
+  renderSprawl();
+}
+function toggleService(name) {
+  if (connectedSvc.has(name)) connectedSvc.delete(name); else connectedSvc.add(name);
+  document.getElementById('svc-' + name).classList.toggle('on', connectedSvc.has(name));
+  renderSprawl();
+}
+function setMode(m) {
+  brokerMode = (m === 'broker');
+  document.getElementById('mode-diy').className = 'btn' + (brokerMode ? ' btn-outline' : '');
+  document.getElementById('mode-broker').className = 'btn' + (brokerMode ? '' : ' btn-outline');
+  renderSprawl();
+}
+function renderSprawl() {
+  const n = connectedSvc.size;
+  const flows   = brokerMode ? (n > 0 ? 1 : 0) : n;
+  const refresh = brokerMode ? 0 : n;
+  const fEl = document.getElementById('stat-flows');
+  const rEl = document.getElementById('stat-refresh');
+  fEl.textContent = flows; rEl.textContent = refresh;
+  fEl.className = 'stat-num ' + (brokerMode ? 'good' : (n ? 'bad' : ''));
+  rEl.className = 'stat-num ' + (brokerMode ? 'good' : (n ? 'bad' : ''));
+  document.getElementById('stat-flows-cap').innerHTML = brokerMode
+    ? 'OAuth flows <b>you</b> maintain — one, to the broker'
+    : 'OAuth flows you build &amp; maintain (one per service)';
+  document.getElementById('stat-refresh-cap').innerHTML = brokerMode
+    ? 'Token-refresh jobs you own — the broker runs them'
+    : 'Token-refresh jobs you own (one per service)';
+  const log = document.getElementById('sprawl-log');
+  if (n === 0) { log.innerHTML = 'Click services to connect them, then toggle the mode and watch what <em>you</em> have to maintain.'; return; }
+  log.innerHTML = brokerMode
+    ? `🧩 <b style="color:var(--green)">Broker mode:</b> ${n} service${n>1?'s':''} connected, yet you still maintain just <b>1</b> integration and <b>0</b> refresh jobs. The broker owns every provider's flow, token store, and refresh.`
+    : `🛠️ <b style="color:var(--red)">DIY mode:</b> ${n} service${n>1?'s':''} = <b>${flows}</b> OAuth flows to build and <b>${refresh}</b> refresh jobs to run — each with its own app registration, redirect handling, and encrypted token store. It scales with every service you add.`;
+}
+
+/* ---------- S2: role cards ---------- */
+const roleData = {
+  owner:  '🧑 <b>Resource Owner = you, the user.</b> You own the Gmail account and its data. OAuth exists so you can <i>delegate</i> access without handing over your password.',
+  client: '🧩 <b>Client = the broker, on behalf of your agent.</b> It\'s the party requesting access. It holds the <code>client_id</code>/<code>client_secret</code> registered with Google and drives the whole flow.',
+  as:     '🛂 <b>Authorization Server = Google\'s OAuth server.</b> It authenticates you, shows the consent screen with the requested scopes, and issues the access + refresh tokens.',
+  rs:     '📬 <b>Resource Server = the Gmail API.</b> It holds the actual resource and accepts the access token as a bearer credential to perform <code>gmail.send</code>.',
+};
+function pickRole(key) {
+  ['owner','client','as','rs'].forEach(k => document.getElementById('role-' + k).classList.toggle('selected', k === key));
+  document.getElementById('role-log').innerHTML = roleData[key];
+}
+
+/* ---------- S3: auth-code timeline ---------- */
+const timelineSteps = [
+  { label: 'Connect',  icon: '🔌', detail: 'User clicks "Connect Gmail" in your app. The request reaches the broker, which knows Gmail\'s OAuth endpoints and its own client credentials.' },
+  { label: 'Redirect', icon: '↗️', detail: 'Broker redirects the browser to Google\'s consent URL with client_id, the requested scopes (gmail.send), a redirect_uri, and an unguessable state value.' },
+  { label: 'Consent',  icon: '✅', detail: 'User signs in to Google (not to your app) and approves exactly the scopes shown. The password never touches your app or the broker.' },
+  { label: 'Code',     icon: '🎟️', detail: 'Google redirects back to the broker\'s redirect_uri with ?code=… (short-lived, single-use) and the same state value it was given.' },
+  { label: 'Exchange', icon: '🔁', detail: 'Broker\'s BACKEND POSTs the code + client_secret to Google\'s token endpoint — server-to-server, so the secret and tokens never touch the browser.' },
+  { label: 'Tokens',   icon: '🔑', detail: 'Google returns an access_token (~1h) and a refresh_token (long-lived). These are the keys to act on the user\'s behalf, within the granted scopes.' },
+  { label: 'Store',    icon: '🗄️', detail: 'Broker encrypts both tokens and saves them as a connected account keyed to (your user id, gmail). Future calls just reference that record.' },
+];
+let timelineActive = -1;
+function buildTimeline() {
+  const container = document.getElementById('seq-steps');
+  timelineSteps.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'seq-step';
+    el.id = 'seq-step-' + i;
+    el.innerHTML = `<div class="seq-dot" id="seq-dot-${i}"></div><div class="seq-label">${s.icon}<br><span>${s.label}</span></div>`;
+    el.onclick = () => selectStep(i);
+    container.appendChild(el);
+  });
+}
+function selectStep(i) {
+  if (timelineActive === i) {
+    document.getElementById('seq-detail').textContent = 'Click a step to inspect it.';
+    timelineActive = -1;
+    document.querySelectorAll('.seq-step').forEach(el => el.classList.remove('seq-selected'));
+    return;
+  }
+  timelineActive = i;
+  document.getElementById('seq-detail').textContent = timelineSteps[i].detail;
+  document.querySelectorAll('.seq-step').forEach((el, j) => el.classList.toggle('seq-selected', j === i));
+}
+function playTimeline() {
+  resetTimeline();
+  const total = timelineSteps.length;
+  timelineSteps.forEach((_, i) => {
+    setTimeout(() => {
+      document.getElementById('seq-dot-' + i).classList.add('seq-dot-active');
+      document.getElementById('seq-step-' + i).classList.add('seq-revealed');
+      document.getElementById('seq-line').style.width = ((i + 1) / total * 100) + '%';
+    }, i * 420);
+  });
+}
+function resetTimeline() {
+  timelineActive = -1;
+  document.getElementById('seq-line').style.width = '0%';
+  document.getElementById('seq-detail').textContent = 'Click a step to inspect it.';
+  timelineSteps.forEach((_, i) => {
+    document.getElementById('seq-dot-' + i).classList.remove('seq-dot-active');
+    document.getElementById('seq-step-' + i).classList.remove('seq-revealed', 'seq-selected');
+  });
+}
+
+/* ---------- S4: token vault ---------- */
+let tokenExpired = false;
+let refreshCount = 0;
+const accessTokens = ['ya29.a0Af_Hq3…8xQk', 'ya29.a0Bg_Lp7…2Rm7', 'ya29.a0Cd_Zt4…9Kp1'];
+function renderVault() {
+  const badge = document.getElementById('v-badge');
+  const acc = document.getElementById('v-access');
+  acc.textContent = accessTokens[refreshCount % accessTokens.length];
+  if (tokenExpired) { badge.className = 'badge exp'; badge.textContent = 'expired'; }
+  else { badge.className = 'badge ok'; badge.textContent = 'valid · ~59m left'; }
+}
+function agentCall() {
+  const log = document.getElementById('vault-log');
+  if (!tokenExpired) {
+    log.innerHTML = '🤖 Agent → broker: <code>GMAIL_SEND_EMAIL</code>. Token still valid → broker calls the Gmail API with it → <b style="color:var(--green)">email sent ✓</b>. The agent never touched the token.';
+    return;
+  }
+  log.innerHTML = '🤖 Agent → broker: <code>GMAIL_SEND_EMAIL</code>. Broker notices the access token is <b style="color:var(--red)">expired</b>… refreshing silently…';
+  setTimeout(() => {
+    refreshCount++;
+    tokenExpired = false;
+    renderVault();
+    log.innerHTML = '🔁 Broker used the refresh_token → minted a <b style="color:var(--green)">fresh access token</b> → retried the call → <b style="color:var(--green)">email sent ✓</b>. From the agent\'s side it was one seamless call.';
+  }, 1300);
+}
+function expireToken() {
+  tokenExpired = true;
+  renderVault();
+  document.getElementById('vault-log').innerHTML = '⏩ One hour passed — the access token is now <b style="color:var(--red)">expired</b>. The refresh token is still good. Try the agent call again.';
+}
+function resetVault() {
+  tokenExpired = false; refreshCount = 0; renderVault();
+  document.getElementById('vault-log').innerHTML = 'The agent just wants to "send an email." It never asks about tokens — that\'s the broker\'s job.';
+}
+
+/* ---------- S5: direction flows ---------- */
+const consumeMsgs = [
+  '1 · Agent calls the typed tool GMAIL_SEND_EMAIL for user_42 — a plain intent, no token.',
+  '2 · Composio resolves user_42\'s Gmail connected account, refreshes the token if stale, and attaches it.',
+  '3 · Gmail\'s API performs the send and returns the result, which Composio hands back to the agent. ✓',
+];
+const provideMsgs = [
+  '1 · Another app/agent hits "Log in with Your App" and is redirected to your Stytch-backed authorization server.',
+  '2 · You authenticate the user and issue a scoped OAuth/OIDC token (JWT) to that external client.',
+  '3 · The external client calls YOUR API with the token; you verify it via JWKS and serve scoped data. ✓',
+];
+function traceFlow(containerId, logId, msgs) {
+  const nodes = document.querySelectorAll('#' + containerId + ' .flow-node');
+  nodes.forEach(n => n.classList.remove('lit'));
+  nodes.forEach((n, i) => setTimeout(() => {
+    nodes.forEach(x => x.classList.remove('lit'));
+    n.classList.add('lit');
+    document.getElementById(logId).innerHTML = msgs[i];
+    if (i === nodes.length - 1) setTimeout(() => n.classList.remove('lit'), 1400);
+  }, i * 950));
+}
+
+/* ---------- S6: architecture play ---------- */
+const archScript = [
+  { node: 'an-agent',  msg: '1 · Agent → broker: "post this to Slack for user_42." It sends an intent + user id and its broker API key — no Slack token.' },
+  { node: 'an-broker', msg: '2 · Broker resolves the connected account (user_42, slack), checks scopes, and inspects the access token\'s expiry.' },
+  { node: 'an-vault',  msg: '3 · Token in the vault is stale → broker uses the refresh token to mint a fresh access token, encrypted at rest. (If it were valid, this step is skipped.)' },
+  { node: 'an-api',    msg: '4 · Broker calls Slack chat.postMessage with the bearer token. Slack performs it and returns the result.' },
+  { node: 'an-agent',  msg: '5 · Broker passes the result back to the agent. The agent issued one tool call and held no secret the entire time. 🎉' },
+];
+let archPlaying = false;
+function playArch() {
+  if (archPlaying) return;
+  archPlaying = true;
+  document.getElementById('arch-btn').disabled = true;
+  document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+  archScript.forEach((step, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+      document.getElementById(step.node).classList.add('lit');
+      document.getElementById('arch-log').textContent = step.msg;
+      if (i === archScript.length - 1) {
+        setTimeout(() => {
+          document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+          document.getElementById('arch-btn').disabled = false;
+          archPlaying = false;
+        }, 1600);
+      }
+    }, i * 1600);
+  });
+}
+
+/* ---------- tooltips (overflow-safe: position fixed) ---------- */
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.arch-tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+window.addEventListener('load', () => {
+  buildSprawl();
+  buildTimeline();
+  renderVault();
+  initTooltips();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attribution Modeling, Visualized — Who Gets Credit for the Sale?</title>
+<meta name="description" content="Interactive explainer of marketing attribution models: switch between first-touch, last-touch, linear, time-decay, position-based (U/W/Z), and data-driven and watch how each splits the credit for one conversion across a customer journey — plus how to choose a model and why none is ever 100% accurate.">
+<meta name="date" content="2026-06-24">
+<meta name="timestamp" content="2026-06-24T12:00:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #9696b0;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 680px; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; cursor: pointer; user-select: none;
+}
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s; font-family: inherit;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin: 14px 0;
+}
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+
+/* ---------- Segmented toggle ---------- */
+.seg { display: inline-flex; flex-wrap: wrap; gap: 4px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; padding: 4px; margin-bottom: 6px; }
+.seg-btn { background: none; border: none; color: var(--muted); padding: 7px 14px; border-radius: 7px; cursor: pointer; font-size: 13px; font-weight: 600; font-family: inherit; transition: background 0.15s, color 0.15s; }
+.seg-btn:hover { color: var(--text); }
+.seg-btn.on { background: var(--accent); color: #fff; }
+
+/* ---------- Credit bars ---------- */
+.credit-bars { display: flex; flex-direction: column; gap: 9px; margin: 6px 0 4px; }
+.cb-row { display: flex; align-items: center; gap: 12px; }
+.cb-label { width: 150px; flex-shrink: 0; font-size: 12.5px; display: flex; align-items: center; gap: 7px; color: var(--text); }
+.cb-ico { font-size: 15px; }
+.cb-track { flex: 1; height: 26px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; overflow: hidden; }
+.cb-fill { height: 100%; width: 0%; border-radius: 6px; background: linear-gradient(90deg, rgba(94,106,210,0.5), var(--accent)); transition: width 0.55s cubic-bezier(0.22,1,0.36,1); }
+.cb-fill.hi { background: linear-gradient(90deg, rgba(251,191,36,0.5), var(--amber)); }
+.cb-fill.zero { background: var(--surface2); }
+.cb-pct { width: 46px; flex-shrink: 0; text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; font-size: 13px; color: var(--text); }
+.conv-node { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 9px 14px; border-radius: 8px; border: 1px dashed var(--green); background: rgba(74,222,128,0.06); font-size: 12.5px; color: var(--green); font-weight: 600; }
+.model-blurb { margin-top: 12px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; line-height: 1.5; min-height: 40px; }
+
+/* ---------- S1: journey nodes + tooltip + sequence ---------- */
+.jp-grid { display: flex; align-items: stretch; gap: 6px; flex-wrap: wrap; margin: 4px 0 14px; }
+.jp-node {
+  position: relative; flex: 1; min-width: 96px; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 13px 9px; text-align: center; cursor: default;
+  transition: border-color 0.2s, background 0.2s, opacity 0.3s; opacity: 0.45;
+}
+.jp-node.revealed { opacity: 1; }
+.jp-node.lit { border-color: var(--accent); background: rgba(94,106,210,0.12); }
+.jp-ico { font-size: 22px; }
+.jp-name { font-size: 11.5px; font-weight: 700; margin-top: 4px; }
+.jp-step { font-size: 10px; color: var(--muted); margin-top: 2px; }
+.jp-arrow { display: flex; align-items: center; color: var(--muted); font-size: 15px; flex-shrink: 0; }
+.jp-tooltip {
+  display: none; position: fixed; z-index: 1000; pointer-events: none;
+  width: 220px; background: var(--surface2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: left; line-height: 1.5;
+}
+
+/* ---------- S6: model chooser ---------- */
+.chooser { display: flex; flex-direction: column; gap: 14px; }
+.ch-q { font-size: 13px; }
+.ch-q-label { display: block; font-weight: 600; margin-bottom: 7px; color: var(--text); }
+.ch-opts { display: flex; gap: 8px; flex-wrap: wrap; }
+.ch-opt { padding: 7px 14px; border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--muted); font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+.ch-opt:hover { border-color: var(--accent); color: var(--text); }
+.ch-opt.on { border-color: var(--accent); background: rgba(94,106,210,0.12); color: var(--text); font-weight: 600; }
+.rec-card { margin-top: 4px; padding: 16px; border: 1px solid var(--accent); border-radius: 12px; background: rgba(94,106,210,0.07); }
+.rec-card .rec-tag { font-size: 10.5px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; }
+.rec-card .rec-name { font-size: 19px; font-weight: 800; margin: 4px 0 8px; }
+.rec-card .rec-why { font-size: 13.5px; color: #c9c9da; line-height: 1.55; }
+
+/* ---------- Quiz ---------- */
+.quiz { margin-top: 22px; border-top: 1px dashed var(--border); padding-top: 18px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-q::before { content: "QUIZ"; display: inline-block; font-size: 10px; letter-spacing: 1.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 5px; padding: 1px 7px; margin-right: 10px; vertical-align: 1px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; font-family: inherit; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 7px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); }
+
+/* ---------- Completion ---------- */
+.completion {
+  display: none; text-align: center; padding: 36px 24px; margin: 40px 0;
+  border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05);
+}
+.completion.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.completion h2 { color: var(--green); font-size: 22px; margin-bottom: 8px; }
+.completion p { color: var(--muted); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .cb-label { width: 112px; }
+  .jp-arrow { display: none; }
+  .jp-node { min-width: 44%; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <span class="hero-label">Marketing Attribution · 2026</span>
+  <h1>Attribution Modeling, <span class="grad">Visualized</span></h1>
+  <p>A customer taps an Instagram ad, googles you, opens an email, watches a review, then buys. <strong style="color:var(--text)">Which of those gets the credit for the sale?</strong> That's attribution modeling. Switch between the models below and watch the same 100% of credit redistribute across one journey — then learn how to pick a model, and why none of them is ever perfect.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">The Credit Problem</div>
+      <div class="section-sub">Touchpoints, a conversion, and the question of who deserves the credit</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Almost no one buys on the first click. A customer collects <strong>touchpoints</strong> — an interaction with your brand at a moment in time — until one of them tips into a <strong>conversion</strong> (the action you wanted: a purchase, a signup). <strong>Attribution modeling</strong> is the process of deciding how to split the credit for that conversion across the touchpoints that led to it.</p>
+    <p>Get it wrong and you'll over-fund the channels that <em>look</em> decisive and starve the ones that quietly did the work. So before any model, get the journey straight.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — hover each touchpoint for its role, then play the path to the sale</div>
+      <div class="jp-grid" id="jp-grid"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" onclick="playJourney()" id="jp-btn">▶ Play the journey</button>
+        <button class="btn btn-outline" onclick="resetJourney()">Reset</button>
+      </div>
+      <div class="demo-log" id="jp-log">Five touchpoints, one conversion. Every model on this page splits credit across these five.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">What does an attribution model actually decide?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Which ad to show the customer next</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">How to divide credit for one conversion across the touchpoints that led to it</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">How much to bid in the next ad auction</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">Single-Touch: First- and Last-Click</div>
+      <div class="section-sub">All the credit to exactly one touchpoint — the simplest (and most common) approach</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Single-touch models hand <strong>100% of the credit to one touchpoint</strong>. <strong>First-touch</strong> credits whatever created awareness; <strong>last-touch</strong> credits the final interaction before the sale — and last-touch (last-click) is the most common model in the marketing world because it's so easy to measure.</p>
+    <p>The catch is obvious once you see it: everything else in the journey gets a zero.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — flip between first- and last-touch and watch 100% jump</div>
+      <div class="seg" id="s2-seg">
+        <button class="seg-btn" data-m="first" onclick="setModel('s2','first')">First-touch</button>
+        <button class="seg-btn" data-m="last" onclick="setModel('s2','last')">Last-touch</button>
+      </div>
+      <div class="credit-bars" id="s2-bars"></div>
+      <div class="conv-node">🛒 Conversion — the purchase being attributed</div>
+      <div class="model-blurb" id="s2-blurb"></div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Last-touch attribution assigns 100% of the credit to…</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">The first ad the customer ever saw</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">The final touchpoint before the conversion</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">Whichever channel cost the most money</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Multi-Touch: Linear &amp; Time-Decay</div>
+      <div class="section-sub">Spread the credit across every touchpoint — equally, or weighted toward the finish</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Multi-touch attribution (MTA) distributes credit across <strong>all</strong> the touchpoints. The simplest split is <strong>linear</strong> — everyone gets an equal share. <strong>Time-decay</strong> keeps multi-touch but gives more weight the closer a touch sits to the conversion, on the theory that recent nudges mattered more.</p>
+    <p>It's a real shift in thinking: a 2024 MMA report found <strong>52% of marketers</strong> use multi-touch attribution, and they report more confidence in how they allocate budget than single-touch users.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — compare an equal split with a recency-weighted one</div>
+      <div class="seg" id="s3-seg">
+        <button class="seg-btn" data-m="linear" onclick="setModel('s3','linear')">Linear</button>
+        <button class="seg-btn" data-m="decay" onclick="setModel('s3','decay')">Time-decay</button>
+      </div>
+      <div class="credit-bars" id="s3-bars"></div>
+      <div class="conv-node">🛒 Conversion — the purchase being attributed</div>
+      <div class="model-blurb" id="s3-blurb"></div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Compared with linear, time-decay attribution…</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Splits credit equally across all touchpoints</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">Gives more credit to touchpoints closer to the conversion</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Ignores the final touch entirely</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Position-Based: U, W, and Z Shapes</div>
+      <div class="section-sub">Reward the milestone moments — discovery, conversion, and the key steps between</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Position-based models concentrate credit on the touchpoints that matter most and treat the rest as supporting cast. The shapes are named for where the credit piles up:</p>
+    <p><strong>U-shaped</strong> rewards the <strong>first and last</strong> touch (≈40% each), splitting the remainder across the middle — like a book whose beginning and end you remember while the middle goes fuzzy. <strong>W-shaped</strong> adds a third milestone in the middle; <strong>Z-shaped</strong> recognizes four milestones.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — switch shapes; the highlighted bars are the milestones</div>
+      <div class="seg" id="s4-seg">
+        <button class="seg-btn" data-m="u" onclick="setModel('s4','u')">U-shaped</button>
+        <button class="seg-btn" data-m="w" onclick="setModel('s4','w')">W-shaped</button>
+        <button class="seg-btn" data-m="z" onclick="setModel('s4','z')">Z-shaped</button>
+      </div>
+      <div class="credit-bars" id="s4-bars"></div>
+      <div class="conv-node">🛒 Conversion — the purchase being attributed</div>
+      <div class="model-blurb" id="s4-blurb"></div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">In U-shaped (position-based) attribution, which touchpoints get the most credit?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">Only the middle touchpoints</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">The first and the last</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">Every touchpoint, equally</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Data-Driven &amp; the Wider Toolkit</div>
+      <div class="section-sub">When a fixed rule isn't enough: let the data decide — and look beyond clicks</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Every model so far applies a <strong>fixed rule</strong>. <strong>Data-driven attribution (DDA)</strong> instead uses machine learning over your historical conversions to <em>learn</em> how much each touchpoint really contributed — including <strong>incremental</strong> credit for touches a conversion wouldn't have happened without. It's the most accurate option, but it needs a large volume of data to work.</p>
+    <p>And attribution is bigger than clicks. <strong>Last non-direct click</strong> credits the last <em>non-direct</em> touch (a newsletter or ad) rather than someone typing in your URL. <strong>Cross-channel</strong> models weigh every channel together. <strong>Marketing Mix Modeling (MMM)</strong> zooms all the way out to include offline — TV, print, in-store — and seasonality. Vendors layer on proprietary blends of first- and zero-party data on top.</p>
+
+    <div class="callout">Use the master allocator below to flip through all the headline models on the same journey. Watch how dramatically the same five touchpoints get revalued.</div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — the master credit allocator: every model, one journey</div>
+      <div class="seg" id="s5-seg">
+        <button class="seg-btn" data-m="first" onclick="setModel('s5','first')">First-touch</button>
+        <button class="seg-btn" data-m="last" onclick="setModel('s5','last')">Last-touch</button>
+        <button class="seg-btn" data-m="linear" onclick="setModel('s5','linear')">Linear</button>
+        <button class="seg-btn" data-m="decay" onclick="setModel('s5','decay')">Time-decay</button>
+        <button class="seg-btn" data-m="u" onclick="setModel('s5','u')">U-shaped</button>
+        <button class="seg-btn" data-m="data" onclick="setModel('s5','data')">Data-driven</button>
+      </div>
+      <div class="credit-bars" id="s5-bars"></div>
+      <div class="conv-node">🛒 Conversion — the purchase being attributed</div>
+      <div class="model-blurb" id="s5-blurb"></div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">What makes data-driven attribution different from the rule-based models?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">It always gives the last touch 100% of the credit</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">It learns credit weights from your historical conversion data instead of applying a fixed rule</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">It only counts offline channels like TV and print</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">Choosing a Model — and What No Model Can Fix</div>
+      <div class="section-sub">Match the model to your reality, and stay honest about its blind spots</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>There's no universally "correct" model — the right one depends on your sales-cycle length, journey complexity, how much conversion data you have, and whether offline channels are in play. Answer a few questions and see where that points.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — answer four questions for a starting-point recommendation</div>
+      <div class="chooser" id="chooser">
+        <div class="ch-q">
+          <span class="ch-q-label">1 · How long is your sales cycle?</span>
+          <div class="ch-opts" data-q="cycle">
+            <button class="ch-opt" onclick="setChoice('cycle','short',this)">Short (impulse)</button>
+            <button class="ch-opt" onclick="setChoice('cycle','long',this)">Long (considered)</button>
+          </div>
+        </div>
+        <div class="ch-q">
+          <span class="ch-q-label">2 · Which channels do you run?</span>
+          <div class="ch-opts" data-q="channels">
+            <button class="ch-opt" onclick="setChoice('channels','digital',this)">Mostly digital</button>
+            <button class="ch-opt" onclick="setChoice('channels','offline',this)">Digital + offline</button>
+          </div>
+        </div>
+        <div class="ch-q">
+          <span class="ch-q-label">3 · How much conversion data do you have?</span>
+          <div class="ch-opts" data-q="data">
+            <button class="ch-opt" onclick="setChoice('data','low',this)">Low</button>
+            <button class="ch-opt" onclick="setChoice('data','high',this)">High</button>
+          </div>
+        </div>
+        <div class="ch-q">
+          <span class="ch-q-label">4 · How complex is the typical journey?</span>
+          <div class="ch-opts" data-q="complexity">
+            <button class="ch-opt" onclick="setChoice('complexity','simple',this)">Simple (1–2 touches)</button>
+            <button class="ch-opt" onclick="setChoice('complexity','complex',this)">Complex (many)</button>
+          </div>
+        </div>
+        <div class="rec-card" id="rec-card">
+          <div class="rec-tag">Recommendation</div>
+          <div class="rec-name" id="rec-name">Answer the four questions above…</div>
+          <div class="rec-why" id="rec-why">Pick one option in each row and a starting-point model will appear here.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout warn"><strong>What no model can fix.</strong> Attribution is built on incomplete data. Cookies are disappearing in favor of first- and zero-party data; offline and word-of-mouth go untracked; people switch devices mid-journey; assisted conversions get undervalued; and different models produce different answers, so the numbers can be nudged. <strong>There is no model that captures 100% of every customer's data</strong> — the best one is simply the one that gets you closest to the truth for the decisions you need to make.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Why can no attribution model be 100% accurate?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Because marketers refuse to use them</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">Cross-device, offline, and privacy/cookie gaps mean no model sees every touch</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Because online conversions can't be measured at all</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🎯 You can read an attribution model now</h2>
+  <p>Touchpoints → a conversion → credit. Single-touch (first/last) hands it all to one touch; multi-touch spreads it (linear, time-decay, position-based U/W/Z); data-driven learns it from your data; MMM zooms out to offline. Pick for your cycle, data, and channels — and remember no model captures everything.</p>
+</div>
+
+</div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#9696b0;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://www.triplewhale.com/blog/attribution-modeling" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Triple Whale — Attribution Modeling</a>
+  </div>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'An attribution model divides the credit for a single conversion across the touchpoints that led to it. It is a measurement decision, not a bidding or targeting decision.' },
+  q2: { correct: 1, explanation: 'Last-touch (last-click) gives all the credit to the final touchpoint before the conversion. It is simple and the most common model — but it zeroes out everything earlier in the journey.' },
+  q3: { correct: 1, explanation: 'Both are multi-touch, but time-decay weights touches by recency — the closer to the conversion, the more credit. Linear splits credit equally instead.' },
+  q4: { correct: 1, explanation: 'U-shaped is "position-based": roughly 40% to the first touch and 40% to the last, with the remaining 20% shared across the middle. W- and Z-shaped add more milestone positions.' },
+  q5: { correct: 1, explanation: 'Rule-based models apply a fixed formula. Data-driven attribution uses machine learning over your historical conversions to learn each touchpoint\'s real contribution — which is why it needs a large data volume.' },
+  q6: { correct: 1, explanation: 'No model captures 100%: cookies are going away, offline and word-of-mouth are untracked, people switch devices, and assisted conversions get undervalued. The best model just gets you closest to the truth.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- shared journey + models ---------- */
+const JOURNEY = [
+  { ico: '📱', name: 'Instagram Ad', step: 'Touch 1 · awareness', tip: '<b>Paid social.</b> A scroll-stopping ad is the customer\'s very first contact with your brand — it created the awareness everything else builds on.' },
+  { ico: '🔍', name: 'Google Search', step: 'Touch 2 · interest', tip: '<b>Search.</b> Now curious, they google you. High intent, but they only searched because something earlier put you on their radar.' },
+  { ico: '✉️', name: 'Email', step: 'Touch 3 · nurture', tip: '<b>Email.</b> They joined your list and a nurture email keeps you top of mind between visits.' },
+  { ico: '▶️', name: 'YouTube Review', step: 'Touch 4 · consideration', tip: '<b>Influencer / review.</b> A creator\'s review answers their last doubts — classic mid-to-late consideration.' },
+  { ico: '🔗', name: 'Direct visit', step: 'Touch 5 · closing', tip: '<b>Direct.</b> They type in your URL and buy. The closing touch — but would they be here without the four before it?' },
+];
+
+// credit distributions (each array sums to 100), keyed by model
+const DIST = {
+  first:  [100, 0, 0, 0, 0],
+  last:   [0, 0, 0, 0, 100],
+  linear: [20, 20, 20, 20, 20],
+  decay:  [3, 6, 13, 26, 52],
+  u:      [40, 7, 6, 7, 40],
+  w:      [30, 5, 30, 5, 30],
+  z:      [23, 22, 10, 22, 23],
+  data:   [22, 18, 12, 16, 32],
+};
+const HILITE = { u: [0, 4], w: [0, 2, 4], z: [0, 1, 3, 4] };
+const BLURB = {
+  first:  '<b>First-touch.</b> 100% to the Instagram ad that created awareness — and a zero for everything that actually closed the deal.',
+  last:   '<b>Last-touch.</b> 100% to the final direct visit. Easy to measure and very common, but it ignores the whole journey that made the customer ready to buy.',
+  linear: '<b>Linear.</b> An equal 20% to every touch. Fair and simple — but it treats a throwaway impression like a decisive review.',
+  decay:  '<b>Time-decay.</b> Credit grows toward the sale (3% → 52%). Great for short cycles; it can undervalue the early discovery that started everything.',
+  u:      '<b>U-shaped.</b> 40% to discovery, 40% to closing, 20% shared across the middle — it rewards both the touch that found the customer and the one that converted them.',
+  w:      '<b>W-shaped.</b> Three milestones — first, a key middle touch, and last — each get ~30%, with the rest as support.',
+  z:      '<b>Z-shaped.</b> Four milestone touches share the bulk of the credit, leaving a sliver for the non-milestone step.',
+  data:   '<b>Data-driven.</b> Weights here are <i>illustrative</i> — a real DDA model learns them from your historical conversions with machine learning, not from a fixed rule.',
+};
+
+function renderCredits(slot, model) {
+  const vals = DIST[model];
+  const hi = HILITE[model] || [];
+  const box = document.getElementById(slot + '-bars');
+  box.innerHTML = JOURNEY.map((tp, i) => {
+    const v = vals[i];
+    const cls = v === 0 ? 'cb-fill zero' : (hi.includes(i) ? 'cb-fill hi' : 'cb-fill');
+    return `<div class="cb-row">
+        <div class="cb-label"><span class="cb-ico">${tp.ico}</span>${tp.name}</div>
+        <div class="cb-track"><div class="${cls}" id="${slot}-f${i}" style="width:0%"></div></div>
+        <div class="cb-pct">${v}%</div>
+      </div>`;
+  }).join('');
+  // animate to target widths on the next frame
+  requestAnimationFrame(() => {
+    JOURNEY.forEach((_, i) => {
+      const f = document.getElementById(slot + '-f' + i);
+      if (f) f.style.width = vals[i] + '%';
+    });
+  });
+  const blurb = document.getElementById(slot + '-blurb');
+  if (blurb) blurb.innerHTML = BLURB[model];
+  // toggle active button
+  const seg = document.getElementById(slot + '-seg');
+  if (seg) seg.querySelectorAll('.seg-btn').forEach(b => b.classList.toggle('on', b.dataset.m === model));
+}
+function setModel(slot, model) { renderCredits(slot, model); }
+
+/* ---------- S1: journey nodes + play ---------- */
+function buildJourney() {
+  const grid = document.getElementById('jp-grid');
+  let html = '';
+  JOURNEY.forEach((tp, i) => {
+    html += `<div class="jp-node" id="jp-${i}">
+        <div class="jp-ico">${tp.ico}</div>
+        <div class="jp-name">${tp.name}</div>
+        <div class="jp-step">${tp.step}</div>
+        <div class="jp-tooltip">${tp.tip}</div>
+      </div>`;
+    if (i < JOURNEY.length - 1) html += `<div class="jp-arrow">→</div>`;
+  });
+  grid.innerHTML = html;
+}
+let jpPlaying = false;
+function playJourney() {
+  if (jpPlaying) return;
+  jpPlaying = true;
+  document.getElementById('jp-btn').disabled = true;
+  JOURNEY.forEach((_, i) => document.getElementById('jp-' + i).classList.remove('revealed', 'lit'));
+  JOURNEY.forEach((tp, i) => {
+    setTimeout(() => {
+      JOURNEY.forEach((_, j) => document.getElementById('jp-' + j).classList.remove('lit'));
+      const node = document.getElementById('jp-' + i);
+      node.classList.add('revealed', 'lit');
+      document.getElementById('jp-log').innerHTML = `${tp.ico} <b>${tp.name}</b> — ${tp.step.split('· ')[1]}.`;
+      if (i === JOURNEY.length - 1) {
+        setTimeout(() => {
+          document.getElementById('jp-' + i).classList.remove('lit');
+          document.getElementById('jp-log').innerHTML = '🛒 <b style="color:var(--green)">Conversion!</b> Five touchpoints led here. Now the question: who gets the credit? That\'s what the next sections answer.';
+          document.getElementById('jp-btn').disabled = false;
+          jpPlaying = false;
+        }, 850);
+      }
+    }, i * 850);
+  });
+}
+function resetJourney() {
+  if (jpPlaying) return;
+  JOURNEY.forEach((_, i) => document.getElementById('jp-' + i).classList.remove('revealed', 'lit'));
+  document.getElementById('jp-log').innerHTML = 'Five touchpoints, one conversion. Every model on this page splits credit across these five.';
+}
+
+/* ---------- S6: model chooser ---------- */
+const choices = { cycle: null, channels: null, data: null, complexity: null };
+function setChoice(q, val, btn) {
+  choices[q] = val;
+  const group = btn.parentElement;
+  group.querySelectorAll('.ch-opt').forEach(o => o.classList.remove('on'));
+  btn.classList.add('on');
+  recommend();
+}
+function recommend() {
+  const { cycle, channels, data, complexity } = choices;
+  if (!cycle || !channels || !data || !complexity) return;
+  let name, why;
+  if (channels === 'offline') {
+    name = 'Marketing Mix Modeling (MMM)';
+    why = 'With offline channels in play, you need a top-down model that weighs TV, print, and in-store activity alongside digital — and accounts for seasonality. It forecasts well, but expect to feed it a lot of historical data.';
+  } else if (complexity === 'complex' && data === 'high' && cycle === 'long') {
+    name = 'Data-driven attribution';
+    why = 'A long, complex journey with plenty of conversion data is exactly where machine-learning-derived weights beat any fixed rule. You have the volume to make it trustworthy.';
+  } else if (complexity === 'complex') {
+    name = 'Position-based (U-shaped)';
+    why = 'The journey is complex but you don\'t have the data volume for ML. Rewarding both discovery (first touch) and closing (last touch) while still crediting the middle is a sensible, robust default.';
+  } else if (cycle === 'short' && complexity === 'simple') {
+    name = 'Last-touch';
+    why = 'Short, simple journeys convert fast. The closing touch tells you most of what you need at almost no cost — just don\'t mistake it for the whole story as you grow.';
+  } else if (cycle === 'long' && complexity === 'simple') {
+    name = 'First-touch';
+    why = 'A considered purchase but few touches: knowing what put you on the customer\'s radar in the first place is the most useful single signal here.';
+  } else {
+    name = 'Linear';
+    why = 'No single touch clearly dominates, so a balanced multi-touch split is a fair starting point. Revisit once you can see which stages actually move people.';
+  }
+  document.getElementById('rec-name').textContent = name;
+  document.getElementById('rec-why').innerHTML = why + ' <span style="color:var(--muted)">Revisit this as your data and channels grow.</span>';
+}
+
+/* ---------- tooltips (overflow-safe: position fixed) ---------- */
+function initTooltips() {
+  document.querySelectorAll('.jp-node').forEach(node => {
+    const tooltip = node.querySelector('.jp-tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 220, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+window.addEventListener('load', () => {
+  buildJourney();
+  initTooltips();
+  renderCredits('s2', 'last');
+  renderCredits('s3', 'linear');
+  renderCredits('s4', 'u');
+  renderCredits('s5', 'last');
+});
+</script>
+</body>
+</html>

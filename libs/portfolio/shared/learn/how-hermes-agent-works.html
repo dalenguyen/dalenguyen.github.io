@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How the Hermes Agent Works — Components &amp; Architecture</title>
+<meta name="description" content="Interactive guide to Nous Research's open-source Hermes agent: one agent + one memory across every surface, its six capabilities (Connect, Remember, Schedule, Delegate, Search, Experiment), persistent skill-learning memory, isolated zero-context-cost subagents, gateway scheduling, and the five execution backends.">
+<meta name="date" content="2026-06-23">
+<meta name="timestamp" content="2026-06-23T12:00:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #9696b0;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 680px; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head {
+  display: flex; align-items: center; gap: 16px;
+  padding: 20px 24px; cursor: pointer; user-select: none;
+}
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px;
+  font-size: 14px;
+  margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+pre.code {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 10px;
+  padding: 14px 16px; font-size: 12.5px; line-height: 1.65; overflow-x: auto;
+  margin: 12px 0; color: #d6d6e7;
+}
+.tok-k { color: #82aaff; } .tok-s { color: #c3e88d; } .tok-c { color: #697098; } .tok-n { color: #f78c6c; } .tok-f { color: #c792ea; }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s; font-family: inherit;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box {
+  background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px;
+  padding: 18px; margin: 14px 0;
+}
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 8px; margin: 16px 0 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-weight: 500; font-family: inherit; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- S1: surfaces hub ---------- */
+.hub { display: flex; gap: 18px; align-items: center; flex-wrap: wrap; justify-content: center; }
+.surf-grid { display: flex; flex-wrap: wrap; gap: 8px; flex: 1; min-width: 240px; }
+.surf-chip {
+  display: flex; align-items: center; gap: 7px; padding: 8px 13px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--text);
+  font-size: 13px; cursor: pointer; font-family: inherit; transition: all 0.15s;
+}
+.surf-chip:hover { border-color: var(--accent); }
+.surf-chip.used { border-color: var(--green); background: rgba(74,222,128,0.1); color: var(--green); }
+.surf-chip .surf-ico { font-size: 15px; }
+.hub-core {
+  flex-shrink: 0; width: 168px; text-align: center; border: 1px solid var(--accent);
+  border-radius: 12px; background: rgba(94,106,210,0.08); padding: 16px 10px;
+  transition: box-shadow 0.25s, transform 0.15s;
+}
+.hub-core.pulse { box-shadow: 0 0 0 4px var(--accent-glow); transform: scale(1.03); }
+.hub-core-ico { font-size: 26px; }
+.hub-core-name { font-size: 13px; font-weight: 700; margin-top: 4px; }
+.hub-core-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+/* ---------- S2: capability cards ---------- */
+.cap-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.cap-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 14px 12px; cursor: pointer; transition: border-color 0.2s, transform 0.1s;
+  text-align: left; color: var(--text); font-family: inherit;
+}
+.cap-card:hover { border-color: var(--accent); }
+.cap-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.cap-ico { font-size: 22px; margin-bottom: 6px; }
+.cap-name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+.cap-tag { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+/* ---------- S3: memory / skills ---------- */
+.task-row { display: flex; flex-direction: column; gap: 8px; margin-bottom: 14px; }
+.skill-lib { border: 1px dashed var(--border); border-radius: 10px; padding: 12px 14px; background: var(--surface2); margin-top: 4px; }
+.skill-lib-h { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+.skill-pills { display: flex; flex-wrap: wrap; gap: 7px; }
+.skill-pill { font-family: ui-monospace, Menlo, monospace; font-size: 12px; padding: 4px 10px; border-radius: 99px;
+              border: 1px solid var(--green); background: rgba(74,222,128,0.1); color: var(--green); }
+.skill-empty { font-size: 12.5px; color: var(--muted); }
+
+/* ---------- S4: subagents ---------- */
+.sub-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 4px 0 14px; }
+.sub-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 13px 12px; text-align: center; transition: all 0.2s; opacity: 0.5;
+}
+.sub-card.running { opacity: 1; border-color: var(--amber); background: rgba(251,191,36,0.08); }
+.sub-card.done { opacity: 1; border-color: var(--green); background: rgba(74,222,128,0.08); }
+.sub-ico { font-size: 20px; }
+.sub-name { font-size: 12.5px; font-weight: 700; margin-top: 4px; }
+.sub-work { font-size: 10.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.sub-status { font-size: 11px; margin-top: 7px; font-weight: 700; min-height: 14px; }
+.stat-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 4px; }
+.stat-card { border: 1px solid var(--border); border-radius: 10px; background: var(--surface2); padding: 14px; }
+.stat-num { font-size: 26px; font-weight: 800; line-height: 1; }
+.stat-num.bad { color: var(--red); } .stat-num.good { color: var(--green); }
+.stat-cap { font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.4; }
+
+/* ---------- S5: schedule ---------- */
+.sched-opts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px; }
+.sched-opt {
+  text-align: left; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 13px; cursor: pointer; font-family: inherit;
+}
+.sched-opt:hover { border-color: var(--accent); }
+.sched-opt.on { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.sched-chip { display: inline-block; font-family: ui-monospace, Menlo, monospace; font-size: 12px;
+              padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); background: var(--code-bg); color: var(--amber); }
+.gateway-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
+
+/* ---------- S6: tools / backends + architecture ---------- */
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 6px; }
+.tool-chip { display: flex; align-items: center; gap: 6px; font-size: 12.5px; padding: 7px 12px;
+             border-radius: 8px; border: 1px solid var(--border); background: var(--surface2); color: var(--text); }
+.tool-chip .t-ico { font-size: 14px; }
+.arch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 14px 0; }
+.arch-node {
+  position: relative; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 14px 10px; text-align: center; cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+}
+.arch-node .a-icon { font-size: 22px; margin-bottom: 4px; }
+.arch-node .a-name { font-size: 12px; font-weight: 700; }
+.arch-node .a-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.arch-node.lit { border-color: var(--amber); background: rgba(251,191,36,0.1); }
+.arch-tooltip {
+  display: none; position: fixed; z-index: 1000; pointer-events: none;
+  width: 230px; background: var(--surface2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: left; line-height: 1.5;
+}
+
+/* ---------- Quiz ---------- */
+.quiz { margin-top: 22px; border-top: 1px dashed var(--border); padding-top: 18px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-q::before { content: "QUIZ"; display: inline-block; font-size: 10px; letter-spacing: 1.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 5px; padding: 1px 7px; margin-right: 10px; vertical-align: 1px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; font-family: inherit; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 7px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); }
+
+/* ---------- Completion ---------- */
+.completion {
+  display: none; text-align: center; padding: 36px 24px; margin: 40px 0;
+  border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05);
+}
+.completion.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.completion h2 { color: var(--green); font-size: 22px; margin-bottom: 8px; }
+.completion p { color: var(--muted); font-size: 14px; }
+
+@media (max-width: 640px) {
+  .cap-cards { grid-template-columns: repeat(2, 1fr); }
+  .arch-grid { grid-template-columns: repeat(2, 1fr); }
+  .sub-grid  { grid-template-columns: 1fr; }
+  .stat-grid { grid-template-columns: 1fr; }
+  .hub-core  { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <span class="hero-label">Hermes Agent · Nous Research · 2026</span>
+  <h1>How the <span class="grad">Hermes Agent</span> Works — and Its Components</h1>
+  <p>A mental model for Nous Research's open-source (MIT) Hermes agent: <strong style="color:var(--text)">one agent, one memory, every surface</strong>. We'll walk its six capabilities — Connect, Remember, Schedule, Delegate, Search, Experiment — then trace a single request end to end, through persistent skill-learning memory, isolated subagents, the scheduling gateway, and five hardened execution backends.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">One Agent, One Memory, Every Surface</div>
+      <div class="section-sub">The core idea: Hermes lives everywhere — and it's always the same agent behind every channel</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Hermes is "<strong>the agent that grows with you</strong>." Its founding idea is that you shouldn't have a different assistant in every app. Instead it <strong>lives everywhere</strong> — Telegram, Discord, Slack, WhatsApp, Signal, Email, the CLI, and a growing list of platforms — but every one of those surfaces is just a doorway into <strong>a single agent with one shared memory</strong>.</p>
+    <p>So a project you set up from the CLI is known when you message it on Slack; a fact it learned over email is available on WhatsApp. The surface changes; the agent and its memory don't.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — message Hermes from any surface; notice it's the same agent + memory</div>
+      <div class="hub">
+        <div class="surf-grid" id="surf-grid"></div>
+        <div class="hub-core" id="hub-core">
+          <div class="hub-core-ico">🧠</div>
+          <div class="hub-core-name">One Hermes agent</div>
+          <div class="hub-core-sub">one shared memory</div>
+        </div>
+      </div>
+      <div class="demo-log" id="surf-log">Click any surface to send a message from it.</div>
+    </div>
+
+    <div class="callout">The demos on this page are <strong>illustrative simulations</strong> of the behaviour described on the Hermes site, built to make each concept tangible — not live calls to the real agent.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">What does "one agent, one memory, every surface" actually mean for Hermes?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Each platform (Slack, Telegram, CLI…) runs its own separate agent with its own memory</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">The same agent and one shared memory back every channel, so context follows you across surfaces</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Memory is wiped each time you switch channels, to keep them independent</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">The Six Capabilities — The Component Map</div>
+      <div class="section-sub">Connect · Remember · Schedule · Delegate · Search · Experiment</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Hermes is organized around <strong>six capabilities</strong>. Together they're the building blocks of everything it does — think of them as the agent's components. The rest of this page zooms into the four that explain <em>how it works</em>: Remember, Delegate, Schedule, and the Search/Experiment pairing.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — click each capability to see what it does</div>
+      <div class="cap-cards">
+        <button class="cap-card" id="cap-connect" onclick="pickCap('connect')">
+          <div class="cap-ico">🔌</div><div class="cap-name">Connect</div><div class="cap-tag">lives everywhere</div>
+        </button>
+        <button class="cap-card" id="cap-remember" onclick="pickCap('remember')">
+          <div class="cap-ico">🧠</div><div class="cap-name">Remember</div><div class="cap-tag">persistent memory</div>
+        </button>
+        <button class="cap-card" id="cap-schedule" onclick="pickCap('schedule')">
+          <div class="cap-ico">⏰</div><div class="cap-name">Schedule</div><div class="cap-tag">runs unattended</div>
+        </button>
+        <button class="cap-card" id="cap-delegate" onclick="pickCap('delegate')">
+          <div class="cap-ico">🧩</div><div class="cap-name">Delegate</div><div class="cap-tag">isolated subagents</div>
+        </button>
+        <button class="cap-card" id="cap-search" onclick="pickCap('search')">
+          <div class="cap-ico">🔎</div><div class="cap-name">Search</div><div class="cap-tag">tools &amp; reasoning</div>
+        </button>
+        <button class="cap-card" id="cap-experiment" onclick="pickCap('experiment')">
+          <div class="cap-ico">🧪</div><div class="cap-name">Experiment</div><div class="cap-tag">five backends</div>
+        </button>
+      </div>
+      <div class="demo-log" id="cap-log">Click a capability card.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Which Hermes capability covers isolated subagents with their own terminals and Python RPC scripts?</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">Connect — it's about reaching every messaging platform</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">Delegate — it spins up isolated subagents for zero-context-cost pipelines</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">Search — it bundles web search and browser automation</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Remember: Persistent Memory That Auto-Generates Skills</div>
+      <div class="section-sub">It learns your projects, saves how it solved a problem, and never re-derives it</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Memory is what makes Hermes "grow with you." It does three things: <strong>learns your projects</strong>, <strong>auto-generates skills</strong>, and <strong>never forgets how it solved a problem</strong>. The key move is that auto-generated skill: the first time it works out how to do something, it saves that recipe — so the next time, it reuses the skill instead of reasoning from scratch.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — run a task twice. First run learns a skill; second run reuses it</div>
+      <div class="task-row" id="task-row"></div>
+      <div class="skill-lib">
+        <div class="skill-lib-h">Auto-generated skill library</div>
+        <div class="skill-pills" id="skill-pills"><span class="skill-empty">No skills yet — run a task to teach Hermes one.</span></div>
+      </div>
+      <div class="demo-log" id="mem-log">Pick a task. The first time it's slow (figuring it out); the second time it's instant (reused skill).</div>
+    </div>
+
+    <div class="callout good">This is the difference between a stateless chatbot and an agent that <strong>compounds</strong>: every problem solved becomes reusable capability, so it gets faster and more capable the longer you use it.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Hermes is asked to do a task it already worked out last week. What does its persistent memory let it do?</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Solve it from scratch again, because every run is independent for accuracy</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">Reuse the auto-generated skill it saved, instead of re-deriving the whole solution</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Ask you to re-explain the steps so it can relearn them</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Delegate: Isolated Subagents, Zero-Context-Cost</div>
+      <div class="section-sub">Each subagent gets its own conversation, terminal, and Python RPC — and returns only the result</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Big jobs blow up an agent's context window. Hermes' answer is to <strong>delegate</strong>: it hands a chunk of work to an <strong>isolated subagent</strong> that has its own conversation, its own terminal, and its own Python RPC scripts. The subagent does the messy, token-heavy work in isolation and hands back <strong>only the result</strong>.</p>
+    <p>That's what "<strong>zero-context-cost pipelines</strong>" means — the main agent's context stays lean because all the intermediate thinking happened somewhere else, out of view.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — delegate a job to three isolated subagents and watch the main context stay lean</div>
+      <div class="sub-grid" id="sub-grid"></div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-num bad" id="stat-inline">0</div>
+          <div class="stat-cap">Tokens if run <b>inline</b> in the main context</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num good" id="stat-deleg">0</div>
+          <div class="stat-cap">Tokens added to the main context when <b>delegated</b></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin:14px 0 0;flex-wrap:wrap;">
+        <button class="btn" id="deleg-btn" onclick="spawnSubagents()">🧩 Delegate the job</button>
+        <button class="btn btn-outline" onclick="resetSubagents()">Reset</button>
+      </div>
+      <div class="demo-log" id="deleg-log">The main agent only needs the answer — not every step the subagents took to get there.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">Why are Hermes subagents described as "zero-context-cost"?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">Because they're free of charge to run</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">They run in isolation and return only their result, so the main agent's context isn't bloated by their intermediate work</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">They share the main agent's single conversation, so nothing is ever duplicated</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Schedule: Unattended Work Through the Gateway</div>
+      <div class="section-sub">Describe a recurring task in plain English; the gateway runs it on its own, focused every time</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>You don't write cron syntax for Hermes — you describe what you want in <strong>natural language</strong>: "every morning, email me a sales briefing." Hermes turns that into a schedule and runs it <strong>unattended through the gateway</strong> — a process that keeps firing your reports, backups, and briefings even when you're offline, "focused every time."</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — pick a natural-language schedule, then fast-forward and watch the gateway fire it</div>
+      <div class="sched-opts" id="sched-opts"></div>
+      <div class="gateway-bar" id="gateway-bar" style="display:none;">
+        <span style="font-size:12.5px;color:var(--muted);">Parsed schedule:</span>
+        <span class="sched-chip" id="sched-cron">—</span>
+        <span style="font-size:12.5px;color:var(--green);">● gateway armed</span>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="btn" id="ff-btn" onclick="fastForward()" disabled>⏩ Fast-forward one day</button>
+        <button class="btn btn-outline" onclick="resetSchedule()">Reset</button>
+      </div>
+      <div class="demo-log" id="sched-log">Pick a schedule above to arm the gateway.</div>
+    </div>
+
+    <div class="callout"><strong>Why a gateway?</strong> Scheduled runs can't depend on your laptop being open or a chat window being focused. The gateway is the always-on process that owns the clock and launches the agent on time, on its own.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">How does a scheduled Hermes job run while you're offline?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Your device must stay open and focused to trigger it at the right time</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">It runs unattended through the gateway on the natural-language schedule you set</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">You re-run it manually each time from whichever surface you're on</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">The Full Flow: Tools, Backends, and One Request End to End</div>
+      <div class="section-sub">Search (the toolset) + Experiment (the five backends) — assembled into a single run</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>The last two capabilities are where work actually gets done. <strong>Search</strong> is the toolset the agent reaches for; <strong>Experiment</strong> is the set of places that work can run. Switch between them, then play the full flow to see how every component from this page snaps together.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tab-tools')">🔎 Search — the tools</button>
+      <button class="tab" onclick="switchTab(this,'tab-backends')">🧪 Experiment — the backends</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-tools">
+      <p>Search gives the agent hands and senses. Backed by access to <strong>300+ models</strong> via the Nous Portal, it can pick the right model for the job — that's the "multi-model reasoning."</p>
+      <div class="chip-row">
+        <span class="tool-chip"><span class="t-ico">🌐</span> Web search</span>
+        <span class="tool-chip"><span class="t-ico">🖱️</span> Browser automation</span>
+        <span class="tool-chip"><span class="t-ico">👁️</span> Vision</span>
+        <span class="tool-chip"><span class="t-ico">🎨</span> Image generation</span>
+        <span class="tool-chip"><span class="t-ico">🔊</span> Text-to-speech</span>
+        <span class="tool-chip"><span class="t-ico">🧠</span> Multi-model reasoning</span>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-backends">
+      <p>Experiment is <strong>where</strong> code and tools execute — five interchangeable backends, all with <strong>container hardening and namespace isolation</strong> so a task can't reach beyond its sandbox.</p>
+      <div class="chip-row">
+        <span class="tool-chip"><span class="t-ico">💻</span> Local</span>
+        <span class="tool-chip"><span class="t-ico">📦</span> Docker</span>
+        <span class="tool-chip"><span class="t-ico">🔗</span> SSH</span>
+        <span class="tool-chip"><span class="t-ico">🧊</span> Singularity</span>
+        <span class="tool-chip"><span class="t-ico">☁️</span> Modal</span>
+      </div>
+      <div class="callout">Local for quick work, Docker/Singularity for reproducible isolated runs, SSH to use a remote box, Modal for serverless scale — same agent, swappable execution.</div>
+    </div>
+
+    <h4>One request, all components</h4>
+    <p>Hover any component for its job, then hit <strong>Play full flow</strong> to trace a real request through the whole system.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — "research competitor pricing and post a summary to Slack"</div>
+      <div class="arch-grid">
+        <div class="arch-node" id="an-surface">
+          <div class="a-icon">📨</div><div class="a-name">Surface</div><div class="a-sub">Slack message</div>
+          <div class="arch-tooltip">The request enters from any connected surface — Slack, Telegram, CLI, email. Hermes treats them all as one inbox into a single agent (Section 1).</div>
+        </div>
+        <div class="arch-node" id="an-core">
+          <div class="a-icon">🧠</div><div class="a-name">Agent Core</div><div class="a-sub">reasons &amp; plans</div>
+          <div class="arch-tooltip">The core reasons over the request with access to 300+ models via the Nous Portal (multi-model reasoning), then decides what to recall, which tools to call, and what to delegate.</div>
+        </div>
+        <div class="arch-node" id="an-mem">
+          <div class="a-icon">💾</div><div class="a-name">Memory</div><div class="a-sub">skills &amp; projects</div>
+          <div class="arch-tooltip">Persistent memory + auto-generated skills. The core checks whether it has solved this before and reuses a saved skill instead of re-thinking (Section 3).</div>
+        </div>
+        <div class="arch-node" id="an-tools">
+          <div class="a-icon">🧰</div><div class="a-name">Tools</div><div class="a-sub">search · browser · vision</div>
+          <div class="arch-tooltip">The Search toolset: web search, browser automation, vision, image generation, text-to-speech. The core calls whichever the task needs (Section 6).</div>
+        </div>
+        <div class="arch-node" id="an-subs">
+          <div class="a-icon">🧩</div><div class="a-name">Subagents</div><div class="a-sub">isolated work</div>
+          <div class="arch-tooltip">Heavy or parallel work goes to isolated subagents — own conversation, terminal, and Python RPC — so the main context stays clean (Section 4).</div>
+        </div>
+        <div class="arch-node" id="an-backend">
+          <div class="a-icon">🖥️</div><div class="a-name">Backend</div><div class="a-sub">hardened sandbox</div>
+          <div class="arch-tooltip">Code runs on one of five backends — local, Docker, SSH, Singularity, Modal — with container hardening and namespace isolation (Section 6).</div>
+        </div>
+      </div>
+      <button class="btn" id="arch-btn" onclick="playArch()">Play full flow</button>
+      <div class="demo-log" id="arch-log">Hover a component, or play the flow.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">When Hermes runs a subagent's code, where does it execute?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Always directly inside the chat client you messaged it from</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">On one of five backends — local, Docker, SSH, Singularity, or Modal — with container hardening and namespace isolation</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Only on your local machine, since agents can't use remote compute</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🧠 You've got the Hermes model</h2>
+  <p>One agent, one memory, every surface → six capabilities → memory that auto-saves skills → isolated zero-context-cost subagents → a gateway that runs work unattended → tools (Search) executing across five hardened backends (Experiment). An agent that grows with you.</p>
+</div>
+
+</div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#9696b0;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://hermes-agent.nousresearch.com/" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">Hermes Agent — Nous Research</a>
+  </div>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- tabs ---------- */
+function switchTab(btn, panelId) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById(panelId);
+  let sib = group.nextElementSibling;
+  while (sib && sib.classList.contains('tab-panel')) { sib.classList.remove('active'); sib = sib.nextElementSibling; }
+  panel.classList.add('active');
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'Every surface — Telegram, Slack, CLI, email — is a doorway into the same agent and one shared memory. What it learns on one channel is available on all of them.' },
+  q2: { correct: 1, explanation: 'Delegate is the capability for isolated subagents, each with its own conversation, terminal, and Python RPC scripts — enabling zero-context-cost pipelines.' },
+  q3: { correct: 1, explanation: 'Hermes auto-generates a skill the first time it solves something and never forgets it, so a repeat task reuses the saved recipe instead of being re-derived from scratch.' },
+  q4: { correct: 1, explanation: 'A subagent does its token-heavy work in an isolated conversation/terminal and returns only the result. The main agent\'s context absorbs the answer, not the intermediate steps — hence "zero-context-cost."' },
+  q5: { correct: 1, explanation: 'You describe the schedule in plain English; the gateway is the always-on process that owns the clock and launches the agent on time, unattended — no open device or focused window required.' },
+  q6: { correct: 1, explanation: 'Hermes\' Experiment capability offers five backends — local, Docker, SSH, Singularity, Modal — all with container hardening and namespace isolation, so it can run anywhere from your laptop to serverless cloud.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- S1: surfaces hub ---------- */
+const surfaces = [
+  { name: 'Telegram', ico: '💬' }, { name: 'Discord', ico: '🎮' }, { name: 'Slack', ico: '💼' },
+  { name: 'WhatsApp', ico: '📱' }, { name: 'Signal', ico: '🔒' }, { name: 'Email', ico: '✉️' },
+  { name: 'CLI', ico: '⌨️' },
+];
+const usedSurfaces = new Set();
+let lastSurface = null;
+function buildSurfaces() {
+  const grid = document.getElementById('surf-grid');
+  surfaces.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'surf-chip';
+    b.id = 'surf-' + s.name;
+    b.innerHTML = `<span class="surf-ico">${s.ico}</span>${s.name}`;
+    b.onclick = () => pingSurface(s.name);
+    grid.appendChild(b);
+  });
+}
+function pingSurface(name) {
+  const core = document.getElementById('hub-core');
+  core.classList.add('pulse');
+  setTimeout(() => core.classList.remove('pulse'), 350);
+  const log = document.getElementById('surf-log');
+  if (!usedSurfaces.has(name)) { document.getElementById('surf-' + name).classList.add('used'); }
+  if (usedSurfaces.size === 0 || lastSurface === null) {
+    log.innerHTML = `📨 Message arrives via <b>${name}</b>. The one Hermes agent handles it — and stores it in the shared memory.`;
+  } else if (name === lastSurface) {
+    log.innerHTML = `📨 Another message via <b>${name}</b> — same conversation, same agent, same memory.`;
+  } else {
+    log.innerHTML = `📨 Now via <b>${name}</b>. Same agent, same memory: it still recalls what you said over <b>${lastSurface}</b>. <span style="color:var(--green)">One agent, one memory, every surface.</span>`;
+  }
+  usedSurfaces.add(name);
+  lastSurface = name;
+}
+
+/* ---------- S2: capability cards ---------- */
+const capData = {
+  connect:    '🔌 <b>Connect</b> — Lives everywhere: Telegram, Discord, Slack, WhatsApp, Signal, Email, CLI — and a growing list of platforms. <i>One agent, one memory, every surface.</i>',
+  remember:   '🧠 <b>Remember</b> — Persistent memory. It learns your projects, auto-generates skills, and never forgets how it solved a problem.',
+  schedule:   '⏰ <b>Schedule</b> — Natural-language scheduling for reports, backups, and briefings — running unattended through the gateway, focused every time.',
+  delegate:   '🧩 <b>Delegate</b> — Isolated subagents with their own conversations, terminals, and Python RPC scripts for zero-context-cost pipelines.',
+  search:     '🔎 <b>Search</b> — Web search, browser automation, vision, image generation, text-to-speech, and multi-model reasoning (300+ models via the Nous Portal).',
+  experiment: '🧪 <b>Experiment</b> — Five backends: local, Docker, SSH, Singularity, Modal — with container hardening and namespace isolation.',
+};
+function pickCap(key) {
+  Object.keys(capData).forEach(k => document.getElementById('cap-' + k).classList.toggle('selected', k === key));
+  document.getElementById('cap-log').innerHTML = capData[key];
+}
+
+/* ---------- S3: memory / auto-skills ---------- */
+const tasks = [
+  { id: 'deploy', label: 'Deploy the staging build', skill: 'deploy-staging',
+    steps: ['pull latest main', 'install deps + build', 'run the test suite', 'push to staging', 'smoke-check the URL'] },
+  { id: 'report', label: 'Compile the weekly metrics report', skill: 'weekly-report',
+    steps: ['query the analytics DB', 'aggregate by week', 'render the charts', 'format a summary'] },
+  { id: 'backup', label: 'Back up the database', skill: 'db-backup',
+    steps: ['dump the database', 'compress the dump', 'upload to cloud storage', 'verify the checksum'] },
+];
+const learned = new Set();
+let memBusy = false;
+function buildTasks() {
+  const row = document.getElementById('task-row');
+  tasks.forEach(t => {
+    const b = document.createElement('button');
+    b.className = 'btn btn-outline';
+    b.id = 'task-' + t.id;
+    b.textContent = '▶ ' + t.label;
+    b.onclick = () => runTask(t.id);
+    row.appendChild(b);
+  });
+}
+function renderSkills() {
+  const box = document.getElementById('skill-pills');
+  if (learned.size === 0) { box.innerHTML = '<span class="skill-empty">No skills yet — run a task to teach Hermes one.</span>'; return; }
+  box.innerHTML = '';
+  learned.forEach(s => {
+    const span = document.createElement('span');
+    span.className = 'skill-pill';
+    span.textContent = '💾 ' + s;
+    box.appendChild(span);
+  });
+}
+function runTask(id) {
+  if (memBusy) return;
+  const t = tasks.find(x => x.id === id);
+  const log = document.getElementById('mem-log');
+  if (learned.has(t.skill)) {
+    log.innerHTML = `♻️ <b style="color:var(--green)">Recognized.</b> Hermes reused its saved skill <code>${t.skill}</code> — no re-thinking, done in one step. This is "never forgets how it solved a problem."`;
+    return;
+  }
+  memBusy = true;
+  document.querySelectorAll('#task-row .btn').forEach(b => b.disabled = true);
+  log.innerHTML = `🧠 <b>First time.</b> Figuring out "${t.label}" step by step…`;
+  let i = 0;
+  const tick = () => {
+    if (i < t.steps.length) {
+      log.innerHTML = `🧠 Working out "${t.label}"… &nbsp;<code>${i + 1}. ${t.steps[i]}</code>`;
+      i++;
+      setTimeout(tick, 650);
+    } else {
+      learned.add(t.skill);
+      renderSkills();
+      log.innerHTML = `💾 <b style="color:var(--green)">Solved &amp; saved as a skill:</b> <code>${t.skill}</code>. Run the same task again — it'll be instant.`;
+      document.querySelectorAll('#task-row .btn').forEach(b => b.disabled = false);
+      memBusy = false;
+    }
+  };
+  setTimeout(tick, 650);
+}
+
+/* ---------- S4: delegate / subagents ---------- */
+const subs = [
+  { name: 'Researcher', ico: '🔬', work: 'searches docs + web in its own conversation', cost: 4200, result: 'found 9 sources' },
+  { name: 'Coder',      ico: '💻', work: 'writes + runs code in its own terminal',      cost: 5100, result: 'script returns clean data' },
+  { name: 'Tester',     ico: '🧪', work: 'runs the suite via Python RPC',               cost: 3100, result: 'all 24 tests pass' },
+];
+let delegBusy = false;
+function buildSubs() {
+  const grid = document.getElementById('sub-grid');
+  subs.forEach((s, i) => {
+    const el = document.createElement('div');
+    el.className = 'sub-card';
+    el.id = 'sub-' + i;
+    el.innerHTML = `<div class="sub-ico">${s.ico}</div><div class="sub-name">${s.name}</div>
+      <div class="sub-work">${s.work}</div><div class="sub-status" id="sub-st-${i}"></div>`;
+    grid.appendChild(el);
+  });
+}
+function spawnSubagents() {
+  if (delegBusy) return;
+  delegBusy = true;
+  document.getElementById('deleg-btn').disabled = true;
+  resetSubMarkers();
+  document.getElementById('deleg-log').innerHTML = '🧩 Main agent delegates the job to three <b>isolated</b> subagents — each gets its own conversation, terminal, and Python RPC.';
+  const inlineTotal = subs.reduce((a, s) => a + s.cost, 0);
+  let done = 0;
+  subs.forEach((s, i) => {
+    const card = document.getElementById('sub-' + i);
+    const st = document.getElementById('sub-st-' + i);
+    setTimeout(() => { card.classList.add('running'); st.style.color = 'var(--amber)'; st.textContent = 'running…'; }, 150);
+    setTimeout(() => {
+      card.classList.remove('running'); card.classList.add('done');
+      st.style.color = 'var(--green)'; st.textContent = '✓ ' + s.result;
+      done++;
+      if (done === subs.length) {
+        animateCount('stat-inline', inlineTotal);
+        animateCount('stat-deleg', 180);
+        document.getElementById('deleg-log').innerHTML = `✓ All three returned <b>just their results</b>. Run inline, their work would have cost <b style="color:var(--red)">${inlineTotal.toLocaleString()}</b> tokens of main context. Delegated, the main agent only absorbed <b style="color:var(--green)">~180</b> tokens of summaries — <i>zero-context-cost</i>.`;
+        document.getElementById('deleg-btn').disabled = false;
+        delegBusy = false;
+      }
+    }, 1100 + i * 700);
+  });
+}
+function animateCount(elId, target) {
+  const el = document.getElementById(elId);
+  const steps = 18; let n = 0;
+  const inc = target / steps;
+  const t = setInterval(() => {
+    n += inc;
+    if (n >= target) { n = target; clearInterval(t); }
+    el.textContent = Math.round(n).toLocaleString();
+  }, 35);
+}
+function resetSubMarkers() {
+  subs.forEach((_, i) => {
+    document.getElementById('sub-' + i).classList.remove('running', 'done');
+    document.getElementById('sub-st-' + i).textContent = '';
+  });
+}
+function resetSubagents() {
+  if (delegBusy) return;
+  resetSubMarkers();
+  document.getElementById('stat-inline').textContent = '0';
+  document.getElementById('stat-deleg').textContent = '0';
+  document.getElementById('deleg-log').innerHTML = 'The main agent only needs the answer — not every step the subagents took to get there.';
+}
+
+/* ---------- S5: schedule via gateway ---------- */
+const schedules = [
+  { id: 'brief',  nl: 'Every morning at 8:00, email me a sales briefing',          cron: '0 8 * * *',  run: '📧 Sales briefing compiled and emailed' },
+  { id: 'backup', nl: 'Every night at 2:00, back up the database',                 cron: '0 2 * * *',  run: '🗄️ Database backed up to cloud storage' },
+  { id: 'report', nl: 'Every Monday at 9:00, post the weekly report to Slack',     cron: '0 9 * * 1',  run: '📊 Weekly report posted to #general' },
+];
+let selectedSched = null;
+let dayCount = 0;
+function buildSchedules() {
+  const box = document.getElementById('sched-opts');
+  schedules.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'sched-opt';
+    b.id = 'sched-' + s.id;
+    b.innerHTML = `🗣️ "${s.nl}"`;
+    b.onclick = () => pickSchedule(s.id);
+    box.appendChild(b);
+  });
+}
+function pickSchedule(id) {
+  selectedSched = schedules.find(s => s.id === id);
+  dayCount = 0;
+  schedules.forEach(s => document.getElementById('sched-' + s.id).classList.toggle('on', s.id === id));
+  document.getElementById('gateway-bar').style.display = 'flex';
+  document.getElementById('sched-cron').textContent = selectedSched.cron;
+  document.getElementById('ff-btn').disabled = false;
+  document.getElementById('sched-log').innerHTML = `✅ Parsed to a schedule and handed to the <b>gateway</b>. You can close every app now — fast-forward to watch it fire on its own.`;
+}
+function fastForward() {
+  if (!selectedSched) return;
+  dayCount++;
+  document.getElementById('sched-log').innerHTML =
+    `📅 <b>Day ${dayCount}</b> — you're offline. The gateway woke the agent on schedule → <b style="color:var(--green)">${selectedSched.run}</b>. No prompt from you, focused every time.`;
+}
+function resetSchedule() {
+  selectedSched = null; dayCount = 0;
+  schedules.forEach(s => document.getElementById('sched-' + s.id).classList.remove('on'));
+  document.getElementById('gateway-bar').style.display = 'none';
+  document.getElementById('ff-btn').disabled = true;
+  document.getElementById('sched-log').innerHTML = 'Pick a schedule above to arm the gateway.';
+}
+
+/* ---------- S6: architecture play ---------- */
+const archScript = [
+  { node: 'an-surface', msg: '1 · A request arrives from Slack: "research competitor pricing and post a summary." Same agent, same memory as every other surface.' },
+  { node: 'an-core',    msg: '2 · The agent core reasons over it — multi-model reasoning via the Nous Portal — and plans the work.' },
+  { node: 'an-mem',     msg: '3 · It checks memory: there\'s a saved "pricing-research" skill from last week, so it reuses the recipe instead of starting from scratch.' },
+  { node: 'an-tools',   msg: '4 · It calls tools: web search + browser automation to gather prices, vision to read a pricing chart image.' },
+  { node: 'an-subs',    msg: '5 · The heavy crunching is delegated to an isolated subagent (own terminal + Python RPC), keeping the main context lean.' },
+  { node: 'an-backend', msg: '6 · That subagent\'s code runs in a hardened Docker backend with namespace isolation, then returns just the result.' },
+  { node: 'an-surface', msg: '✓ The summary is posted back to Slack — and you could schedule it to repeat through the gateway. One agent did the whole thing, holding it all in one memory. 🎉' },
+];
+let archPlaying = false;
+function playArch() {
+  if (archPlaying) return;
+  archPlaying = true;
+  document.getElementById('arch-btn').disabled = true;
+  document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+  archScript.forEach((step, i) => {
+    setTimeout(() => {
+      document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+      document.getElementById(step.node).classList.add('lit');
+      document.getElementById('arch-log').textContent = step.msg;
+      if (i === archScript.length - 1) {
+        setTimeout(() => {
+          document.querySelectorAll('.arch-node').forEach(n => n.classList.remove('lit'));
+          document.getElementById('arch-btn').disabled = false;
+          archPlaying = false;
+        }, 1800);
+      }
+    }, i * 1700);
+  });
+}
+
+/* ---------- tooltips (overflow-safe: position fixed) ---------- */
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.arch-tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+window.addEventListener('load', () => {
+  buildSurfaces();
+  buildTasks();
+  renderSkills();
+  buildSubs();
+  buildSchedules();
+  initTooltips();
+});
+</script>
+</body>
+</html>
