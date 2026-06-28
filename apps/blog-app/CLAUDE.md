@@ -22,11 +22,17 @@ Build preset is switched by the `NITRO_PRESET` env var in `vite.config.ts`:
 - unset → `vercel` preset + `static: true` (SSG) → `.vercel/output/`
 - `node-server` → Nitro Node server + `static: false` (SSR) → `dist/apps/blog-app/analog/`
 
-Cloud Run (project `dalenguyen-prod`, region `us-central1`, account `dale@dalenguyen.me`):
+Cloud Run (project `dalenguyen-prod`, region `us-central1`):
 
 ```
 nx run blog-app:deploy        # build-server → gcloud builds submit → gcloud run deploy
 ```
+
+Deploy identity: the nx targets pass `--account ${GCLOUD_ACCOUNT:-dale@dalenguyen.me}`.
+`dale@dalenguyen.me` is the default because it's the only account with access to
+`dalenguyen-prod` (the usual active account, `dale.nguyen@noibu.com`, does not). In CI or
+any other environment, set `GCLOUD_ACCOUNT` to the authenticated (service) account that
+has `roles/run.admin` + `roles/cloudbuild.builds.editor` on the project.
 
 Targets: `build-server` (node-server build), `build-docker` (stage `analog/` into
 `.cloudrun/` + Cloud Build), `deploy` (Cloud Run). Image: nginx-free `node:22-slim`

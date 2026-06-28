@@ -12,7 +12,9 @@ FROM node:22-slim
 WORKDIR /app
 ENV NODE_ENV=production
 # Cloud Run injects PORT=8080; the node-server preset binds it on 0.0.0.0.
-COPY .cloudrun/analog ./analog
+# --chown so the unprivileged `node` user owns the output (e.g. if Nitro ever
+# needs to write a runtime cache under analog/).
+COPY --chown=node:node .cloudrun/analog ./analog
 # Drop root: the server only reads its bundled output, so the unprivileged
 # `node` user (present in the official image) is enough.
 USER node

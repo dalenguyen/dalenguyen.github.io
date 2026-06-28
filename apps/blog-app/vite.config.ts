@@ -105,6 +105,10 @@ export default defineConfig(({ mode }) => {
         prerender:
           mode === 'production'
             ? {
+                // This list is the static-vs-SSR selector for BOTH builds: a
+                // listed route is prerendered; an omitted one is SSR'd on the
+                // Cloud Run node-server but 404s on the static Vercel build — so
+                // keep every Vercel-served route here. (See header comment.)
                 routes: async () => [
                   '/',
                   '/blog',
