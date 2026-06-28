@@ -71,8 +71,10 @@ export default defineConfig(({ mode }) => {
   // instead produces a self-contained Nitro Node server that prerenders the
   // routes listed in `prerender.routes` and SERVER-RENDERS everything else on
   // demand, while exposing AnalogJS API routes under src/server/** (e.g.
-  // /api/v1/hello). To make a page static, add it to `prerender.routes`; to
-  // make it SSR, leave it out. Nitro also honours NITRO_PRESET natively.
+  // /api/v1/hello). `prerender.routes` is the AUTHORITATIVE list of statically
+  // prerendered routes: every route the default Vercel/SSG build serves MUST be
+  // listed there or it 404s in production. Omitting a route only makes it
+  // SSR-on-demand on the Cloud Run server. Nitro also honours NITRO_PRESET natively.
   const nitroPreset = process.env.NITRO_PRESET ?? 'vercel'
   const isServerBuild = nitroPreset === 'node-server'
   return {
