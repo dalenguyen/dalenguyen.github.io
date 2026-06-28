@@ -58,6 +58,33 @@
         }
       },
       "dependsOn": ["build"]
+    },
+    "build-server": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "NITRO_PRESET=node-server npx nx build blog-app --skip-nx-cache",
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "build-docker": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-server"],
+      "options": {
+        "commands": [
+          "rm -rf apps/blog-app/.cloudrun && mkdir -p apps/blog-app/.cloudrun && cp -R dist/apps/blog-app/analog apps/blog-app/.cloudrun/analog",
+          "gcloud builds submit apps/blog-app --tag us-central1-docker.pkg.dev/dalenguyen-prod/blog/blog-app --project dalenguyen-prod --account dale@dalenguyen.me --quiet"
+        ],
+        "parallel": false,
+        "cwd": "{workspaceRoot}"
+      }
+    },
+    "deploy": {
+      "executor": "nx:run-commands",
+      "dependsOn": ["build-docker"],
+      "options": {
+        "command": "gcloud run deploy blog-app --image us-central1-docker.pkg.dev/dalenguyen-prod/blog/blog-app --region us-central1 --project dalenguyen-prod --account dale@dalenguyen.me --platform managed --allow-unauthenticated --min-instances=0 --cpu-boost --memory=512Mi --port 8080 --labels app=blog-app,managed-by=nx --quiet",
+        "cwd": "{workspaceRoot}"
+      }
     }
   }
 }

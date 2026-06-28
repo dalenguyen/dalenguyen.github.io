@@ -52,6 +52,9 @@ thunder-tests
 .nx/workspace-data
 .vercel
 
+# Staged static output for the blog-app Cloud Run image (build-docker target)
+apps/blog-app/.cloudrun
+
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 .cursor

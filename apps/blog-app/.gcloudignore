@@ -1,0 +1,7 @@
+# Cloud Build context for `nx build-docker blog-app`. Without this file gcloud
+# falls back to .gitignore, which excludes .cloudrun/ (the staged node-server
+# output the Dockerfile copies). Upload only the Dockerfile and that staged
+# output — nothing else from the app source is needed.
+/*
+!/Dockerfile
+!/.cloudrun
