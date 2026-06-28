@@ -65,6 +65,18 @@ function tuneCriticalPath(html: string): string {
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
+  // Deployment-target switch. The default build targets Vercel (static SSG:
+  // every route is prerendered, no runtime server). Setting
+  // NITRO_PRESET=node-server (used by the Cloud Run `build-server` nx target)
+  // instead produces a self-contained Nitro Node server that prerenders the
+  // routes listed in `prerender.routes` and SERVER-RENDERS everything else on
+  // demand, while exposing AnalogJS API routes under src/server/** (e.g.
+  // /api/v1/hello). `prerender.routes` is the AUTHORITATIVE list of statically
+  // prerendered routes: every route the default Vercel/SSG build serves MUST be
+  // listed there or it 404s in production. Omitting a route only makes it
+  // SSR-on-demand on the Cloud Run server. Nitro also honours NITRO_PRESET natively.
+  const nitroPreset = process.env.NITRO_PRESET ?? 'vercel'
+  const isServerBuild = nitroPreset === 'node-server'
   return {
     root: __dirname,
     publicDir: '../../libs/portfolio/shared',
@@ -82,9 +94,11 @@ export default defineConfig(({ mode }) => {
     plugins: [
       analog({
         ssr: mode === 'production', // Enable SSR only in production for prerendering
-        static: true,
+        // SSG for the Vercel build; a real SSR server for the node-server
+        // (Cloud Run) build so non-prerendered routes render on demand.
+        static: !isServerBuild,
         nitro: {
-          preset: 'vercel',
+          preset: nitroPreset,
         },
         vite: {
           // tsconfig: 'apps/blog-app/tsconfig.app.json',
@@ -93,10 +107,15 @@ export default defineConfig(({ mode }) => {
         prerender:
           mode === 'production'
             ? {
+                // This list is the static-vs-SSR selector for BOTH builds: a
+                // listed route is prerendered; an omitted one is SSR'd on the
+                // Cloud Run node-server but 404s on the static Vercel build — so
+                // keep every Vercel-served route here. (See header comment.)
                 routes: async () => [
                   '/',
                   '/blog',
                   '/learn',
+                  '/bucket-list',
                   {
                     contentDir: 'src/content',
                     transform: (file: PrerenderContentFile) => {
