@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How We Build Effective Agents — Barry Zhang, Anthropic</title>
+<meta name="description" content="Interactive breakdown of Barry Zhang's (Anthropic) AI Engineer Summit talk: the spectrum from features to workflows to agents, when NOT to build an agent, keeping agents simple (models using tools in a loop), thinking like your agent, and the open questions ahead.">
+<meta name="date" content="2026-06-30">
+<meta name="timestamp" content="2026-06-30T23:30:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --text: #e8e8f0;
+  --muted: #9696b0;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 700px; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head { display: flex; align-items: center; gap: 16px; padding: 20px 24px; cursor: pointer; user-select: none; }
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px; font-size: 14px; margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s; font-family: inherit;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin: 14px 0; }
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+.demo-log code { color: var(--amber); font-size: 12.5px; }
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 8px; margin: 16px 0 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-weight: 500; font-family: inherit; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- kv chips ---------- */
+.kv-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 4px; }
+.kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; font-size: 12px; }
+.kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted); font-weight: 600; }
+.kv-chip-val { padding: 4px 9px; color: var(--text); }
+
+/* ---------- S1: spectrum ---------- */
+.spec-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.spec-stage {
+  flex: 1; min-width: 120px; text-align: center; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--surface2); padding: 12px 8px; cursor: pointer;
+  transition: all 0.2s; color: var(--text); font-family: inherit;
+}
+.spec-stage:hover { border-color: var(--accent); }
+.spec-stage.on { border-color: var(--accent); background: var(--accent-glow); box-shadow: 0 0 0 1px var(--accent-glow); }
+.spec-ico { font-size: 22px; }
+.spec-name { font-size: 12.5px; font-weight: 700; margin-top: 4px; }
+.spec-tag { font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+.meter { margin: 12px 0 0; }
+.meter-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.meter-track { height: 10px; background: var(--code-bg); border: 1px solid var(--border); border-radius: 99px; overflow: hidden; }
+.meter-fill { height: 100%; width: 0%; border-radius: 99px; transition: width 0.5s cubic-bezier(0.22,1,0.36,1); }
+.meter-fill.agency { background: linear-gradient(90deg, #5e6ad2aa, #5e6ad2); }
+.meter-fill.cost   { background: linear-gradient(90deg, #f8717199, #f87171); }
+
+/* ---------- S2 / S4: flow + loop nodes ---------- */
+.flow-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px; }
+.flow-node {
+  border: 1px solid var(--border); border-radius: 9px; background: var(--surface2);
+  padding: 10px 12px; font-size: 12.5px; font-weight: 600; text-align: center;
+  min-width: 78px; transition: all 0.25s; opacity: 0.5;
+}
+.flow-node.lit { opacity: 1; border-color: var(--accent); background: var(--accent-glow); }
+.flow-node.loop.lit { border-color: var(--amber); background: rgba(251,191,36,0.12); }
+.flow-arrow { color: var(--muted); font-size: 15px; }
+
+/* ---------- S3: checklist ---------- */
+.chk-list { display: flex; flex-direction: column; gap: 10px; margin: 6px 0 16px; }
+.chk-item {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--border);
+  border-radius: 10px; background: var(--surface2); cursor: pointer; transition: all 0.15s;
+  text-align: left; color: var(--text); font-family: inherit;
+}
+.chk-item:hover { border-color: var(--accent); }
+.chk-box {
+  width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; font-size: 13px; color: transparent;
+  background: var(--bg); transition: all 0.15s;
+}
+.chk-item.on .chk-box { background: var(--green); border-color: var(--green); color: #052e16; }
+.chk-main { flex: 1; }
+.chk-title { font-size: 13.5px; font-weight: 600; }
+.chk-sub { font-size: 11.5px; color: var(--muted); margin-top: 2px; }
+.verdict { padding: 14px 16px; border-radius: 10px; border: 1px solid var(--border); background: var(--surface2); font-size: 14px; }
+.verdict.agent { border-color: var(--green); background: rgba(74,222,128,0.07); }
+.verdict.workflow { border-color: var(--accent); background: rgba(94,106,210,0.08); }
+.verdict.caution { border-color: var(--amber); background: rgba(251,191,36,0.07); }
+.verdict-head { font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+.verdict-reasons { margin: 6px 0 0; padding-left: 18px; font-size: 12.5px; color: var(--muted); }
+.verdict-reasons li { margin: 3px 0; }
+
+/* ---------- S4: component nodes + tooltip ---------- */
+.arch-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 6px 0 4px; }
+.arch-node {
+  position: relative; border: 1px solid var(--border); border-radius: 10px;
+  background: var(--surface2); padding: 14px 10px; text-align: center; cursor: default;
+  transition: border-color 0.2s, background 0.2s;
+}
+.arch-node .a-icon { font-size: 22px; margin-bottom: 4px; }
+.arch-node .a-name { font-size: 12.5px; font-weight: 700; }
+.arch-node .a-sub { font-size: 10.5px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+.arch-node:hover { border-color: var(--accent); }
+.arch-tooltip {
+  display: none; position: fixed; z-index: 1000; pointer-events: none;
+  width: 230px; background: var(--surface2); border: 1px solid var(--accent);
+  border-radius: 8px; padding: 10px 14px; font-size: 12.5px; color: var(--text);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.5); text-align: left; line-height: 1.5;
+}
+
+/* ---------- S5: computer-use screen ---------- */
+.screen { position: relative; border: 1px solid var(--border); border-radius: 10px; background: #0a0a10; height: 190px; overflow: hidden; }
+.screen-bar { display: flex; align-items: center; gap: 6px; padding: 8px 10px; background: var(--surface2); border-bottom: 1px solid var(--border); }
+.screen-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); }
+.screen-url { flex: 1; font-size: 11px; color: var(--muted); background: var(--code-bg); border-radius: 5px; padding: 3px 8px; font-family: ui-monospace, Menlo, monospace; }
+.screen-body { position: relative; padding: 16px; height: calc(100% - 33px); }
+.screen-el { position: absolute; border-radius: 6px; font-size: 11px; display: flex; align-items: center; justify-content: center; }
+.screen-cursor { position: absolute; font-size: 18px; transition: left 0.4s ease, top 0.4s ease; z-index: 5; }
+.screen-overlay {
+  position: absolute; inset: 0; background: rgba(0,0,0,0.94); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; color: var(--amber);
+  font-size: 13px; opacity: 0; pointer-events: none; transition: opacity 0.3s; padding: 20px; gap: 8px;
+}
+.screen-overlay.show { opacity: 1; }
+.ctx-list { list-style: none; margin: 10px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.ctx-list li { font-size: 12.5px; color: var(--muted); padding: 7px 12px; border: 1px dashed var(--border); border-radius: 7px; background: var(--surface2); }
+.ctx-list li.on { color: var(--green); border-color: var(--green); border-style: solid; background: rgba(74,222,128,0.07); }
+
+/* ---------- S6: open-question cards ---------- */
+.oq-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.oq-card {
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  padding: 14px 12px; cursor: pointer; transition: border-color 0.2s, transform 0.1s;
+  text-align: left; color: var(--text); font-family: inherit;
+}
+.oq-card:hover { border-color: var(--accent); }
+.oq-card.selected { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow); }
+.oq-ico { font-size: 22px; margin-bottom: 6px; }
+.oq-name { font-size: 12.5px; font-weight: 700; line-height: 1.25; }
+.oq-tag { font-size: 10.5px; color: var(--muted); margin-top: 3px; }
+
+/* ---------- Quiz ---------- */
+.quiz { margin-top: 22px; border-top: 1px dashed var(--border); padding-top: 18px; }
+.quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+.quiz-q::before { content: "QUIZ"; display: inline-block; font-size: 10px; letter-spacing: 1.5px; color: var(--amber); border: 1px solid var(--amber); border-radius: 5px; padding: 1px 7px; margin-right: 10px; vertical-align: 1px; }
+.quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+.quiz-opt { padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border); background: var(--bg); color: var(--text); font-size: 14px; text-align: left; cursor: pointer; font-family: inherit; }
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-opt.wrong   { border-color: var(--red);   background: rgba(248,113,113,0.08); color: var(--red); }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 14px; border-radius: 7px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); color: var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); color: var(--red); }
+
+/* ---------- Completion ---------- */
+.completion { display: none; text-align: center; padding: 36px 24px; margin: 40px 0; border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05); }
+.completion.show { display: block; animation: pop 0.4s ease; }
+@keyframes pop { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
+.completion h2 { color: var(--green); font-size: 22px; margin-bottom: 8px; }
+.completion p { color: var(--muted); font-size: 14px; max-width: 640px; margin: 0 auto; }
+
+@media (max-width: 640px) {
+  .arch-grid { grid-template-columns: 1fr; }
+  .oq-cards  { grid-template-columns: 1fr; }
+  .spec-stage { min-width: calc(50% - 4px); }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap hero">
+  <span class="hero-label">Building Agents · Anthropic · 2026</span>
+  <h1>How We Build <span class="grad">Effective Agents</span></h1>
+  <p>An interactive walkthrough of Barry Zhang's AI Engineer Summit talk. Three ideas anchor it: <strong style="color:var(--text)">don't build agents for everything</strong>, <strong style="color:var(--text)">keep it simple</strong>, and <strong style="color:var(--text)">think like your agent</strong> — plus the spectrum that runs from simple features to workflows to fully autonomous agents, and the open questions coming next.</p>
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">The Agentic Spectrum: Features → Workflows → Agents</div>
+      <div class="section-sub">More agency makes systems more useful — and more expensive, slower, and riskier</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Most of us started with <strong>simple features</strong> — summarization, classification, extraction — single model calls that felt like magic a few years ago and are now table stakes. As products matured, one call wasn't enough, so we started <strong>orchestrating multiple model calls in predefined control flows</strong>. Barry calls these <strong>workflows</strong>, and considers them the beginning of agentic systems.</p>
+    <p>Now models are capable enough that <strong>agents</strong> can <strong>decide their own trajectory and operate almost independently</strong> from environment feedback. What the next phase looks like — more general single agents, or multi-agent collaboration — is still too early to name.</p>
+    <div class="callout"><strong>The through-line:</strong> the more agency you hand a system, the more useful and capable it becomes — but cost, latency, and the consequences of errors all rise with it.</div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — click a stage to see its trade-off</div>
+      <div class="spec-row" id="spec-row"></div>
+      <div class="meter">
+        <div class="meter-label"><span>Agency &amp; capability</span><span id="agency-val">—</span></div>
+        <div class="meter-track"><div class="meter-fill agency" id="agency-fill"></div></div>
+      </div>
+      <div class="meter">
+        <div class="meter-label"><span>Cost · latency · consequence of error</span><span id="cost-val">—</span></div>
+        <div class="meter-track"><div class="meter-fill cost" id="cost-fill"></div></div>
+      </div>
+      <div class="demo-log" id="spec-log">Pick a stage above. Notice both bars climb together as you move right.</div>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">As you give a system more agency along this spectrum, what happens?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">It gets more capable, and cost &amp; latency drop because the model does more per call</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">It gets more useful and capable — but cost, latency, and the consequences of errors all go up too</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Capability stays flat; only the branding changes from "workflow" to "agent"</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">Workflows vs Agents: Who Decides the Path?</div>
+      <div class="section-sub">A workflow follows a path you defined; an agent chooses its own from feedback</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>The distinction is precise. A <strong>workflow</strong> runs model calls through a <strong>predefined control flow</strong> — you drew the path, it always follows it. An <strong>agent</strong> runs the model <strong>in a loop</strong>, deciding its own next step based on what the environment gives back. Same building blocks; who's steering is different.</p>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(this,'tab-workflow')">🔀 Workflow</button>
+      <button class="tab" onclick="switchTab(this,'tab-agent')">🤖 Agent</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-workflow">
+      <div class="demo-box">
+        <div class="demo-label">Demo — a predefined path; it runs the same way every time</div>
+        <div class="flow-row" id="wf-flow"></div>
+        <button class="btn" id="wf-btn" onclick="runWorkflow()">▶ Run workflow</button>
+        <div class="demo-log" id="wf-log">You define every node up front. Predictable cost &amp; latency, maximum control.</div>
+      </div>
+    </div>
+
+    <div class="tab-panel" id="tab-agent">
+      <div class="demo-box">
+        <div class="demo-label">Demo — the model loops, choosing its next tool from feedback</div>
+        <div class="flow-row" id="ag-flow"></div>
+        <button class="btn" id="ag-btn" onclick="runAgent()">▶ Run agent</button>
+        <div class="demo-log" id="ag-log">The agent picks each step itself and stops when the goal is met. Flexible in ambiguous spaces — at higher, less predictable cost.</div>
+      </div>
+    </div>
+
+    <div class="kv-row">
+      <span class="kv-chip"><span class="kv-chip-key">Workflow</span><span class="kv-chip-val">control + predictable cost</span></span>
+      <span class="kv-chip"><span class="kv-chip-key">Agent</span><span class="kv-chip-val">autonomy + ambiguity handling</span></span>
+    </div>
+
+    <div class="quiz">
+      <div class="quiz-q">What actually distinguishes an agent from a workflow?</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">An agent uses a bigger model; a workflow uses a smaller one</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">An agent decides its own trajectory in a loop from environment feedback; a workflow follows a control flow you defined in advance</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">Agents never call tools, while workflows are just chains of tool calls</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">Don't Build Agents for Everything</div>
+      <div class="section-sub">Run the four-part checklist before you reach for autonomy</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Agents scale <strong>complex and valuable</strong> tasks — they're not a drop-in upgrade for every use case. Barry's checklist has four questions. Toggle each one below and watch the recommendation change. If you can't check the first box, an explicit <strong>workflow</strong> is almost always the better, cheaper, more controllable choice.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — toggle each criterion; the verdict updates live</div>
+      <div class="chk-list" id="chk-list"></div>
+      <div class="verdict" id="verdict">
+        <div class="verdict-head">Toggle the criteria above</div>
+        <div id="verdict-body">The recommendation appears here.</div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+        <button class="btn" onclick="presetCoding()">Try the "coding agent" preset</button>
+        <button class="btn btn-outline" onclick="resetChecklist()">Reset</button>
+      </div>
+    </div>
+
+    <div class="callout good"><strong>Why coding is a great agent use case:</strong> going from design doc to PR is genuinely ambiguous and complex, good code is high-value, the critical capabilities (write, debug, recover) are already strong, and the output is <strong>easily verifiable</strong> through unit tests and CI — so errors are cheap to discover.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Your task's whole decision tree is easy to map, and each error is high-stakes and hard to detect. What does the checklist suggest?</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Build an agent anyway — autonomy always beats a workflow eventually</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">Build an explicit workflow (and add guardrails) — the task isn't ambiguous, and the error cost is too high for autonomy</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Give the agent more tokens so it can explore its way to safety</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Keep It Simple: Models Using Tools in a Loop</div>
+      <div class="section-sub">Environment + tools + system prompt, called in a loop. Optimize later.</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>To Anthropic, an agent is just <strong>a model using tools in a loop</strong>. Three components define it: the <strong>environment</strong> it operates in, the <strong>tools</strong> that let it act and get feedback, and the <strong>system prompt</strong> that sets goals, constraints, and ideal behavior. Then the model is called in a loop. That's it.</p>
+    <p>Wildly different agents — coding, search, computer use — look nothing alike on the surface but share almost <strong>the exact same backbone and code</strong>. The only real design decisions are <em>which tools</em> and <em>what prompt</em>. Any complexity up front kills iteration speed; optimizations (caching trajectories, parallelizing tool calls, surfacing progress for user trust) come <em>after</em> the behavior is right.</p>
+
+    <h4>The three components</h4>
+    <div class="arch-grid">
+      <div class="arch-node">
+        <div class="a-icon">🌍</div><div class="a-name">Environment</div><div class="a-sub">where it operates</div>
+        <div class="arch-tooltip">The system the agent works in — a codebase, a browser, a search index. Largely fixed by your use case, not a design lever.</div>
+      </div>
+      <div class="arch-node">
+        <div class="a-icon">🔧</div><div class="a-name">Tools</div><div class="a-sub">act &amp; get feedback</div>
+        <div class="arch-tooltip">The interface for taking action and receiving results. One of your two real design decisions: which tools to offer the agent.</div>
+      </div>
+      <div class="arch-node">
+        <div class="a-icon">📜</div><div class="a-name">System Prompt</div><div class="a-sub">goals &amp; constraints</div>
+        <div class="arch-tooltip">Defines the goals, constraints, and ideal behavior. Your other real design decision: what you instruct the agent to do.</div>
+      </div>
+    </div>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — run the loop and watch the same backbone cycle</div>
+      <div class="flow-row" id="loop-flow"></div>
+      <button class="btn" id="loop-btn" onclick="runLoop()">▶ Run the loop</button>
+      <div class="demo-log" id="loop-log">Model reasons → calls a tool → environment returns feedback → model reasons again. Repeat until done.</div>
+    </div>
+
+    <div class="callout"><strong>Same backbone, different surface:</strong> a coding agent, a search agent, and a computer-use agent share nearly identical code. Build the three components first; optimize once the behavior is down.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">In this framing, what <em>is</em> an agent?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">A large graph of specialized models each handling one sub-task</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">A model using tools in a loop — defined by its environment, tools, and system prompt</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">A workflow with enough hand-written branches to cover every case</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Think Like Your Agent</div>
+      <div class="section-sub">Put yourself in its context window — you'll see why it "made that mistake"</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Builders design agents from their own perspective, then get confused when the agent errs. At each step the model is just <strong>running inference on a very limited context</strong> — everything it knows about the world lives in roughly <strong>10–20k tokens</strong>. Limiting yourself to that context reveals whether it's actually sufficient and coherent.</p>
+    <p>Barry's exercise: <em>be</em> a computer-use agent. You get a static screenshot and a poorly written task. You reason, then attempt a click — but while inference and tool execution run, it's like <strong>closing your eyes for 3–5 seconds and using the computer in the dark</strong>. You open them to a new screenshot. Did it work? You just don't know. Try the blind cycle below, then give the agent the context it actually needed.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — attempt a click "in the dark", then add the missing context</div>
+      <div class="screen" id="cu-screen">
+        <div class="screen-bar">
+          <span class="screen-dot"></span><span class="screen-dot"></span><span class="screen-dot"></span>
+          <span class="screen-url">app.example.com/checkout</span>
+        </div>
+        <div class="screen-body" id="cu-body">
+          <div class="screen-el" id="cu-target" style="left:60%;top:52%;width:96px;height:34px;background:var(--accent);color:#fff;font-weight:700;">Submit</div>
+          <div class="screen-el" style="left:16px;top:14px;width:120px;height:14px;background:var(--surface2);"></div>
+          <div class="screen-el" style="left:16px;top:40px;width:200px;height:30px;background:var(--code-bg);border:1px solid var(--border);"></div>
+          <span class="screen-cursor" id="cu-cursor" style="left:20%;top:70%;">🖱️</span>
+        </div>
+        <div class="screen-overlay" id="cu-overlay">
+          <div style="font-size:26px;">👁️‍🗨️</div>
+          <div id="cu-overlay-text">Eyes closed — running inference + tool execution…</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;margin:14px 0 0;flex-wrap:wrap;">
+        <button class="btn" id="cu-btn" onclick="attemptClick()">🖱️ Attempt a click</button>
+        <button class="btn btn-outline" id="cu-ctx-btn" onclick="addContext()">➕ Give the agent context</button>
+      </div>
+      <ul class="ctx-list" id="ctx-list">
+        <li id="ctx-0">Screen resolution — so it knows where to click</li>
+        <li id="ctx-1">Recommended actions — so it doesn't wander</li>
+        <li id="ctx-2">Limitations / guardrails — so it avoids unnecessary exploration</li>
+      </ul>
+      <div class="demo-log" id="cu-log">Attempt a click blind first. Then add context and try again — the difference is the point.</div>
+    </div>
+
+    <div class="callout good"><strong>Bonus move:</strong> we build systems that speak our language, so ask Claude to understand Claude. Paste in your system prompt ("is any of this ambiguous?"), a tool description ("do you know how to use this?"), or a whole trajectory ("why did you decide this — what would help you decide better?").</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Why does Barry recommend putting yourself inside the agent's context window?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">To reduce token costs by trimming the prompt as much as possible</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">Because the model only acts on the limited context it's given — seeing exactly that reveals whether it's sufficient and coherent</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Because agents can't be tested any other way</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">What's Next: Three Open Questions</div>
+      <div class="section-sub">Budget-awareness · self-evolving tools · multi-agent collaboration</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Barry closes with the open problems on his mind — the things AI engineers still need to figure out together. Click each to see the idea and the question it leaves open.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — click an open question</div>
+      <div class="oq-cards">
+        <button class="oq-card" id="oq-budget" onclick="pickOQ('budget')">
+          <div class="oq-ico">💰</div><div class="oq-name">Budget-aware agents</div><div class="oq-tag">control cost &amp; latency</div>
+        </button>
+        <button class="oq-card" id="oq-tools" onclick="pickOQ('tools')">
+          <div class="oq-ico">🛠️</div><div class="oq-name">Self-evolving tools</div><div class="oq-tag">agents design their own</div>
+        </button>
+        <button class="oq-card" id="oq-multi" onclick="pickOQ('multi')">
+          <div class="oq-ico">🕸️</div><div class="oq-name">Multi-agent collaboration</div><div class="oq-tag">by end of year</div>
+        </button>
+      </div>
+      <div class="demo-log" id="oq-log">Click a card to explore the open question.</div>
+    </div>
+
+    <div class="callout"><strong>Three takeaways to keep:</strong> don't build agents for everything · if you do, keep it as simple as possible for as long as possible · as you iterate, think like your agent and help it do its job.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Which is one of the open questions Barry highlights for the future?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Replacing all workflows with a single giant prompt</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">Making agents budget-aware — defining and enforcing limits on time, money, and tokens</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">Removing tools entirely so the model reasons unaided</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🧠 You've got the model</h2>
+  <p>Agency rises along a spectrum (features → workflows → agents) and so do cost, latency, and risk → so don't build agents for everything; run the four-part checklist → when you do, keep it simple: a model using tools in a loop → and as you iterate, think like your agent by living in its context window. Now go build.</p>
+</div>
+
+</div>
+
+<div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+  <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#9696b0;flex-wrap:wrap;">
+    <span>Learning Reference</span>
+    <span>·</span>
+    <a href="https://www.youtube.com/watch?v=D7_ipDqhtwk" target="_blank" rel="noopener"
+       style="color:#5e6ad2;text-decoration:none;font-weight:500;">How We Build Effective Agents — Barry Zhang, Anthropic (AI Engineer Summit)</a>
+  </div>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- tabs ---------- */
+function switchTab(btn, panelId) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  let sib = group.nextElementSibling;
+  while (sib && sib.classList.contains('tab-panel')) { sib.classList.remove('active'); sib = sib.nextElementSibling; }
+  document.getElementById(panelId).classList.add('active');
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'The broad trend: more agency makes systems more useful and capable, but the cost, latency, and consequences of errors rise right alongside it. That trade-off is why you don\'t hand everything full autonomy.' },
+  q2: { correct: 1, explanation: 'A workflow orchestrates model calls through a control flow you defined in advance. An agent runs the model in a loop and decides its own trajectory from environment feedback. Both use tools — the difference is who steers.' },
+  q3: { correct: 1, explanation: 'A mappable decision tree means low complexity (build it explicitly as a workflow), and high-stakes, hard-to-discover errors mean you can\'t trust autonomy yet — limit scope, add read-only access or human-in-the-loop.' },
+  q4: { correct: 1, explanation: 'To Anthropic, an agent is simply a model using tools in a loop, defined by three components: the environment, the tools, and the system prompt. Keep those simple; optimize later.' },
+  q5: { correct: 1, explanation: 'At each step the model only runs inference on its ~10–20k-token context. Seeing exactly what it sees shows whether that context is sufficient and coherent — and bridges the gap between your understanding and the agent\'s.' },
+  q6: { correct: 1, explanation: 'Budget-awareness is one of Barry\'s three open questions: unlike workflows, agents lack good control over cost and latency. Defining and enforcing budgets (time, money, tokens) would unlock more production use cases. The others: self-evolving tools and multi-agent collaboration.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- S1: spectrum ---------- */
+const stages = [
+  { id: 'features',  ico: '✨', name: 'Simple Features', tag: 'single call', agency: 1, cost: 1,
+    desc: 'Summarization, classification, extraction — one model call. Felt like magic 2–3 years ago; now table stakes.' },
+  { id: 'workflows', ico: '🔀', name: 'Workflows', tag: 'predefined flow', agency: 2, cost: 2,
+    desc: 'Multiple model calls orchestrated in predefined control flows. Trades cost &amp; latency for better performance — the beginning of agentic systems.' },
+  { id: 'agents',    ico: '🤖', name: 'Agents', tag: 'self-directed', agency: 4, cost: 4,
+    desc: 'The model decides its own trajectory and operates almost independently from environment feedback. Domain-specific agents in production today.' },
+  { id: 'multi',     ico: '🕸️', name: 'Multi-agent (next?)', tag: 'too early to name', agency: 5, cost: 5,
+    desc: 'The next phase is unnamed: maybe far more general single agents, maybe collaboration &amp; delegation across many agents. More agency, more capability — and more of everything else.' },
+];
+function buildSpectrum() {
+  const row = document.getElementById('spec-row');
+  stages.forEach(s => {
+    const b = document.createElement('button');
+    b.className = 'spec-stage';
+    b.id = 'spec-' + s.id;
+    b.innerHTML = `<div class="spec-ico">${s.ico}</div><div class="spec-name">${s.name}</div><div class="spec-tag">${s.tag}</div>`;
+    b.onclick = () => pickStage(s.id);
+    row.appendChild(b);
+  });
+}
+function pickStage(id) {
+  const s = stages.find(x => x.id === id);
+  stages.forEach(x => document.getElementById('spec-' + x.id).classList.toggle('on', x.id === id));
+  document.getElementById('agency-fill').style.width = (s.agency / 5 * 100) + '%';
+  document.getElementById('cost-fill').style.width = (s.cost / 5 * 100) + '%';
+  document.getElementById('agency-val').textContent = s.agency + ' / 5';
+  document.getElementById('cost-val').textContent = s.cost + ' / 5';
+  document.getElementById('spec-log').innerHTML = `<b>${s.ico} ${s.name}</b> — ${s.desc}`;
+}
+
+/* ---------- S2: workflow vs agent ---------- */
+const wfNodes = ['Input', 'Classify', 'Route', 'Respond'];
+let wfBusy = false;
+function buildWorkflow() {
+  const row = document.getElementById('wf-flow');
+  wfNodes.forEach((n, i) => {
+    if (i > 0) { const a = document.createElement('span'); a.className = 'flow-arrow'; a.textContent = '→'; row.appendChild(a); }
+    const d = document.createElement('div'); d.className = 'flow-node'; d.id = 'wf-' + i; d.textContent = n; row.appendChild(d);
+  });
+}
+function runWorkflow() {
+  if (wfBusy) return; wfBusy = true;
+  document.getElementById('wf-btn').disabled = true;
+  wfNodes.forEach((_, i) => document.getElementById('wf-' + i).classList.remove('lit'));
+  wfNodes.forEach((n, i) => setTimeout(() => {
+    document.getElementById('wf-' + i).classList.add('lit');
+    document.getElementById('wf-log').innerHTML = `Fixed path, step ${i + 1}/${wfNodes.length}: <code>${n}</code>. It runs this exact route every time.`;
+    if (i === wfNodes.length - 1) setTimeout(() => { document.getElementById('wf-btn').disabled = false; wfBusy = false; }, 600);
+  }, 150 + i * 650));
+}
+const agNodes = ['🧠 Model', '🔧 Tool', '🌍 Env'];
+const agDecisions = ['🔍 search the web', '📄 read a file', '✍️ write code', '✅ goal reached'];
+let agBusy = false;
+function buildAgent() {
+  const row = document.getElementById('ag-flow');
+  agNodes.forEach((n, i) => {
+    if (i > 0) { const a = document.createElement('span'); a.className = 'flow-arrow'; a.textContent = '→'; row.appendChild(a); }
+    const d = document.createElement('div'); d.className = 'flow-node loop'; d.id = 'ag-' + i; d.textContent = n; row.appendChild(d);
+  });
+  const a = document.createElement('span'); a.className = 'flow-arrow'; a.textContent = '↻'; row.appendChild(a);
+}
+function runAgent() {
+  if (agBusy) return; agBusy = true;
+  document.getElementById('ag-btn').disabled = true;
+  let step = 0;
+  const iterate = () => {
+    agNodes.forEach((_, i) => document.getElementById('ag-' + i).classList.remove('lit'));
+    const decision = agDecisions[step];
+    // light Model, then Tool, then Env
+    setTimeout(() => document.getElementById('ag-0').classList.add('lit'), 0);
+    document.getElementById('ag-log').innerHTML = `Iteration ${step + 1}: model reasons and <b>decides</b> → <code>${decision}</code>`;
+    if (decision.startsWith('✅')) {
+      setTimeout(() => {
+        document.getElementById('ag-log').innerHTML = `✅ The agent chose to stop — <b>goal reached</b>. It picked its own path here; nobody scripted it.`;
+        document.getElementById('ag-btn').disabled = false; agBusy = false;
+      }, 700);
+      return;
+    }
+    setTimeout(() => document.getElementById('ag-1').classList.add('lit'), 500);
+    setTimeout(() => document.getElementById('ag-2').classList.add('lit'), 1000);
+    setTimeout(() => { step++; iterate(); }, 1600);
+  };
+  iterate();
+}
+
+/* ---------- S3: checklist ---------- */
+const criteria = [
+  { id: 'complexity',  title: 'The task is complex &amp; ambiguous',
+    sub: 'You can\'t cleanly map the whole decision tree in advance' },
+  { id: 'value',       title: 'The task value justifies heavy token use',
+    sub: 'Exploration costs tokens — the payoff has to be worth it' },
+  { id: 'capability',  title: 'Critical capabilities are de-risked',
+    sub: 'No fatal bottlenecks in the agent\'s trajectory' },
+  { id: 'errorcost',   title: 'Errors are low-stakes or easy to discover',
+    sub: 'You can trust it to act, or verify what it did' },
+];
+const chkState = { complexity: false, value: false, capability: false, errorcost: false };
+function buildChecklist() {
+  const list = document.getElementById('chk-list');
+  criteria.forEach(c => {
+    const b = document.createElement('button');
+    b.className = 'chk-item'; b.id = 'chk-' + c.id;
+    b.innerHTML = `<span class="chk-box">✓</span><span class="chk-main"><span class="chk-title">${c.title}</span><span class="chk-sub">${c.sub}</span></span>`;
+    b.onclick = () => toggleChk(c.id);
+    list.appendChild(b);
+  });
+  updateVerdict();
+}
+function toggleChk(id) {
+  chkState[id] = !chkState[id];
+  document.getElementById('chk-' + id).classList.toggle('on', chkState[id]);
+  updateVerdict();
+}
+function updateVerdict() {
+  const v = document.getElementById('verdict');
+  const head = v.querySelector('.verdict-head');
+  const body = document.getElementById('verdict-body');
+  v.className = 'verdict';
+  const reasons = [];
+  if (!chkState.complexity) reasons.push('Task isn\'t ambiguous — map the decision tree explicitly and build a <b>workflow</b>; optimize each node for cost &amp; control.');
+  if (!chkState.value)      reasons.push('Value doesn\'t justify the token cost — use a <b>workflow</b> to capture the common scenarios cheaply.');
+  if (!chkState.capability) reasons.push('A critical capability is a bottleneck — <b>reduce the scope</b>, simplify the task, and try again.');
+  if (!chkState.errorcost)  reasons.push('Errors are high-stakes or hard to discover — add <b>guardrails</b>: read-only access, human-in-the-loop, tighter scope.');
+
+  const allYes = criteria.every(c => chkState[c.id]);
+  if (allYes) {
+    v.classList.add('agent');
+    head.innerHTML = '✅ Strong agent use case — build the agent';
+    body.innerHTML = 'Complex &amp; valuable, capabilities de-risked, and errors are affordable. This is exactly where agents thrive.';
+  } else if (!chkState.complexity || !chkState.value) {
+    v.classList.add('workflow');
+    head.innerHTML = '🔀 Use a workflow instead';
+    body.innerHTML = '<ul class="verdict-reasons"><li>' + reasons.join('</li><li>') + '</li></ul>';
+  } else {
+    v.classList.add('caution');
+    head.innerHTML = '⚠️ Not yet — de-risk first';
+    body.innerHTML = '<ul class="verdict-reasons"><li>' + reasons.join('</li><li>') + '</li></ul>';
+  }
+}
+function presetCoding() {
+  Object.keys(chkState).forEach(k => { chkState[k] = true; document.getElementById('chk-' + k).classList.add('on'); });
+  updateVerdict();
+  document.getElementById('verdict-body').innerHTML = 'Design-doc → PR is ambiguous &amp; complex ✓, good code is high-value ✓, write/debug/recover are strong capabilities ✓, and unit tests + CI make errors easy to catch ✓. Every box checked — that\'s why coding agents work.';
+}
+function resetChecklist() {
+  Object.keys(chkState).forEach(k => { chkState[k] = false; document.getElementById('chk-' + k).classList.remove('on'); });
+  updateVerdict();
+}
+
+/* ---------- S4: agent loop ---------- */
+const loopNodes = ['🧠 Model', '🔧 Tool call', '🌍 Environment'];
+let loopBusy = false;
+function buildLoop() {
+  const row = document.getElementById('loop-flow');
+  loopNodes.forEach((n, i) => {
+    if (i > 0) { const a = document.createElement('span'); a.className = 'flow-arrow'; a.textContent = '→'; row.appendChild(a); }
+    const d = document.createElement('div'); d.className = 'flow-node loop'; d.id = 'loop-' + i; d.textContent = n; row.appendChild(d);
+  });
+  const a = document.createElement('span'); a.className = 'flow-arrow'; a.textContent = '↻'; row.appendChild(a);
+}
+function runLoop() {
+  if (loopBusy) return; loopBusy = true;
+  document.getElementById('loop-btn').disabled = true;
+  const iters = 3; let count = 0;
+  const cycle = () => {
+    loopNodes.forEach((_, i) => setTimeout(() => {
+      loopNodes.forEach((_, j) => document.getElementById('loop-' + j).classList.remove('lit'));
+      document.getElementById('loop-' + i).classList.add('lit');
+      const label = ['reasons over the context', 'calls a tool to act', 'returns feedback'][i];
+      document.getElementById('loop-log').innerHTML = `Loop ${count + 1}/${iters} — <b>${loopNodes[i]}</b> ${label}.`;
+    }, i * 550));
+    setTimeout(() => {
+      count++;
+      if (count < iters) cycle();
+      else {
+        loopNodes.forEach((_, j) => document.getElementById('loop-' + j).classList.remove('lit'));
+        document.getElementById('loop-log').innerHTML = '✅ Done — same three components cycled every loop. That backbone is shared across coding, search, and computer-use agents.';
+        document.getElementById('loop-btn').disabled = false; loopBusy = false;
+      }
+    }, loopNodes.length * 550 + 250);
+  };
+  cycle();
+}
+
+/* ---------- S5: computer use ---------- */
+let cuContext = false;
+let cuBusy = false;
+function attemptClick() {
+  if (cuBusy) return; cuBusy = true;
+  const btn = document.getElementById('cu-btn');
+  btn.disabled = true;
+  const cursor = document.getElementById('cu-cursor');
+  const overlay = document.getElementById('cu-overlay');
+  const log = document.getElementById('cu-log');
+  // move cursor toward the (assumed) target
+  cursor.style.left = cuContext ? '62%' : (35 + Math.floor(Math.random() * 40)) + '%';
+  cursor.style.top  = cuContext ? '55%' : (40 + Math.floor(Math.random() * 40)) + '%';
+  log.innerHTML = '🤔 Reasoning over a static screenshot… choosing where to click.';
+  setTimeout(() => {
+    overlay.classList.add('show');
+    document.getElementById('cu-overlay-text').textContent = 'Eyes closed — inference + tool execution running (3–5s in the dark)…';
+  }, 650);
+  setTimeout(() => {
+    overlay.classList.remove('show');
+    if (cuContext) {
+      document.getElementById('cu-target').style.background = 'var(--green)';
+      document.getElementById('cu-target').style.color = '#052e16';
+      log.innerHTML = '✅ <b style="color:var(--green)">Clicked "Submit" cleanly.</b> With resolution, recommended actions, and guardrails in context, the blind step is no longer a gamble.';
+    } else {
+      const hit = Math.random() < 0.4;
+      if (hit) {
+        log.innerHTML = '😅 You got lucky — the click landed on "Submit" this time. But you had no way to <i>know</i> it would. That uncertainty is the lethal part.';
+      } else {
+        log.innerHTML = '⚠️ <b style="color:var(--amber)">You clicked empty space.</b> Without knowing the resolution or layout, you clicked blind — and only found out when you opened your eyes. The cycle starts again.';
+      }
+    }
+    btn.disabled = false; cuBusy = false;
+  }, 3100);
+}
+function addContext() {
+  cuContext = true;
+  ['ctx-0', 'ctx-1', 'ctx-2'].forEach(id => document.getElementById(id).classList.add('on'));
+  document.getElementById('cu-ctx-btn').disabled = true;
+  document.getElementById('cu-log').innerHTML = '➕ Context added: screen resolution, recommended actions, and limitations. Now attempt a click again — notice it becomes reliable.';
+}
+
+/* ---------- S6: open questions ---------- */
+const oqData = {
+  budget: '💰 <b>Budget-aware agents.</b> Unlike workflows, agents give us little control over cost and latency. Getting this right unlocks more production use cases. <i>Open question: what\'s the best way to define and enforce budgets in time, money, and tokens?</i>',
+  tools:  '🛠️ <b>Self-evolving tools.</b> We already use models to iterate on tool descriptions — this should generalize into a meta-tool where agents design and improve their own tool ergonomics, making them far more general-purpose. <i>Open question: how far can agents go in adapting their own tools per use case?</i>',
+  multi:  '🕸️ <b>Multi-agent collaboration.</b> Barry\'s conviction: much more of this in production by end of year — well-parallelized, clean separation of concerns, sub-agents protecting the main context window. <i>Open question: how should agents communicate beyond rigid synchronous user/assistant turns — async, with real roles?</i>',
+};
+function pickOQ(key) {
+  Object.keys(oqData).forEach(k => document.getElementById('oq-' + k).classList.toggle('selected', k === key));
+  document.getElementById('oq-log').innerHTML = oqData[key];
+}
+
+/* ---------- tooltips (overflow-safe: position fixed) ---------- */
+function initTooltips() {
+  document.querySelectorAll('.arch-node').forEach(node => {
+    const tooltip = node.querySelector('.arch-tooltip');
+    if (!tooltip) return;
+    node.addEventListener('mouseenter', () => {
+      const rect = node.getBoundingClientRect();
+      const ttWidth = 230, gap = 12;
+      tooltip.style.display = 'block';
+      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+      tooltip.style.transform = 'translateY(-50%)';
+      if (window.innerWidth - rect.right - gap >= ttWidth) {
+        tooltip.style.left = (rect.right + gap) + 'px';
+      } else if (rect.left - gap >= ttWidth) {
+        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+      } else {
+        tooltip.style.top = (rect.bottom + gap) + 'px';
+        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+        tooltip.style.transform = 'none';
+      }
+    });
+    node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+  });
+}
+
+window.addEventListener('load', () => {
+  buildSpectrum();
+  buildWorkflow();
+  buildAgent();
+  buildChecklist();
+  buildLoop();
+  initTooltips();
+});
+</script>
+</body>
+</html>
