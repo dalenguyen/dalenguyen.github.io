@@ -10,6 +10,8 @@ jobs:
     timeout-minutes: 30
     name: Deploy website and sentry
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     strategy:
       matrix:
         node-version: [20]
@@ -52,7 +54,7 @@ jobs:
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          token: ${{ secrets.GH_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           branch: master
           folder: dist/production
           clean: true
