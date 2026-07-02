@@ -1,0 +1,537 @@
+{
+  "id": "portfolio",
+  "name": "portfolio",
+  "metaData": {
+    "name": "portfolio",
+    "type": "app",
+    "buildInfo": {
+      "buildVersion": "1.0.0",
+      "buildName": "dalenguyen"
+    },
+    "remoteEntry": {
+      "name": "",
+      "path": "",
+      "type": "module"
+    },
+    "types": {
+      "path": "",
+      "name": "",
+      "zip": "",
+      "api": ""
+    },
+    "globalName": "portfolio",
+    "pluginVersion": "0.18.4",
+    "prefetchInterface": false,
+    "publicPath": "auto"
+  },
+  "shared": [
+    {
+      "id": "portfolio:@analogjs/content",
+      "name": "@analogjs/content",
+      "version": "2.6.1",
+      "singleton": true,
+      "requiredVersion": "2.6.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "3127.59fd8e312269c654.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/animations/browser",
+      "name": "@angular/animations/browser",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "4603.59123367eb47090c.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/common/http",
+      "name": "@angular/common/http",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "9081.e800c2fadaf12dbd.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/common",
+      "name": "@angular/common",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "3022.1efa20aab2d609f6.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/core/primitives/di",
+      "name": "@angular/core/primitives/di",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/core/primitives/signals",
+      "name": "@angular/core/primitives/signals",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/core/rxjs-interop",
+      "name": "@angular/core/rxjs-interop",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/core",
+      "name": "@angular/core",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "5773.cbdb330bac3dfd10.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/platform-browser/animations",
+      "name": "@angular/platform-browser/animations",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/platform-browser",
+      "name": "@angular/platform-browser",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "9883.aec9230ec335767b.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@angular/router",
+      "name": "@angular/router",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "9339.b932f61ade0e170c.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@dalenguyen/angular",
+      "name": "@dalenguyen/angular",
+      "version": "1.0.0",
+      "singleton": true,
+      "requiredVersion": "^1.0.0",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@dalenguyen/portfolio/home/feature",
+      "name": "@dalenguyen/portfolio/home/feature",
+      "version": "0.0.1",
+      "singleton": true,
+      "requiredVersion": "0.0.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "8394.d591f155eca08617.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@dalenguyen/portfolio/shell/feature",
+      "name": "@dalenguyen/portfolio/shell/feature",
+      "version": "0.0.1",
+      "singleton": true,
+      "requiredVersion": "0.0.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@dalenguyen/portfolio/shell/ui",
+      "name": "@dalenguyen/portfolio/shell/ui",
+      "version": "0.0.1",
+      "singleton": true,
+      "requiredVersion": "0.0.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "1471.b3afd45fd717a94e.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@dalenguyen/saas-libs",
+      "name": "@dalenguyen/saas-libs",
+      "version": "12.0.0",
+      "singleton": true,
+      "requiredVersion": "12.0.0",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.07b2ffda808eedba.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@sentry/browser",
+      "name": "@sentry/browser",
+      "version": "7.119.1",
+      "singleton": true,
+      "requiredVersion": "^7.119.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "7838.2b6fab666c5c1a24.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@sentry/core",
+      "name": "@sentry/core",
+      "version": "7.119.1",
+      "singleton": true,
+      "requiredVersion": "^7.119.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "7855.229e2190a4b47c16.js",
+            "2217.0d599b52d1e27695.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:@sentry/integrations",
+      "name": "@sentry/integrations",
+      "version": "7.119.1",
+      "singleton": true,
+      "requiredVersion": "^7.119.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "3639.8d313dc3851542b6.js",
+            "4758.c55be75f5866a347.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:buttercms",
+      "name": "buttercms",
+      "version": "1.2.15",
+      "singleton": true,
+      "requiredVersion": "^1.2.12",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "5119.be76df176c3e24e2.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:leaflet",
+      "name": "leaflet",
+      "version": "1.9.4",
+      "singleton": true,
+      "requiredVersion": "^1.9.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "5286.231b1a37f53ce536.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:mapbox-gl",
+      "name": "mapbox-gl",
+      "version": "false",
+      "singleton": true,
+      "requiredVersion": "^2.14.1",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "9913.8b69fb14c35df45a.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:rxjs/operators",
+      "name": "rxjs/operators",
+      "version": "7.5.7",
+      "singleton": true,
+      "requiredVersion": "~7.5.7",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "2595.f3fcf5fa54583c5e.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:rxjs",
+      "name": "rxjs",
+      "version": "7.5.7",
+      "singleton": true,
+      "requiredVersion": "~7.5.7",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "3026.86e01f88912ebd60.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "portfolio:smoothscroll-polyfill",
+      "name": "smoothscroll-polyfill",
+      "version": "0.4.4",
+      "singleton": true,
+      "requiredVersion": "^0.4.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "polyfills.fc8b144650a43757.js",
+            "main.69934e3c6abe16db.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": [
+            "styles.c19657cfa20cf41f.css"
+          ]
+        }
+      }
+    },
+    {
+      "id": "portfolio:tslib",
+      "name": "tslib",
+      "version": "2.8.1",
+      "singleton": true,
+      "requiredVersion": "^2.5.2",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "5482.8f4377a36150e235.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    }
+  ],
+  "remotes": [
+    {
+      "federationContainerName": "https://dalenguyen.github.io/resume-remote/remoteEntry.mjs",
+      "moduleName": "Routes",
+      "alias": "resume-remote",
+      "entry": "*"
+    }
+  ],
+  "exposes": []
+}

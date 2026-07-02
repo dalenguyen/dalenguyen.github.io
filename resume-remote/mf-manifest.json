@@ -1,0 +1,223 @@
+{
+  "id": "resume_remote",
+  "name": "resume_remote",
+  "metaData": {
+    "name": "resume_remote",
+    "type": "app",
+    "buildInfo": {
+      "buildVersion": "1.0.0",
+      "buildName": "dalenguyen"
+    },
+    "remoteEntry": {
+      "name": "remoteEntry.mjs",
+      "path": "",
+      "type": "module"
+    },
+    "types": {
+      "path": "",
+      "name": "",
+      "zip": "",
+      "api": ""
+    },
+    "globalName": "resume_remote",
+    "pluginVersion": "0.18.4",
+    "prefetchInterface": false,
+    "publicPath": "auto"
+  },
+  "shared": [
+    {
+      "id": "resume_remote:@angular/common/http",
+      "name": "@angular/common/http",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "81.4c8e9cb22f6132f8.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/common",
+      "name": "@angular/common",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "22.c15f66b43102096a.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/core/primitives/di",
+      "name": "@angular/core/primitives/di",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.45c5ec93ce1449b4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/core/primitives/signals",
+      "name": "@angular/core/primitives/signals",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.45c5ec93ce1449b4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/core",
+      "name": "@angular/core",
+      "version": "20.3.17",
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "123.bd06c44091c11ab0.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/material/icon",
+      "name": "@angular/material/icon",
+      "version": "20.2.8",
+      "singleton": true,
+      "requiredVersion": "20.2.8",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "802.116222a31c7e8902.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/platform-browser",
+      "name": "@angular/platform-browser",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "4.99621cdd9c3b2123.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@angular/router",
+      "name": "@angular/router",
+      "version": "20.3.4",
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "945.be8a700b1918dbe4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    },
+    {
+      "id": "resume_remote:@dalenguyen/portfolio/resume/feature",
+      "name": "@dalenguyen/portfolio/resume/feature",
+      "version": "1.0.0",
+      "singleton": true,
+      "requiredVersion": "^1.0.0",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "134.42a4ddcffa58bbd1.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      }
+    }
+  ],
+  "remotes": [],
+  "exposes": [
+    {
+      "id": "resume_remote:Routes",
+      "name": "Routes",
+      "assets": {
+        "js": {
+          "sync": [
+            "__federation_expose_Routes.01b954f90372e50b.js"
+          ],
+          "async": [
+            "976.42bbd7c226ebe63c.js",
+            "656.5ff369c723c18f11.js"
+          ]
+        },
+        "css": {
+          "sync": [],
+          "async": []
+        }
+      },
+      "path": "./Routes"
+    }
+  ]
+}

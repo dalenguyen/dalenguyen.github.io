@@ -1,0 +1,1 @@
+(self.webpackChunkresume_remote=self.webpackChunkresume_remote||[]).push([[286],{6853:(m,o,e)=>{e.r(o),e.d(o,{remoteRoutes:()=>t});const t=[{path:"",loadComponent:()=>e.e(720).then(e.t.bind(e,3720,23))}]}}]);

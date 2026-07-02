@@ -1,0 +1,260 @@
+{
+  "id": "resume_remote",
+  "name": "resume_remote",
+  "metaData": {
+    "name": "resume_remote",
+    "type": "app",
+    "buildInfo": {
+      "buildVersion": "1.0.0",
+      "buildName": "dalenguyen"
+    },
+    "remoteEntry": {
+      "name": "remoteEntry.mjs",
+      "path": "",
+      "type": "module"
+    },
+    "types": {
+      "path": "",
+      "name": "",
+      "zip": "",
+      "api": ""
+    },
+    "globalName": "resume_remote",
+    "pluginVersion": "0.18.4",
+    "prefetchInterface": false,
+    "publicPath": "auto"
+  },
+  "shared": [
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/common/http",
+      "version": "20.3.4",
+      "eager": false,
+      "id": "resume_remote:@angular/common/http",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "81.4c8e9cb22f6132f8.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/common",
+      "version": "20.3.4",
+      "eager": false,
+      "id": "resume_remote:@angular/common",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "22.c15f66b43102096a.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/core/primitives/di",
+      "version": "20.3.17",
+      "eager": false,
+      "id": "resume_remote:@angular/core/primitives/di",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.45c5ec93ce1449b4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/core/primitives/signals",
+      "version": "20.3.17",
+      "eager": false,
+      "id": "resume_remote:@angular/core/primitives/signals",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "common.45c5ec93ce1449b4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.17",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/core",
+      "version": "20.3.17",
+      "eager": false,
+      "id": "resume_remote:@angular/core",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "123.bd06c44091c11ab0.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.2.8",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/material/icon",
+      "version": "20.2.8",
+      "eager": false,
+      "id": "resume_remote:@angular/material/icon",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "802.116222a31c7e8902.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/platform-browser",
+      "version": "20.3.4",
+      "eager": false,
+      "id": "resume_remote:@angular/platform-browser",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "4.99621cdd9c3b2123.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "20.3.4",
+      "shareScope": "default",
+      "strictVersion": true,
+      "name": "@angular/router",
+      "version": "20.3.4",
+      "eager": false,
+      "id": "resume_remote:@angular/router",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "945.be8a700b1918dbe4.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    },
+    {
+      "singleton": true,
+      "requiredVersion": "^1.0.0",
+      "shareScope": "default",
+      "eager": false,
+      "name": "@dalenguyen/portfolio/resume/feature",
+      "version": "1.0.0",
+      "id": "resume_remote:@dalenguyen/portfolio/resume/feature",
+      "assets": {
+        "js": {
+          "async": [],
+          "sync": [
+            "134.42a4ddcffa58bbd1.js"
+          ]
+        },
+        "css": {
+          "async": [],
+          "sync": []
+        }
+      },
+      "usedIn": []
+    }
+  ],
+  "remotes": [],
+  "exposes": [
+    {
+      "path": "./Routes",
+      "id": "resume_remote:Routes",
+      "name": "Routes",
+      "requires": [],
+      "file": "apps/resume-remote/src/app/remote-entry/entry.routes.ts",
+      "assets": {
+        "js": {
+          "sync": [
+            "__federation_expose_Routes.01b954f90372e50b.js"
+          ],
+          "async": [
+            "976.42bbd7c226ebe63c.js",
+            "656.5ff369c723c18f11.js"
+          ]
+        },
+        "css": {
+          "sync": [],
+          "async": []
+        }
+      }
+    }
+  ]
+}
