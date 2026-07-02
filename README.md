@@ -1,39 +1,36 @@
 # Dale Nguyen Portfolio Website
 
 An [Nx](https://nx.dev) monorepo powering [dalenguyen.me](https://dalenguyen.me) —
-built with Angular 20, [AnalogJS](https://analogjs.org), and NestJS.
+built with [AnalogJS](https://analogjs.org) (Angular 20) and NestJS.
 
 ## Live sites
 
-- **Portfolio** — https://dalenguyen.me (hosted on Vercel)
-- **Blog** — AnalogJS app served statically on Vercel and as an SSR node-server on Cloud Run
+- **Main site** — https://dalenguyen.me (blog-app on Vercel): home, blog, resume, learn, bucket list
+- **Blog SSR** — the same app runs as a Nitro node-server on Cloud Run for on-demand SSR + API routes
 
 ## Tech stack
 
 - **Nx 21** workspace (with Nx Cloud) managed with **pnpm 10**
-- **Angular 20** + Angular Material + Tailwind CSS
-- **AnalogJS 2** (Vite + Vitest) for the blog
+- **AnalogJS 2** (Vite + Vitest) — the main site/blog, Angular 20 + Angular Material + Tailwind CSS
 - **NestJS 10** for the API
-- **Module Federation** — `portfolio` (host) consumes `resume-remote` (remote)
-- Jest / Vitest for tests, Cypress / Playwright for e2e, Storybook for components
+- Blog content authored as **static markdown** in `apps/blog-app/src/content/`
 - Node `>=20`
 
 ## Project structure
 
 ```
 apps/
-  portfolio      Angular Module Federation host — the main site (dalenguyen.me)
-  resume-remote  Module Federation remote consumed by portfolio
-  blog-app       AnalogJS blog (SSG on Vercel, SSR + API on Cloud Run)
-  api-nest       NestJS API (deployed as a Google Cloud Function)
-  saas           Angular SaaS app
+  blog-app    AnalogJS — the main site (dalenguyen.me): home, blog (static md),
+              resume, learn, bucket list. SSG on Vercel + SSR/API on Cloud Run.
+  api-nest    NestJS API (deployed as a Google Cloud Function)
+  saas        Angular SaaS app
 libs/
-  portfolio      Feature/UI/util libraries for the portfolio app
-  angular        Shared Angular UI + utilities
-  api-nest       NestJS domains / shell / infrastructure / usecases
-  openai         OpenAI helper library
-  saas-libs      Shared SaaS libraries
-  shared         Framework-agnostic shared code (e.g. shared/ui)
+  portfolio   home / shell / resume / shared UI libraries (consumed by blog-app)
+  angular     Shared Angular UI + utilities
+  api-nest    NestJS domains / shell / infrastructure / usecases
+  openai      OpenAI helper library
+  saas-libs   Shared SaaS libraries
+  shared      Framework-agnostic shared code (e.g. shared/ui)
 ```
 
 See [docs/project-structure.md](/docs/project-structure.md) for the library boundary conventions.
@@ -46,21 +43,18 @@ pnpm install
 
 ## Development server
 
-`npm start` serves the default project (`portfolio`) at `http://localhost:4200/`.
-
-Serve any app directly with Nx:
+`npm start` serves the default project (`blog-app`).
 
 ```sh
-nx serve portfolio      # http://localhost:4200 (Module Federation host + resume-remote)
-nx serve blog-app       # http://localhost:3000 (AnalogJS)
-nx serve saas
+nx serve blog-app       # http://localhost:3000 (AnalogJS — the main site)
 nx serve api-nest
+nx serve saas
 ```
 
 ## Build
 
 ```sh
-nx build <app>          # e.g. nx build portfolio
+nx build <app>          # e.g. nx build blog-app
 ```
 
 ## Test & lint
@@ -76,11 +70,8 @@ Use `nx affected -t build|test|lint` to run only what changed against `origin/de
 
 ## Deployment
 
-The `dev` branch is the production branch. Pushing to `dev` deploys both sites to **Vercel**
-via its Git integration:
-
-- **Portfolio** → Vercel (dalenguyen.me).
-- **Blog** → Vercel (static SSG, default).
+The `dev` branch is the production branch. Pushing to `dev` deploys to **Vercel**
+via its Git integration (static SSG — every route prerendered), serving `dalenguyen.me`.
 
 Deploy the blog's SSR node-server to Cloud Run manually:
 
@@ -88,16 +79,18 @@ Deploy the blog's SSR node-server to Cloud Run manually:
 nx run blog-app:deploy  # build-server → gcloud builds submit → gcloud run deploy
 ```
 
-See [apps/blog-app/CLAUDE.md](/apps/blog-app/CLAUDE.md) for the blog's dual-deploy details.
+See [apps/blog-app/CLAUDE.md](/apps/blog-app/CLAUDE.md) for the dual-deploy (Vercel SSG + Cloud Run SSR) details.
 
-> Note: `.github/workflows/ci.yml` still publishes `nx deploy portfolio` to the `master`
-> branch for GitHub Pages, but Vercel is the source of truth for dalenguyen.me — the Pages
-> path is legacy and unverified.
+## Blog posts
+
+Posts are markdown files in `apps/blog-app/src/content/`. Frontmatter fields: `title`,
+`slug`, `date`, `draft` (optional). A route is prerendered only if its path is listed in
+`prerender.routes` in `apps/blog-app/vite.config.ts` — posts are added there automatically
+from the content directory.
 
 ## Generate a new app / library
 
 ```sh
-nx generate @nx/angular:app my-app
 nx generate @nx/angular:library my-lib --buildable --publishable
 nx generate @nx/nest:app my-api
 
