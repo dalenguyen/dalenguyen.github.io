@@ -9,7 +9,7 @@
       }
     }
   },
-  "defaultProject": "portfolio",
+  "defaultProject": "blog-app",
   "generators": {
     "@nx/angular:application": {
       "e2eTestRunner": "cypress",
