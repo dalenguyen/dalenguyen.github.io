@@ -168,6 +168,7 @@
     "deploy": {
       "executor": "nx:run-commands",
       "outputs": [],
+      "dependsOn": ["build", "resume-remote:build"],
       "options": {
         "command": "rm -rf production && mkdir production && cp -r ./apps/portfolio/browser/* production && cp -r ./apps/resume-remote production",
         "cwd": "dist"
