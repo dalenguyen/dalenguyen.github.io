@@ -211,3 +211,6 @@ In **Part 2**, this same core goes online — reachable from GitHub, wrapped in 
 and a job queue so runs survive and stay rate-limited, and pointed at a hosted model. The
 loop barely changes; everything around it does. That's the interesting part, and it's
 next.
+
+<!-- Part 2 coming soon -->
+
