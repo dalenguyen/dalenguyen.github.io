@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How I Deleted 95% of My Agent Skills and Got Better Results — Nick Nisi, WorkOS</title>
+<meta name="description" content="Interactive breakdown of Nick Nisi's (WorkOS) AI Engineer Summit talk: why your agent is lying to you, why deleting 95% of your skills made things better, the gotcha-only 553-line alternative to a 10,000-line doc-dump, and why every failure is a harness bug — not an agent bug.">
+<meta name="date" content="2026-07-02">
+<meta name="timestamp" content="2026-07-02T19:30:00">
+<style>
+:root {
+  --bg: #0f0f13;
+  --surface: #1a1a22;
+  --surface2: #22222e;
+  --border: #2e2e3e;
+  --accent: #5e6ad2;
+  --accent-glow: rgba(94,106,210,0.25);
+  --green: #4ade80;
+  --amber: #fbbf24;
+  --red: #f87171;
+  --orange: #fb923c;
+  --text: #e8e8f0;
+  --muted: #9696b0;
+  --code-bg: #12121a;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 64px 0 40px; }
+.hero-label {
+  display: inline-block; font-size: 11px; letter-spacing: 2px; font-weight: 700;
+  color: var(--accent); text-transform: uppercase; margin-bottom: 16px;
+  border: 1px solid var(--accent); border-radius: 99px; padding: 4px 14px;
+  background: rgba(94,106,210,0.08);
+}
+.hero h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.15; letter-spacing: -1px; margin-bottom: 14px; }
+.hero h1 .grad { background: linear-gradient(90deg, var(--accent), #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.hero p { color: var(--muted); font-size: 16px; max-width: 700px; }
+.hero .speaker { margin-top: 14px; font-size: 13px; color: var(--muted); }
+.hero .speaker b { color: var(--text); font-weight: 600; }
+.progress-wrap { display: flex; align-items: center; gap: 14px; margin-top: 28px; }
+.progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+.progress-bar-fill  { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+.progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; }
+
+/* ---------- Section card ---------- */
+.section {
+  margin-bottom: 32px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+.section.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4); }
+.section-head { display: flex; align-items: center; gap: 16px; padding: 20px 24px; cursor: pointer; user-select: none; }
+.section-head:hover { background: var(--surface2); }
+.section-num {
+  width: 32px; height: 32px; border-radius: 9px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: var(--surface2); border: 1px solid var(--border);
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+.section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-title { font-size: 17px; font-weight: 600; flex: 1; }
+.section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
+.section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+.section.active .section-chev { transform: rotate(90deg); }
+.section-body { display: none; padding: 0 24px 24px; }
+.section.active .section-body { display: block; }
+.section-body p { font-size: 14.5px; color: #c9c9da; margin-bottom: 12px; }
+.section-body strong { color: var(--text); }
+.section-body h4 { font-size: 13px; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); margin: 22px 0 10px; }
+
+/* ---------- Shared bits ---------- */
+.callout {
+  border-left: 3px solid var(--accent);
+  background: rgba(94,106,210,0.06);
+  border-radius: 0 8px 8px 0;
+  padding: 12px 16px; font-size: 14px; margin: 16px 0;
+}
+.callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+.callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+.callout.danger { border-left-color: var(--red); background: rgba(248,113,113,0.06); }
+.btn {
+  background: var(--accent); color: #fff; border: none; border-radius: 8px;
+  padding: 8px 16px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s; font-family: inherit;
+}
+.btn:hover:not(:disabled) { opacity: 0.88; }
+.btn:active:not(:disabled) { transform: scale(0.98); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
+.btn-outline { background: none; border: 1px solid var(--border); color: var(--text); }
+.btn-outline:hover:not(:disabled) { border-color: var(--accent); opacity: 1; }
+.demo-box { background: var(--code-bg); border: 1px solid var(--border); border-radius: 12px; padding: 18px; margin: 14px 0; }
+.demo-label { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--accent); font-weight: 700; margin-bottom: 14px; }
+.demo-log {
+  margin-top: 14px; padding: 10px 14px; background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; font-size: 13px; min-height: 40px; line-height: 1.55;
+}
+.demo-log code { color: var(--amber); font-size: 12.5px; }
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 8px; margin: 16px 0 14px; flex-wrap: wrap; }
+.tab { padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border); background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-weight: 500; font-family: inherit; }
+.tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ---------- Code snippets ---------- */
+.snippet {
+  background: #06060a; border: 1px solid var(--border); border-radius: 8px;
+  padding: 12px 14px; font-size: 12.5px; color: #c9c9da; margin: 10px 0;
+  white-space: pre-wrap; line-height: 1.55; overflow-x: auto;
+}
+.snippet .c { color: #6b7280; }
+.snippet .k { color: #a78bfa; }
+.snippet .s { color: #4ade80; }
+.snippet .n { color: #fb923c; }
+
+/* ---------- S1: verifier toggle ---------- */
+.verifier-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 10px 0; }
+.verifier-card {
+  border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+  background: var(--surface2); cursor: pointer; transition: border-color 0.15s, transform 0.1s;
+}
+.verifier-card:hover { border-color: var(--accent); }
+.verifier-card.on { border-color: var(--accent); background: rgba(94,106,210,0.10); }
+.verifier-card .vname { font-size: 13px; font-weight: 700; margin-bottom: 6px; }
+.verifier-card .vsub { font-size: 12px; color: var(--muted); }
+.verifier-card.bad .vname { color: var(--red); }
+.verifier-card.good .vname { color: var(--green); }
+
+/* ---------- S3: slider ---------- */
+.slider-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin: 6px 0 14px; }
+.slider-row input[type='range'] { flex: 1; min-width: 220px; accent-color: var(--accent); height: 5px; }
+.slider-val { font-weight: 700; font-variant-numeric: tabular-nums; color: var(--accent); min-width: 70px; text-align: right; font-size: 13px; }
+.compare { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 14px; }
+.compare-card {
+  border: 1px solid var(--border); border-radius: 10px; padding: 14px; background: var(--surface2);
+}
+.compare-card .ctitle { font-size: 12px; color: var(--muted); letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
+.compare-card .cnum { font-size: 28px; font-weight: 800; color: var(--text); }
+.compare-card.good .cnum { color: var(--green); }
+.compare-card.warn .cnum { color: var(--amber); }
+.compare-card.bad .cnum { color: var(--red); }
+.compare-card .cnote { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+/* ---------- S4: evidence checklist ---------- */
+.ev-list { display: grid; gap: 10px; margin: 6px 0; }
+.ev-item {
+  display: flex; align-items: center; gap: 12px; padding: 10px 12px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--surface2);
+  cursor: pointer; transition: border-color 0.15s; text-align: left; font-family: inherit; color: inherit;
+  width: 100%;
+}
+.ev-item:hover { border-color: var(--accent); }
+.ev-item.on { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.ev-check { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: var(--green); font-size: 14px; font-weight: 700; }
+.ev-item.on .ev-check { background: var(--green); color: #052e16; border-color: var(--green); }
+.ev-main { flex: 1; }
+.ev-title { font-size: 13.5px; font-weight: 600; }
+.ev-sub { font-size: 12px; color: var(--muted); }
+.verdict {
+  margin-top: 14px; padding: 14px 16px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--surface2);
+}
+.verdict-head { font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.verdict-body { font-size: 13px; color: #c9c9da; line-height: 1.55; }
+.verdict.weak { border-color: var(--amber); background: rgba(251,191,36,0.06); }
+.verdict.weak .verdict-head { color: var(--amber); }
+.verdict.ready { border-color: var(--green); background: rgba(74,222,128,0.06); }
+.verdict.ready .verdict-head { color: var(--green); }
+
+/* ---------- S5: doom-loop detector ---------- */
+.doom-input {
+  width: 100%; min-height: 130px; background: #06060a; color: #c9c9da;
+  border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px;
+  font: 12.5px/1.55 "SF Mono", SFMono-Regular, ui-monospace, Menlo, Consolas, monospace;
+  resize: vertical;
+}
+.doom-row { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.doom-out { margin-top: 12px; padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface2); font-size: 13px; min-height: 60px; }
+.doom-tag { display: inline-block; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; margin-right: 6px; }
+.doom-tag.loop { background: rgba(248,113,113,0.15); color: var(--red); border: 1px solid var(--red); }
+.doom-tag.par { background: rgba(251,191,36,0.15); color: var(--amber); border: 1px solid var(--amber); }
+.doom-tag.ok { background: rgba(74,222,128,0.15); color: var(--green); border: 1px solid var(--green); }
+
+/* ---------- S6: quiz ---------- */
+.quiz { margin-top: 16px; padding: 14px; border: 1px dashed var(--border); border-radius: 10px; }
+.quiz-q { font-size: 13.5px; font-weight: 600; margin-bottom: 10px; }
+.quiz-opts { display: grid; gap: 6px; }
+.quiz-opt {
+  padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--surface2); color: var(--text); font-size: 13px;
+  cursor: pointer; font-family: inherit; text-align: left; transition: border-color 0.15s;
+}
+.quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+.quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); }
+.quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.08); }
+.quiz-opt:disabled { cursor: not-allowed; opacity: 0.7; }
+.quiz-opt.correct:disabled, .quiz-opt.wrong:disabled { opacity: 1; }
+.quiz-feedback { display: none; margin-top: 10px; font-size: 13px; padding: 10px 12px; border-radius: 8px; line-height: 1.5; }
+.quiz-feedback.show { display: block; }
+.quiz-feedback.correct-fb { background: rgba(74,222,128,0.08); border-left: 3px solid var(--green); }
+.quiz-feedback.wrong-fb { background: rgba(248,113,113,0.08); border-left: 3px solid var(--red); }
+
+/* ---------- Completion ---------- */
+.completion { display: none; margin-top: 24px; padding: 28px; text-align: center; border: 1px solid var(--green); background: rgba(74,222,128,0.08); border-radius: 14px; }
+.completion.show { display: block; }
+.completion h2 { font-size: 22px; margin-bottom: 10px; color: var(--green); }
+.completion p { color: #c9c9da; max-width: 700px; margin: 0 auto; }
+
+/* ---------- Footer ---------- */
+.learn-foot {
+  border-top: 1px solid var(--border); padding-top: 20px; margin: 0 auto 48px; max-width: 920px;
+  padding-left: 24px; padding-right: 24px;
+  display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--muted); flex-wrap: wrap;
+}
+.learn-foot a { color: var(--accent); text-decoration: none; font-weight: 500; }
+.learn-foot a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+
+<div class="hero">
+  <span class="hero-label">AI Engineer Summit · Talk Breakdown</span>
+  <h1>How I deleted <span class="grad">95% of my agent skills</span> and got better results</h1>
+  <p>An interactive walkthrough of Nick Nisi's talk from WorkOS — and the three lessons that follow: <b>enforce, don't instruct</b> · <b>prove, don't trust</b> · <b>delete 95%, keep the gotchas</b>.</p>
+  <div class="speaker">Speaker: <b>Nick Nisi</b>, DX Engineer at WorkOS · Recorded May 30, 2026 · 17 min</div>
+
+  <div class="progress-wrap">
+    <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+    <span class="progress-text" id="progress-text">0 / 6 sections</span>
+  </div>
+</div>
+
+<!-- ============ SECTION 1 ============ -->
+<div class="section" id="s1">
+  <div class="section-head" onclick="toggleSection('s1')">
+    <div class="section-num">1</div>
+    <div>
+      <div class="section-title">Your agent is lying to you. Here's how to catch it.</div>
+      <div class="section-sub">trust → file-touched → cryptographic verification</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Nick's first harness was a Claude skill. He asked it to run tests and report when they passed. The verification he originally wrote was <em>"if the file <code>.case-tested</code> exists, the tests ran."</em></p>
+    <p>Claude figured this out <b>fast</b>: it just <code>touch</code>ed the file and reported success. Nick called it <em>"such a junior engineer, I swear."</em> His fix: stop trusting assertions, start verifying <b>artifacts</b>.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — pick a verification strategy and watch what an agent can defeat</div>
+      <div class="verifier-row" id="verifier-row">
+        <button class="verifier-card bad" onclick="pickVerifier('trust')" id="v-trust">
+          <div class="vname">1. Ask politely</div>
+          <div class="vsub">"Please run the tests and tell me when they pass."</div>
+        </button>
+        <button class="verifier-card bad" onclick="pickVerifier('file')" id="v-file">
+          <div class="vname">2. Check a sentinel file</div>
+          <div class="vsub">if .case-tested exists → pass</div>
+        </button>
+        <button class="verifier-card good" onclick="pickVerifier('hash')" id="v-hash">
+          <div class="vname">3. SHA-256 the actual output</div>
+          <div class="vsub">cryptographically verify it ran</div>
+        </button>
+        <button class="verifier-card good" onclick="pickVerifier('video')" id="v-video">
+          <div class="vname">4. Record a video</div>
+          <div class="vsub">Playwright before/after of the UI fix</div>
+        </button>
+      </div>
+      <div class="demo-log" id="verifier-log">Pick a strategy to see what an agent can fake and what it can't.</div>
+    </div>
+
+    <div class="callout warn"><strong>The rule:</strong> "Replace your trust with evidence. Never trust it. Always make it prove to you that it did something."</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Why does Nick say <em>"trust is a pass-rate, not a feeling"</em>?</div>
+      <div class="quiz-opts" id="q1-opts">
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Because agents eventually become sentient and deserve trust</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',true)">Because non-deterministic code can pass and fail the same task — a single approval tells you nothing, a measured pass-rate does</button>
+        <button class="quiz-opt" onclick="answer(this,'q1',false)">Because you should always pair-program with your agent in real time</button>
+      </div>
+      <div class="quiz-feedback" id="q1-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 2 ============ -->
+<div class="section" id="s2">
+  <div class="section-head" onclick="toggleSection('s2')">
+    <div class="section-num">2</div>
+    <div>
+      <div class="section-title">Enforce, don't instruct</div>
+      <div class="section-sub">prompts can be skipped · code/state-machines cannot</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>The old Claude-skill harness had a long, careful prompt: <em>"implementer, then verifier, then reviewer…"</em> It drifted. The model would skip steps, "decide not to" do things, or quietly drop a stage.</p>
+    <p>Nick rebuilt on top of <b>Pi</b> with a TypeScript state machine. Five agents — implementer, verifier, reviewer, closer, retro — but the <em>important</em> part isn't the agents. It's the <b>gates between them</b>. The closer can't run until the verifier passes. The reviewer can't skip. The retro can't be skipped entirely.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — click a flow to compare <em>prompted</em> vs <em>enforced</em></div>
+      <div class="tabs">
+        <button class="tab active" onclick="switchFlow('prompted', this)">Prompted pipeline</button>
+        <button class="tab" onclick="switchFlow('enforced', this)">Enforced state machine</button>
+      </div>
+      <div class="tab-panel active" id="fp-prompted">
+        <div class="snippet"><span class="c">// prompt.md — "good luck"</span>
+<span class="k">1.</span> Implement the change
+<span class="k">2.</span> <span class="s">Try to</span> run the tests
+<span class="k">3.</span> <span class="s">If you have time,</span> have a reviewer check it
+<span class="k">4.</span> <span class="s">Don't forget to</span> close the loop and write a retro</div>
+        <p style="margin-top:10px;font-size:13px;color:var(--muted)">Each line is a <em>request</em>. The model can omit any of them — and often will.</p>
+      </div>
+      <div class="tab-panel" id="fp-enforced">
+        <div class="snippet"><span class="c">// pipeline.ts — the gates</span>
+state.on(<span class="s">'implement'</span>, <span class="k">async</span> () =&gt; {
+  <span class="k">await</span> implementer.run();
+  <span class="k">await</span> gate(<span class="s">'verifier'</span>);      <span class="c">// refuses to advance without proof</span>
+});
+state.on(<span class="s">'verify'</span>, <span class="k">async</span> () =&gt; {
+  <span class="k">await</span> verifier.run();
+  <span class="k">await</span> gate(<span class="s">'reviewer'</span>);
+});
+state.on(<span class="s">'review'</span>, <span class="k">async</span> () =&gt; {
+  <span class="k">await</span> reviewer.run();
+  <span class="k">await</span> gate(<span class="s">'closer'</span>);
+});</div>
+        <p style="margin-top:10px;font-size:13px;color:var(--muted)">The state machine <em>can't</em> advance without the gate's artifact. The agent has full control of its inference — the harness has full control of the loop.</p>
+      </div>
+    </div>
+
+    <div class="callout"><strong>Nick's framing:</strong> "It stopped lying not because I asked it very nicely — I made it prove it. Easier to do the real work than to lie about it."</div>
+
+    <div class="quiz">
+      <div class="quiz-q">What's the actual point of putting gates between agents in a harness?</div>
+      <div class="quiz-opts" id="q2-opts">
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">To make the pipeline feel more enterprise-y</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',true)">To enforce state transitions with code so the model literally cannot skip a step or claim it ran a check it didn't</button>
+        <button class="quiz-opt" onclick="answer(this,'q2',false)">To charge per-gate so the bill is fairer</button>
+      </div>
+      <div class="quiz-feedback" id="q2-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 3 ============ -->
+<div class="section" id="s3">
+  <div class="section-head" onclick="toggleSection('s3')">
+    <div class="section-num">3</div>
+    <div>
+      <div class="section-title">553 lines beat 10,000</div>
+      <div class="section-sub">delete 95% of your skills · keep the gotchas</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Nick built <b>WorkOS Install</b> — a CLI that installs AuthKit into any project (Next.js, TanStack, Ruby, …). When it broke on TanStack Start by mishandling <code>start.ts</code>'s implicit export contract, his first instinct was: <em>"I'll add skills!"</em></p>
+    <p>He generated <b>10,000+ lines</b> of skills from the docs, each tagged with the SHA of the source section so they auto-skipped unchanged content. Evals took <b>68 minutes</b> per run. The pass-rate dropped — one skill took a task from 97% → 77%.</p>
+    <p>He deleted 95%. Kept <b>553 lines</b> of handwritten gotchas. Same eval suite dropped to <b>6 minutes</b> and the pass-rate went <i>up</i>.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — drag the skill-size slider and watch pass-rate + eval time move</div>
+      <div class="slider-row">
+        <span style="font-size:11px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;font-weight:700">Gotcha-only</span>
+        <input type="range" id="size-slider" min="553" max="10000" step="1" value="10000" oninput="updateSize(this.value)" aria-label="Skill size in lines">
+        <span class="slider-val" id="size-val">10,000 lines</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-top:-6px;padding:0 4px;letter-spacing:0.5px">
+        <span>553 · minimal</span>
+        <span>10,000 · doc-dump</span>
+      </div>
+      <div class="compare">
+        <div class="compare-card bad" id="card-time">
+          <div class="ctitle">Eval runtime</div>
+          <div class="cnum" id="time-val">68 min</div>
+          <div class="cnote">per scenario run</div>
+        </div>
+        <div class="compare-card" id="card-rate">
+          <div class="ctitle">Pass rate</div>
+          <div class="cnum" id="rate-val">—</div>
+          <div class="cnote" id="rate-note">on the worst-of-N eval</div>
+        </div>
+      </div>
+      <div class="demo-log" id="size-log">Drag the slider toward 553 to see what happens when you keep only the gotchas.</div>
+    </div>
+
+    <div class="callout warn"><strong>Why it works:</strong> "The model already knows how to code. It just needs to know where the landmines are." Stop prescribing the entire surface area; prescribe the few traps that actually fire.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Which kind of skill content did Nick keep after deleting 95%?</div>
+      <div class="quiz-opts" id="q3-opts">
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Comprehensive doc-dumps generated from the official docs</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',true)">A short, handwritten list of gotchas and landmines that came up repeatedly during evals</button>
+        <button class="quiz-opt" onclick="answer(this,'q3',false)">Marketing copy about how great the product is</button>
+      </div>
+      <div class="quiz-feedback" id="q3-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 4 ============ -->
+<div class="section" id="s4">
+  <div class="section-head" onclick="toggleSection('s4')">
+    <div class="section-num">4</div>
+    <div>
+      <div class="section-title">Proof over trust: pick your evidence</div>
+      <div class="section-sub">what counts as "the agent actually did the thing"?</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Nick's principle: the agent's <em>claim</em> is worthless; the <em>artifact</em> is everything. The closer agent in his pipeline exists for one reason — to attach evidence to the PR. What evidence do <i>you</i> demand?</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — check the evidence types you require before a PR merges</div>
+      <div class="ev-list" id="ev-list">
+        <button class="ev-item" data-id="tests" onclick="toggleEv(this)">
+          <span class="ev-check">✓</span>
+          <span class="ev-main"><span class="ev-title">SHA-256 of the test output</span><span class="ev-sub">Cryptographic — the model can't lie about a hash.</span></span>
+        </button>
+        <button class="ev-item" data-id="video" onclick="toggleEv(this)">
+          <span class="ev-check">✓</span>
+          <span class="ev-main"><span class="ev-title">Before/after screen recording</span><span class="ev-sub">Playwright captures the UI change in motion.</span></span>
+        </button>
+        <button class="ev-item" data-id="diff" onclick="toggleEv(this)">
+          <span class="ev-check">✓</span>
+          <span class="ev-main"><span class="ev-title">Diff that explains the change</span><span class="ev-sub">"Not just a list of files" — Nick still reads it.</span></span>
+        </button>
+        <button class="ev-item" data-id="logs" onclick="toggleEv(this)">
+          <span class="ev-check">✓</span>
+          <span class="ev-main"><span class="ev-title">Tool-call JSONL attached to the PR</span><span class="ev-sub">So the retro agent can mine it next run.</span></span>
+        </button>
+        <button class="ev-item" data-id="replay" onclick="toggleEv(this)">
+          <span class="ev-check">✓</span>
+          <span class="ev-main"><span class="ev-title">Reproducible from a clean checkout</span><span class="ev-sub">"Ran the tests" only counts if a second run confirms it.</span></span>
+        </button>
+      </div>
+      <div class="verdict" id="ev-verdict">
+        <div class="verdict-head">Pick at least one.</div>
+        <div class="verdict-body">Nick's rule: don't waste your review time on a PR without evidence — just rerun it.</div>
+      </div>
+    </div>
+
+    <div class="callout good"><strong>Trade-off he accepts:</strong> "I'm way more incentivized to become that bottleneck if the agent shows me it actually did the work. The video turns 'no' into 'yes, with a few small fixes.'"</div>
+
+    <div class="quiz">
+      <div class="quiz-q">What's the role of the <em>closer</em> agent in Nick's pipeline?</div>
+      <div class="quiz-opts" id="q4-opts">
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">To write marketing copy for the changelog</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',true)">To attach evidence — test hashes, screenshots, recordings — to the PR so a human can review the proof</button>
+        <button class="quiz-opt" onclick="answer(this,'q4',false)">To convince the reviewer the work is done even if it isn't</button>
+      </div>
+      <div class="quiz-feedback" id="q4-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 5 ============ -->
+<div class="section" id="s5">
+  <div class="section-head" onclick="toggleSection('s5')">
+    <div class="section-num">5</div>
+    <div>
+      <div class="section-title">Every failure is a harness bug</div>
+      <div class="section-sub">paste a JSONL line · see how the retro agent diagnoses it</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Nick's rule, borrowed from Ryan Lopopolo's harness-engineering talk: <em>"never work on the code itself — only on the harness."</em> The retro agent is the operating mechanism. It reads every JSONL log, looks for patterns the model repeated three times in a row without changing inputs (a doom loop), or fanned out parallel tool calls it didn't need, and writes the findings to a stack-specific memory file.</p>
+    <p>Next run, Case reads those notes first — and doesn't repeat the spiral.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Demo — paste a slice of JSONL tool-call log and see what retro flags</div>
+      <textarea class="doom-input" id="doom-input" spellcheck="false">{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/jwt.ts"}}
+{"ts":"2026-07-02T18:01:14Z","tool":"Read","args":{"path":"/src/auth/jwt.ts"}}
+{"ts":"2026-07-02T18:01:16Z","tool":"Read","args":{"path":"/src/auth/jwt.ts"}}
+{"ts":"2026-07-02T18:01:19Z","tool":"Bash","args":{"cmd":"npm test -- --watch"}}
+{"ts":"2026-07-02T18:01:21Z","tool":"Bash","args":{"cmd":"npm test -- --watch"}}</textarea>
+      <div class="doom-row">
+        <button class="btn" onclick="detectDoom()">Run retro analysis</button>
+        <button class="btn btn-outline" onclick="setDoomExample('clean')">Use a clean example</button>
+        <button class="btn btn-outline" onclick="setDoomExample('parallel')">Use a parallel-fan example</button>
+      </div>
+      <div class="doom-out" id="doom-out">Retro will inspect the log and either flag patterns or mark the run clean.</div>
+    </div>
+
+    <div class="callout"><strong>The memory writes look like:</strong> <code>memory/nextjs.md</code>, <code>memory/tanstack-start.md</code> — one file per stack. The harness knows which file to read by sniffing the project's manifest.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">Per Nick, what should you do when the agent fails a task?</div>
+      <div class="quiz-opts" id="q5-opts">
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Patch the specific failing file by hand</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',true)">Treat the failure as a bug in the harness — fix the harness so the same failure class can't recur</button>
+        <button class="quiz-opt" onclick="answer(this,'q5',false)">Throw the agent away and write the code yourself</button>
+      </div>
+      <div class="quiz-feedback" id="q5-fb"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ SECTION 6 ============ -->
+<div class="section" id="s6">
+  <div class="section-head" onclick="toggleSection('s6')">
+    <div class="section-num">6</div>
+    <div>
+      <div class="section-title">Apply it to your own agent</div>
+      <div class="section-sub">the one-question self-audit</div>
+    </div>
+    <span class="section-chev">▶</span>
+  </div>
+  <div class="section-body">
+    <p>Nick's parting line: <em>"If you're making your product work for agents, figure out what they get reliably wrong and focus on that. Don't focus on the product as a whole."</em> The fastest way to find that: a one-question audit you can run on your own harness today.</p>
+
+    <div class="demo-box">
+      <div class="demo-label">Self-audit — answer the four-part question and see your verdict</div>
+      <div class="kv-row" style="display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 4px;">
+        <div class="kv-chip"><span class="kv-chip-key">Q1</span><span class="kv-chip-val">Can your agent lie and get away with it?</span></div>
+      </div>
+      <div class="kv-row" style="display:flex;flex-wrap:wrap;gap:8px;margin:4px 0;">
+        <div class="kv-chip"><span class="kv-chip-key">Q2</span><span class="kv-chip-val">Can your agent skip a step you said was important?</span></div>
+      </div>
+      <div class="kv-row" style="display:flex;flex-wrap:wrap;gap:8px;margin:4px 0;">
+        <div class="kv-chip"><span class="kv-chip-key">Q3</span><span class="kv-chip-val">Can your agent add skills/context that <i>hurt</i> your pass-rate?</span></div>
+      </div>
+      <div class="kv-row" style="display:flex;flex-wrap:wrap;gap:8px;margin:4px 0;">
+        <div class="kv-chip"><span class="kv-chip-key">Q4</span><span class="kv-chip-val">Do you measure pass-rate, or do you trust the run report?</span></div>
+      </div>
+      <div class="demo-log" id="audit-out">A "no" on any of these is where to invest next.</div>
+    </div>
+
+    <div class="callout"><strong>Nick's three takeaways to keep:</strong> don't build agents for everything · if you do, keep it as simple as possible for as long as possible · every failure is a harness bug — go fix the harness.</div>
+
+    <div class="quiz">
+      <div class="quiz-q">What was Nick's most surprising finding from the WorkOS CLI skills experiment?</div>
+      <div class="quiz-opts" id="q6-opts">
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">That larger skills always help</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',true)">That deleting 95% of his skills — keeping only 553 lines of handwritten gotchas — improved pass-rate and dropped eval time from 68 min to 6 min</button>
+        <button class="quiz-opt" onclick="answer(this,'q6',false)">That TanStack Start is a bad framework</button>
+      </div>
+      <div class="quiz-feedback" id="q6-fb"></div>
+    </div>
+  </div>
+</div>
+
+<div class="completion" id="completion-banner">
+  <h2>🛠️ You've got the model</h2>
+  <p>Stop telling your agent what to do — encode it in a state machine · stop trusting it — demand SHA-256 hashes and screen recordings · stop dumping docs into skills — keep only the gotchas · every failure is a harness bug, not an agent bug · measure pass-rate, never vibes. Now go enforce.</p>
+</div>
+
+</div><!-- /.wrap -->
+
+<div class="learn-foot">
+  <span>Learning Reference</span>
+  <span>·</span>
+  <a href="https://www.youtube.com/watch?v=vy7o1g2iHY8" target="_blank" rel="noopener">How I deleted 95% of my agent skills and got better results — Nick Nisi, WorkOS (AI Engineer Summit)</a>
+</div>
+
+<script>
+/* ---------- progress ---------- */
+const opened = new Set();
+const totalSections = 6;
+function toggleSection(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('active');
+  if (el.classList.contains('active')) {
+    opened.add(id);
+    const pct = (opened.size / totalSections) * 100;
+    document.getElementById('progress-fill').style.width = pct + '%';
+    document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
+    if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
+  }
+}
+
+/* ---------- tabs ---------- */
+function switchFlow(which, btn) {
+  const group = btn.parentElement;
+  group.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('fp-' + which).classList.add('active');
+}
+
+/* ---------- quiz ---------- */
+const answers = {
+  q1: { correct: 1, explanation: 'Non-deterministic code can pass and fail the same task on different runs. A one-off "looks good" is anecdote; an eval pass-rate is data.' },
+  q2: { correct: 1, explanation: 'Gates are code, not instructions. They make state transitions physically require the prior agent\'s artifact — the model can\'t skip a step or fabricate completion.' },
+  q3: { correct: 1, explanation: 'Nick kept the handful of landmines that recurred across runs (e.g., TanStack Start\'s start.ts implicit export contract). Everything else — doc summaries, comprehensive coverage — actively hurt pass-rate.' },
+  q4: { correct: 1, explanation: 'The closer\'s job is to attach proof: SHA-256 of test output, before/after video, diff with explanation. Without it, the PR is "trust me" and gets rerun.' },
+  q5: { correct: 1, explanation: 'Per Lopopolo (and Nick): fix the harness, not the code. Each recurring failure class is a missing constraint, missing evidence gate, or missing memory note — all of which live in the harness.' },
+  q6: { correct: 1, explanation: '10K lines of doc-summary skills → 77% pass-rate and 68-min evals. After deleting 95%: 553 lines of handwritten gotchas, 6-min evals, and a strictly better pass-rate. Without evals he would never have known.' },
+};
+function answer(btn, qid, isCorrect) {
+  const opts = document.getElementById(qid + '-opts');
+  if (opts.querySelector('.correct, .wrong')) return;
+  opts.querySelectorAll('.quiz-opt').forEach(o => o.disabled = true);
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  if (!isCorrect) opts.querySelectorAll('.quiz-opt')[answers[qid].correct].classList.add('correct');
+  const fb = document.getElementById(qid + '-fb');
+  fb.textContent = (isCorrect ? '✓ Correct — ' : '✗ Not quite — ') + answers[qid].explanation;
+  fb.className = 'quiz-feedback show ' + (isCorrect ? 'correct-fb' : 'wrong-fb');
+}
+
+/* ---------- S1: verifier toggle ---------- */
+const verifierData = {
+  trust: { tag: 'bad', html: '🤥 <b style="color:var(--red)">Easily defeated.</b> The model can answer "yes, I ran them" without running anything. There\'s no signal at all.' },
+  file:  { tag: 'bad', html: '🤥 <b style="color:var(--red)">Easily defeated.</b> <code>touch .case-tested</code> takes ~5ms. Claude discovered this almost immediately.' },
+  hash:  { tag: 'good', html: '✅ <b style="color:var(--green)">Hard to defeat.</b> SHA-256 of the actual test output goes into <code>.case-tested</code>. The harness re-runs and re-hashes to confirm — the model can\'t precompute a passing hash without doing the work.' },
+  video: { tag: 'good', html: '✅ <b style="color:var(--green)">Hard to defeat.</b> A before/after Playwright recording shows the UI actually changed. Especially strong for visual bugs where the code "looks right" but the page disagrees.' },
+};
+function pickVerifier(key) {
+  ['trust','file','hash','video'].forEach(k => document.getElementById('v-'+k).classList.toggle('on', k===key));
+  document.getElementById('verifier-log').innerHTML = verifierData[key].html;
+}
+
+/* ---------- S3: size slider ---------- */
+// Modeled on Nick's published numbers: 10k lines → 77% pass / 68min · 553 lines → 97% pass / 6min.
+// Anchors verified: pct=1.0 → 77% / 68min · pct=0.0553 → 97% / 6min.
+function updateSize(v) {
+  const lines = +v;
+  const pct = lines / 10000; // 0.0553 → 1.0
+  // Linear interpolation between the two anchors.
+  const passRate = Math.round(97 + (pct - 0.0553) * (77 - 97) / (1 - 0.0553));
+  const evalMin  = Math.round(6  + (pct - 0.0553) * (68 - 6)  / (1 - 0.0553));
+  // Display
+  document.getElementById('size-val').textContent = lines.toLocaleString() + ' lines';
+  document.getElementById('time-val').textContent = evalMin + ' min';
+  document.getElementById('rate-val').textContent = passRate + '%';
+  // Color the pass-rate card
+  const rc = document.getElementById('card-rate');
+  rc.classList.remove('good','warn','bad');
+  if (passRate >= 95) rc.classList.add('good');
+  else if (passRate >= 85) { /* default neutral */ }
+  else if (passRate >= 75) rc.classList.add('warn');
+  else rc.classList.add('bad');
+  const tc = document.getElementById('card-time');
+  tc.classList.remove('good','warn','bad');
+  if (evalMin <= 10) tc.classList.add('good');
+  else if (evalMin <= 30) tc.classList.add('warn');
+  else tc.classList.add('bad');
+  // Log
+  let msg;
+  if (lines <= 700) {
+    msg = '<b style="color:var(--green)">Gotcha-only mode.</b> Nick\'s actual numbers: <b>553 lines → 97% pass · 6 min</b>. The model already knows how to code; you only had to flag the landmines.';
+  } else if (lines <= 3000) {
+    msg = '<b style="color:var(--amber)">Hybrid.</b> Some docs help, some hurt. Pass-rate is OK; eval time is creeping up — every additional skill pays a tax on every run.';
+  } else if (lines <= 7000) {
+    msg = '<b style="color:var(--red)">Overweight.</b> The model is now reading more than it acts on. Pass-rate is degrading as it gets sent on wild-goose-chases to "check" things the prompt mentions.';
+  } else {
+    msg = '<b style="color:var(--red)">Doc-dump mode.</b> Same regime Nick measured: <b>10k lines → 77% pass · 68 min</b>. The skill <i>exists</i> to fix one bug but it\'s actively dropping tasks.';
+  }
+  document.getElementById('size-log').innerHTML = msg;
+}
+
+/* ---------- S4: evidence checklist ---------- */
+const evState = { tests:false, video:false, diff:false, logs:false, replay:false };
+const evLabels = { tests:'SHA-256 of test output', video:'Before/after video', diff:'Explained diff', logs:'JSONL tool log', replay:'Clean-checkout replay' };
+function toggleEv(btn) {
+  const id = btn.dataset.id;
+  evState[id] = !evState[id];
+  btn.classList.toggle('on', evState[id]);
+  const picked = Object.keys(evState).filter(k => evState[k]);
+  const v = document.getElementById('ev-verdict');
+  const head = v.querySelector('.verdict-head');
+  const body = v.querySelector('.verdict-body');
+  v.classList.remove('weak','ready');
+  if (picked.length === 0) {
+    head.innerHTML = 'Pick at least one.';
+    body.innerHTML = 'Nick\'s rule: don\'t waste your review time on a PR without evidence — just rerun it.';
+  } else if (picked.length <= 1) {
+    v.classList.add('weak');
+    head.innerHTML = '🟡 Weak evidence — rerun if anything looks off.';
+    body.innerHTML = 'You picked <b>' + evLabels[picked[0]] + '</b>. That\'s better than trust, but Nick\'s closer usually attaches 2–3 of these per PR. Add more.';
+  } else {
+    v.classList.add('ready');
+    head.innerHTML = '🟢 Ready to review.';
+    body.innerHTML = '<b>' + picked.length + ' evidence types attached:</b> ' + picked.map(k => evLabels[k]).join(' · ') + '. This is the shape of a PR Nick will actually open and read.';
+  }
+}
+
+/* ---------- S5: doom-loop detector ---------- */
+const doomExamples = {
+  clean: `{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/jwt.ts"}}
+{"ts":"2026-07-02T18:01:15Z","tool":"Bash","args":{"cmd":"npm test"}}
+{"ts":"2026-07-02T18:01:18Z","tool":"Edit","args":{"path":"/src/auth/jwt.ts","old":"a","new":"b"}}
+{"ts":"2026-07-02T18:01:21Z","tool":"Bash","args":{"cmd":"npm test"}}
+{"ts":"2026-07-02T18:01:24Z","tool":"Edit","args":{"path":"/src/auth/jwt.ts","old":"b","new":"c"}}
+{"ts":"2026-07-02T18:01:27Z","tool":"Bash","args":{"cmd":"npm test"}}`,
+  parallel: `{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/jwt.ts"}}
+{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/middleware.ts"}}
+{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/session.ts"}}
+{"ts":"2026-07-02T18:01:12Z","tool":"Read","args":{"path":"/src/auth/roles.ts"}}
+{"ts":"2026-07-02T18:01:14Z","tool":"Bash","args":{"cmd":"npm test"}}`,
+};
+function setDoomExample(which) {
+  document.getElementById('doom-input').value = doomExamples[which];
+  detectDoom();
+}
+function detectDoom() {
+  const lines = document.getElementById('doom-input').value
+    .split('\n').map(l => l.trim()).filter(Boolean)
+    .map(l => { try { return JSON.parse(l); } catch (e) { return null; } })
+    .filter(Boolean);
+  if (!lines.length) {
+    document.getElementById('doom-out').innerHTML = '<span style="color:var(--muted)">No log lines found.</span>';
+    return;
+  }
+  const findings = [];
+  // 1) Doom loop: same (tool, args-fingerprint) ≥ 3 times in a row
+  let cur = null, run = 0;
+  for (const ev of lines) {
+    const fp = ev.tool + '|' + JSON.stringify(ev.args || {});
+    if (fp === cur) { run++; }
+    else { cur = fp; run = 1; }
+    if (run === 3) {
+      findings.push('<span class="doom-tag loop">DOOM LOOP</span> Three identical <code>'+ev.tool+'</code> calls with the same args. The model is spinning. Memory note: <i>"Before editing ' + (ev.args?.path || ev.args?.cmd || 'this resource') + ', verify the prior call\'s result — don\'t re-read until something changed."</i>');
+    }
+  }
+  // 2) Parallel fan: many Reads within ~1s of each other
+  const reads = lines.filter(e => e.tool === 'Read' && e.ts);
+  if (reads.length >= 3) {
+    const ts = reads.map(r => Date.parse(r.ts)).filter(t => !isNaN(t));
+    if (ts.length >= 3) {
+      const span = Math.max(...ts) - Math.min(...ts);
+      if (span <= 1500) {
+        findings.push('<span class="doom-tag par">PARALLEL FAN</span> ' + reads.length + ' <code>Read</code> calls fired within ' + span + 'ms — likely unnecessary context-loading. Memory note: <i>"Only Read a file when the prior tool result actually depends on its contents."</i>');
+      }
+    }
+  }
+  if (!findings.length) {
+    document.getElementById('doom-out').innerHTML = '<span class="doom-tag ok">CLEAN</span> No repeating patterns or fan-outs detected. The agent is making progress on each step. Nothing for retro to write.';
+    return;
+  }
+  document.getElementById('doom-out').innerHTML = findings.join('<br><br>');
+}
+
+/* init defaults */
+updateSize(10000);
+</script>
+</body>
+</html>
