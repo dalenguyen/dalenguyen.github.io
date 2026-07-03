@@ -8,6 +8,11 @@
   "targets": {
     "build": {
       "executor": "@analogjs/platform:vite",
+      "inputs": [
+        "production",
+        "^production",
+        "{workspaceRoot}/libs/portfolio/shared/**/*"
+      ],
       "options": {
         "configFile": "apps/blog-app/vite.config.ts",
         "main": "apps/blog-app/src/main.ts",
