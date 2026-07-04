@@ -87,7 +87,7 @@
       "executor": "nx:run-commands",
       "dependsOn": ["build-docker"],
       "options": {
-        "command": "gcloud run deploy blog-app --image us-central1-docker.pkg.dev/dalenguyen-prod/blog/blog-app --region us-central1 --project dalenguyen-prod --account ${GCLOUD_ACCOUNT:-dale@dalenguyen.me} --platform managed --allow-unauthenticated --min-instances=0 --max-instances=4 --cpu-boost --memory=512Mi --port 8080 --labels app=blog-app,managed-by=nx --quiet",
+        "command": "gcloud run deploy blog-app --image us-central1-docker.pkg.dev/dalenguyen-prod/blog/blog-app --region us-central1 --project dalenguyen-prod --account ${GCLOUD_ACCOUNT:-dale@dalenguyen.me} --platform managed --allow-unauthenticated --min-instances=0 --max-instances=4 --cpu-boost --memory=512Mi --port 8080 --labels app=blog-app,managed-by=nx --set-secrets RESEND_API_KEY=RESEND_API_KEY:latest --quiet",
         "cwd": "{workspaceRoot}"
       }
     }
