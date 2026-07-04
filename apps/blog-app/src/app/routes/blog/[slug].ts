@@ -155,7 +155,7 @@ export const routeMeta: RouteMeta = {
                  so a reader who just finished the post is invited to share.
                  The action URLs (X, LinkedIn, Reddit, HN) are computed lazily
                  in click handlers, so the SSG/prerender output doesn't depend
-                 on `window` — only the runtime click does. -->
+                 on window — only the runtime click does. -->
             <div class="mt-10 pt-6 border-t border-border" aria-label="Share this post">
               <div class="flex flex-wrap items-center justify-center gap-3">
                 <span class="text-sm font-medium text-fg-muted mr-1">Share</span>
@@ -165,7 +165,7 @@ export const routeMeta: RouteMeta = {
                   target="_blank"
                   rel="noopener noreferrer"
                   (click)="trackShare($event, 'x')"
-                  class="share-btn"
+                  class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-fg-muted no-underline cursor-pointer transition hover:text-accent hover:border-accent hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px"
                   aria-label="Share on X"
                 >
                   <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -179,7 +179,7 @@ export const routeMeta: RouteMeta = {
                   target="_blank"
                   rel="noopener noreferrer"
                   (click)="trackShare($event, 'linkedin')"
-                  class="share-btn"
+                  class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-fg-muted no-underline cursor-pointer transition hover:text-accent hover:border-accent hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px"
                   aria-label="Share on LinkedIn"
                 >
                   <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -193,7 +193,7 @@ export const routeMeta: RouteMeta = {
                   target="_blank"
                   rel="noopener noreferrer"
                   (click)="trackShare($event, 'reddit')"
-                  class="share-btn"
+                  class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-fg-muted no-underline cursor-pointer transition hover:text-accent hover:border-accent hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px"
                   aria-label="Share on Reddit"
                 >
                   <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -207,7 +207,7 @@ export const routeMeta: RouteMeta = {
                   target="_blank"
                   rel="noopener noreferrer"
                   (click)="trackShare($event, 'hn')"
-                  class="share-btn"
+                  class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-fg-muted no-underline cursor-pointer transition hover:text-accent hover:border-accent hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px"
                   aria-label="Share on Hacker News"
                 >
                   <svg class="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
@@ -219,7 +219,7 @@ export const routeMeta: RouteMeta = {
                 <button
                   type="button"
                   (click)="copyShareLink()"
-                  class="share-btn"
+                  class="inline-flex items-center gap-2 rounded-lg border border-border bg-surface-2 px-3.5 py-1.5 text-sm font-medium text-fg-muted no-underline cursor-pointer transition hover:text-accent hover:border-accent hover:bg-accent/10 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px"
                   [attr.aria-label]="copyLabel() === 'Copied!' ? 'Link copied to clipboard' : 'Copy link to clipboard'"
                 >
                   @if (copyLabel() === 'Copied!') {
@@ -246,43 +246,6 @@ export const routeMeta: RouteMeta = {
       <div class="mx-auto max-w-prose mt-12 mb-12">
         <div #giscusContainer class="giscus-container"></div>
       </div>
-
-      <style>
-        /* Scoped to this component so the share buttons don't bleed into the
-           global stylesheet. Tokens (--surface-2 / --border / --accent) are
-           inherited from :root so they flip automatically with the theme. */
-        .share-btn {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.4rem 0.85rem;
-          font-size: 0.85rem;
-          font-weight: 500;
-          color: rgb(var(--fg-muted));
-          background-color: rgb(var(--surface-2));
-          border: 1px solid rgb(var(--border));
-          border-radius: 0.5rem;
-          text-decoration: none;
-          cursor: pointer;
-          transition:
-            color 0.15s ease,
-            background-color 0.15s ease,
-            border-color 0.15s ease,
-            transform 0.15s ease;
-        }
-        .share-btn:hover {
-          color: rgb(var(--accent));
-          border-color: rgb(var(--accent));
-          background-color: rgb(var(--accent) / 0.08);
-        }
-        .share-btn:focus-visible {
-          outline: 2px solid rgb(var(--accent));
-          outline-offset: 2px;
-        }
-        .share-btn:active {
-          transform: translateY(1px);
-        }
-      </style>
   `,
 })
 export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestroy {
