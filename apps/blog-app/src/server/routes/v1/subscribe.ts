@@ -6,9 +6,12 @@ import { defineEventHandler, getMethod, getRequestHeader, H3Event, readBody, set
 // forwards to Resend when RESEND_API_KEY + RESEND_AUDIENCE_ID are configured;
 // otherwise returns success in dev so the UI flow can be exercised without
 // credentials. Kept dependency-free (no `resend` SDK import here) so the route
-// builds without network access and won't crash if the package isn't installed
-// yet — once the Resend integration lands, swap the dev branch for a real
-// fetch to https://api.resend.com/contacts.
+// builds without network access and won't crash if the package isn't installed.
+//
+// Uses POST /audiences/{audience_id}/contacts (audience id in the URL path).
+// The flat POST /contacts + body audience_id shape looks accepted (201, a
+// contact id) but silently does not persist anything — confirmed live against
+// the real API on 2026-07-04, don't revert to it.
 //
 // CORS: the main site (dalenguyen.me) is a Vercel static SSG build with no
 // API routes, so the capture form posts cross-origin to this Cloud Run origin
@@ -61,7 +64,7 @@ export default defineEventHandler(async (event) => {
 
   if (apiKey && audienceId) {
     try {
-      const res = await fetch('https://api.resend.com/contacts', {
+      const res = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${apiKey}`,
@@ -69,7 +72,6 @@ export default defineEventHandler(async (event) => {
         },
         body: JSON.stringify({
           email,
-          audience_id: audienceId,
           unsubscribed: false,
         }),
       })
