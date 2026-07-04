@@ -4,10 +4,15 @@ import { sendWelcomeEmail } from '../../emails/send-welcome'
 // POST /api/v1/subscribe
 // Shared subscribe endpoint backing both the blog/learn modal and inline
 // email capture fields. Accepts `{ email: string, source?: string }` and
-// forwards to Resend when RESEND_API_KEY + RESEND_AUDIENCE_ID are configured;
-// otherwise returns success in dev so the UI flow can be exercised without
-// credentials. Kept dependency-free (no `resend` SDK import here) so the route
-// builds without network access and won't crash if the package isn't installed.
+// forwards to Resend when RESEND_API_KEY + RESEND_AUDIENCE_ID are configured.
+// In production, missing credentials are a hard error (502) rather than a
+// silent dev-fallback success — that fallback previously masked a
+// misconfigured secret in production. The dev-fallback path is now scoped
+// to NODE_ENV !== 'production' so local development without credentials
+// still works.
+//
+// Kept dependency-free (no `resend` SDK import here) so the route builds
+// without network access and won't crash if the package isn't installed.
 //
 // Uses POST /audiences/{audience_id}/contacts (audience id in the URL path).
 // The flat POST /contacts + body audience_id shape looks accepted (201, a
@@ -41,6 +46,14 @@ function applyCors(event: H3Event, origin: string | undefined): void {
     setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type')
     setHeader(event, 'Access-Control-Max-Age', '86400')
   }
+}
+
+// True when the runtime is not production. Used to scope the dev-fallback
+// success path so a missing RESEND_API_KEY in production fails loudly
+// instead of silently pretending the signup succeeded.
+function isDevRuntime(): boolean {
+  const env = process.env['NODE_ENV']
+  return env !== 'production' && env !== 'prod'
 }
 
 // Forward a successful subscribe to the welcome-email send. Wraps any throw
@@ -119,10 +132,27 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Dev / no-credentials path: accept and log so the UI can be exercised.
-  // The welcome-email send itself short-circuits to a logged no-op when
-  // RESEND_API_KEY is missing, so dispatching here keeps the dev path
-  // symmetrical with the prod path.
+  // Production with missing credentials: fail loudly. Previously this
+  // branch returned `{ ok: true, dev: true }`, which silently masked a
+  // misconfigured RESEND_API_KEY / RESEND_AUDIENCE_ID on Cloud Run —
+  // signups looked like they landed but never reached Resend. Returning
+  // 503 makes the misconfiguration visible in logs and to the reader
+  // (the form flips to its error state) without leaking internal details.
+  if (!isDevRuntime()) {
+    console.error(
+      `[subscribe] refusing signup in production: RESEND_API_KEY=${apiKey ? 'set' : 'missing'} RESEND_AUDIENCE_ID=${audienceId ? 'set' : 'missing'} source=${source} email=${email}`,
+    )
+    setResponseStatus(event, 503)
+    return {
+      ok: false,
+      error: 'Subscription is temporarily unavailable. Please try again later.',
+    }
+  }
+
+  // Dev / no-credentials path: accept and log so the UI can be exercised
+  // without env wiring. The welcome-email send itself short-circuits to a
+  // logged no-op when RESEND_API_KEY is missing, so dispatching here keeps
+  // the dev path symmetrical with the prod path.
   console.log(`[subscribe] (dev) source=${source} email=${email}`)
   dispatchWelcome(email, source)
   return { ok: true, source, dev: true }
