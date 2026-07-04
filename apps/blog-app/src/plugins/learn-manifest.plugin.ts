@@ -62,12 +62,6 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 </script>
 <!-- learn-a11y-end -->`
 
-// Kill switch for the email capture UI (inline field + modal) until #196
-// wires RESEND_API_KEY into the Cloud Run deploy. Flip to true once that
-// ships so learn pages aren't showing a live form before it can actually
-// reach Resend. Share row is unaffected.
-const EMAIL_CAPTURE_ENABLED = false
-
 // Inline email capture + share row injected near the end of every learn
 // page. Mirrors the blog-post footer
 // (apps/blog-app/src/app/routes/blog/[slug].ts): the inline email field sits
@@ -75,6 +69,13 @@ const EMAIL_CAPTURE_ENABLED = false
 // the modal (see EMAIL_CAPTURE_HTML below) prompts on first visit. The same
 // localStorage flag (`learn-email-capture.dismissed.v1`) suppresses the
 // modal after a dismiss so it never reopens for that browser.
+//
+// The inline + modal HTML/JS is always injected at build time (so the
+// markup stays a single self-contained block per page and the JS can find
+// the nodes it wires). Visibility per request is then toggled in
+// EMAIL_CAPTURE_JS by reading the `?newsletter=true` query param — this
+// replaces the previous build-time EMAIL_CAPTURE_ENABLED flag so the UI
+// can be enabled per-request without a redeploy.
 //
 // Styled with each page's own `:root` custom properties (--surface /
 // --surface2, --border, --accent, --text, --muted) so it picks up the
@@ -118,7 +119,8 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
 
 // Email capture modal — opens on first visit, suppresses itself on dismiss
 // via localStorage. Browser-only (learn pages aren't SSR'd, so no platform
-// guard is needed).
+// guard is needed). EMAIL_CAPTURE_JS only opens the modal when the current
+// URL carries `?newsletter=true`; otherwise it stays hidden and inert.
 const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 <style>
 #learn-email-modal-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -170,9 +172,30 @@ const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 // persists a dismissal flag in localStorage so it never reopens for the same
 // browser. Kept inline (rather than a separate .js asset) so the plugin can
 // inject a self-contained block per page with no extra HTTP request.
+//
+// The inline HTML/JS is always injected at build time, so the per-request
+// toggle lives here: when the current URL carries `?newsletter=true`, the
+// inline field stays visible and the modal opens once (unless already
+// dismissed); otherwise both are hidden — the inline section via the
+// `hidden` HTML attribute, the modal because we never open it. Reading the
+// query param client-side (rather than gating the build-time injection)
+// keeps the same self-contained block per page while letting the UI be
+// flipped on without a redeploy.
 const EMAIL_CAPTURE_JS = `<script>
 (function () {
   var DISMISS_KEY = 'learn-email-capture.dismissed.v1';
+
+  // ?newsletter=true opt-in. Computed once on script load so the inline
+  // section and the modal stay in sync for the lifetime of the page.
+  function newsletterEnabled() {
+    try {
+      return new URLSearchParams(window.location.search).get('newsletter') === 'true';
+    } catch (e) {
+      return false;
+    }
+  }
+  var newsletterOn = newsletterEnabled();
+
   function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
   function safeSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
 
@@ -229,6 +252,17 @@ const EMAIL_CAPTURE_JS = `<script>
   }
 
   function init() {
+    // Without the ?newsletter=true opt-in, hide the inline section so the
+    // page stays free of the form by default. The modal HTML stays in the
+    // DOM (hidden) — we just skip wiring its open() so it never auto-opens.
+    if (!newsletterOn) {
+      var inline = document.getElementById('learn-email-inline');
+      if (inline) inline.hidden = true;
+      // Skip wiring the modal too so the dismissal flag isn't created when
+      // the reader hasn't opted in.
+      return;
+    }
+
     // Wire up every [data-email-form] on the page (inline + modal).
     document.querySelectorAll('[data-email-form]').forEach(function (form) {
       form.addEventListener('submit', function (e) {
@@ -409,10 +443,12 @@ function injectNav(html: string): string {
   //   3. Modal HTML (rendered hidden until JS opens it on first visit)
   //   4. Email capture JS (wired last so it can find the above nodes)
   //   5. Share row JS (existing)
-  // Email capture blocks are gated by EMAIL_CAPTURE_ENABLED until #196 ships.
-  const footer = EMAIL_CAPTURE_ENABLED
-    ? `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
-    : SHARE_HTML
+  // The email-capture blocks are always injected at build time; the JS
+  // hides both the inline section and skips the modal when the current
+  // URL doesn't carry `?newsletter=true`, replacing the previous
+  // build-time EMAIL_CAPTURE_ENABLED flag so the UI can be toggled per
+  // request without a redeploy.
+  const footer = `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
   // Nav + a11y go right after <body> (top of page). Footer (inline + share +
   // modal + scripts) goes right before </body> — learn pages have no
   // comments section, so bottom-of-page is the equivalent slot to "after
