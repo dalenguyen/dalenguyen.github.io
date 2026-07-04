@@ -1,4 +1,5 @@
 import { defineEventHandler, getMethod, getRequestHeader, H3Event, readBody, setHeader, setResponseStatus } from 'h3'
+import { sendWelcomeEmail } from '../../emails/send-welcome'
 
 // POST /api/v1/subscribe
 // Shared subscribe endpoint backing both the blog/learn modal and inline
@@ -19,6 +20,12 @@ import { defineEventHandler, getMethod, getRequestHeader, H3Event, readBody, set
 // (plus localhost for dev) and echo it back as Access-Control-Allow-Origin.
 // Preflight OPTIONS is handled here too — without it the browser blocks the
 // real POST before it leaves the page.
+//
+// Welcome email: every successful signup (Resend-configured OR dev no-op)
+// triggers a fire-and-forget transactional send via Resend's /emails endpoint.
+// The send is awaited-but-not-thrown: if the welcome email fails the signup
+// still resolves as success — the acceptance criterion is "failure to send
+// the welcome email does not block or fail the signup itself".
 const ALLOWED_ORIGINS = new Set<string>([
   'https://dalenguyen.me',
   'https://www.dalenguyen.me',
@@ -34,6 +41,27 @@ function applyCors(event: H3Event, origin: string | undefined): void {
     setHeader(event, 'Access-Control-Allow-Headers', 'Content-Type')
     setHeader(event, 'Access-Control-Max-Age', '86400')
   }
+}
+
+// Forward a successful subscribe to the welcome-email send. Wraps any throw
+// from sendWelcomeEmail so a render or Resend failure can't reject the signup
+// promise — every path ends with the console line and returns void. The send
+// itself is awaited (so the server doesn't exit the request before the
+// outbound HTTP call is dispatched) but the result is treated as advisory.
+function dispatchWelcome(email: string, source: string): void {
+  sendWelcomeEmail({ email, source })
+    .then((res) => {
+      if (res.ok) {
+        console.log(`[welcome-email] sent to ${email} id=${res.id ?? 'unknown'} (source=${source})`)
+      } else {
+        // Already logged inside sendWelcomeEmail; here just for grep-ability.
+        console.log(`[welcome-email] failed (soft) to ${email}: ${res.error ?? 'unknown'} (source=${source})`)
+      }
+    })
+    .catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : 'unknown'
+      console.error(`[welcome-email] unhandled error sending to ${email}: ${msg}`)
+    })
 }
 
 export default defineEventHandler(async (event) => {
@@ -76,10 +104,14 @@ export default defineEventHandler(async (event) => {
         }),
       })
       if (!res.ok) {
-        const detail = await res.text().catch(() => '')
+        // Intentionally NOT dispatching the welcome email on a failed
+        // audience upsert — we only have confirmed consent after the
+        // audience accepted the contact, and we don't want to email
+        // addresses we never persisted.
         setResponseStatus(event, 502)
         return { ok: false, error: 'Subscription failed. Please try again later.' }
       }
+      dispatchWelcome(email, source)
       return { ok: true, source }
     } catch {
       setResponseStatus(event, 502)
@@ -88,6 +120,10 @@ export default defineEventHandler(async (event) => {
   }
 
   // Dev / no-credentials path: accept and log so the UI can be exercised.
+  // The welcome-email send itself short-circuits to a logged no-op when
+  // RESEND_API_KEY is missing, so dispatching here keeps the dev path
+  // symmetrical with the prod path.
   console.log(`[subscribe] (dev) source=${source} email=${email}`)
+  dispatchWelcome(email, source)
   return { ok: true, source, dev: true }
 })
