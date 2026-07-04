@@ -163,12 +163,16 @@ export const routeMeta: RouteMeta = {
             <!-- Inline email capture. Sits above the existing share row so a
                  reader who finished the post sees the subscription prompt
                  before the social share row. Shares the EmailCaptureService
-                 with the modal so both forms show consistent state. -->
-            <blog-inline-email-capture
-              [heading]="'Get new posts in your inbox'"
-              [subheading]="'No spam — just new posts and learning pages when they ship.'"
-              source="blog-inline"
-            ></blog-inline-email-capture>
+                 with the modal so both forms show consistent state.
+                 Hidden behind emailCaptureEnabled until #196 wires the
+                 Resend API key into the Cloud Run deploy. -->
+            @if (emailCaptureEnabled) {
+              <blog-inline-email-capture
+                [heading]="'Get new posts in your inbox'"
+                [subheading]="'No spam — just new posts and learning pages when they ship.'"
+                source="blog-inline"
+              ></blog-inline-email-capture>
+            }
 
             <!-- Share row. Sits between the article body and the comments section
                  so a reader who just finished the post is invited to share.
@@ -264,8 +268,11 @@ export const routeMeta: RouteMeta = {
       <!-- Email capture modal. Browser-only; the modal template is gated by
            the service signal so SSR/SSG output stays clean. Dismissing the
            modal persists a flag in localStorage and never reopens for the
-           same reader. -->
-      <blog-email-capture-modal></blog-email-capture-modal>
+           same reader. Hidden behind emailCaptureEnabled until #196 wires
+           the Resend API key into the Cloud Run deploy. -->
+      @if (emailCaptureEnabled) {
+        <blog-email-capture-modal></blog-email-capture-modal>
+      }
 
       <!-- Comments section -->
       <div class="mx-auto max-w-prose mt-12 mb-12">
@@ -280,6 +287,10 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
   private readonly appRef = inject(ApplicationRef)
   private readonly platformId = inject(PLATFORM_ID)
   private readonly emailCapture = inject(EmailCaptureService)
+  // Kill switch for the email capture UI (modal + inline field) until #196
+  // wires RESEND_API_KEY into the Cloud Run deploy. Flip to true once that
+  // ships so the form isn't live before it can actually reach Resend.
+  readonly emailCaptureEnabled = false
   private chartRefs: ComponentRef<unknown>[] = []
   private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
@@ -422,8 +433,11 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
       }
       // Open the email-capture modal once per browser, unless the reader has
       // already dismissed it. The service persists the dismissal in
-      // localStorage so this is a no-op on subsequent visits.
-      this.emailCapture.maybeShowModal()
+      // localStorage so this is a no-op on subsequent visits. Gated by
+      // emailCaptureEnabled (see field doc) until #196 ships.
+      if (this.emailCaptureEnabled) {
+        this.emailCapture.maybeShowModal()
+      }
     }
   }
 

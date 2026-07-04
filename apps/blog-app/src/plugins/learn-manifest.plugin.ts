@@ -62,6 +62,12 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 </script>
 <!-- learn-a11y-end -->`
 
+// Kill switch for the email capture UI (inline field + modal) until #196
+// wires RESEND_API_KEY into the Cloud Run deploy. Flip to true once that
+// ships so learn pages aren't showing a live form before it can actually
+// reach Resend. Share row is unaffected.
+const EMAIL_CAPTURE_ENABLED = false
+
 // Inline email capture + share row injected near the end of every learn
 // page. Mirrors the blog-post footer
 // (apps/blog-app/src/app/routes/blog/[slug].ts): the inline email field sits
@@ -403,7 +409,10 @@ function injectNav(html: string): string {
   //   3. Modal HTML (rendered hidden until JS opens it on first visit)
   //   4. Email capture JS (wired last so it can find the above nodes)
   //   5. Share row JS (existing)
-  const footer = `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
+  // Email capture blocks are gated by EMAIL_CAPTURE_ENABLED until #196 ships.
+  const footer = EMAIL_CAPTURE_ENABLED
+    ? `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
+    : SHARE_HTML
   // Nav + a11y go right after <body> (top of page). Footer (inline + share +
   // modal + scripts) goes right before </body> — learn pages have no
   // comments section, so bottom-of-page is the equivalent slot to "after
