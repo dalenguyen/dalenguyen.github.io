@@ -62,6 +62,216 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 </script>
 <!-- learn-a11y-end -->`
 
+// Inline email capture + share row injected near the end of every learn
+// page. Mirrors the blog-post footer
+// (apps/blog-app/src/app/routes/blog/[slug].ts): the inline email field sits
+// above the existing share row, both forms POST to /api/v1/subscribe, and
+// the modal (see EMAIL_CAPTURE_HTML below) prompts on first visit. The same
+// localStorage flag (`learn-email-capture.dismissed.v1`) suppresses the
+// modal after a dismiss so it never reopens for that browser.
+//
+// Styled with each page's own `:root` custom properties (--surface /
+// --surface2, --border, --accent, --text, --muted) so it picks up the
+// page's theme instead of introducing new tokens. Same fallbacks as the
+// share row for pages that don't define every token.
+const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
+<style>
+#learn-email-inline{max-width:920px;margin:48px auto 0;padding:0 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+#learn-email-inline .learn-email-card{border:1px solid var(--border);background:var(--surface, #1e1e26);border-radius:16px;padding:24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;}
+#learn-email-inline h3{margin:0 0 4px;font-size:18px;font-weight:600;color:var(--text, #e5e7eb);}
+#learn-email-inline p.learn-email-sub{margin:0;font-size:14px;color:var(--muted, #9696b0);}
+#learn-email-inline form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 280px;justify-content:flex-end;}
+#learn-email-inline input[type="email"]{flex:1 1 220px;min-width:0;padding:9px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface2, #22222e);color:var(--text, #e5e7eb);font-size:14px;font-family:inherit;}
+#learn-email-inline input[type="email"]:focus{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--accent);}
+#learn-email-inline input[type="email"]::placeholder{color:var(--muted, #9696b0);}
+#learn-email-inline button{padding:9px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;transition:filter .15s,transform .05s;}
+#learn-email-inline button:hover:not(:disabled){filter:brightness(0.92);}
+#learn-email-inline button:active:not(:disabled){transform:translateY(1px);}
+#learn-email-inline button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#learn-email-inline button:disabled{opacity:.6;cursor:not-allowed;}
+#learn-email-inline .learn-email-status{margin-top:12px;font-size:13px;color:var(--muted, #9696b0);}
+#learn-email-inline .learn-email-status.is-success{color:var(--accent);}
+#learn-email-inline .learn-email-status.is-error{color:#f87171;}
+@media(max-width:640px){#learn-email-inline .learn-email-card{flex-direction:column;align-items:stretch;}#learn-email-inline form{justify-content:stretch;}}
+</style>
+<section id="learn-email-inline" aria-label="Subscribe for updates" data-email-capture-source="inline">
+  <div class="learn-email-card">
+    <div style="flex:1 1 220px;min-width:0;">
+      <h3>Get new posts in your inbox</h3>
+      <p class="learn-email-sub">No spam — just new posts and learning pages when they ship.</p>
+    </div>
+    <form data-email-form>
+      <label class="sr-only" for="learn-email-inline-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Email address</label>
+      <input id="learn-email-inline-input" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com" />
+      <button type="submit" data-submit-label>Subscribe</button>
+    </form>
+  </div>
+  <p class="learn-email-status" data-email-status role="status" aria-live="polite" hidden></p>
+</section>
+<!-- learn-email-inline-end -->`
+
+// Email capture modal — opens on first visit, suppresses itself on dismiss
+// via localStorage. Browser-only (learn pages aren't SSR'd, so no platform
+// guard is needed).
+const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
+<style>
+#learn-email-modal-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;}
+#learn-email-modal-panel{position:relative;width:100%;max-width:440px;background:var(--surface, #1e1e26);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text, #e5e7eb);}
+#learn-email-modal-panel h2{margin:0 0 8px;font-size:20px;font-weight:700;color:var(--text, #e5e7eb);}
+#learn-email-modal-panel p.learn-email-sub{margin:0 0 20px;font-size:14px;color:var(--muted, #9696b0);}
+#learn-email-modal-panel input[type="email"]{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface2, #22222e);color:var(--text, #e5e7eb);font-size:14px;font-family:inherit;box-sizing:border-box;}
+#learn-email-modal-panel input[type="email"]:focus{outline:2px solid var(--accent);outline-offset:2px;border-color:var(--accent);}
+#learn-email-modal-panel input[type="email"]::placeholder{color:var(--muted, #9696b0);}
+#learn-email-modal-panel button.primary{padding:10px 18px;border-radius:8px;border:1px solid var(--accent);background:var(--accent);color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;width:100%;margin-top:12px;transition:filter .15s;}
+#learn-email-modal-panel button.primary:hover:not(:disabled){filter:brightness(0.92);}
+#learn-email-modal-panel button.primary:disabled{opacity:.6;cursor:not-allowed;}
+#learn-email-modal-panel .learn-email-status{font-size:13px;color:#f87171;margin-top:8px;}
+#learn-email-modal-panel .learn-email-status.is-success{color:var(--accent);}
+#learn-email-modal-panel .learn-email-fineprint{margin-top:12px;font-size:12px;color:var(--muted, #9696b0);}
+#learn-email-modal-close{position:absolute;top:10px;right:10px;width:32px;height:32px;border:0;background:transparent;color:var(--muted, #9696b0);cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;}
+#learn-email-modal-close:hover{background:var(--surface2, #22222e);color:var(--text, #e5e7eb);}
+#learn-email-modal-close:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#learn-email-modal-panel[data-state="success"] .learn-email-form{display:none;}
+#learn-email-modal-panel .learn-email-success{display:none;color:var(--text, #e5e7eb);font-size:14px;}
+#learn-email-modal-panel[data-state="success"] .learn-email-success{display:block;}
+#learn-email-modal-panel[data-state="success"] .learn-email-fineprint{display:none;}
+</style>
+<div id="learn-email-modal-backdrop" hidden role="dialog" aria-modal="true" aria-labelledby="learn-email-modal-title">
+  <div id="learn-email-modal-panel" data-state="idle">
+    <button type="button" id="learn-email-modal-close" aria-label="Close subscribe dialog">
+      <svg width="14" height="14" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    </button>
+    <h2 id="learn-email-modal-title">Stay in the loop?</h2>
+    <p class="learn-email-sub">Drop your email and I will send new posts and learning pages your way.</p>
+    <form class="learn-email-form" data-email-form>
+      <label class="sr-only" for="learn-email-modal-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Email address</label>
+      <input id="learn-email-modal-input" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com" />
+      <button type="submit" class="primary" data-submit-label>Subscribe</button>
+      <p class="learn-email-status" data-email-status role="alert" aria-live="assertive"></p>
+    </form>
+    <div class="learn-email-success" role="status" aria-live="polite">
+      <p style="margin:0 0 12px;color:var(--accent);font-weight:600;">Thanks — you are subscribed.</p>
+      <p style="margin:0;color:var(--muted, #9696b0);font-size:14px;">You can close this dialog now.</p>
+      <button type="button" class="primary" data-modal-close>Close</button>
+    </div>
+    <p class="learn-email-fineprint">We will only email you when there is something new. Unsubscribe any time.</p>
+  </div>
+</div>
+<!-- learn-email-modal-end -->`
+
+// Shared client-side wiring for the inline email field and the modal. Both
+// submit to /api/v1/subscribe, share the same DOM helpers, and the modal
+// persists a dismissal flag in localStorage so it never reopens for the same
+// browser. Kept inline (rather than a separate .js asset) so the plugin can
+// inject a self-contained block per page with no extra HTTP request.
+const EMAIL_CAPTURE_JS = `<script>
+(function () {
+  var DISMISS_KEY = 'learn-email-capture.dismissed.v1';
+  function safeGet(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+  function safeSet(key, value) { try { localStorage.setItem(key, value); } catch (e) {} }
+
+  function setStatus(node, message, kind) {
+    if (!node) return;
+    if (!message) { node.hidden = true; node.textContent = ''; node.className = 'learn-email-status'; return; }
+    node.hidden = false;
+    node.textContent = message;
+    node.className = 'learn-email-status' + (kind ? ' is-' + kind : '');
+  }
+
+  function submitForm(form, source) {
+    var input = form.querySelector('input[type="email"]');
+    var button = form.querySelector('[data-submit-label]');
+    var status = form.parentNode.querySelector('[data-email-status]') || form.querySelector('[data-email-status]');
+    if (!input || !button) return Promise.resolve({ ok: false });
+    var email = (input.value || '').trim();
+    if (!email) {
+      setStatus(status, 'Please enter your email address.', 'error');
+      input.focus();
+      return Promise.resolve({ ok: false });
+    }
+    button.disabled = true;
+    var originalLabel = button.textContent;
+    button.textContent = 'Subscribing…';
+    setStatus(status, '', null);
+    return fetch('/api/v1/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email, source: source })
+    }).then(function (res) {
+      return res.json().catch(function () { return {}); }).then(function (body) {
+        if (res.ok && body && body.ok) {
+          setStatus(status, 'Thanks — you are subscribed.', 'success');
+          input.value = '';
+          if (form.classList.contains('learn-email-form')) {
+            // Modal form — flip the panel to success state.
+            var panel = document.getElementById('learn-email-modal-panel');
+            if (panel) panel.setAttribute('data-state', 'success');
+          }
+          return { ok: true };
+        }
+        setStatus(status, (body && body.error) || 'Something went wrong. Please try again.', 'error');
+        return { ok: false };
+      });
+    }).catch(function () {
+      setStatus(status, 'Something went wrong. Please try again.', 'error');
+      return { ok: false };
+    }).then(function (result) {
+      button.disabled = false;
+      button.textContent = originalLabel;
+      return result;
+    });
+  }
+
+  function init() {
+    // Wire up every [data-email-form] on the page (inline + modal).
+    document.querySelectorAll('[data-email-form]').forEach(function (form) {
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var source = form.closest('[data-email-capture-source]')?.getAttribute('data-email-capture-source') || 'learn';
+        submitForm(form, source);
+      });
+    });
+
+    // Modal open/close wiring. Open once unless the reader already
+    // dismissed in a previous visit.
+    var backdrop = document.getElementById('learn-email-modal-backdrop');
+    if (backdrop) {
+      var closeBtn = document.getElementById('learn-email-modal-close');
+      var dismiss = function () {
+        backdrop.hidden = true;
+        backdrop.setAttribute('aria-hidden', 'true');
+        safeSet(DISMISS_KEY, '1');
+      };
+      if (closeBtn) closeBtn.addEventListener('click', dismiss);
+      backdrop.addEventListener('click', function (e) {
+        if (e.target === backdrop) dismiss();
+      });
+      document.addEventListener('keydown', function (e) {
+        if (!backdrop.hidden && (e.key === 'Escape' || e.key === 'Esc')) dismiss();
+      });
+      // The success state's "Close" button is rendered after data flips, so
+      // delegate clicks on [data-modal-close].
+      backdrop.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.matches && t.matches('[data-modal-close]')) dismiss();
+      });
+      if (!safeGet(DISMISS_KEY)) {
+        // Defer one frame so the page paints first.
+        requestAnimationFrame(function () {
+          backdrop.hidden = false;
+          backdrop.removeAttribute('aria-hidden');
+          var input = document.getElementById('learn-email-modal-input');
+          if (input) input.focus();
+        });
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>`
+
 // Share row injected near the end of every learn page. Mirrors the blog-post
 // share row (apps/blog-app/src/app/routes/blog/[slug].ts): four intent links
 // (X / LinkedIn / Reddit / Hacker News) + a copy-link button. Reads title and
@@ -179,18 +389,28 @@ const SHARE_HTML = `<!-- learn-share-start -->
 <!-- learn-share-end -->`
 
 function injectNav(html: string): string {
-  // Remove any previously injected nav/a11y/share blocks to avoid duplicates
-  // (dev re-injection / repeated closeBundle runs).
+  // Remove any previously injected nav/a11y/share/email blocks to avoid
+  // duplicates (dev re-injection / repeated closeBundle runs).
   const cleaned = html
     .replace(/<link[^>]+Material\+Icons[^>]*>\s*<style>\s*#learn-app-nav[\s\S]*?<\/nav>/m, '')
     .replace(/<!-- learn-a11y-start -->[\s\S]*?<!-- learn-a11y-end -->/m, '')
     .replace(/<!-- learn-share-start -->[\s\S]*?<!-- learn-share-end -->/m, '')
-  // Nav + a11y go right after <body> (top of page). Share row goes right
-  // before </body> — learn pages have no comments section, so bottom-of-page
-  // is the equivalent slot to "after the post, before comments" on the blog.
+    .replace(/<!-- learn-email-inline-start -->[\s\S]*?<!-- learn-email-inline-end -->/m, '')
+    .replace(/<!-- learn-email-modal-start -->[\s\S]*?<!-- learn-email-modal-end -->/m, '')
+  // Order at end of body (top-down):
+  //   1. Inline email capture field (above the share row)
+  //   2. Share row (existing)
+  //   3. Modal HTML (rendered hidden until JS opens it on first visit)
+  //   4. Email capture JS (wired last so it can find the above nodes)
+  //   5. Share row JS (existing)
+  const footer = `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
+  // Nav + a11y go right after <body> (top of page). Footer (inline + share +
+  // modal + scripts) goes right before </body> — learn pages have no
+  // comments section, so bottom-of-page is the equivalent slot to "after
+  // the post, before comments" on the blog.
   return cleaned
     .replace('<body>', `<body>\n${NAV_HTML}\n${A11Y_ADDON}`)
-    .replace('</body>', `${SHARE_HTML}\n</body>`)
+    .replace('</body>', `${footer}\n</body>`)
 }
 
 function scanLearnDir(dir: string) {

@@ -24,6 +24,9 @@ import { RouterLink } from '@angular/router'
 import { readingTimes } from 'virtual:reading-time-manifest'
 import { PostAttributes } from '../../blog/models'
 import { postMetaResolver, postTitleResolver } from '../../blog/resolvers'
+import { EmailCaptureModalComponent } from '../../email-capture/email-capture-modal.component'
+import { EmailCaptureService } from '../../email-capture/email-capture.service'
+import { InlineEmailCaptureComponent } from '../../email-capture/inline-email-capture.component'
 
 export const routeMeta: RouteMeta = {
   title: postTitleResolver,
@@ -32,7 +35,13 @@ export const routeMeta: RouteMeta = {
 
 @Component({
   standalone: true,
-  imports: [CommonModule, MarkdownComponent, RouterLink],
+  imports: [
+    CommonModule,
+    MarkdownComponent,
+    RouterLink,
+    InlineEmailCaptureComponent,
+    EmailCaptureModalComponent,
+  ],
   template: `
       <div class="relative mx-auto max-w-3xl px-6 lg:px-8">
         <nav class="flex py-4" aria-label="Breadcrumb">
@@ -151,6 +160,16 @@ export const routeMeta: RouteMeta = {
 
             <analog-markdown [content]="post.content" />
 
+            <!-- Inline email capture. Sits above the existing share row so a
+                 reader who finished the post sees the subscription prompt
+                 before the social share row. Shares the EmailCaptureService
+                 with the modal so both forms show consistent state. -->
+            <blog-inline-email-capture
+              [heading]="'Get new posts in your inbox'"
+              [subheading]="'No spam — just new posts and learning pages when they ship.'"
+              source="blog-inline"
+            ></blog-inline-email-capture>
+
             <!-- Share row. Sits between the article body and the comments section
                  so a reader who just finished the post is invited to share.
                  The action URLs (X, LinkedIn, Reddit, HN) are computed lazily
@@ -242,6 +261,12 @@ export const routeMeta: RouteMeta = {
         </div>
       </div>
 
+      <!-- Email capture modal. Browser-only; the modal template is gated by
+           the service signal so SSR/SSG output stays clean. Dismissing the
+           modal persists a flag in localStorage and never reopens for the
+           same reader. -->
+      <blog-email-capture-modal></blog-email-capture-modal>
+
       <!-- Comments section -->
       <div class="mx-auto max-w-prose mt-12 mb-12">
         <div #giscusContainer class="giscus-container"></div>
@@ -254,6 +279,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
   private readonly envInjector = inject(EnvironmentInjector)
   private readonly appRef = inject(ApplicationRef)
   private readonly platformId = inject(PLATFORM_ID)
+  private readonly emailCapture = inject(EmailCaptureService)
   private chartRefs: ComponentRef<unknown>[] = []
   private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
@@ -394,6 +420,10 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
       } else {
         this.canonicalUrl.set(window.location.href)
       }
+      // Open the email-capture modal once per browser, unless the reader has
+      // already dismissed it. The service persists the dismissal in
+      // localStorage so this is a no-op on subsequent visits.
+      this.emailCapture.maybeShowModal()
     }
   }
 
