@@ -17,6 +17,18 @@ const DISMISS_KEY = 'email-capture.dismissed.v1'
 // that interrupt the first scroll get dismissed at a much higher rate.
 const MODAL_DELAY_MS = 4000
 
+// Absolute URL of the deployed Cloud Run service that serves the
+// /api/v1/subscribe endpoint. The main site (dalenguyen.me) is a static
+// Vercel SSG build with no API routes, so a relative `/api/v1/subscribe`
+// from the browser would 404 against that origin. CORS on subscribe.ts
+// already whitelists https://dalenguyen.me and https://www.dalenguyen.me
+// for cross-origin POSTs, so the only thing this absolute URL changes is
+// where the request goes — we always intended to hit Cloud Run, since
+// that's the only deploy target with the Resend-backed route. The same
+// URL is used by the learn plugin's EMAIL_CAPTURE_JS for parity.
+const SUBSCRIBE_ENDPOINT =
+  'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe'
+
 export type EmailSubmitStatus = 'idle' | 'submitting' | 'success' | 'error'
 
 export interface EmailSubmitResult {
@@ -120,9 +132,9 @@ export class EmailCaptureService {
     this.errorMessage.set(null)
   }
 
-  // POST to /api/v1/subscribe. Returns the parsed result so callers can layer
-  // on extra behavior (e.g. close-on-success for the modal) without re-reading
-  // signals they just wrote.
+  // POST to the deployed Cloud Run subscribe endpoint. Returns the parsed
+  // result so callers can layer on extra behavior (e.g. close-on-success
+  // for the modal) without re-reading signals they just wrote.
   async submit(email: string, source: string): Promise<EmailSubmitResult> {
     const trimmed = email.trim()
     if (!trimmed) {
@@ -134,7 +146,7 @@ export class EmailCaptureService {
     this.errorMessage.set(null)
     try {
       const res = await firstValueFrom(
-        this.http.post<{ ok: boolean; error?: string }>('/api/v1/subscribe', {
+        this.http.post<{ ok: boolean; error?: string }>(SUBSCRIBE_ENDPOINT, {
           email: trimmed,
           source,
         }),

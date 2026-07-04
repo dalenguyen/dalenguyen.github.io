@@ -5,6 +5,16 @@ import type { Plugin, ResolvedConfig } from 'vite'
 const VIRTUAL_ID = 'virtual:learn-manifest'
 const RESOLVED_ID = '\0' + VIRTUAL_ID
 
+// Absolute URL of the deployed Cloud Run service that serves the
+// /api/v1/subscribe endpoint. The main site (dalenguyen.me) is a static
+// Vercel SSG build with no API routes, so a relative `/api/v1/subscribe`
+// from the browser would 404 against that origin. CORS on subscribe.ts
+// whitelists https://dalenguyen.me and https://www.dalenguyen.me, so the
+// form posts cross-origin to Cloud Run. The Angular-side email-capture
+// service uses the same URL for parity.
+const SUBSCRIBE_ENDPOINT =
+  'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe'
+
 const NAV_HTML = `<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
 #learn-app-nav{position:sticky;top:0;z-index:9999;background:#1e293b;box-shadow:0 1px 3px rgba(0,0,0,.4);display:flex;align-items:center;padding:0 24px;height:64px;gap:4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
@@ -65,17 +75,20 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 // Inline email capture + share row injected near the end of every learn
 // page. Mirrors the blog-post footer
 // (apps/blog-app/src/app/routes/blog/[slug].ts): the inline email field sits
-// above the existing share row, both forms POST to /api/v1/subscribe, and
-// the modal (see EMAIL_CAPTURE_HTML below) prompts on first visit. The same
-// localStorage flag (`learn-email-capture.dismissed.v1`) suppresses the
-// modal after a dismiss so it never reopens for that browser.
+// above the existing share row, both forms POST to the deployed Cloud Run
+// /api/v1/subscribe endpoint, and the modal (see EMAIL_CAPTURE_HTML below)
+// prompts on first visit. The same localStorage flag
+// (`learn-email-capture.dismissed.v1`) suppresses the modal after a dismiss
+// so it never reopens for that browser.
 //
-// The inline + modal HTML/JS is always injected at build time (so the
-// markup stays a single self-contained block per page and the JS can find
-// the nodes it wires). Visibility per request is then toggled in
-// EMAIL_CAPTURE_JS by reading the `?newsletter=true` query param — this
-// replaces the previous build-time EMAIL_CAPTURE_ENABLED flag so the UI
-// can be enabled per-request without a redeploy.
+// The inline + modal HTML is always injected at build time (so the markup
+// stays a single self-contained block per page and the JS can find the
+// nodes it wires). Visibility per request is then toggled in
+// EMAIL_CAPTURE_JS by reading the `?newsletter=false` query param — the UI
+// is enabled by default now that the Cloud Run + Resend backend is live,
+// and the param serves as a per-request opt-out (matching the original
+// #195 behavior). Replaces the previous `?newsletter=true` opt-in gate
+// from #199.
 //
 // Styled with each page's own `:root` custom properties (--surface /
 // --surface2, --border, --accent, --text, --muted) so it picks up the
@@ -119,8 +132,9 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
 
 // Email capture modal — opens on first visit, suppresses itself on dismiss
 // via localStorage. Browser-only (learn pages aren't SSR'd, so no platform
-// guard is needed). EMAIL_CAPTURE_JS only opens the modal when the current
-// URL carries `?newsletter=true`; otherwise it stays hidden and inert.
+// guard is needed). Email capture UI is enabled by default now; the modal
+// opens on first visit unless the current URL carries `?newsletter=false`
+// (per-request opt-out).
 const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 <style>
 #learn-email-modal-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;}
@@ -168,30 +182,37 @@ const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 <!-- learn-email-modal-end -->`
 
 // Shared client-side wiring for the inline email field and the modal. Both
-// submit to /api/v1/subscribe, share the same DOM helpers, and the modal
-// persists a dismissal flag in localStorage so it never reopens for the same
-// browser. Kept inline (rather than a separate .js asset) so the plugin can
-// inject a self-contained block per page with no extra HTTP request.
+// submit to the deployed Cloud Run subscribe endpoint, share the same DOM
+// helpers, and the modal persists a dismissal flag in localStorage so it
+// never reopens for the same browser. Kept inline (rather than a separate
+// .js asset) so the plugin can inject a self-contained block per page
+// with no extra HTTP request.
 //
 // The inline HTML/JS is always injected at build time, so the per-request
-// toggle lives here: when the current URL carries `?newsletter=true`, the
-// inline field stays visible and the modal opens once (unless already
-// dismissed); otherwise both are hidden — the inline section via the
-// `hidden` HTML attribute, the modal because we never open it. Reading the
-// query param client-side (rather than gating the build-time injection)
-// keeps the same self-contained block per page while letting the UI be
-// flipped on without a redeploy.
+// toggle lives here: the email capture UI is enabled by default (matching
+// the original #195 behavior, now that Cloud Run + Resend are live); the
+// current URL carrying `?newsletter=false` opts out per-request — hides
+// the inline section and skips opening the modal. Replaces the previous
+// `?newsletter=true` opt-in gate from #199.
 const EMAIL_CAPTURE_JS = `<script>
 (function () {
+  var SUBSCRIBE_ENDPOINT = 'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe';
   var DISMISS_KEY = 'learn-email-capture.dismissed.v1';
 
-  // ?newsletter=true opt-in. Computed once on script load so the inline
-  // section and the modal stay in sync for the lifetime of the page.
+  // Per-request toggle. The email capture UI is enabled by default — the
+  // modal opens on first visit and the inline field is visible unless the
+  // reader has dismissed the modal in a previous visit. Carrying
+  // ?newsletter=false on the URL opts out per-request (hides both). The
+  // previous ?newsletter=true opt-in from #199 has been flipped to this
+  // ?newsletter=false opt-out now that Cloud Run + Resend are live.
   function newsletterEnabled() {
     try {
-      return new URLSearchParams(window.location.search).get('newsletter') === 'true';
+      var v = new URLSearchParams(window.location.search).get('newsletter');
+      // Default true. The only opt-out is an explicit ?newsletter=false.
+      if (v === null) return true;
+      return v !== 'false';
     } catch (e) {
-      return false;
+      return true;
     }
   }
   var newsletterOn = newsletterEnabled();
@@ -222,7 +243,7 @@ const EMAIL_CAPTURE_JS = `<script>
     var originalLabel = button.textContent;
     button.textContent = 'Subscribing…';
     setStatus(status, '', null);
-    return fetch('/api/v1/subscribe', {
+    return fetch(SUBSCRIBE_ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, source: source })
@@ -252,9 +273,9 @@ const EMAIL_CAPTURE_JS = `<script>
   }
 
   function init() {
-    // Without the ?newsletter=true opt-in, hide the inline section so the
-    // page stays free of the form by default. The modal HTML stays in the
-    // DOM (hidden) — we just skip wiring its open() so it never auto-opens.
+    // With ?newsletter=false, hide the inline section and skip wiring the
+    // modal so the dismissal flag isn't created when the reader has opted
+    // out for this request. Default behavior is UI-on.
     if (!newsletterOn) {
       var inline = document.getElementById('learn-email-inline');
       if (inline) inline.hidden = true;
@@ -444,10 +465,10 @@ function injectNav(html: string): string {
   //   4. Email capture JS (wired last so it can find the above nodes)
   //   5. Share row JS (existing)
   // The email-capture blocks are always injected at build time; the JS
-  // hides both the inline section and skips the modal when the current
-  // URL doesn't carry `?newsletter=true`, replacing the previous
-  // build-time EMAIL_CAPTURE_ENABLED flag so the UI can be toggled per
-  // request without a redeploy.
+  // defaults the UI to visible (matching the original #195 behavior) and
+  // hides both the inline section and skips the modal when the current URL
+  // carries `?newsletter=false`. Replaces the previous `?newsletter=true`
+  // opt-in gate from #199 now that Cloud Run + Resend are live.
   const footer = `${EMAIL_INLINE_HTML}\n${SHARE_HTML}\n${EMAIL_MODAL_HTML}\n${EMAIL_CAPTURE_JS}`
   // Nav + a11y go right after <body> (top of page). Footer (inline + share +
   // modal + scripts) goes right before </body> — learn pages have no

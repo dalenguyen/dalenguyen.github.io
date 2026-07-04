@@ -163,9 +163,11 @@ export const routeMeta: RouteMeta = {
             <!-- Inline email capture. Sits above the existing share row so a
                  reader who finished the post sees the subscription prompt
                  before the social share row. Shares the EmailCaptureService
-                 with the modal so both forms show consistent state. Gated on
-                 the browser-only ?newsletter=true query param (see field)
-                 so the UI can be toggled per-request without a redeploy. -->
+                 with the modal so both forms show consistent state. Enabled
+                 by default now that Cloud Run + Resend are live; the
+                 browser-only ?newsletter=false query param is a per-request
+                 opt-out (see emailCaptureEnabled signal) matching the
+                 original #195 behavior. -->
             @if (emailCaptureEnabled()) {
               <blog-inline-email-capture
                 [heading]="'Get new posts in your inbox'"
@@ -265,12 +267,13 @@ export const routeMeta: RouteMeta = {
         </div>
       </div>
 
-      <!-- Email capture modal. Browser-only; the modal template is gated by
-           the service signal so SSR/SSG output stays clean. Dismissing the
-           modal persists a flag in localStorage and never reopens for the
-           same reader. Toggled per-request via the ?newsletter=true query
-           param (see emailCaptureEnabled signal) so the UI can be enabled
-           without a redeploy. -->
+      <!-- Email capture modal. Gated by the emailCaptureEnabled signal (see
+           field doc) so the modal/inline-field can be opted out per-request
+           via ?newsletter=false on the URL. Defaults to enabled so the UI
+           is shown to all readers, matching the original #195 behavior now
+           that the Cloud Run + Resend backend is live. The modal opens on
+           first visit unless the reader has already dismissed it (flag
+           persisted in localStorage by the EmailCaptureService). -->
       @if (emailCaptureEnabled()) {
         <blog-email-capture-modal></blog-email-capture-modal>
       }
@@ -289,18 +292,20 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
   private readonly platformId = inject(PLATFORM_ID)
   private readonly emailCapture = inject(EmailCaptureService)
 
-  // Backing signal for the ?newsletter=true query param check. Defaulted to
-  // false so SSR/SSG output never includes the email capture UI; flipped to
-  // true on the browser when the URL carries ?newsletter=true. Kept as a
-  // signal (not a plain field) so the template re-renders the @if branches
-  // when hydration flips it after mount.
-  private readonly newsletterParam = signal(false)
+  // Backing signal for the per-request `?newsletter=false` opt-out. Defaulted
+  // to true so SSR/SSG output (and the default browser request) renders the
+  // email capture UI — matching the original #195 behavior. Flipped to false
+  // on the browser when the URL carries an explicit `?newsletter=false`.
+  // Kept as a signal (not a plain field) so the template re-renders the @if
+  // branches when hydration flips it after mount.
+  private readonly newsletterParam = signal(true)
 
   // Per-request toggle for the email capture UI (modal + inline field).
-  // Reads the current URL's `?newsletter=true` query param on the browser;
-  // SSR/SSG always returns false so the prerendered HTML stays clean of
-  // the form. This replaces the previous hard-coded `emailCaptureEnabled`
-  // build flag so the UI can be enabled without a redeploy.
+  // True when the UI should be shown — defaults to true now that the
+  // Cloud Run + Resend backend is live (matches the original #195
+  // behavior). A URL carrying `?newsletter=false` opts out per-request.
+  // The previous `?newsletter=true` opt-in gate from #199 has been flipped
+  // to this `?newsletter=false` opt-out.
   readonly emailCaptureEnabled = computed(() => this.newsletterParam())
 
   private chartRefs: ComponentRef<unknown>[] = []
@@ -444,24 +449,32 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
         this.canonicalUrl.set(window.location.href)
       }
 
-      // Read the ?newsletter=true query param to gate the email capture UI
-      // (modal + inline field) for this request. Done client-side so the
-      // prerendered HTML stays clean (SSR returns false), and the value can
-      // be flipped without a redeploy by sharing /blog/<slug>?newsletter=true.
+      // Per-request opt-out for the email capture UI. The UI is enabled by
+      // default; carrying `?newsletter=false` on the URL hides both the
+      // inline field and the modal for this request. The previous
+      // `?newsletter=true` opt-in gate from #199 was flipped to this
+      // `?newsletter=false` opt-out now that Cloud Run + Resend are live.
       try {
         const params = new URLSearchParams(window.location.search)
-        this.newsletterParam.set(params.get('newsletter') === 'true')
+        const raw = params.get('newsletter')
+        if (raw !== null) {
+          // Only override the default when the param is explicitly present;
+          // any value other than the string "false" (including "true",
+          // "0", missing-before-query, etc.) keeps the UI on.
+          this.newsletterParam.set(raw !== 'false')
+        }
       } catch {
-        // Malformed URL — leave the default (off) so we never surprise a
-        // reader with a modal they didn't opt into.
-        this.newsletterParam.set(false)
+        // Malformed URL — leave the default (on) so the reader gets the
+        // intended default-on behavior rather than being silently opted
+        // out by a query string parse failure.
+        this.newsletterParam.set(true)
       }
 
       // Open the email-capture modal once per browser, unless the reader has
       // already dismissed it. The service persists the dismissal in
-      // localStorage so this is a no-op on subsequent visits. Gated by
-      // emailCaptureEnabled (see field doc) so the UI only appears when the
-      // current request opted in via ?newsletter=true.
+      // localStorage so this is a no-op on subsequent visits. The UI is
+      // enabled by default (matches the original #195 behavior); the only
+      // opt-out is `?newsletter=false` on the URL.
       if (this.emailCaptureEnabled()) {
         this.emailCapture.maybeShowModal()
       }
