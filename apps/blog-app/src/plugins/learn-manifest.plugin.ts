@@ -69,14 +69,17 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 // click time — learn pages aren't SSR'd, so no platform guard is needed.
 // Styled with each page's own `:root` custom properties (--surface/--surface2,
 // --border, --accent, --text, --muted) so it picks up the page's theme instead
-// of introducing new tokens. Wrapped in `<!-- learn-share-start/end -->` so the
-// same regex cleanup used for nav/a11y strips any previous injection on dev
-// re-requests.
+// of introducing new tokens. --muted/--surface2 carry a literal fallback (the
+// values used by most pages) since one outlier
+// (turboquant-vector-quantization.html) names its tokens differently
+// (--text-secondary/--bg-tertiary) and doesn't define them at all. Wrapped in
+// `<!-- learn-share-start/end -->` so the same regex cleanup used for nav/a11y
+// strips any previous injection on dev re-requests.
 const SHARE_HTML = `<!-- learn-share-start -->
 <style>
 #learn-share-row{max-width:920px;margin:48px auto 0;padding:24px 24px 8px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
-#learn-share-row .learn-share-label{font-size:13px;font-weight:600;color:var(--muted);margin-right:4px;letter-spacing:.04em;text-transform:uppercase;}
-#learn-share-row .learn-share-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);font-size:13px;font-weight:500;font-family:inherit;text-decoration:none;cursor:pointer;transition:color .15s,border-color .15s,background .15s,transform .05s;}
+#learn-share-row .learn-share-label{font-size:13px;font-weight:600;color:var(--muted, #9696b0);margin-right:4px;letter-spacing:.04em;text-transform:uppercase;}
+#learn-share-row .learn-share-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface2, #22222e);color:var(--muted, #9696b0);font-size:13px;font-weight:500;font-family:inherit;text-decoration:none;cursor:pointer;transition:color .15s,border-color .15s,background .15s,transform .05s;}
 #learn-share-row .learn-share-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(94,106,210,.08);}
 #learn-share-row .learn-share-btn:active{transform:translateY(1px);}
 #learn-share-row .learn-share-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
