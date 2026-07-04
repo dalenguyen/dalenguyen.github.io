@@ -62,12 +62,135 @@ const A11Y_ADDON = `<!-- learn-a11y-start -->
 </script>
 <!-- learn-a11y-end -->`
 
+// Share row injected near the end of every learn page. Mirrors the blog-post
+// share row (apps/blog-app/src/app/routes/blog/[slug].ts): four intent links
+// (X / LinkedIn / Reddit / Hacker News) + a copy-link button. Reads title and
+// canonical URL directly from `document.title` and `window.location.href` at
+// click time — learn pages aren't SSR'd, so no platform guard is needed.
+// Styled with each page's own `:root` custom properties (--surface/--surface2,
+// --border, --accent, --text, --muted) so it picks up the page's theme instead
+// of introducing new tokens. --muted/--surface2 carry a literal fallback (the
+// values used by most pages) since one outlier
+// (turboquant-vector-quantization.html) names its tokens differently
+// (--text-secondary/--bg-tertiary) and doesn't define them at all. Wrapped in
+// `<!-- learn-share-start/end -->` so the same regex cleanup used for nav/a11y
+// strips any previous injection on dev re-requests.
+const SHARE_HTML = `<!-- learn-share-start -->
+<style>
+#learn-share-row{max-width:920px;margin:48px auto 0;padding:24px 24px 8px;border-top:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+#learn-share-row .learn-share-label{font-size:13px;font-weight:600;color:var(--muted, #9696b0);margin-right:4px;letter-spacing:.04em;text-transform:uppercase;}
+#learn-share-row .learn-share-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:8px;border:1px solid var(--border);background:var(--surface2, #22222e);color:var(--muted, #9696b0);font-size:13px;font-weight:500;font-family:inherit;text-decoration:none;cursor:pointer;transition:color .15s,border-color .15s,background .15s,transform .05s;}
+#learn-share-row .learn-share-btn:hover{color:var(--accent);border-color:var(--accent);background:rgba(94,106,210,.08);}
+#learn-share-row .learn-share-btn:active{transform:translateY(1px);}
+#learn-share-row .learn-share-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+#learn-share-row .learn-share-btn svg{width:14px;height:14px;flex-shrink:0;}
+</style>
+<div id="learn-share-row" aria-label="Share this learning page">
+  <span class="learn-share-label">Share</span>
+  <a class="learn-share-btn" data-share="x" target="_blank" rel="noopener noreferrer" aria-label="Share on X">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M18.244 2H21l-6.52 7.453L22 22h-6.797l-5.32-6.957L3.8 22H1l7.02-8.025L1.5 2h6.957l4.81 6.36L18.244 2Zm-2.39 18.4h1.884L7.236 3.5H5.215L15.854 20.4Z"/></svg>
+    <span>X</span>
+  </a>
+  <a class="learn-share-btn" data-share="linkedin" target="_blank" rel="noopener noreferrer" aria-label="Share on LinkedIn">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5ZM3 9h4v12H3V9Zm7 0h3.8v1.7h.05c.53-.95 1.83-1.95 3.77-1.95 4.03 0 4.78 2.65 4.78 6.1V21h-4v-5.4c0-1.29-.02-2.95-1.8-2.95-1.8 0-2.07 1.4-2.07 2.85V21h-4V9Z"/></svg>
+    <span>LinkedIn</span>
+  </a>
+  <a class="learn-share-btn" data-share="reddit" target="_blank" rel="noopener noreferrer" aria-label="Share on Reddit">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M22 12.07a2.2 2.2 0 0 0-3.73-1.57c-1.4-.95-3.27-1.55-5.32-1.62l1.02-4.8 3.33.7a1.55 1.55 0 1 0 .16-1.04l-3.74-.79a.5.5 0 0 0-.59.38l-1.14 5.36c-2.08.06-3.97.66-5.39 1.62A2.2 2.2 0 1 0 4.2 14.5c-.04.22-.06.45-.06.69 0 3.1 3.52 5.6 7.86 5.6 4.34 0 7.86-2.5 7.86-5.6 0-.24-.02-.47-.06-.7A2.2 2.2 0 0 0 22 12.07Zm-13.4 2.43a1.55 1.55 0 1 1 3.1 0 1.55 1.55 0 0 1-3.1 0Zm7.76 3.66c-.95.95-2.78 1.02-3.36 1.02s-2.41-.07-3.36-1.02a.43.43 0 0 1 .6-.6c.56.55 1.75.76 2.76.76s2.2-.2 2.76-.76a.43.43 0 0 1 .6.6Zm-.26-2.11a1.55 1.55 0 1 1 0-3.1 1.55 1.55 0 0 1 0 3.1Z"/></svg>
+    <span>Reddit</span>
+  </a>
+  <a class="learn-share-btn" data-share="hn" target="_blank" rel="noopener noreferrer" aria-label="Share on Hacker News">
+    <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"><path d="M3 3h18v18H3V3Zm10.2 12.4 3.05-4.93h-1.86l-1.66 2.97-1.57-2.97h-1.94l3.05 4.93v3.38h.93v-3.38Zm-5.95-6.84h-1.07l4.36 6.53v3.69h.93v-3.69l4.36-6.53h-1.07l-3.75 5.77-3.76-5.77Z"/></svg>
+    <span>Hacker News</span>
+  </a>
+  <button type="button" class="learn-share-btn" data-share="copy" aria-label="Copy link to clipboard">
+    <svg data-share-icon="default" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.07 0l3-3a5 5 0 0 0-7.07-7.07l-1.5 1.5"/><path d="M14 11a5 5 0 0 0-7.07 0l-3 3a5 5 0 0 0 7.07 7.07l1.5-1.5"/></svg>
+    <svg data-share-icon="copied" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><path d="M20 6 9 17l-5-5"/></svg>
+    <span data-share-label>Copy link</span>
+  </button>
+</div>
+<script>
+(function () {
+  function shareUrl(network, url, title) {
+    var u = encodeURIComponent(url);
+    var t = encodeURIComponent(title);
+    switch (network) {
+      case 'x':       return 'https://twitter.com/intent/tweet?text=' + t + '&url=' + u;
+      case 'linkedin':return 'https://www.linkedin.com/sharing/share-offsite/?url=' + u;
+      case 'reddit':  return 'https://www.reddit.com/submit?url=' + u + '&title=' + t;
+      case 'hn':      return 'https://news.ycombinator.com/submitlink?u=' + u + '&t=' + t;
+    }
+    return '';
+  }
+  function init() {
+    var row = document.getElementById('learn-share-row');
+    if (!row) return;
+    var currentUrl = window.location.href;
+    var currentTitle = document.title;
+
+    row.querySelectorAll('[data-share]').forEach(function (el) {
+      var network = el.getAttribute('data-share');
+      if (network === 'copy') {
+        el.addEventListener('click', function () {
+          var labelEl = el.querySelector('[data-share-label]');
+          var defaultIcon = el.querySelector('[data-share-icon="default"]');
+          var copiedIcon = el.querySelector('[data-share-icon="copied"]');
+          function fallbackCopy(text) {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); } catch (e) {}
+            document.body.removeChild(ta);
+          }
+          var done = function () {
+            if (labelEl) labelEl.textContent = 'Copied!';
+            if (defaultIcon) defaultIcon.style.display = 'none';
+            if (copiedIcon) copiedIcon.style.display = '';
+            el.setAttribute('aria-label', 'Link copied to clipboard');
+            setTimeout(function () {
+              if (labelEl) labelEl.textContent = 'Copy link';
+              if (defaultIcon) defaultIcon.style.display = '';
+              if (copiedIcon) copiedIcon.style.display = 'none';
+              el.setAttribute('aria-label', 'Copy link to clipboard');
+            }, 2000);
+          };
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(currentUrl).then(done, function () {
+              fallbackCopy(currentUrl);
+              done();
+            });
+          } else {
+            fallbackCopy(currentUrl);
+            done();
+          }
+        });
+      } else {
+        el.setAttribute('href', shareUrl(network, currentUrl, currentTitle));
+      }
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+<!-- learn-share-end -->`
+
 function injectNav(html: string): string {
-  // Remove any previously injected nav/a11y blocks to avoid duplicates (dev re-injection)
+  // Remove any previously injected nav/a11y/share blocks to avoid duplicates
+  // (dev re-injection / repeated closeBundle runs).
   const cleaned = html
     .replace(/<link[^>]+Material\+Icons[^>]*>\s*<style>\s*#learn-app-nav[\s\S]*?<\/nav>/m, '')
     .replace(/<!-- learn-a11y-start -->[\s\S]*?<!-- learn-a11y-end -->/m, '')
-  return cleaned.replace('<body>', `<body>\n${NAV_HTML}\n${A11Y_ADDON}`)
+    .replace(/<!-- learn-share-start -->[\s\S]*?<!-- learn-share-end -->/m, '')
+  // Nav + a11y go right after <body> (top of page). Share row goes right
+  // before </body> — learn pages have no comments section, so bottom-of-page
+  // is the equivalent slot to "after the post, before comments" on the blog.
+  return cleaned
+    .replace('<body>', `<body>\n${NAV_HTML}\n${A11Y_ADDON}`)
+    .replace('</body>', `${SHARE_HTML}\n</body>`)
 }
 
 function scanLearnDir(dir: string) {
