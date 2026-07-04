@@ -9,6 +9,14 @@ import { firstValueFrom } from 'rxjs'
 // migration step.
 const DISMISS_KEY = 'email-capture.dismissed.v1'
 
+// How long, in milliseconds, to wait after `maybeShowModal()` is called
+// before actually opening the modal. The previous behavior was a single
+// microtask (`Promise.resolve().then`), which fired essentially immediately
+// after route activation. A few-second delay lets the reader land on the
+// page and start reading before being interrupted — empirically, prompts
+// that interrupt the first scroll get dismissed at a much higher rate.
+const MODAL_DELAY_MS = 4000
+
 export type EmailSubmitStatus = 'idle' | 'submitting' | 'success' | 'error'
 
 export interface EmailSubmitResult {
@@ -39,6 +47,12 @@ export class EmailCaptureService {
   readonly status = signal<EmailSubmitStatus>('idle')
   readonly errorMessage = signal<string | null>(null)
 
+  // Pending timer for the delayed modal-open. Tracked so back-to-back calls
+  // to `maybeShowModal()` (e.g. SPA navigations between blog posts before
+  // the first timer fires) don't stack timers and open the modal twice, and
+  // so we don't keep a reference around after it fires.
+  private modalOpenTimer: ReturnType<typeof setTimeout> | null = null
+
   // Returns true when the browser has not yet dismissed the modal. Safe to
   // call during SSR — falls through to `false` on the server.
   private hasDismissed(): boolean {
@@ -53,27 +67,50 @@ export class EmailCaptureService {
     }
   }
 
-  // Open the modal unless the reader has already dismissed it in a previous
-  // visit. Called from the blog/learn pages' ngOnInit. Idempotent.
-  maybeShowModal(): void {
-    if (!isPlatformBrowser(this.platformId)) return
-    if (this.hasDismissed()) return
-    // Defer one frame so the modal renders after the route's content, not
-    // before it — avoids an empty-content flash when the route is lazy.
-    Promise.resolve().then(() => this.modalOpen.set(true))
-  }
-
-  // Close the modal and persist the dismissal. The flag is what makes the
-  // acceptance criterion hold: "never reopens after being closed once".
-  dismissModal(): void {
-    this.modalOpen.set(false)
-    this.resetStatus()
+  // Persist the dismissal flag in localStorage. Browser-only; silently
+  // swallows storage errors so the modal UX still works in privacy modes
+  // and sandboxed iframes where localStorage throws on write.
+  private persistDismissal(): void {
     if (!isPlatformBrowser(this.platformId)) return
     try {
       this.document.defaultView?.localStorage.setItem(DISMISS_KEY, '1')
     } catch {
       // Ignore — see hasDismissed().
     }
+  }
+
+  // Open the modal unless the reader has already dismissed it in a previous
+  // visit. Called from the blog/learn pages' ngOnInit. Idempotent: if a
+  // delayed open is already scheduled, this call replaces it with a fresh
+  // timer rather than stacking another one.
+  maybeShowModal(): void {
+    if (!isPlatformBrowser(this.platformId)) return
+    if (this.modalOpen()) return
+    if (this.modalOpenTimer !== null) return
+    if (this.hasDismissed()) return
+    // Defer opening the modal by a few seconds so the reader has a chance
+    // to start reading the post before being interrupted. Re-checks
+    // `hasDismissed()` when the timer fires so a successful inline submit
+    // during the delay window still suppresses the modal.
+    this.modalOpenTimer = setTimeout(() => {
+      this.modalOpenTimer = null
+      if (this.hasDismissed()) return
+      this.modalOpen.set(true)
+    }, MODAL_DELAY_MS)
+  }
+
+  // Close the modal and persist the dismissal. The flag is what makes the
+  // acceptance criterion hold: "never reopens after being closed once".
+  dismissModal(): void {
+    // Cancel a pending delayed open so the modal doesn't pop up after the
+    // reader has already dismissed it on this visit (e.g. X → navigate).
+    if (this.modalOpenTimer !== null) {
+      clearTimeout(this.modalOpenTimer)
+      this.modalOpenTimer = null
+    }
+    this.modalOpen.set(false)
+    this.resetStatus()
+    this.persistDismissal()
   }
 
   // Reset submission state. Called when the modal opens/closes so a previous
@@ -104,6 +141,16 @@ export class EmailCaptureService {
       )
       if (res?.ok) {
         this.status.set('success')
+        // Persist the dismissal flag so the modal never reopens for this
+        // browser, regardless of which form (modal or inline) the reader
+        // used to subscribe. Also cancels any pending delayed open so a
+        // successful inline submit while the modal is mid-delay doesn't
+        // get followed by a pop-up a moment later.
+        if (this.modalOpenTimer !== null) {
+          clearTimeout(this.modalOpenTimer)
+          this.modalOpenTimer = null
+        }
+        this.persistDismissal()
         return { ok: true }
       }
       this.status.set('error')
