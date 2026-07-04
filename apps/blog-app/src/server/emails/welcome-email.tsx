@@ -1,4 +1,15 @@
+/** @jsx React.createElement */
+/** @jsxFrag React.Fragment */
 import * as React from 'react'
+
+// Pragma comments above force esbuild's classic JSX transform to
+// React.createElement/React.Fragment for this file. Nitro's build otherwise
+// defaults JSX to the `h` pragma (a Vue/Nuxt-ecosystem convention) since
+// nothing in this repo configures a jsxFactory — confirmed live 2026-07-04:
+// without this, every element in this file compiled to a bare `h(...)` call
+// with no `h` in scope, so rendering threw "h is not defined" at runtime
+// (not caught by the build — esbuild doesn't verify the factory identifier
+// exists until the code actually runs).
 
 // Welcome email sent to a reader right after a successful subscribe via the
 // email capture form. Renders to an HTML email body via
