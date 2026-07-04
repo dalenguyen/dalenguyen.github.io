@@ -202,9 +202,9 @@ const EMAIL_CAPTURE_JS = `<script>
   // Per-request toggle. The email capture UI is enabled by default — the
   // modal opens on first visit and the inline field is visible unless the
   // reader has dismissed the modal in a previous visit. Carrying
-  // `?newsletter=false` on the URL opts out per-request (hides both). The
-  // previous `?newsletter=true` opt-in from #199 has been flipped to this
-  // `?newsletter=false` opt-out now that Cloud Run + Resend are live.
+  // ?newsletter=false on the URL opts out per-request (hides both). The
+  // previous ?newsletter=true opt-in from #199 has been flipped to this
+  // ?newsletter=false opt-out now that Cloud Run + Resend are live.
   function newsletterEnabled() {
     try {
       var v = new URLSearchParams(window.location.search).get('newsletter');
