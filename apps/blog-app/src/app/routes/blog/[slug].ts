@@ -163,10 +163,10 @@ export const routeMeta: RouteMeta = {
             <!-- Inline email capture. Sits above the existing share row so a
                  reader who finished the post sees the subscription prompt
                  before the social share row. Shares the EmailCaptureService
-                 with the modal so both forms show consistent state.
-                 Hidden behind emailCaptureEnabled until #196 wires the
-                 Resend API key into the Cloud Run deploy. -->
-            @if (emailCaptureEnabled) {
+                 with the modal so both forms show consistent state. Gated on
+                 the browser-only ?newsletter=true query param (see field)
+                 so the UI can be toggled per-request without a redeploy. -->
+            @if (emailCaptureEnabled()) {
               <blog-inline-email-capture
                 [heading]="'Get new posts in your inbox'"
                 [subheading]="'No spam — just new posts and learning pages when they ship.'"
@@ -268,9 +268,10 @@ export const routeMeta: RouteMeta = {
       <!-- Email capture modal. Browser-only; the modal template is gated by
            the service signal so SSR/SSG output stays clean. Dismissing the
            modal persists a flag in localStorage and never reopens for the
-           same reader. Hidden behind emailCaptureEnabled until #196 wires
-           the Resend API key into the Cloud Run deploy. -->
-      @if (emailCaptureEnabled) {
+           same reader. Toggled per-request via the ?newsletter=true query
+           param (see emailCaptureEnabled signal) so the UI can be enabled
+           without a redeploy. -->
+      @if (emailCaptureEnabled()) {
         <blog-email-capture-modal></blog-email-capture-modal>
       }
 
@@ -287,10 +288,21 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
   private readonly appRef = inject(ApplicationRef)
   private readonly platformId = inject(PLATFORM_ID)
   private readonly emailCapture = inject(EmailCaptureService)
-  // Kill switch for the email capture UI (modal + inline field) until #196
-  // wires RESEND_API_KEY into the Cloud Run deploy. Flip to true once that
-  // ships so the form isn't live before it can actually reach Resend.
-  readonly emailCaptureEnabled = false
+
+  // Backing signal for the ?newsletter=true query param check. Defaulted to
+  // false so SSR/SSG output never includes the email capture UI; flipped to
+  // true on the browser when the URL carries ?newsletter=true. Kept as a
+  // signal (not a plain field) so the template re-renders the @if branches
+  // when hydration flips it after mount.
+  private readonly newsletterParam = signal(false)
+
+  // Per-request toggle for the email capture UI (modal + inline field).
+  // Reads the current URL's `?newsletter=true` query param on the browser;
+  // SSR/SSG always returns false so the prerendered HTML stays clean of
+  // the form. This replaces the previous hard-coded `emailCaptureEnabled`
+  // build flag so the UI can be enabled without a redeploy.
+  readonly emailCaptureEnabled = computed(() => this.newsletterParam())
+
   private chartRefs: ComponentRef<unknown>[] = []
   private giscusObserver?: IntersectionObserver
   readonly post = toSignal(injectContent<PostAttributes>())
@@ -431,11 +443,26 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
       } else {
         this.canonicalUrl.set(window.location.href)
       }
+
+      // Read the ?newsletter=true query param to gate the email capture UI
+      // (modal + inline field) for this request. Done client-side so the
+      // prerendered HTML stays clean (SSR returns false), and the value can
+      // be flipped without a redeploy by sharing /blog/<slug>?newsletter=true.
+      try {
+        const params = new URLSearchParams(window.location.search)
+        this.newsletterParam.set(params.get('newsletter') === 'true')
+      } catch {
+        // Malformed URL — leave the default (off) so we never surprise a
+        // reader with a modal they didn't opt into.
+        this.newsletterParam.set(false)
+      }
+
       // Open the email-capture modal once per browser, unless the reader has
       // already dismissed it. The service persists the dismissal in
       // localStorage so this is a no-op on subsequent visits. Gated by
-      // emailCaptureEnabled (see field doc) until #196 ships.
-      if (this.emailCaptureEnabled) {
+      // emailCaptureEnabled (see field doc) so the UI only appears when the
+      // current request opted in via ?newsletter=true.
+      if (this.emailCaptureEnabled()) {
         this.emailCapture.maybeShowModal()
       }
     }
