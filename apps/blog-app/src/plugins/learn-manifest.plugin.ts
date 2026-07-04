@@ -198,7 +198,7 @@ const EMAIL_CAPTURE_JS = `<script>
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email: email, source: source })
     }).then(function (res) {
-      return res.json().catch(function () { return {}); }).then(function (body) {
+      return res.json().catch(function () { return {} }).then(function (body) {
         if (res.ok && body && body.ok) {
           setStatus(status, 'Thanks — you are subscribed.', 'success');
           input.value = '';
