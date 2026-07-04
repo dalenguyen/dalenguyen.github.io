@@ -3,7 +3,7 @@ title: "Build a Coding Agent From Scratch — Part 1: The Core"
 slug: 2026-07-03-build-a-coding-agent-from-scratch
 description: A coding agent is a loop around one primitive — a tool call. Build the whole core from scratch in Python, running on a local Ollama model or NVIDIA's free NIM tier, with no Anthropic key required.
 categories: ['agents', 'llm', 'python', 'developer-tools', 'ollama']
-coverImage: https://dalenguyen.me/assets/images/blog/build-a-coding-agent-from-scratch.png
+coverImage: https://dalenguyen.me/assets/images/blog/2026-07-03-build-a-coding-agent-from-scratch.png
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2026-07-03T00:00:00.000Z
 author: Dale Nguyen
