@@ -108,6 +108,7 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
 <style>
 #learn-email-inline{max-width:920px;margin:48px auto 0;padding:0 24px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 #learn-email-inline .learn-email-card{border:1px solid var(--border);background:var(--surface, #1e1e26);border-radius:16px;padding:24px;display:flex;flex-wrap:wrap;gap:16px;align-items:center;justify-content:space-between;}
+#learn-email-inline .learn-email-text{flex:1 1 220px;min-width:0;}
 #learn-email-inline h3{margin:0 0 4px;font-size:18px;font-weight:600;color:var(--text, #e5e7eb);}
 #learn-email-inline p.learn-email-sub{margin:0;font-size:14px;color:var(--muted, #9696b0);}
 #learn-email-inline form{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1 1 280px;justify-content:flex-end;}
@@ -119,14 +120,14 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
 #learn-email-inline button:active:not(:disabled){transform:translateY(1px);}
 #learn-email-inline button:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
 #learn-email-inline button:disabled{opacity:.6;cursor:not-allowed;}
-#learn-email-inline .learn-email-status{margin-top:12px;font-size:13px;color:var(--muted, #9696b0);}
+#learn-email-inline .learn-email-status{flex:0 0 100%;margin-top:12px;font-size:13px;color:var(--muted, #9696b0);}
 #learn-email-inline .learn-email-status.is-success{color:var(--accent);}
 #learn-email-inline .learn-email-status.is-error{color:#f87171;}
-@media(max-width:640px){#learn-email-inline .learn-email-card{flex-direction:column;align-items:stretch;}#learn-email-inline form{justify-content:stretch;}}
+@media(max-width:640px){#learn-email-inline .learn-email-card{flex-direction:column;align-items:stretch;}#learn-email-inline .learn-email-text{flex:none;}#learn-email-inline form{flex:none;justify-content:stretch;}}
 </style>
 <section id="learn-email-inline" aria-label="Subscribe for updates" data-email-capture-source="inline">
   <div class="learn-email-card">
-    <div style="flex:1 1 220px;min-width:0;">
+    <div class="learn-email-text">
       <h3>Get new posts in your inbox</h3>
       <p class="learn-email-sub">No spam — just new posts and learning pages when they ship.</p>
     </div>
@@ -134,9 +135,9 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
       <label class="sr-only" for="learn-email-inline-input" style="position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;">Email address</label>
       <input id="learn-email-inline-input" name="email" type="email" inputmode="email" autocomplete="email" required placeholder="you@example.com" />
       <button type="submit" data-submit-label>Subscribe</button>
+      <p class="learn-email-status" data-email-status role="status" aria-live="polite" hidden></p>
     </form>
   </div>
-  <p class="learn-email-status" data-email-status role="status" aria-live="polite" hidden></p>
 </section>
 <!-- learn-email-inline-end -->`
 
