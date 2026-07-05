@@ -1,5 +1,7 @@
 import { injectContentFiles } from '@analogjs/content'
 import { MetaTag } from '@analogjs/router'
+import { DOCUMENT } from '@angular/common'
+import { inject } from '@angular/core'
 import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router'
 import { PostAttributes } from './models'
 
@@ -47,4 +49,22 @@ export const postMetaResolver: ResolveFn<MetaTag[]> = (route) => {
       content: postAttributes.coverImage,
     },
   ]
+}
+
+// Runs at route-resolution time (before the component mounts) rather than as a
+// component-level effect() — that ran too late to make it into the prerendered
+// SSG HTML (GSC was reporting "no user-declared canonical" on every post,
+// likely feeding the large "Crawled - currently not indexed" bucket). Fixed at
+// the prod origin regardless of which origin served the request, so preview
+// deployments canonicalize to prod instead of getting indexed as duplicates.
+export const postCanonicalResolver: ResolveFn<void> = (route) => {
+  const { slug } = injectActivePostAttributes(route)
+  const document = inject(DOCUMENT)
+  let link = document.querySelector<HTMLLinkElement>('link[rel="canonical"]')
+  if (!link) {
+    link = document.createElement('link')
+    link.setAttribute('rel', 'canonical')
+    document.head.appendChild(link)
+  }
+  link.setAttribute('href', `https://dalenguyen.me/blog/${slug}`)
 }

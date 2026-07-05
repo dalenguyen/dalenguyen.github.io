@@ -128,6 +128,15 @@ export default defineConfig(({ mode }) => {
                       const slug = file.attributes['slug'] || file.name
                       return `/blog/${slug}`
                     },
+                    // Without this, Analog defaults lastmod to the build date for every
+                    // post, so the sitemap claims all posts changed today on every deploy —
+                    // a signal Google can end up distrusting/deprioritizing entirely.
+                    sitemap: (file: PrerenderContentFile) => {
+                      const published = file.attributes['published']
+                      return published
+                        ? { lastmod: new Date(published).toISOString().split('T')[0] }
+                        : {}
+                    },
                   },
                 ],
                 postRenderingHooks: [
@@ -184,7 +193,14 @@ export default defineConfig(({ mode }) => {
                   },
                 ],
                 sitemap: {
-                  host: 'https://dalenguyen.me/',
+                  // No trailing slash: AnalogJS's sitemap builder looks up each
+                  // route's per-page config (our lastmod fn below) by re-deriving
+                  // a URL key from `host` + route path, and a trailing slash
+                  // makes that derived key lose its leading "/" — silently
+                  // breaking the lookup for every routeSitemaps entry, so all
+                  // pages fell back to today's build date regardless of what
+                  // the per-route `sitemap` fn below returned.
+                  host: 'https://dalenguyen.me',
                 },
               }
             : undefined,

@@ -23,7 +23,7 @@ import { toSignal } from '@angular/core/rxjs-interop'
 import { RouterLink } from '@angular/router'
 import { readingTimes } from 'virtual:reading-time-manifest'
 import { PostAttributes } from '../../blog/models'
-import { postMetaResolver, postTitleResolver } from '../../blog/resolvers'
+import { postCanonicalResolver, postMetaResolver, postTitleResolver } from '../../blog/resolvers'
 import { EmailCaptureModalComponent } from '../../email-capture/email-capture-modal.component'
 import { EmailCaptureService } from '../../email-capture/email-capture.service'
 import { InlineEmailCaptureComponent } from '../../email-capture/inline-email-capture.component'
@@ -31,6 +31,9 @@ import { InlineEmailCaptureComponent } from '../../email-capture/inline-email-ca
 export const routeMeta: RouteMeta = {
   title: postTitleResolver,
   meta: postMetaResolver,
+  resolve: {
+    canonical: postCanonicalResolver,
+  },
 }
 
 @Component({
