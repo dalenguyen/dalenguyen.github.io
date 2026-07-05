@@ -19,12 +19,14 @@ import { sendWelcomeEmail } from '../../emails/send-welcome'
 // contact id) but silently does not persist anything — confirmed live against
 // the real API on 2026-07-04, don't revert to it.
 //
-// CORS: the main site (dalenguyen.me) is a Vercel static SSG build with no
-// API routes, so the capture form posts cross-origin to this Cloud Run origin
-// (blog-app-185772516206.us-central1.run.app). We allow exactly that origin
-// (plus localhost for dev) and echo it back as Access-Control-Allow-Origin.
-// Preflight OPTIONS is handled here too — without it the browser blocks the
-// real POST before it leaves the page.
+// CORS: the apex `https://dalenguyen.me` is now served by this same Cloud
+// Run instance, so the browser's same-origin `POST /api/v1/subscribe` from
+// the page never trips a CORS preflight. The allowlist below is kept as a
+// safety net for external consumers (the previous absolute-URL workaround
+// pointed the modal/inline form at this Cloud Run origin cross-origin, and
+// a future proxy / dev tunnel could reintroduce that shape). Preflight
+// OPTIONS is handled here too — without it the browser blocks the real
+// POST before it leaves the page on any cross-origin consumer.
 //
 // Welcome email: every successful signup (Resend-configured OR dev no-op)
 // triggers a fire-and-forget transactional send via Resend's /emails endpoint.
