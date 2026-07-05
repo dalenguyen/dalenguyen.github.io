@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "routes": [
+    { "src": "/learn/([^/]+)", "dest": "/learn/$1.html", "check": true }
+  ]
+}

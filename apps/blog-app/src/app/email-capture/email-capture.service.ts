@@ -17,17 +17,21 @@ const DISMISS_KEY = 'email-capture.dismissed.v1'
 // that interrupt the first scroll get dismissed at a much higher rate.
 const MODAL_DELAY_MS = 4000
 
-// Absolute URL of the deployed Cloud Run service that serves the
-// /api/v1/subscribe endpoint. The main site (dalenguyen.me) is a static
-// Vercel SSG build with no API routes, so a relative `/api/v1/subscribe`
-// from the browser would 404 against that origin. CORS on subscribe.ts
-// already whitelists https://dalenguyen.me and https://www.dalenguyen.me
-// for cross-origin POSTs, so the only thing this absolute URL changes is
-// where the request goes — we always intended to hit Cloud Run, since
-// that's the only deploy target with the Resend-backed route. The same
-// URL is used by the learn plugin's EMAIL_CAPTURE_JS for parity.
-const SUBSCRIBE_ENDPOINT =
-  'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe'
+// Relative `/api/v1/subscribe` endpoint. The apex `https://dalenguyen.me`
+// is now served by the same Cloud Run instance that hosts this Angular
+// app, so the subscribe request is same-origin and avoids CORS / cookie /
+// future-proxy surprises. `www.dalenguyen.me` (still Vercel static) has no
+// `/api` route — a subscribe attempt from there will 404, but the modal /
+// inline field are wired in `routes/blog/[slug].ts` and only enabled when
+// `?newsletter=false` is absent, so phasing Vercel out removes that host
+// from the request path entirely. The learn plugin's `EMAIL_CAPTURE_JS`
+// uses the same relative URL for parity.
+//
+// REGRESSION NOTE: do NOT reintroduce an absolute Cloud Run URL here —
+// the same-origin relative path is intentional now that the apex IS Cloud
+// Run, and an absolute URL would make the request cross-origin again,
+// re-introducing the CORS allowlist dependency.
+const SUBSCRIBE_ENDPOINT = '/api/v1/subscribe'
 
 export type EmailSubmitStatus = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -132,9 +136,9 @@ export class EmailCaptureService {
     this.errorMessage.set(null)
   }
 
-  // POST to the deployed Cloud Run subscribe endpoint. Returns the parsed
-  // result so callers can layer on extra behavior (e.g. close-on-success
-  // for the modal) without re-reading signals they just wrote.
+  // POST to the same-origin subscribe endpoint. Returns the parsed result so
+  // callers can layer on extra behavior (e.g. close-on-success for the
+  // modal) without re-reading signals they just wrote.
   async submit(email: string, source: string): Promise<EmailSubmitResult> {
     const trimmed = email.trim()
     if (!trimmed) {
