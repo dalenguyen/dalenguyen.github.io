@@ -45,6 +45,7 @@ export interface WelcomeEmailProps {
 
 const DEFAULT_AUTHOR = 'Dale Nguyen'
 const DEFAULT_SITE_URL = 'https://dalenguyen.me'
+const BLOG_PATH = '/blog'
 const UNSUBSCRIBE_URL = 'https://dalenguyen.me/unsubscribe'
 
 // Email-safe palette. Mirrors the dark-mode palette used on the blog so the
@@ -109,6 +110,17 @@ function container(children: React.ReactNode): React.ReactElement {
   )
 }
 
+// Resolve the blog listing URL from the site URL. The CTA in the email must
+// point at the blog listing (e.g. https://dalenguyen.me/blog), not the bare
+// site root — readers subscribed from a post and expect to land back on
+// recent content. We strip any trailing slash from `siteUrl` before joining
+// the blog path so a misconfigured caller with `siteUrl = 'https://x.com/'`
+// doesn't produce a doubled slash like `https://x.com//blog`.
+function resolveBlogUrl(siteUrl: string): string {
+  const base = siteUrl.replace(/\/+$/, '')
+  return `${base}${BLOG_PATH}`
+}
+
 export function WelcomeEmail({
   email,
   authorName = DEFAULT_AUTHOR,
@@ -117,6 +129,7 @@ export function WelcomeEmail({
 }: WelcomeEmailProps): React.ReactElement {
   const greeting = firstName?.trim() ? `Hi ${firstName.trim()},` : 'Hi there,'
   const unsubscribeHref = `${UNSUBSCRIBE_URL}?email=${encodeURIComponent(email)}`
+  const blogUrl = resolveBlogUrl(siteUrl)
 
   // Use an explicit Fragment rather than the JSX `<>...</>` shorthand so the
   // children passed to `container` are unambiguously a ReactElement (and the
@@ -173,7 +186,7 @@ export function WelcomeEmail({
               }}
             >
               <a
-                href={siteUrl}
+                href={blogUrl}
                 style={{
                   backgroundColor: colors.accent,
                   borderRadius: 8,
