@@ -131,6 +131,11 @@ const PHASE_LABELS: Record<Phase, string> = {
         text-align: left;
         color: #e6edf3;
         font: 15px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        /* Every step swaps in code/inspector content of a different height.
+           Without this, the browser's scroll-anchoring "helpfully" adjusts
+           scrollTop to compensate for the resize, which reads as the page
+           auto-scrolling on every click (and every 2.2s during Play). */
+        overflow-anchor: none;
       }
       .card {
         background: #161b22;
