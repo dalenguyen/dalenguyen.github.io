@@ -148,6 +148,7 @@ const EMAIL_INLINE_HTML = `<!-- learn-email-inline-start -->
 const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 <style>
 #learn-email-modal-backdrop{position:fixed;inset:0;z-index:99999;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);display:flex;align-items:center;justify-content:center;padding:16px;}
+#learn-email-modal-backdrop[hidden]{display:none;}
 #learn-email-modal-panel{position:relative;width:100%;max-width:440px;background:var(--surface, #1e1e26);border:1px solid var(--border);border-radius:16px;padding:24px;box-shadow:0 25px 50px -12px rgba(0,0,0,.5);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;color:var(--text, #e5e7eb);}
 #learn-email-modal-panel h2{margin:0 0 8px;font-size:20px;font-weight:700;color:var(--text, #e5e7eb);}
 #learn-email-modal-panel p.learn-email-sub{margin:0 0 20px;font-size:14px;color:var(--muted, #9696b0);}
