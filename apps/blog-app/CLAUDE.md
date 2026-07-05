@@ -46,8 +46,9 @@ Both deployments share `prerender.routes` in `vite.config.ts` as the selector:
 - **SSR** — leave it out; on Cloud Run it renders per request (on Vercel SSG it
   would 404, so keep the Vercel route set complete).
 
-API routes: `src/server/routes/**` → served under `/api` (e.g. `/api/v1/hello`).
+API routes: `src/server/routes/**` → served under `/api` (e.g. `/api/v1/subscribe`).
 SSR/API only run on the Cloud Run node-server build, not the static Vercel build.
+Unmatched `/api/*` paths fall through to `src/server/routes/[...].ts`.
 
 ## Notes
 - SSR enabled in production only
