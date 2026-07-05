@@ -7,6 +7,16 @@ Disallow: /private/
 Disallow: /admin/
 Disallow: /drafts/
 
+# Allow all bots to access CSS, JS, and image files
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.jpg$
+Allow: /*.jpeg$
+Allow: /*.png$
+Allow: /*.gif$
+Allow: /*.svg$
+Allow: /*.webp$
+
 # Sitemap location
 Sitemap: https://dalenguyen.me/sitemap.xml
 
