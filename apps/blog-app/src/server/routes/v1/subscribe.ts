@@ -82,10 +82,7 @@ const RATE_LONG_WINDOW_MS = 60 * 60 * 1_000
 
 // IPKeyed bucket — kept intentionally tiny. We store the
 // `tokensLeft` + `lastRefillMs` for each window per IP. Two windows
-// means two entries per IP. There is no LRU eviction today; an attacker
-// rotating IPs could grow this map. If that ever shows up in a memory
-// profile, swap to a capped LRU keyed by IP; the surface here is small
-// enough that simple is fine for now.
+// means two entries per IP.
 interface RateBucket {
   tokens: number
   lastRefill: number
@@ -96,6 +93,19 @@ const rateBuckets: {
 } = {
   perMinute: new Map(),
   perHour: new Map(),
+}
+
+// Hard cap per bucket so an attacker rotating source IPs can't grow these
+// maps without bound. `Map` preserves insertion order, so evicting the
+// first key on overflow is a cheap FIFO drop — no LRU bookkeeping needed
+// for what's meant to be a first-pass filter, not the durable defense
+// (that's Cloud Armor, see the issue).
+const MAX_BUCKET_ENTRIES = 10_000
+
+function evictOldestIfFull(buckets: Map<string, RateBucket>): void {
+  if (buckets.size < MAX_BUCKET_ENTRIES) return
+  const oldestKey = buckets.keys().next().value
+  if (oldestKey !== undefined) buckets.delete(oldestKey)
 }
 
 // Token-bucket `consume`. Lazily refills proportionally to the time
@@ -110,6 +120,7 @@ function consume(
 ): boolean {
   const existing = buckets.get(key)
   if (!existing) {
+    evictOldestIfFull(buckets)
     buckets.set(key, { tokens: capacity - 1, lastRefill: now })
     return true
   }
@@ -149,6 +160,13 @@ function applyCors(event: H3Event, origin: string | undefined): void {
 function isDevRuntime(): boolean {
   const env = process.env['NODE_ENV']
   return env !== 'production' && env !== 'prod'
+}
+
+// Masks an email for logging — keeps only the domain, since Cloud Logging
+// is not a safe place to store PII even in an error/diagnostic line.
+function maskEmail(email: string): string {
+  const at = email.indexOf('@')
+  return at > 0 ? `***@${email.slice(at + 1)}` : '***'
 }
 
 // Forward a successful subscribe to the welcome-email send. Wraps any throw
@@ -282,7 +300,7 @@ export default defineEventHandler(async (event) => {
     const keyState = apiKey ? 'set' : 'missing'
     const audState = audienceId ? 'set' : 'missing'
     console.error(
-      `[subscribe] reqId=${reqId} ip=${ip} refusing signup in production: RESEND_API_KEY=${keyState} RESEND_AUDIENCE_ID=${audState} source=${source} email=${email}`,
+      `[subscribe] reqId=${reqId} ip=${ip} refusing signup in production: RESEND_API_KEY=${keyState} RESEND_AUDIENCE_ID=${audState} source=${source} email=${maskEmail(email)}`,
     )
     setResponseStatus(event, 503)
     return {
@@ -295,7 +313,7 @@ export default defineEventHandler(async (event) => {
   // without env wiring. The welcome-email send itself short-circuits to a
   // logged no-op when RESEND_API_KEY is missing, so dispatching here keeps
   // the dev path symmetrical with the prod path.
-  console.log(`[subscribe] reqId=${reqId} ip=${ip} (dev) source=${source} email=${email}`)
+  console.log(`[subscribe] reqId=${reqId} ip=${ip} (dev) source=${source} email=${maskEmail(email)}`)
   dispatchWelcome(email, source)
   return { ok: true, source, dev: true }
 })
