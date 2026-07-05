@@ -5,15 +5,25 @@ import type { Plugin, ResolvedConfig } from 'vite'
 const VIRTUAL_ID = 'virtual:learn-manifest'
 const RESOLVED_ID = '\0' + VIRTUAL_ID
 
-// Absolute URL of the deployed Cloud Run service that serves the
-// /api/v1/subscribe endpoint. The main site (dalenguyen.me) is a static
-// Vercel SSG build with no API routes, so a relative `/api/v1/subscribe`
-// from the browser would 404 against that origin. CORS on subscribe.ts
-// whitelists https://dalenguyen.me and https://www.dalenguyen.me, so the
-// form posts cross-origin to Cloud Run. The Angular-side email-capture
-// service uses the same URL for parity.
-const SUBSCRIBE_ENDPOINT =
-  'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe'
+// Relative `/api/v1/subscribe` endpoint. The apex `https://dalenguyen.me`
+// is now served by the same Cloud Run instance that hosts this app, so the
+// subscribe request is same-origin and avoids CORS / cookie / future-proxy
+// surprises. `www.dalenguyen.me` (still Vercel static) has no `/api` route —
+// a subscribe attempt from there will 404 silently, so the embedded JS
+// bails out early when running on that host (see EMAIL_CAPTURE_JS). The
+// Angular-side email-capture service uses the same relative URL for parity.
+//
+// REGRESSION NOTE: do NOT reintroduce an absolute Cloud Run URL here —
+// the same-origin relative path is intentional now that the apex IS Cloud
+// Run, and an absolute URL would make the request cross-origin again,
+// re-introducing the CORS allowlist dependency on the user-facing surface.
+const SUBSCRIBE_ENDPOINT = '/api/v1/subscribe'
+
+// Hostname for the legacy Vercel static deploy. Served pages have no
+// `/api/v1/subscribe` route, so a subscribe attempt would 404. The embedded
+// EMAIL_CAPTURE_JS guards against this by bailing out when the page is
+// served from this host — see `isStaticVercelHost` in that script.
+const STATIC_VERCEL_HOST = 'www.dalenguyen.me'
 
 const NAV_HTML = `<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 <style>
@@ -182,11 +192,11 @@ const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 <!-- learn-email-modal-end -->`
 
 // Shared client-side wiring for the inline email field and the modal. Both
-// submit to the deployed Cloud Run subscribe endpoint, share the same DOM
-// helpers, and the modal persists a dismissal flag in localStorage so it
-// never reopens for the same browser. Kept inline (rather than a separate
-// .js asset) so the plugin can inject a self-contained block per page
-// with no extra HTTP request.
+// submit to the same-origin subscribe endpoint, share the same DOM helpers,
+// and the modal persists a dismissal flag in localStorage so it never
+// reopens for the same browser. Kept inline (rather than a separate .js
+// asset) so the plugin can inject a self-contained block per page with no
+// extra HTTP request.
 //
 // The inline HTML/JS is always injected at build time, so the per-request
 // toggle lives here: the email capture UI is enabled by default (matching
@@ -194,10 +204,33 @@ const EMAIL_MODAL_HTML = `<!-- learn-email-modal-start -->
 // current URL carrying `?newsletter=false` opts out per-request — hides
 // the inline section and skips opening the modal. Replaces the previous
 // `?newsletter=true` opt-in gate from #199.
+//
+// REGRESSION NOTE: SUBSCRIBE_ENDPOINT is intentionally the relative
+// `/api/v1/subscribe` (same-origin on the Cloud Run apex). Do NOT revert
+// to an absolute Cloud Run URL — the cross-origin request would
+// re-introduce the CORS allowlist dependency on the user-facing surface.
+// When the page is served from the legacy Vercel host
+// (`www.dalenguyen.me`), the script bails out early because that origin
+// has no `/api` route — a subscribe attempt would 404 silently otherwise.
 const EMAIL_CAPTURE_JS = `<script>
 (function () {
-  var SUBSCRIBE_ENDPOINT = 'https://blog-app-185772516206.us-central1.run.app/api/v1/subscribe';
+  var SUBSCRIBE_ENDPOINT = '/api/v1/subscribe';
+  var STATIC_VERCEL_HOST = 'www.dalenguyen.me';
   var DISMISS_KEY = 'learn-email-capture.dismissed.v1';
+
+  // Bail out on the legacy Vercel static deploy — it serves no /api route,
+  // so a relative POST would 404 silently. We hide the UI rather than
+  // showing a broken form. The apex (Cloud Run) and localhost dev both
+  // continue to work normally.
+  try {
+    if (window.location.hostname === STATIC_VERCEL_HOST) {
+      var inlineEl = document.getElementById('learn-email-inline');
+      if (inlineEl) inlineEl.hidden = true;
+      var modalEl = document.getElementById('learn-email-modal-backdrop');
+      if (modalEl) modalEl.hidden = true;
+      return;
+    }
+  } catch (e) { /* ignore — fall through to normal init */ }
 
   // Per-request toggle. The email capture UI is enabled by default — the
   // modal opens on first visit and the inline field is visible unless the
@@ -546,3 +579,7 @@ export function learnManifestPlugin(learnDir: string): Plugin {
     },
   }
 }
+
+// Re-export the Vercel host constant so it's discoverable to tests / other
+// tooling that want to mirror the embedded script's bail-out behavior.
+export { STATIC_VERCEL_HOST }
