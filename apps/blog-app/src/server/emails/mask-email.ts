@@ -5,10 +5,10 @@
 // directly without pulling in a h3-touching route file.
 //
 // Output:
-//   foo@example.com  -> ***@example.com
+//   foo@example.com  -> f***@example.com
 //   (no `@`)        -> ***
 
 export function maskEmail(email: string): string {
   const at = email.indexOf('@')
-  return at > 0 ? `***@${email.slice(at + 1)}` : '***'
+  return at > 0 ? `${email[0]}***@${email.slice(at + 1)}` : '***'
 }

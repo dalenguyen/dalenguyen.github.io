@@ -1,11 +1,11 @@
 import { defineEventHandler, getQuery, getRequestURL, send, setResponseHeader, setResponseStatus, H3Event } from 'h3'
-import { maskEmail } from '../emails/mask-email'
+import { maskEmail } from '../emails/mask-email.ts'
 
 // GET /unsubscribe
 //
 // One-click unsubscribe endpoint. The welcome email links to
 // `https://dalenguyen.me/unsubscribe?email=<addr>` (built in
-// ./emails/welcome-email.tsx from `UNSUBSCRIBE_URL`). Prior to this route
+// ./emails/welcome-email.tsx from `UNSUBSCRIBE_URL`). Prior to this
 // existing the link 404'd for every reader — fixing that is the only
 // reason this file was added.
 //
@@ -21,7 +21,16 @@ import { maskEmail } from '../emails/mask-email'
 //      shows the reader what just happened, instead of dumping JSON and
 //      looking like a 200 from a half-broken endpoint.
 //
-// Why a Nitro route and not an Analog Angular page:
+// Why a Nitro middleware and not a `server/routes/**` file:
+//   Everything under `src/server/routes/**` is served under `/api`
+//   (e.g. `/api/v1/subscribe` — see subscribe.ts), so a `routes/unsubscribe.ts`
+//   would only ever answer at `/api/unsubscribe`, not `/unsubscribe` — the
+//   exact path the welcome email links to. `src/server/middleware/learn.ts`
+//   is the existing precedent for a global Nitro middleware that matches a
+//   specific bare path and renders its own HTML; this follows the same
+//   path-guard-then-fall-through shape.
+//
+// Why not an Analog Angular page either:
 //   The unsubscribe URL is hit by readers from email clients, which send
 //   no cookies, no Angular bootstrapping, no JS — they just want a flat
 //   HTML page. Nitro renders SSR HTML directly with zero client-side
@@ -68,10 +77,13 @@ function isDevRuntime(): boolean {
 
 // Compose the Resend PATCH URL. Audience id comes from env so the same
 // deploy can be pointed at a different audience without rebuilding.
-// Email is URL-encoded for path-safety (e.g. `+` in a local-part).
+// Email is URL-encoded for path-safety (e.g. `+` in a local-part), but the
+// `@` is left literal — it's not a reserved delimiter in a path segment,
+// and Resend's contacts-by-email endpoint expects it unencoded.
 export function buildContactUrl(email: string): string {
   const audienceId = process.env['RESEND_AUDIENCE_ID'] ?? ''
-  return `https://api.resend.com/audiences/${audienceId}/contacts/${encodeURIComponent(email)}`
+  const encoded = encodeURIComponent(email).replace(/%40/g, '@')
+  return `https://api.resend.com/audiences/${audienceId}/contacts/${encoded}`
 }
 
 // Outcome of an attempt to flip a contact's `unsubscribed` flag. The
@@ -152,6 +164,7 @@ function pageShell(title: string, body: string): string {
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <title>${escapeHtml(title)} — Dale Nguyen</title>
@@ -212,7 +225,7 @@ export function buildUnsubscribeHtml(state: UnsubscribePageState): string {
   if (state.kind === 'success') {
     const masked = escapeHtml(maskEmail(state.email))
     const body = `
-      <h1>You're unsubscribed</h1>
+      <h1>You're Unsubscribed</h1>
       <p>
         <strong>${masked}</strong> has been removed from future newsletter
         sends. Sorry to see you go — the door is always open if you
@@ -222,7 +235,7 @@ export function buildUnsubscribeHtml(state: UnsubscribePageState): string {
         <a class="btn" href="/">Read the latest posts</a>
       </p>
     `
-    return pageShell("You're unsubscribed", body)
+    return pageShell("You're Unsubscribed", body)
   }
   switch (state.reason) {
     case 'invalid_email':
@@ -230,9 +243,10 @@ export function buildUnsubscribeHtml(state: UnsubscribePageState): string {
         'Unsubscribe link invalid',
         `
           <h1>Something's off with that link</h1>
-          <p>The unsubscribe link is missing or invalid. If you reached this
-          page from a newsletter email, please copy the address it was sent to
-          and email <a href="mailto:hello@dalenguyen.me" style="color:#22d3ee;">hello@dalenguyen.me</a>
+          <p>This unsubscribe link has a missing or invalid email address. If
+          you reached this page from a newsletter email, please copy the
+          address it was sent to and email
+          <a href="mailto:hello@dalenguyen.me" style="color:#22d3ee;">hello@dalenguyen.me</a>
           — I'll remove you manually.</p>
         `,
       )
@@ -253,7 +267,7 @@ export function buildUnsubscribeHtml(state: UnsubscribePageState): string {
         `
           <h1>We couldn't unsubscribe you just now</h1>
           <p>Our email provider returned an error while flipping your
-          subscription. Please try the link again in a few minutes, or email
+          subscription. Please try again in a few minutes, or email
           <a href="mailto:hello@dalenguyen.me" style="color:#22d3ee;">hello@dalenguyen.me</a>
           if the problem sticks.</p>
         `,
@@ -261,10 +275,20 @@ export function buildUnsubscribeHtml(state: UnsubscribePageState): string {
   }
 }
 
+// Matches only the bare `/unsubscribe` path (with or without trailing
+// slash), same tight-scoping approach as `learn.ts`'s `LEARN_PATH_RE` —
+// so this middleware never touches `/api/**` or any other route.
+export const UNSUBSCRIBE_PATH_RE = /^\/unsubscribe\/?$/
+
 // h3 entry point. We do everything off the `getQuery` result so the
 // route is GET-shaped (the unsubscribe link in the email is a plain
 // `<a href>` and bots/email-clients won't send anything else).
 export default defineEventHandler(async (event: H3Event) => {
+  // Fast path: not `/unsubscribe` → do nothing, let Nitro/Angular SSR
+  // handle it (mirrors `learn.ts`'s fall-through behaviour).
+  const url = getRequestURL(event)
+  if (!UNSUBSCRIBE_PATH_RE.test(url.pathname)) return
+
   // Skip non-GET methods silently — preflight/POSTs aren't expected and
   // a 405 would just confuse a reader clicking an email link.
   // h3 normalizes the request method.

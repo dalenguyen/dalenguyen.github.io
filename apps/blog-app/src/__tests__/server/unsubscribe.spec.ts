@@ -6,7 +6,7 @@ import {
   buildUnsubscribeHtml,
   isValidEmail,
   markContactUnsubscribed,
-} from '../../server/routes/unsubscribe.ts'
+} from '../../server/middleware/unsubscribe.ts'
 
 // Run via `node --import ts-node/esm --test src/__tests__/server/unsubscribe.spec.ts`
 // Pure Node logic, no Angular/JSX/Nitro runtime involved (see learn.spec.ts
