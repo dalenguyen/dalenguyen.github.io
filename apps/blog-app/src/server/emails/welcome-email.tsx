@@ -2,6 +2,8 @@
 /** @jsxFrag React.Fragment */
 import * as React from 'react'
 
+import { resolveBlogUrl } from './blog-url'
+
 // Pragma comments above force esbuild's classic JSX transform to
 // React.createElement/React.Fragment for this file. Nitro's build otherwise
 // defaults JSX to the `h` pragma (a Vue/Nuxt-ecosystem convention) since
@@ -117,6 +119,7 @@ export function WelcomeEmail({
 }: WelcomeEmailProps): React.ReactElement {
   const greeting = firstName?.trim() ? `Hi ${firstName.trim()},` : 'Hi there,'
   const unsubscribeHref = `${UNSUBSCRIBE_URL}?email=${encodeURIComponent(email)}`
+  const blogUrl = resolveBlogUrl(siteUrl)
 
   // Use an explicit Fragment rather than the JSX `<>...</>` shorthand so the
   // children passed to `container` are unambiguously a ReactElement (and the
@@ -173,7 +176,7 @@ export function WelcomeEmail({
               }}
             >
               <a
-                href={siteUrl}
+                href={blogUrl}
                 style={{
                   backgroundColor: colors.accent,
                   borderRadius: 8,
