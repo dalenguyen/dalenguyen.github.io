@@ -55,6 +55,22 @@ thunder-tests
 # Staged static output for the blog-app Cloud Run image (build-docker target)
 apps/blog-app/.cloudrun
 
+# Nitro prerendered routes + hashed JS/CSS chunks land in public/ during a
+# local build (it doubles as the served-static-routes dir). Only the source
+# images under assets/images are real; everything else here is regenerated
+# on every build/deploy and shouldn't be committed.
+apps/blog-app/public/blog/
+apps/blog-app/public/bucket-list/
+apps/blog-app/public/learn/
+apps/blog-app/public/resume/
+apps/blog-app/public/index.html
+apps/blog-app/public/llms.txt
+apps/blog-app/public/package.json
+apps/blog-app/public/sitemap.xml
+apps/blog-app/public/styles/
+apps/blog-app/public/assets/*
+!apps/blog-app/public/assets/images/
+
 .cursor/rules/nx-rules.mdc
 .github/instructions/nx.instructions.md
 .cursor
