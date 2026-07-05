@@ -531,7 +531,14 @@ function scanLearnDir(dir: string) {
     const timestamp =
       html.match(/<meta[^>]+name=["']timestamp["'][^>]+content="([^"]+)"/i)?.[1]?.trim() ??
       html.match(/<meta[^>]+name=["']timestamp["'][^>]+content='([^']+)'/i)?.[1]?.trim() ?? ''
-    return { title, description, date, timestamp, url: `/learn/${file}` }
+    // Strip the `.html` extension so the manifest emits the canonical URL
+    // (`/learn/<slug>`). Matches what the Nitro middleware
+    // (apps/blog-app/src/server/middleware/learn.ts) and the dev-server
+    // middleware below both serve — users who click an `<a href>` from the
+    // `/learn` index never need to type `.html`, and the served content is
+    // identical. Closes the apex 404 reported in #210.
+    const slug = file.replace(/\.html$/, '')
+    return { title, description, date, timestamp, url: `/learn/${slug}` }
   })
 }
 
@@ -554,12 +561,22 @@ export function learnManifestPlugin(learnDir: string): Plugin {
       return `export const learnPages = ${JSON.stringify(scanLearnDir(learnDir))};`
     },
 
-    // Dev: intercept /learn/*.html requests and inject nav
+    // Dev: intercept `/learn/<slug>` AND `/learn/<slug>.html` requests and
+    // inject the nav/email/share/a11y footer. We accept BOTH shapes so
+    // links from older bookmarks / legacy `.html` URLs keep working AND
+    // the dev server mirrors production behaviour (the Nitro middleware
+    // in apps/blog-app/src/server/middleware/learn.ts does the same on
+    // the Cloud Run node-server). Without the bare-path match, clicking
+    // a card on `/learn` in dev would 404 even though prod serves it.
+    // The slug check matches the Nitro middleware so dev and prod are
+    // behaviour-equivalent for the path-traversal edge cases.
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        const match = req.url?.match(/^\/learn\/([^?#]+\.html)$/)
+        const match = req.url?.match(/^\/learn\/([^?#]+?)(?:\.html)?\/?(?:$|[?#])/)
         if (!match) return next()
-        const filePath = join(learnDir, match[1])
+        const slug = match[1]
+        if (!/^[A-Za-z0-9][A-Za-z0-9._-]*$/.test(slug)) return next()
+        const filePath = join(learnDir, `${slug}.html`)
         if (!existsSync(filePath)) return next()
         const html = readFileSync(filePath, 'utf-8')
         res.setHeader('Content-Type', 'text/html; charset=utf-8')
