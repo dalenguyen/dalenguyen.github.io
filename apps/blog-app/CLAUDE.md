@@ -53,3 +53,19 @@ SSR/API only run on the Cloud Run node-server build, not the static Vercel build
 - SSR enabled in production only
 - Content dir: `src/content/`
 - Use the `blog-post-manager` agent to add/update posts
+
+## Reviewing / resolving PRs
+
+**Verify changes against the Vercel preview URL, not the apex.** Every PR pushes a
+preview deployment; Vercel posts the link on the PR thread. Use that URL to drive
+the change end-to-end (open the route, click the affected UI, watch for console
+errors, etc.) before resolving review comments.
+
+Don't read prod logs (`gcloud logging --project=...`) or hit
+`https://dalenguyen.me` to verify a PR — those reflect the last **merged**
+state, not the diff under review. Apex (`dalenguyen.me`) is served from Cloud
+Run and may also 404 on routes that the Vercel preview renders correctly
+(this repo's static-only `/learn/<slug>` pages are a known example — see
+issue #211 / PR #212).
+
+PR comment bot to resolve: `@codemagpieai[bot]`. Skill: `/resolve-pr`.
