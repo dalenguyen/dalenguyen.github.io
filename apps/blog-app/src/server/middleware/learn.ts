@@ -1,6 +1,7 @@
 import { defineEventHandler, getRequestURL, send, setResponseHeader, setResponseStatus } from 'h3'
 import { existsSync, readFileSync } from 'node:fs'
-import { join, resolve } from 'node:path'
+import { dirname, join, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 // Nitro middleware that makes the canonical `/learn/<slug>` URL (without the
 // `.html` suffix) return the same prerendered static HTML as
@@ -38,13 +39,31 @@ import { join, resolve } from 'node:path'
 // (`dist/apps/blog-app/analog`), and `public/` sits next to `server/`. The
 // candidates cover Cloud Run, `nx preview`, and monorepo dev layouts.
 export function resolvePublicLearnDir(): string | null {
-  const candidates = [
+  const cwdCandidates = [
     resolve(process.cwd(), 'public', 'learn'),
     resolve(process.cwd(), '..', 'public', 'learn'),
     resolve(process.cwd(), '..', '..', 'public', 'learn'),
   ]
-  for (const candidate of candidates) {
+  for (const candidate of cwdCandidates) {
     if (existsSync(candidate)) return candidate
+  }
+
+  // The cwd-relative candidates above assume process.cwd() IS the Nitro
+  // bundle root (true for `nx preview` / local dev). On Cloud Run it isn't:
+  // the Dockerfile's WORKDIR is `/app` and it runs `node analog/server/index.mjs`,
+  // so process.cwd() stays `/app` while the real bundle root is `/app/analog`
+  // — none of the candidates above ever match, so this always fell through
+  // to the Angular 404 page in production. Fall back to walking up from this
+  // module's own on-disk location, which Nitro bundles into a real chunk
+  // file under `analog/server/**` regardless of cwd; `public/` is always a
+  // sibling of `analog/server`.
+  let dir = dirname(fileURLToPath(import.meta.url))
+  for (let i = 0; i < 6; i++) {
+    const candidate = join(dir, 'public', 'learn')
+    if (existsSync(candidate)) return candidate
+    const parent = dirname(dir)
+    if (parent === dir) break
+    dir = parent
   }
   return null
 }
