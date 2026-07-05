@@ -35,16 +35,9 @@ import { join, resolve } from 'node:path'
 
 // We resolve the public dir relative to the Nitro output. The node-server
 // preset's working directory at request time is the bundle root
-// (`dist/apps/blog-app/analog`), and `public/` sits next to `server/`. We
-// resolve to an absolute path once at module load so the read is O(1)
-// per request — Nitro middleware is constructed lazily on the first
-// matching request anyway.
-function resolvePublicLearnDir(): string | null {
-  // CWD inside the Nitro runtime is the bundle root (analog/). The
-  // prerendered static assets are at `<bundle>/public/learn/*.html`. We
-  // try that first, then a few common alternates (dev mode, monorepo
-  // workspace layouts) so this middleware works the same on Cloud Run,
-  // `nx preview`, and dev.
+// (`dist/apps/blog-app/analog`), and `public/` sits next to `server/`. The
+// candidates cover Cloud Run, `nx preview`, and monorepo dev layouts.
+export function resolvePublicLearnDir(): string | null {
   const candidates = [
     resolve(process.cwd(), 'public', 'learn'),
     resolve(process.cwd(), '..', 'public', 'learn'),
@@ -56,8 +49,6 @@ function resolvePublicLearnDir(): string | null {
   return null
 }
 
-const publicLearnDir = resolvePublicLearnDir()
-
 // Slug must be a plain slug (letters, digits, dots, underscores, hyphens).
 // Everything else (`.`, `..`, path separators, special chars, percent-encoded
 // slashes, etc.) is rejected so we never construct a path that escapes
@@ -68,15 +59,19 @@ const SLUG_RE = /^[A-Za-z0-9][A-Za-z0-9._-]*$/
 //   - no leading/trailing slash drift
 //   - exactly one path segment after `/learn/`
 //   - excludes `/learn` itself and `/learn/` (those go to the Angular index)
-const LEARN_PATH_RE = /^\/learn\/([^/?#]+)\/?$/
+export const LEARN_PATH_RE = /^\/learn\/([^/?#]+)\/?$/
 
-export default defineEventHandler(async (event) => {
-  const url = getRequestURL(event)
-  const pathname = url.pathname
-
+// Pure handler logic, exported separately from the `defineEventHandler`
+// wrapper so tests can exercise the path-resolution branches directly
+// without an h3 event. The default export is the h3-wrapped version of
+// this same function — see below.
+export function handleLearnRequest(
+  pathname: string,
+  publicLearnDir: string | null,
+): { status: number; contentType?: string; body?: string } | null {
   // Fast path: not a /learn request → do nothing, let Nitro handle it.
   const match = pathname.match(LEARN_PATH_RE)
-  if (!match) return
+  if (!match) return null
 
   const slug = match[1]
 
@@ -84,34 +79,50 @@ export default defineEventHandler(async (event) => {
   // slug that doesn't look like a plain identifier. Stops `..`, encoded
   // path traversal, Windows drive letters, etc. from ever reaching the
   // filesystem layer.
-  if (!SLUG_RE.test(slug)) return
+  if (!SLUG_RE.test(slug)) return null
 
   // We didn't find the public/learn dir at any of the expected locations.
   // Bail out and let Nitro's default handler / Angular SSR take over
   // (which will 404 in the conventional way). We intentionally do NOT
   // 404 from here — that's the responsibility of the upstream layers.
-  if (!publicLearnDir) return
+  if (!publicLearnDir) return null
 
   // existsSync + readFileSync rather than a streaming read because the
   // files are small (~90 KB) and we want one synchronous-feeling code path
   // that works the same on Cloud Run and `nx preview`.
   const filePath = join(publicLearnDir, `${slug}.html`)
-  if (!existsSync(filePath)) return
+  if (!existsSync(filePath)) return null
 
   const html = readFileSync(filePath, 'utf-8')
+
+  return {
+    status: 200,
+    contentType: 'text/html; charset=UTF-8',
+    body: html,
+  }
+}
+
+export default defineEventHandler(async (event) => {
+  const url = getRequestURL(event)
+  const result = handleLearnRequest(url.pathname, resolvePublicLearnDir())
+  if (!result) return
 
   // h3 `send` writes the body. We set the status and Content-Type
   // explicitly so a future h3 change to `send`'s defaults can't quietly
   // shift the response shape. We also set `event.handled` so downstream
   // Nitro handlers / Angular SSR don't try to render the 404 page on top
   // of our static HTML.
-  setResponseStatus(event, 200)
-  setResponseHeader(event, 'Content-Type', 'text/html; charset=UTF-8')
+  setResponseStatus(event, result.status)
+  if (result.contentType) {
+    setResponseHeader(event, 'Content-Type', result.contentType)
+  }
   // Cache headers mirror what Vercel served (`public, max-age=...`) so a
   // future change to learn content can be invalidated the same way. The
   // 5-minute value is a compromise: long enough for a typical reader to
   // hit the cached copy on a follow-up visit, short enough that a manual
   // deploy shows up quickly without waiting for a CDN edge purge.
   setResponseHeader(event, 'Cache-Control', 'public, max-age=0, s-maxage=300, must-revalidate')
-  return send(event, html)
+  if (typeof result.body === 'string') {
+    return send(event, result.body)
+  }
 })
