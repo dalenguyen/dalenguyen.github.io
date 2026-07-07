@@ -106,19 +106,45 @@ gcloud iam roles describe roles/owner \
 
 ### IAM changes propagate asynchronously.
 
-Grant-then-use in one Terraform apply can race — grants take up to ~2 minutes. Add an explicit `depends_on`, and expect the first apply may fail on propagation lag and pass on re-apply.
+Granting a permission and immediately using it can race — IAM grants take up to ~2 minutes to propagate. Expect the first call right after a grant to fail on propagation lag and pass on a retry; that's normal, not a bug.
 
 ### Layered errors are progress.
 
 A `SERVICE_DISABLED` error resolving into `IAM_PERMISSION_DENIED` means you got *further* — the request now reaches an auth check it never previously hit. Re-run after each fix and read the new error on its own terms.
 
-### Org policies silently gate features.
+### An organization policy silently gates model access.
 
-Org policy can block features org-wide with an opaque `400 FAILED_PRECONDITION` — not IAM or quota. The punchline: provider-enforced structured output (tier 3) 400'd because an org policy didn't allow the feature. The fix was a Terraform-managed org-policy change, which itself needed `roles/orgpolicy.policyAdmin`.
+On Vertex AI, one organization policy — [`vertexai.allowedModels`](https://docs.cloud.google.com/gemini-enterprise-agent-platform/models/control-model-access) — controls which Model Garden models a project may call. When the model you rely on isn't allowed, the API doesn't return an IAM or quota error; it returns an opaque `400 FAILED_PRECONDITION`. That's exactly how tier-3 structured output failed for us: the partner model we called for schema-enforced output wasn't allowed by the policy.
 
-### IAM and org policy are infrastructure-as-code.
+It's a list constraint with three modes — allow all, deny all, or a custom allow/deny list. A *custom allow* policy implicitly denies every model you don't name, so a project that lists only a few models will 400 on any other.
 
-Diagnose read-only with `gcloud`, but make the *change* in Terraform — a manual `gcloud` edit drifts, and the next apply reverts it.
+**Before** — the model isn't in the allow-list, so the call is blocked:
+
+```
+POST .../publishers/anthropic/models/MODEL_NAME:rawPredict
+→ 400 FAILED_PRECONDITION   # blocked by vertexai.allowedModels
+```
+
+**After** — add the model (or the whole publisher) to the allowed values:
+
+```yaml
+# policy.yaml
+name: projects/PROJECT_ID/policies/vertexai.allowedModels
+spec:
+  rules:
+  - values:
+      allowedValues:
+      - publishers/anthropic                     # all Anthropic models
+      - publishers/anthropic/models/MODEL_NAME   # or one specific model
+```
+
+```bash
+# inspect the current policy, then apply the new one
+gcloud org-policies describe vertexai.allowedModels --project=PROJECT_ID
+gcloud org-policies set-policy policy.yaml   # needs roles/orgpolicy.policyAdmin (see above)
+```
+
+The same tier-3 call now returns a schema-valid completion. The fix lived in the org policy, not the code.
 
 ## The one meta-lesson
 
@@ -142,4 +168,4 @@ Every lesson here traces back to something that actually broke:
 | Control chars | Raw `\x00`–`\x1f` bytes in the response text |
 | Caller-project | "API not used in project N" pointed at the *caller's* project |
 | Owner carve-out | `roles/owner` lacked `orgpolicy.policies.create` |
-| Org-policy gate | An org policy 400'd provider-enforced structured output |
+| Org-policy gate | The `vertexai.allowedModels` policy 400'd provider-enforced structured output |
