@@ -120,7 +120,7 @@ It's a list constraint with three modes — allow all, deny all, or a custom all
 
 **Before** — the model isn't in the allow-list, so the call is blocked:
 
-```
+```text
 POST .../publishers/anthropic/models/MODEL_NAME:rawPredict
 → 400 FAILED_PRECONDITION   # blocked by vertexai.allowedModels
 ```
