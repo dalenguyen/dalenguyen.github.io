@@ -141,7 +141,7 @@ spec:
 ```bash
 # inspect the current policy, then apply the new one
 gcloud org-policies describe vertexai.allowedModels --project=PROJECT_ID
-gcloud org-policies set-policy policy.yaml   # needs roles/orgpolicy.policyAdmin (see above)
+gcloud org-policies set-policy policy.yaml   # needs orgpolicy.policyAdmin
 ```
 
 The same tier-3 call now returns a schema-valid completion. The fix lived in the org policy, not the code.
