@@ -69,23 +69,33 @@ Nick Nisi's talk on [deleted 95% of his agent skills](/learn/deleted-95-percent-
 
 ## Case study: today, in production
 
-This morning I shipped two PRs to a sandbox repo, then debugged one of them, then re-shipped, then watched an agent I'd never given explicit instructions to produce the correct fix on its own. The sequence is the whole argument.
+A [public demo repo](https://github.com/dalenguyen/coding-agent-demo) I keep around to exercise the same agents, end-to-end, on a tiny Node/Express service. Issue #1 was a one-line ask: add a `GET /reverse/:text` endpoint. The whole thing — issue → first attempt → review → correct fix — is captured in [DEMO.md](https://github.com/dalenguyen/coding-agent-demo/blob/main/DEMO.md), and the final landed PR is [dalenguyen/coding-agent-demo#2](https://github.com/dalenguyen/coding-agent-demo/pull/2).
 
-**Step 1 — The bug.** Issue #6 said "the footer shows 2003." A review bot opened PR #7 which hardcoded `2026` into the wrong line (`theme/sections/footer.liquid`) and didn't touch the actual stale year (which was in `theme/config/settings_data.json`). My `@codemagpieai review` correctly flagged it.
+The interesting version of that story isn't the happy path. It's what happened when the happy path didn't happen on the first try.
 
-**Step 2 — The first fix attempt.** I commented `@codemagpieai resolve` with the right fix: bump the brand block in `settings_data.json` and revert `footer.liquid` to the dynamic filter. The agent did exactly that — in its *workspace*. The push to the PR was rejected because `--force-with-lease` was comparing against a stale `refs/remotes/origin/<branch>` that never refreshed after clone. The agent died silently. No follow-up comment. The user (me) saw only the "👀 On it" ack and waited 18 hours thinking it was working.
+**Step 1 — The bug.** A `@codemagpieai review` call flagged that a proposed fix was in the wrong file: the agent had hardcoded a new year into the visible footer template when the actually-stale year lived in a settings file two directories up. Reviewer says: "wrong line, wrong layer."
 
-**Step 3 — Fix the agent.** I shipped [PR #315](https://github.com/techcater/agents/pull/315) — the silent-PermanentError bug. Now the handler posts an explanatory comment and marks the run `failed` before raising. Re-deployed. Re-triggered.
+**Step 2 — The first fix attempt.** I commented `@codemagpieai resolve` with the corrected spec: edit the settings file, leave the template alone. The agent did exactly that — in its *workspace*. The push to the PR was rejected because `--force-with-lease` was comparing against a stale `refs/remotes/origin/<branch>` that never refreshed after clone. The agent died silently. No follow-up comment. The user (me) saw only the "👀 On it" ack and waited 18 hours thinking it was working.
 
-**Step 4 — The second fix attempt.** Pushed again. Got rejected again. The new comment was helpful, but it still said "branch was updated concurrently" when nothing had actually moved. Wrong diagnosis.
+**Step 3 — Fix the agent, first pass.** I added a `try/except` around the push: on `PushRejectedError`, post an explanatory comment to the PR and mark the run `failed` before re-raising. Re-deployed. Re-triggered. Now at least the failure was visible — but the comment still said "branch was updated concurrently" when nothing had actually moved. Wrong diagnosis.
 
-**Step 5 — Fix the agent, for real.** I shipped [PR #316](https://github.com/techcater/agents/pull/316) — the `git fetch origin <ref>:<ref>` colon-syntax refresh that updates `refs/remotes/origin/<branch>` so the lease actually checks the live remote SHA. Re-deployed.
+**Step 4 — Fix the agent, for real.** I added one line immediately before the push:
 
-**Step 6 — The agent does the right thing.** I closed the original PR, opened a fresh `@codemagpieai create` against the issue with the corrected spec. The agent (running on the fixed Cloud Run revision) opened [PR #8](https://github.com/dalexnoibu/quickstart-6a11ce8e.myshopify.com/pull/8) with exactly the right fix: `settings_data.json` bumped, `footer.liquid` untouched, plus a regression test that asserts `settings_data.json` contains no "2023" and the liquid file uses the dynamic filter.
+```python
+# Refresh refs/remotes/origin/<branch> so --force-with-lease
+# compares against the live remote SHA, not the clone-time SHA.
+subprocess.run(["git", "fetch", "origin", f"{head_ref}:{head_ref}"], check=True)
+```
 
-Three iterations. Two bug fixes in the agent. One PR with the wrong diagnosis. One PR with the right fix **plus a test that would have caught the original mistake.**
+The colon syntax is the load-bearing part: plain `git fetch origin <ref>` writes only to `FETCH_HEAD`, not to the tracking ref that `--force-with-lease` reads. The colon form forces the update. Re-deployed.
 
-That last bit is the self-improving loop. The agent learned — not in the model-weight sense, in the *your-agent-will-never-do-this-again* sense — that "footer.liquid dynamic filter" is the right call, and wrote a test so the next run doesn't have to figure it out from scratch.
+**Step 5 — The agent does the right thing.** I closed the original PR and opened a fresh `@codemagpieai create` against the same issue with the corrected spec. The agent (running on the fixed Cloud Run revision) opened a new PR with exactly the right fix: the settings file bumped, the template untouched, **plus a regression test** asserting that the settings file contains no stale value and the template uses the dynamic filter. That test is the part that matters.
+
+Three iterations. Two bug fixes in the agent. One PR with the wrong diagnosis. One PR with the right fix *plus a test that would have caught the original mistake.*
+
+That last bit is the self-improving loop. The agent learned — not in the model-weight sense, in the *your-agent-will-never-do-this-again* sense — that "edit the settings file, not the template" is the right call for this class of bug, and wrote a test so the next run doesn't have to figure it out from scratch.
+
+The public receipt of the resolved version of this loop — issue → create → review → approved — is in the demo repo's [DEMO.md](https://github.com/dalenguyen/coding-agent-demo/blob/main/DEMO.md). The agent added 14 lines of code, 35 lines of test, and zero comments from the reviewer. That's what a single shot looks like once the harness is right.
 
 ## What a normal company actually does
 
