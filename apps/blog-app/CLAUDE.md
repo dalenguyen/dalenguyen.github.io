@@ -69,4 +69,37 @@ Run and may also 404 on routes that the Vercel preview renders correctly
 (this repo's static-only `/learn/<slug>` pages are a known example — see
 issue #211 / PR #212).
 
+## Verifying a Cloud Run deploy (after merging to `dev`)
+
+After `nx run blog-app:deploy` finishes, verify the new revision is serving
+traffic correctly. **Hit `https://dalenguyen.me` (the apex via Cloudflare),
+not `https://blog-app-185772516206.us-central1.run.app` directly.** The direct
+service URL can return 404 from a separate routing layer even when the apex
+serves the page correctly — a real hit to the apex is the source of truth.
+
+Quick check after deploy:
+
+```bash
+# 200 + 77 KB = post is live
+curl -s -A "Mozilla/5.0" -o /dev/null -w "%{http_code} bytes=%{size_download}\n" \
+  https://dalenguyen.me/blog/<new-post-slug>
+
+# Or for any other prerendered route
+curl -s -A "Mozilla/5.0" -o /dev/null -w "%{http_code} bytes=%{size_download}\n" \
+  https://dalenguyen.me/<route>
+```
+
+If the apex is 200 but a `gcloud run services describe` shows the new revision
+isn't getting traffic, also check the service's traffic split:
+
+```bash
+gcloud run services describe blog-app --region=us-central1 --project=dalenguyen-prod \
+  --format="value(status.traffic)"
+```
+
+(Lesson learned the hard way on 2026-07-08: the deploy of PR #221 succeeded,
+Cloud Run served the new revision, real users got 200 — but `curl` against the
+direct service URL returned 404, which made it look like the deploy was broken.
+It wasn't. The apex is the only thing users see.)
+
 PR comment bot to resolve: `@codemagpieai[bot]`. Skill: `/resolve-pr`.
