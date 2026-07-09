@@ -1,7 +1,7 @@
 ---
 title: "The Background Task That Froze: A Serverless CPU-Throttling Mystery"
 slug: 2026-07-09-the-background-task-that-froze
-description: A webhook handler acknowledged instantly, but the job it triggered showed up minutes late — or never. The culprit: CPU throttling on request-billed serverless.
+description: "A webhook handler acknowledged instantly, but the job it triggered showed up minutes late — or never. The culprit: CPU throttling on request-billed serverless."
 categories: ['gcp', 'serverless', 'python', 'reliability', 'engineering']
 coverImage: https://dalenguyen.me/assets/images/blog/2026-07-09-the-background-task-that-froze.png
 profileImage: assets/images/dale-nguyen-avatar.webp
