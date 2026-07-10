@@ -10,6 +10,8 @@ author: Dale Nguyen
 draft: false
 ---
 
+> 💡 **Lesson learned building an agent on Cloud Run:** don't schedule work to run *after* you send the response. On Cloud Run's default request-based CPU mode it freezes mid-run — do the latency-critical work before you respond.
+
 I had a webhook receiver that acknowledged events in well under a second. Fast, clean, exactly what you want from a webhook handler. The problem was what happened *after* the ack: the job that receiving the webhook was supposed to launch showed up about three minutes later. Sometimes it showed up right away. Sometimes it never showed up at all — until something completely unrelated happened to hit the service, at which point the "stuck" job would suddenly, retroactively, complete.
 
 That last detail is what made it a genuine mystery for a while. A job that finishes the instant an unrelated request lands is not behaving like a slow job. It's behaving like something that was *frozen*, waiting for permission to keep running.
