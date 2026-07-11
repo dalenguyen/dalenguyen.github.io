@@ -74,6 +74,7 @@ export const PORTFOLIO_ITEMS: PortfolioItem[] = [
       { name: 'GCP', icon: 'cloud' },
     ],
     projectUrl: 'https://dailymastery.io',
+    featured: true,
   },
   {
     id: 5,

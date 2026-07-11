@@ -9,16 +9,17 @@ describe('PORTFOLIO_ITEMS', () => {
     expect(PORTFOLIO_ITEMS.length).toBe(8)
   })
 
-  it('marks exactly 3 as featured', () => {
-    expect(PORTFOLIO_ITEMS.filter((p) => p.featured).length).toBe(3)
+  it('marks exactly 4 as featured', () => {
+    expect(PORTFOLIO_ITEMS.filter((p) => p.featured).length).toBe(4)
   })
 
-  it('features Xoài, CodeMagpie and LogiChat', () => {
+  it('features Xoài, CodeMagpie, LogiChat and DailyMastery', () => {
     const featuredUrls = PORTFOLIO_ITEMS.filter((p) => p.featured).map((p) => p.projectUrl)
     expect(featuredUrls).toEqual([
       'https://heyxoai.com',
       'https://codemagpie.com',
       'https://logichat.io',
+      'https://dailymastery.io',
     ])
   })
 

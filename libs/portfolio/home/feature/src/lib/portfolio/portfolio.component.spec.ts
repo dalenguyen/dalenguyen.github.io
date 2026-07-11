@@ -25,8 +25,8 @@ describe('PortfolioComponent', () => {
     expect(component).toBeTruthy()
   })
 
-  it('shows only the 3 featured projects', () => {
-    expect(component.featured.length).toBe(3)
+  it('shows only the 4 featured projects', () => {
+    expect(component.featured.length).toBe(4)
     expect(component.featured.every((p) => p.featured)).toBe(true)
   })
 
