@@ -117,6 +117,7 @@ export default defineConfig(({ mode }) => {
                   '/learn',
                   '/bucket-list',
                   '/resume',
+                  '/projects',
                   {
                     contentDir: 'src/content',
                     transform: (file: PrerenderContentFile) => {
