@@ -1,9 +1,15 @@
 # Blog App
 
-Angular/Analog blog app. Deploys two ways from one codebase:
-- **Vercel** (default, `dalenguyen.me`): static SSG — every route prerendered.
-- **Cloud Run** (`dalenguyen-prod`): Nitro `node-server` — prerendered routes
-  served as static HTML, everything else SSR'd on demand, API routes live.
+Angular/Analog blog app. One codebase, two build targets — but only Cloud Run
+serves the public site:
+- **Cloud Run** (`dalenguyen-prod`) — **production: this is what serves
+  `dalenguyen.me`.** Nitro `node-server`: prerendered routes served as static HTML,
+  everything else SSR'd on demand, API routes live. Ship it with
+  `nx run blog-app:deploy` (see Deployment). Merging to `dev` does NOT update the
+  public site on its own — you must run the Cloud Run deploy.
+- **Vercel** (project `analogjs-blog`) — **preview only.** Every PR gets a preview
+  deploy (`analogjs-blog-git-<branch>-…vercel.app`) for verification; static SSG,
+  every route prerendered. It is NOT the public apex.
 
 ## Stack
 - [Analog](https://analogjs.org/) — Angular meta-framework with SSG/SSR
