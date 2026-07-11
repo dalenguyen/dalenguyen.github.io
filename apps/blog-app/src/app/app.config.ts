@@ -14,7 +14,7 @@ export const appConfig: ApplicationConfig = {
     provideZonelessChangeDetection(),
     provideFileRouter(
       withRouterConfig({ onSameUrlNavigation: 'reload' }),
-      withInMemoryScrolling({ anchorScrolling: 'enabled' }),
+      withInMemoryScrolling({ scrollPositionRestoration: 'enabled', anchorScrolling: 'enabled' }),
       withComponentInputBinding(),
     ),
     provideClientHydration(withEventReplay()),
