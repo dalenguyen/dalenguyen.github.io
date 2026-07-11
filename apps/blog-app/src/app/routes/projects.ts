@@ -10,13 +10,14 @@ export const routeMeta: RouteMeta = {
       content:
         'Projects by Dale Nguyen — AI agents, developer tools, and web products, from a watchOS voice assistant to a GitHub coding agent.',
     },
-    { name: 'og:title', content: 'Projects | Dale Nguyen' },
+    { property: 'og:title', content: 'Projects | Dale Nguyen' },
     {
-      name: 'og:description',
+      property: 'og:description',
       content: 'A gallery of projects Dale Nguyen has built — AI agents, developer tools, and web products.',
     },
-    { name: 'og:url', content: 'https://dalenguyen.me/projects' },
-    { name: 'type', content: 'website' },
+    { property: 'og:url', content: 'https://dalenguyen.me/projects' },
+    { property: 'og:type', content: 'website' },
+    { property: 'og:image', content: 'https://dalenguyen.me/assets/images/dale-nguyen-avatar.webp' },
   ],
 }
 
