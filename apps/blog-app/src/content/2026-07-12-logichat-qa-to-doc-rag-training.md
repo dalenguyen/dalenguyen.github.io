@@ -12,13 +12,13 @@ draft: false
 
 [LogiChat](https://logichat.io) is a chatbot platform. Customers upload their docs, get a chat widget, never touch a model. For two years, "training the bot" meant hand-curating a Q&A list in a dashboard form — `question` and `answer` pairs, one row at a time, dumped into the prompt as few-shot pairs. We just deleted that and rebuilt the whole pipeline on **[Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/)**, with **Vertex AI** for the model, **Firestore** for vector storage, and **Cloud Run** for everything else.
 
-This post is a tour of what that looks like in production. It's not a "hello world" agent demo — it's the architecture we landed on after five issues, four Cloud Run services, and the one design choice that turned out to matter more than anything else: **retrieval as a pre-model step, not an ADK tool.**
+This post is a tour of what that looks like in production. It's not a "hello world" agent demo — it's the architecture we landed on after five issues, three Cloud Run services rebuilt (the fourth, the Stripe top-up token subscriber, was untouched), and the one design choice that turned out to matter more than anything else: **retrieval as a pre-model step, not an ADK tool.**
 
 ## The stack, end to end
 
-The whole system is five services on GCP. Three of them are new:
+The pipeline below touches three of those services — `apps/api`, `apps/subscribers/doc-processor`, and `apps/agent` — plus the Firestore vector index. `apps/api` appears twice in the diagram because it acts as both the upload ingress AND the gateway that mints ID tokens for the agent:
 
-```
+```text
 customer uploads PDF in dashboard
         │
         ▼
@@ -350,7 +350,7 @@ def _format_chunk(chunk: RetrievedChunk) -> str:
 
 The user message becomes:
 
-```
+```text
 [doc:abc123]
 Our return policy allows returns within 30 days of purchase...
 
@@ -459,7 +459,7 @@ def retrieve_examples(db, app_id, *, limit=DEFAULT_EXAMPLES_LIMIT) -> list[Examp
 
 The cap at 20 is important. The pre-#119 code had no cap; a customer with 200 examples was already paying for it in latency. The new prompt block looks like:
 
-```
+```text
 Q: How do I reset my password?
 A: Click "Forgot password" on the login page.
 
@@ -485,7 +485,9 @@ A few things we got wrong the first time and would change on a green-field rebui
 
 ## The numbers
 
-The old prompt with 100 examples was 12–18K tokens per request, ~1.2s p50 latency, ~$0.003/request at GPT-4o-mini pricing. The new doc-RAG prompt is 1.5–3K tokens (system + 3–5 retrieved chunks + question), ~450ms p50, ~$0.0006/request. Recall on the customer's own docs is dramatically better because we're now searching their actual content instead of paraphrased Q&A. We didn't A/B this formally — the before/after is too entangled with model changes (we also moved off OpenAI to Vertex AI in the same window) — but the unit-economics improvement is 4–5× and the qualitative improvement on recall is the reason we did this in the first place.
+The old prompt with 100 examples was 12–18K tokens per request, ~1.2s p50 latency, ~$0.003/request at GPT-4o-mini pricing. The new doc-RAG prompt is 1.5–3K tokens (system + 3–5 retrieved chunks + question), ~450ms p50, ~$0.0006/request. Recall on the customer's own docs is dramatically better because we're now searching their actual content instead of paraphrased Q&A.
+
+These numbers are **directional, not a controlled benchmark.** We didn't run a head-to-head A/B because the move changed three things at once: training data shape (Q&A pairs → retrieved chunks), model (GPT-4o-mini → Gemini 2.5 Flash), and provider (OpenAI → Vertex AI). The 4–5× cost-per-request delta below is dominated by the model/provider change, not by the retrieval change — don't read it as "RAG is 4–5× cheaper than few-shot." All figures are per-request inference cost; document ingestion (one-time embedding on upload) is excluded. The qualitative claim on recall is the one that I'm confident in: doc-RAG on a customer's actual docs beats few-shot Q&A on paraphrased summaries every time, and that's the reason we did this in the first place.
 
 The full set of changes is across these issues on the [logichat.io](https://logichat.io) project: the document pipeline (PR #113), the agent (issues #105–#107), the retrieval layer (#106), the dashboard UI (#110+), and the fallback spec (2026-07-12-qa-examples-fallback-design).
 
