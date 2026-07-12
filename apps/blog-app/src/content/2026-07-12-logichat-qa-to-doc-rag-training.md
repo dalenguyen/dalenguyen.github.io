@@ -10,7 +10,7 @@ author: Dale Nguyen
 draft: false
 ---
 
-LogiChat is a chatbot platform. Customers upload their docs, get a chat widget, never touch a model. For two years, "training the bot" meant hand-curating a Q&A list in a dashboard form — `question` and `answer` pairs, one row at a time, dumped into the prompt as few-shot pairs. We just deleted that and replaced it with document-based retrieval. This post is about the architecture we landed on, the mistakes we made along the way, and the one piece of the old system we kept as a fallback.
+[LogiChat](https://logichat.io) is a chatbot platform. Customers upload their docs, get a chat widget, never touch a model. For two years, "training the bot" meant hand-curating a Q&A list in a dashboard form — `question` and `answer` pairs, one row at a time, dumped into the prompt as few-shot pairs. We just deleted that and replaced it with document-based retrieval. This post is about the architecture we landed on, the mistakes we made along the way, and the one piece of the old system we kept as a fallback.
 
 The full change touched five issues across four Cloud Run services. The interesting parts are all in two files: `apps/agent/src/agent/agent_definition.py` and `apps/agent/src/agent/retrieval.py`.
 
@@ -174,7 +174,7 @@ The marker lets the model cite by id in its reasoning, but the marker must **nev
 
 > Each retrieved block is prefixed with an internal `[doc:<id>]` marker ... these markers are for your own use only and must never appear anywhere in the text you show the user.
 
-And then we strip them in code anyway. Belt-and-braces is right when the prompt rule is the only thing keeping an internal token out of customer-facing text — see [issue #124](https://github.com/logichat-io/logichat/issues/124), where the marker leaked into the FAQ widget. The sanitiser is a few lines:
+And then we strip them in code anyway. Belt-and-braces is right when the prompt rule is the only thing keeping an internal token out of customer-facing text — see [issue #124 on logichat.io](https://logichat.io), where the marker leaked into the FAQ widget. The sanitiser is a few lines:
 
 ```python
 _DOC_MARKER_RE = re.compile(r"\s*\[doc:[^\]]*\]\s*")
@@ -294,4 +294,4 @@ We considered auto-migrating `examples` into `chunks`. Rejected: customers wrote
 
 The old prompt with 100 examples was 12–18K tokens per request, ~1.2s p50 latency, ~$0.003/request at GPT-4o-mini pricing. The new doc-RAG prompt is 1.5–3K tokens (system + 3–5 retrieved chunks + question), ~450ms p50, ~$0.0006/request. Recall on the customer's own docs is dramatically better because we're now searching their actual content instead of paraphrased Q&A. We didn't A/B this formally — the before/after is too entangled with model changes (we also moved off OpenAI to Vertex AI in the same window) — but the unit-economics improvement is 4–5× and the qualitative improvement on recall is the reason we did this in the first place.
 
-The full set of changes is across these issues on the [logichat-io/logichat](https://github.com/logichat-io/logichat) repo: the document pipeline (PR #113), the agent (issues #105–#107), the retrieval layer (#106), the dashboard UI (#110+), and the fallback spec (2026-07-12-qa-examples-fallback-design).
+The full set of changes is across these issues on the [logichat.io](https://logichat.io) project: the document pipeline (PR #113), the agent (issues #105–#107), the retrieval layer (#106), the dashboard UI (#110+), and the fallback spec (2026-07-12-qa-examples-fallback-design).
