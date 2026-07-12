@@ -16,33 +16,9 @@ It's not a "hello world" agent demo — it's the architecture I landed on after 
 
 ## The stack, end to end
 
-The pipeline below touches three of those services — `apps/api`, `apps/subscribers/doc-processor`, and `apps/agent` — plus the Firestore vector index. `apps/api` appears twice in the diagram because it acts as both the upload ingress AND the gateway that mints ID tokens for the agent:
+The pipeline below touches three of those services — `apps/api`, `apps/subscribers/doc-processor`, and `apps/agent` — plus the Firestore vector index. `apps/api` appears twice in the diagram because it acts as both the upload ingress AND the gateway that mints ID tokens for the agent. Click through the five stages to see which service is active at each hop and what payload crosses each boundary:
 
-```text
-customer uploads PDF in dashboard
-        │
-        ▼
-  apps/api (Express · Cloud Run)
-        │   POST /v1/documents → signed URL
-        ▼
-  Google Cloud Storage
-        │   gcs.finalized event
-        ▼
-apps/subscribers/doc-processor (Node · Cloud Run)
-        │   parse → chunk → embed
-        ▼
-  Firestore  (logichat-apps/{appId}/chunks + KNN index)
-        ▲
-        │   vector search
-        │
-apps/api (gateway)
-        │   POST /v1/agent-run, mints ID token
-        ▼
-apps/agent (Python · FastAPI + ADK + Vertex AI · Cloud Run)
-        │   Agent (gemini-2.5-flash) via google-adk
-        ▼
-  apps/api → user
-```
+<div data-chart="doc-rag-flow">Pipeline: a customer message travels through five stages — Upload, Process, Retrieve, Ground, Answer — touching the dashboard, apps/api, Cloud Storage, doc-processor, Firestore, apps/agent, and Vertex AI. Enable JavaScript to step through the diagram.</div>
 
 Two pieces are different from a textbook RAG stack:
 
