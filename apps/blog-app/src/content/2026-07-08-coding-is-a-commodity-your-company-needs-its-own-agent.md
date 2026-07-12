@@ -3,7 +3,7 @@ title: "Coding Is a Commodity. Your Company Still Needs Its Own Agent."
 slug: 2026-07-08-coding-is-a-commodity-your-company-needs-its-own-agent
 description: Vibe coding for non-coders is here. For teams that ship software for a living, the question is no longer whether AI writes code — it's what kind of agent your company should own.
 categories: ['ai-agents', 'ai-engineering', 'developer-tools', 'agents']
-coverImage: https://dalenguyen.me/assets/images/blog/coding-is-a-commodity-your-company-needs-its-own-agent.png
+coverImage: https://dalenguyen.me/assets/images/blog/2026-07-08-coding-is-a-commodity-your-company-needs-its-own-agent.png
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2026-07-08T10:00:00.000Z
 author: Dale Nguyen
