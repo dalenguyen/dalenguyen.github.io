@@ -10,9 +10,9 @@ author: Dale Nguyen
 draft: false
 ---
 
-[LogiChat](https://logichat.io) is a chatbot platform. Customers upload their docs, get a chat widget, never touch a model. For two years, "training the bot" meant hand-curating a Q&A list in a dashboard form — `question` and `answer` pairs, one row at a time, dumped into the prompt as few-shot pairs. We just deleted that and rebuilt the whole pipeline on **[Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/)**, with **Vertex AI** for the model, **Firestore** for vector storage, and **Cloud Run** for everything else.
+[LogiChat](https://logichat.io) is a chatbot platform. Customers upload their docs, get a chat widget, never touch a model. For two years, "training the bot" meant hand-curating a Q&A list in a dashboard form — `question` and `answer` pairs, one row at a time, dumped into the prompt as few-shot pairs. I just deleted that and rebuilt the whole pipeline on **[Google's Agent Development Kit (ADK)](https://google.github.io/adk-docs/)**, with **Vertex AI** for the model, **Firestore** for vector storage, and **Cloud Run** for everything else.
 
-This post is a tour of what that looks like in production. It's not a "hello world" agent demo — it's the architecture we landed on after five issues, three Cloud Run services rebuilt (the fourth, the Stripe top-up token subscriber, was untouched), and the one design choice that turned out to matter more than anything else: **retrieval as a pre-model step, not an ADK tool.**
+It's not a "hello world" agent demo — it's the architecture I landed on after rebuilding the whole pipeline over the last few months, three Cloud Run services touched (the fourth, the Stripe top-up token subscriber, was untouched), and the one design choice that turned out to matter more than anything else: **retrieval as a pre-model step, not an ADK tool.**
 
 ## The stack, end to end
 
@@ -53,9 +53,9 @@ Both are deliberate. Both are what this post is really about.
 
 ## Why ADK
 
-We picked [Google's Agent Development Kit](https://github.com/google/adk-python) over LangGraph, CrewAI, and a hand-rolled loop for one reason: **the agent service runs entirely on GCP, and ADK is the only one of those that was built for Vertex AI from the ground up.** The Python SDK ships a `google.adk.agents.Agent` and a `google.adk.runners.InMemoryRunner` that route through `google-genai`, which already speaks Vertex AI when `GOOGLE_GENAI_USE_VERTEXAI=TRUE`. No LangChain adapter, no provider shim, no surprise model name drift between staging and prod.
+I picked [Google's Agent Development Kit](https://github.com/google/adk-python) over LangGraph, CrewAI, and a hand-rolled loop for one reason: **the agent service runs entirely on GCP, and ADK is the only one of those that was built for Vertex AI from the ground up.** The Python SDK ships a `google.adk.agents.Agent` and a `google.adk.runners.InMemoryRunner` that route through `google-genai`, which already speaks Vertex AI when `GOOGLE_GENAI_USE_VERTEXAI=TRUE`. No LangChain adapter, no provider shim, no surprise model name drift between staging and prod.
 
-Concretely, our `apps/agent` is a 53-line `pyproject.toml` Python 3.12 service:
+Concretely, my `apps/agent` is a 53-line `pyproject.toml` Python 3.12 service:
 
 ```toml
 [project]
@@ -72,11 +72,11 @@ dependencies = [
     # because ADK's API is still moving; follow-up issues will exercise
     # the real Runner (sessions / tools / streaming).
     "google-adk>=0.1.0",
-    # google-genai comes with ADK, but we import google.genai.types
+    # google-genai comes with ADK, but I import google.genai.types
     # directly in the runner adapter, so declare it explicitly.
     "google-genai>=1.0",
-    # google-cloud-firestore is the client we use for the per-app chunk
-    # vector search. Required by retrieval.py — added in #106.
+    # google-cloud-firestore is the client I use for the per-app chunk
+    # vector search. Required by the retrieval layer.
     "google-cloud-firestore>=2.20",
 ]
 ```
@@ -146,7 +146,7 @@ The env vars are validated at startup so a misconfigured deploy fails the first 
 
 ## The `RunnerProtocol` seam
 
-The `google.adk.runners.InMemoryRunner` exposes more surface than our HTTP layer needs — sessions, event streams, function calls. We wrap it in a protocol so the route handler is stable while the upstream SDK moves:
+The `google.adk.runners.InMemoryRunner` exposes more surface than my HTTP layer needs — sessions, event streams, function calls. I wrap it in a protocol so the route handler is stable while the upstream SDK moves:
 
 ```python
 # apps/agent/src/agent/api/dependencies.py
@@ -161,7 +161,7 @@ class RunnerProtocol(Protocol):
     ) -> RunnerResult: ...
 ```
 
-`_AdkRunnerAdapter` implements that protocol and forwards to the real ADK runner. The HTTP layer only knows about `RunnerProtocol` — it never imports `google.adk`. The reason this matters: **the ADK Python SDK's API is still in motion.** Wrapping it lets us swap implementations later (sessions, eval harness, streaming) without touching `app.py`.
+`_AdkRunnerAdapter` implements that protocol and forwards to the real ADK runner. The HTTP layer only knows about `RunnerProtocol` — it never imports `google.adk`. The reason this matters: **the ADK Python SDK's API is still in motion.** Wrapping it lets me swap implementations later (sessions, eval harness, streaming) without touching `app.py`.
 
 The adapter runs retrieval *before* the ADK Runner call. This is the design choice worth understanding.
 
@@ -172,7 +172,7 @@ This is the single most important architectural decision in the whole system, an
 The "obvious" pattern in ADK is to expose retrieval as a tool:
 
 ```python
-# What we did NOT do.
+# What I did NOT do.
 firestore_retrieval_tool = FunctionTool(firestore_retrieval)
 
 root_agent = Agent(
@@ -183,11 +183,11 @@ root_agent = Agent(
 )
 ```
 
-We evaluated this in issue #106 and rejected it. Two reasons:
+I evaluated this and rejected it. Two reasons:
 
-1. **Threshold short-circuit.** When no chunk is close enough to the question, we want to skip the model call entirely and return `defaultAnswer`. ADK tools fire *inside* the model loop — by the time the tool runs, you've already paid the input-token cost. A tool-based design cannot enforce a "no useful context" short-circuit because the model has to decide to invoke the tool first.
+1. **Threshold short-circuit.** When no chunk is close enough to the question, I want to skip the model call entirely and return `defaultAnswer`. ADK tools fire *inside* the model loop — by the time the tool runs, you've already paid the input-token cost. A tool-based design cannot enforce a "no useful context" short-circuit because the model has to decide to invoke the tool first.
 
-2. **Cross-tenant safety.** `app_id` must never become a model-controlled argument. Exposing it as a tool input would let a crafted prompt pivot retrieval to another tenant's collection. We scope retrieval server-side from the trusted caller (`config` / `RunnerProtocol.run`'s `app_id`), not from the model.
+2. **Cross-tenant safety.** `app_id` must never become a model-controlled argument. Exposing it as a tool input would let a crafted prompt pivot retrieval to another tenant's collection. I scope retrieval server-side from the trusted caller (`config` / `RunnerProtocol.run`'s `app_id`), not from the model.
 
 So retrieval lives in the adapter, *before* the ADK runner is invoked:
 
@@ -242,7 +242,7 @@ Three things worth pointing out:
 
 - **`asyncio.to_thread`** wraps the sync `google-cloud-firestore` and `google-genai` calls so a slow Firestore round-trip doesn't block the uvicorn event loop. ADK itself is async-native; the retrieval layer is the only sync part of the request path.
 - **Graceful degradation**: `_retrieve` swallows exceptions, logs a warning, returns `[]`. The request still succeeds via the ungrounded ADK flow. A transient Firestore outage degrades answer quality; it doesn't take the service down.
-- **`RunnerResult` carries `grounded` + `retrieval`** alongside `answer`. The gateway logs retrieval metadata on the conversation doc so we can evaluate retrieval quality offline (issue #111). The original ADK Runner contract only returns text; we extended it through our adapter.
+- **`RunnerResult` carries `grounded` + `retrieval`** alongside `answer`. The gateway logs retrieval metadata on the conversation doc so I can evaluate retrieval quality offline. The original ADK Runner contract only returns text; I extended it through my adapter.
 
 ## The retrieval layer
 
@@ -294,7 +294,7 @@ The threshold is applied in Python, after KNN returns. The reason: `find_nearest
 }
 ```
 
-Drift here is silent and catastrophic — a chunk embedded with a 1536-dim model stored against a 768-dim index either fails the write or, worse, produces results that look reasonable but are nonsense. We pin `EMBEDDING_MODEL` and `EMBEDDING_DIMENSION` as module constants and fail loud if the API returns the wrong shape:
+Drift here is silent and catastrophic — a chunk embedded with a 1536-dim model stored against a 768-dim index either fails the write or, worse, produces results that look reasonable but are nonsense. I pin `EMBEDDING_MODEL` and `EMBEDDING_DIMENSION` as module constants and fail loud if the API returns the wrong shape:
 
 ```python
 if len(values) != EMBEDDING_DIMENSION:
@@ -308,7 +308,7 @@ if len(values) != EMBEDDING_DIMENSION:
 
 The agent's job is to answer questions. The doc-processor's job is to make sure there *are* chunks to answer from.
 
-`apps/subscribers/doc-processor` is a Cloud Run service subscribed to `google.cloud.storage.object.v1.finalized` events on the project bucket. Trigger filter is the path prefix `apps/{appId}/docs/{documentId}/{filename}` — anything outside that prefix is ignored silently. Why drive off the Storage event instead of a Firestore write? Because the API writes the `pending` doc *before* it returns the signed URL, so the metadata can lag the actual upload by seconds. Driving off Storage means we wait for the real bytes.
+`apps/subscribers/doc-processor` is a Cloud Run service subscribed to `google.cloud.storage.object.v1.finalized` events on the project bucket. Trigger filter is the path prefix `apps/{appId}/docs/{documentId}/{filename}` — anything outside that prefix is ignored silently. Why drive off the Storage event instead of a Firestore write? Because the API writes the `pending` doc *before* it returns the signed URL, so the metadata can lag the actual upload by seconds. Driving off Storage means I wait for the real bytes.
 
 When the event fires:
 
@@ -326,9 +326,9 @@ Three of those lines hide real choices.
 
 **Chunker (`libs/server/ai/src/lib/chunker.utils.ts`).** 800-token chunks with 100-token overlap. Splits on paragraph boundaries first, falls back to sentence boundaries when a paragraph overflows, and applies overlap by prepending the tail of the previous chunk to the next. Pure function in `*.utils.ts` — no injected dependencies, no lifecycle, that's the repo convention.
 
-**Parser.** Plain text, markdown, HTML, and PDF. The HTML parser uses cheerio and **strips `&lt;script&gt;`, `&lt;style&gt;`, `&lt;nav&gt;`, `&lt;header&gt;`, `&lt;footer&gt;`, `&lt;noscript&gt;` before extracting text** — this was an actual bug we shipped and caught when a customer's "About" page nav ended up dominating their retrieval index.
+**Parser.** Plain text, markdown, HTML, and PDF. The HTML parser uses cheerio and **strips `&lt;script&gt;`, `&lt;style&gt;`, `&lt;nav&gt;`, `&lt;header&gt;`, `&lt;footer&gt;`, `&lt;noscript&gt;` before extracting text** — this was an actual bug I shipped and caught when a customer's "About" page nav ended up dominating their retrieval index.
 
-**Embeddings.** `text-embedding-005` via Vertex AI, batched in groups of 50 with two retries on 429/5xx. A single 50-page PDF can produce 200+ chunks; we don't want one HTTP call per chunk.
+**Embeddings.** `text-embedding-005` via Vertex AI, batched in groups of 50 with two retries on 429/5xx. A single 50-page PDF can produce 200+ chunks; I don't want one HTTP call per chunk.
 
 **Vector storage.** Each chunk goes into `logichat-apps/{appId}/chunks/{chunkId}` with `embedding` stored as `FieldValue.vector(...)` — **not a plain `number[]`**. Firestore's KNN index can only query fields written as `Vector` values; a plain number array is invisible to vector search and you'll get zero hits on every query with no error:
 
@@ -337,7 +337,7 @@ Three of those lines hide real choices.
 embedding: FieldValue.vector(vectors[j]),
 ```
 
-We use the modern `@google-cloud/firestore` v7 client *only* for chunk writes, because `firebase-admin@^9` bundles v4 which doesn't have `FieldValue.vector`. Everything else stays on firebase-admin — they share ADC so it works, but the type definitions conflict and the build/src deep import dodges that.
+I use the modern `@google-cloud/firestore` v7 client *only* for chunk writes, because `firebase-admin@^9` bundles v4 which doesn't have `FieldValue.vector`. Everything else stays on firebase-admin — they share ADC so it works, but the type definitions conflict and the build/src deep import dodges that.
 
 ## The prompt: grounded chunks with `[doc:<id>]` markers
 
@@ -360,11 +360,11 @@ Shipping is free for orders over $50...
 User question: how long do I have to return a dress?
 ```
 
-The marker lets the model cite by id in its reasoning, but the marker must **never** appear in the user-facing answer. We tell the model that in the system prompt:
+The marker lets the model cite by id in its reasoning, but the marker must **never** appear in the user-facing answer. I tell the model that in the system prompt:
 
 > Each retrieved block is prefixed with an internal `[doc:<id>]` marker ... these markers are for your own use only and must never appear anywhere in the text you show the user.
 
-And then we strip them in code anyway. Belt-and-braces is right when the prompt rule is the only thing keeping an internal token out of customer-facing text — see [issue #124 on logichat.io](https://logichat.io), where the marker leaked into the FAQ widget. The sanitiser is a few lines:
+And then I strip them in code anyway. Belt-and-braces is right when the prompt rule is the only thing keeping an internal token out of customer-facing text — there was a real incident where the marker leaked into the FAQ widget. The sanitiser is a few lines:
 
 ```python
 _DOC_MARKER_RE = re.compile(r"\s*\[doc:[^\]]*\]\s*")
@@ -397,7 +397,7 @@ const response = await client.request({
 })
 ```
 
-The agent service is deployed with `--no-allow-unauthenticated`, so the only way to reach it is with a valid ID token minted by a service account in the same project. `google-auth-library`'s `GoogleAuth#getIdTokenClient(agentUrl)` handles token refresh and attaches `Authorization: Bearer ...` on every request, so we don't manage tokens ourselves.
+The agent service is deployed with `--no-allow-unauthenticated`, so the only way to reach it is with a valid ID token minted by a service account in the same project. `google-auth-library`'s `GoogleAuth#getIdTokenClient(agentUrl)` handles token refresh and attaches `Authorization: Bearer ...` on every request, so I don't manage tokens myself.
 
 The deploy target:
 
@@ -418,9 +418,9 @@ gcloud run deploy logichat-agent-run \
 
 One Cloud Run service, one service account (the default Compute Engine SA), three env vars that route through Vertex AI. The agent service account needs `roles/aiplatform.user` on the project — same binding covers chat and embeddings, no second role required.
 
-## The fallback we kept
+## The fallback I kept
 
-We deleted the prompt-builder that read `examples`. The dashboard pages for managing Q&A examples are gone. The new upload/list/delete dialog replaced them.
+I deleted the prompt-builder that read `examples`. The dashboard pages for managing Q&A examples are gone. The new upload/list/delete dialog replaced them.
 
 But the **collection is still there.** Every existing customer has `examples` docs they wrote over two years. Deleting those would have been a worse customer experience than the Q&A flow itself. So the fallback:
 
@@ -457,7 +457,7 @@ def retrieve_examples(db, app_id, *, limit=DEFAULT_EXAMPLES_LIMIT) -> list[Examp
     ...
 ```
 
-The cap at 20 is important. The pre-#119 code had no cap; a customer with 200 examples was already paying for it in latency. The new prompt block looks like:
+The cap at 20 is important. The old prompt-builder had no cap; a customer with 200 examples was already paying for it in latency. The new prompt block looks like:
 
 ```text
 Q: How do I reset my password?
@@ -471,9 +471,9 @@ User question: can I return a dress after 30 days?
 
 Document RAG is still the primary path. Examples are the fallback that runs only when retrieval returned nothing — no useful chunks, empty collection, or retrieval itself broke. A customer who uploaded docs gets doc-RAG answers (better recall, fresh as the doc). A customer who hasn't migrated yet still gets answers from their hand-curated examples. A customer who has neither gets `defaultAnswer`.
 
-## What we'd do differently
+## What I'd do differently
 
-A few things we got wrong the first time and would change on a green-field rebuild.
+A few things I got wrong the first time and would change on a green-field rebuild.
 
 **The `firebase-admin` v4 / modern `firestore` v7 split is ugly.** Bumping `firebase-admin` to v13 is the right fix; it's a separate PR's worth of type churn. The `FieldValue.vector` workaround works but it makes the doc-processor code look weirder than it should.
 
@@ -481,15 +481,15 @@ A few things we got wrong the first time and would change on a green-field rebui
 
 **Threshold and top-k should be data-driven, not env-driven.** `RETRIEVAL_DISTANCE_THRESHOLD` is fine for v1. The next step is per-app tuning from the dashboard — different customers have different "useful" thresholds, and 0.5 is a reasonable default, not the right answer for everyone. The KNN top-k belongs in the same config.
 
-**Agent and gateway should share a runner.** Right now `apps/api` POSTs to `apps/agent` over Cloud Run service-to-service ID tokens. The round-trip is invisible to users but adds ~30–80ms of latency and one more thing that can fail. The long-term answer is inlining the ADK flow into the API service for the simple cases, or running both as one Cloud Run service with internal routing. We measured, decided the separation was worth the latency for now (independent deploys, simpler auth), and parked the unification.
+**Agent and gateway should share a runner.** Right now `apps/api` POSTs to `apps/agent` over Cloud Run service-to-service ID tokens. The round-trip is invisible to users but adds ~30–80ms of latency and one more thing that can fail. The long-term answer is inlining the ADK flow into the API service for the simple cases, or running both as one Cloud Run service with internal routing. I measured, decided the separation was worth the latency for now (independent deploys, simpler auth), and parked the unification.
 
 ## The numbers
 
-The old prompt with 100 examples was 12–18K tokens per request, ~1.2s p50 latency, ~$0.003/request at GPT-4o-mini pricing. The new doc-RAG prompt is 1.5–3K tokens (system + 3–5 retrieved chunks + question), ~450ms p50, ~$0.0006/request. Recall on the customer's own docs is dramatically better because we're now searching their actual content instead of paraphrased Q&A.
+The old prompt with 100 examples was 12–18K tokens per request, ~1.2s p50 latency, ~$0.003/request at GPT-4o-mini pricing. The new doc-RAG prompt is 1.5–3K tokens (system + 3–5 retrieved chunks + question), ~450ms p50, ~$0.0006/request. Recall on the customer's own docs is dramatically better because the bot now searches their actual content instead of paraphrased Q&A.
 
-These numbers are **directional, not a controlled benchmark.** We didn't run a head-to-head A/B because the move changed three things at once: training data shape (Q&A pairs → retrieved chunks), model (GPT-4o-mini → Gemini 2.5 Flash), and provider (OpenAI → Vertex AI). The 4–5× cost-per-request delta below is dominated by the model/provider change, not by the retrieval change — don't read it as "RAG is 4–5× cheaper than few-shot." All figures are per-request inference cost; document ingestion (one-time embedding on upload) is excluded. The qualitative claim on recall is the one that I'm confident in: doc-RAG on a customer's actual docs beats few-shot Q&A on paraphrased summaries every time, and that's the reason we did this in the first place.
+These numbers are **directional, not a controlled benchmark.** I didn't run a head-to-head A/B because the move changed three things at once: training data shape (Q&A pairs → retrieved chunks), model (GPT-4o-mini → Gemini 2.5 Flash), and provider (OpenAI → Vertex AI). The 4–5× cost-per-request delta below is dominated by the model/provider change, not by the retrieval change — don't read it as "RAG is 4–5× cheaper than few-shot." All figures are per-request inference cost; document ingestion (one-time embedding on upload) is excluded. The qualitative claim on recall is the one that I'm confident in: doc-RAG on a customer's actual docs beats few-shot Q&A on paraphrased summaries every time, and that's the reason I did this in the first place.
 
-The full set of changes is across these issues on the [logichat.io](https://logichat.io) project: the document pipeline (PR #113), the agent (issues #105–#107), the retrieval layer (#106), the dashboard UI (#110+), and the fallback spec (2026-07-12-qa-examples-fallback-design).
+The full set of changes spans the document pipeline, the agent service, the retrieval layer, the dashboard UI revamp, and a separate design pass for the Q&A fallback.
 
 ## TL;DR for someone building this on ADK today
 
