@@ -15,7 +15,7 @@ const STEPS: Step[] = [
   {
     label: 'Start',
     title: '1 · Client starts the workflow',
-    code: 'client.execute_workflow(\n  DataPipelineWorkflow,\n  args=[raw_data, "schema_v3_final", job_id],\n  id=job_id,\n  task_queue="onboarding-queue",\n)',
+    code: 'client.execute_workflow(\n  DataPipelineWorkflow,\n  args=[raw_data, "schema_v3_final", job_id],\n  id=job_id,\n  task_queue="data-pipeline-queue",\n)',
     desc: 'run.py sends a StartWorkflowExecution request. The Temporal Server persists a WorkflowExecutionStarted event before a single line of your workflow code runs.',
     worker: 'online',
     historyAdd: ['WorkflowExecutionStarted'],
@@ -23,8 +23,8 @@ const STEPS: Step[] = [
   {
     label: 'Schedule',
     title: '2 · The worker picks up the first task',
-    code: 'worker = Worker(\n  client,\n  task_queue="onboarding-queue",\n  workflows=[DataPipelineWorkflow],\n  activities=[validate_input, write_output],\n)',
-    desc: 'worker.py long-polls "onboarding-queue". It runs the workflow function up to the first await, and asks the server to schedule the validate_input activity.',
+    code: 'worker = Worker(\n  client,\n  task_queue="data-pipeline-queue",\n  workflows=[DataPipelineWorkflow],\n  activities=[validate_input, write_output],\n)',
+    desc: 'worker.py long-polls "data-pipeline-queue". It runs the workflow function up to the first await, and asks the server to schedule the validate_input activity.',
     worker: 'online',
     historyAdd: ['WorkflowTaskCompleted', 'ActivityTaskScheduled · validate_input'],
   },
@@ -179,7 +179,7 @@ const STEPS: Step[] = [
         flex-wrap: wrap;
       }
       .seg {
-        flex: 1 1 0;
+        flex: 1 1 auto;
         min-width: 78px;
         display: flex;
         align-items: center;
@@ -208,6 +208,9 @@ const STEPS: Step[] = [
         font-size: 11px;
         font-weight: 700;
         flex-shrink: 0;
+      }
+      .seg-label {
+        white-space: nowrap;
       }
       .seg.done {
         color: #cdd6e0;

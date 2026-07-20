@@ -40,7 +40,7 @@ That's the durable execution problem: keep a long-running, multi-step process co
 | **Workflow** | The orchestration function — "validate, then store." Must be deterministic: no direct network calls, no raw `time.sleep`, nothing that could produce a different decision on replay. |
 | **Activity** | The actual work — the network call, the DB write, the sleep. Activities are *not* replayed; they execute once per attempt and their result gets recorded in history. This is the escape hatch for anything non-deterministic or side-effecting. |
 | **Worker** | A process you run, on your own infra, that polls a task queue and executes workflow and activity code. Any number of workers can poll the same queue — killing one and starting another is invisible to the workflow. |
-| **Task Queue** | A named queue both the worker and the workflow/activity calls agree on (`onboarding-queue` in the demo). Just a string. |
+| **Task Queue** | A named queue both the worker and the workflow/activity calls agree on (`data-pipeline-queue` in the demo). Just a string. |
 | **Temporal Server (Cluster)** | The piece that makes all of this durable. It persists the event history for every workflow execution, matches tasks to available workers, and enforces timers and retries. Locally, this is one command: `temporal server start-dev`. |
 
 ## The demo, end to end
@@ -136,7 +136,7 @@ async def main():
 
     worker = Worker(
         client,
-        task_queue="onboarding-queue",
+        task_queue="data-pipeline-queue",
         workflows=[DataPipelineWorkflow],
         activities=[validate_input, write_output],
     )
@@ -149,7 +149,7 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
-This connects to the local dev server, registers the workflow class and both activity functions against `onboarding-queue`, and calls `worker.run()`, which blocks and long-polls the queue for work. Nothing here is specific to this one workflow run — the same worker process would happily execute a hundred concurrent `DataPipelineWorkflow` executions.
+This connects to the local dev server, registers the workflow class and both activity functions against `data-pipeline-queue`, and calls `worker.run()`, which blocks and long-polls the queue for work. Nothing here is specific to this one workflow run — the same worker process would happily execute a hundred concurrent `DataPipelineWorkflow` executions.
 
 ### The client — `run.py`
 
@@ -173,7 +173,7 @@ async def main():
             job_id,
         ],
         id=job_id,
-        task_queue="onboarding-queue",
+        task_queue="data-pipeline-queue",
     )
 
     print(f"Workflow completed: {result['status']}\n")
