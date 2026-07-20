@@ -71,6 +71,7 @@ code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, 
   font-size: 13px; font-weight: 700; color: var(--accent);
 }
 .section.active .section-num { background: var(--accent); color: #fff; border-color: var(--accent); }
+.section-head:focus-visible, .arch-node:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .section-title { font-size: 17px; font-weight: 600; flex: 1; }
 .section-sub { font-size: 12px; color: var(--muted); margin-top: 2px; font-weight: 400; }
 .section-chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
@@ -161,7 +162,7 @@ code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, 
 .arch-stack { display: flex; flex-direction: column; align-items: stretch; gap: 0; }
 .arch-node {
   position: relative; border: 1px solid var(--border); border-radius: 10px;
-  background: var(--surface2); padding: 13px 16px; cursor: default;
+  background: var(--surface2); padding: 13px 16px; cursor: pointer;
   display: flex; align-items: center; gap: 12px; transition: border-color 0.15s, background 0.15s;
 }
 .arch-node:hover { border-color: var(--accent); background: rgba(94,106,210,0.10); }
@@ -663,16 +664,43 @@ code, pre, .mono { font-family: "SF Mono", SFMono-Regular, ui-monospace, Menlo, 
 /* ---------- progress ---------- */
 const opened = new Set();
 const totalSections = 6;
+const _sectionToggleLock = new Set();
 function toggleSection(id) {
+  // Coalesce duplicate activations fired in the same task: a keyboard Enter on a
+  // role="button" element triggers our keydown handler AND a browser-synthesized
+  // click (Chromium) -> inline onclick. Without this guard the section double-toggles.
+  if (_sectionToggleLock.has(id)) return;
+  _sectionToggleLock.add(id);
+  setTimeout(() => _sectionToggleLock.delete(id), 0);
   const el = document.getElementById(id);
   el.classList.toggle('active');
-  if (el.classList.contains('active')) {
+  const isOpen = el.classList.contains('active');
+  const head = el.querySelector('.section-head');
+  if (head) head.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  if (isOpen) {
     opened.add(id);
     const pct = (opened.size / totalSections) * 100;
     document.getElementById('progress-fill').style.width = pct + '%';
     document.getElementById('progress-text').innerText = `${opened.size} / ${totalSections} sections`;
     if (opened.size === totalSections) document.getElementById('completion-banner').classList.add('show');
   }
+}
+/* Make the div-based section headers keyboard-operable (role=button + Enter/Space) */
+function initSectionHeaders() {
+  document.querySelectorAll('.section-head').forEach(head => {
+    if (head.dataset.a11yInit === '1') return; // idempotent — never double-bind
+    head.dataset.a11yInit = '1';
+    const section = head.closest('.section');
+    head.setAttribute('role', 'button');
+    head.setAttribute('tabindex', '0');
+    head.setAttribute('aria-expanded', section.classList.contains('active') ? 'true' : 'false');
+    head.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+        e.preventDefault();
+        toggleSection(section.id); // call the toggle directly, not a re-dispatched click
+      }
+    });
+  });
 }
 
 /* ---------- quiz ---------- */
@@ -995,32 +1023,59 @@ function resetSteps() {
 }
 
 /* ---------- S2 & S6: tooltips (fixed-position, overflow-safe) ---------- */
+/* Shown on hover AND focus AND tap, so touch + keyboard users can read them too. */
+function placeTooltip(node, tooltip) {
+  const rect = node.getBoundingClientRect();
+  const ttWidth = 250, gap = 12;
+  tooltip.style.display = 'block';
+  tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+  tooltip.style.transform = 'translateY(-50%)';
+  if (window.innerWidth - rect.right - gap >= ttWidth) {
+    tooltip.style.left = (rect.right + gap) + 'px';
+  } else if (rect.left - gap >= ttWidth) {
+    tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+  } else {
+    tooltip.style.top = (rect.bottom + gap) + 'px';
+    tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+    tooltip.style.transform = 'none';
+  }
+}
+function hideAllTooltips() {
+  document.querySelectorAll('.arch-node .tooltip').forEach(t => { t.style.display = 'none'; });
+}
+let tipViaPointer = false; // distinguishes tap/click focus from keyboard (Tab) focus
 function initTooltips() {
-  document.querySelectorAll('.arch-node').forEach(node => {
+  window.addEventListener('pointerdown', () => { tipViaPointer = true; }, true);
+  window.addEventListener('keydown', () => { tipViaPointer = false; }, true);
+  document.querySelectorAll('.arch-node').forEach((node, i) => {
     const tooltip = node.querySelector('.tooltip');
     if (!tooltip) return;
-    node.addEventListener('mouseenter', () => {
-      const rect = node.getBoundingClientRect();
-      const ttWidth = 250, gap = 12;
-      tooltip.style.display = 'block';
-      tooltip.style.top = (rect.top + rect.height / 2) + 'px';
-      tooltip.style.transform = 'translateY(-50%)';
-      if (window.innerWidth - rect.right - gap >= ttWidth) {
-        tooltip.style.left = (rect.right + gap) + 'px';
-      } else if (rect.left - gap >= ttWidth) {
-        tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
-      } else {
-        tooltip.style.top = (rect.bottom + gap) + 'px';
-        tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
-        tooltip.style.transform = 'none';
-      }
-    });
+    if (node.dataset.tipInit === '1') return; // idempotent — never double-bind
+    node.dataset.tipInit = '1';
+    if (!tooltip.id) tooltip.id = 'arch-tip-' + i;
+    node.setAttribute('tabindex', '0');
+    node.setAttribute('aria-describedby', tooltip.id);
+    // Hover (desktop)
+    node.addEventListener('mouseenter', () => placeTooltip(node, tooltip));
     node.addEventListener('mouseleave', () => { tooltip.style.display = 'none'; });
+    // Keyboard focus only (a tap-induced focus is handled by the click toggle below)
+    node.addEventListener('focus', () => { if (!tipViaPointer) placeTooltip(node, tooltip); });
+    node.addEventListener('blur', () => { tooltip.style.display = 'none'; });
+    // Tap / click toggle (touch devices with no hover)
+    node.addEventListener('click', e => {
+      e.stopPropagation();
+      const isOpen = tooltip.style.display === 'block';
+      hideAllTooltips();
+      if (!isOpen) placeTooltip(node, tooltip);
+    });
   });
+  // Tap anywhere else dismisses an open tooltip on touch
+  document.addEventListener('click', hideAllTooltips);
 }
 
 /* ---------- init ---------- */
 window.addEventListener('load', () => {
+  initSectionHeaders();
   ehReset();
   buildTimeline();
   initTooltips();
