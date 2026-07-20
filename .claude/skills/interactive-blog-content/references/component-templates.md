@@ -135,6 +135,39 @@ export class MyWidgetComponent implements OnDestroy {
 }
 ```
 
+## 5. Stepper / multi-chip row (must fit the ~660px content column)
+
+A horizontal row of N numbered "steps" (or tabs/chips) is a common widget — but at the blog's
+~660px content width it wraps two ugly ways unless authored carefully:
+
+- **Labels break mid-phrase** ("Activity 1" → two lines) when chips are forced to equal width
+  with `flex: 1 1 0` — flex-basis `0` sizes chips by grow factor alone and ignores the label.
+- **A lone chip drops to a second row, full-width**, when the chips' natural total just exceeds
+  the column and each chip is allowed to grow into the empty row.
+
+Size chips to their content, keep every label on one line, and keep the per-chip footprint small
+so all N fit one row at ~660px (it still wraps as whole chips on true mobile):
+
+```css
+.stepper { display: flex; flex-wrap: wrap; gap: 4px; }  /* wraps whole chips on mobile */
+.seg {
+  flex: 1 1 auto;          /* size to content, then share leftover width — NOT `1 1 0` */
+  min-width: 0;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 8px;        /* compact — 7 short-label chips must fit ~660px */
+  font-size: 11.5px;
+  /* + card border / bg / radius from the palette */
+}
+.seg-label { white-space: nowrap; }   /* never break a label mid-phrase */
+.seg .dot { width: 18px; height: 18px; }  /* small number badge */
+```
+
+Reference: `apps/blog-app/src/content/2026-07-20-getting-started-with-temporal/durable-flow.component.ts`
+(the 7-step "Surviving a worker crash" stepper). Rule of thumb: at ~660px, ~7 chips with short
+labels is the ceiling for one row. Beyond that, drop the number badges, shorten labels, or make
+the row scroll instead of wrap (`flex-wrap: nowrap; overflow-x: auto` with `flex: 1 0 auto` chips).
+Always confirm in the browser at the real content width, not a wide viewport (see SKILL.md → Verify).
+
 ## Palette reference
 
 | Token | Value | Use |

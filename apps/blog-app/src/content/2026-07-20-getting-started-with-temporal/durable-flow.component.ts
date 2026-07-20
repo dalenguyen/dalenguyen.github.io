@@ -175,23 +175,23 @@ const STEPS: Step[] = [
       }
       .stepper {
         display: flex;
-        gap: 6px;
+        gap: 4px;
         flex-wrap: wrap;
       }
       .seg {
         flex: 1 1 auto;
-        min-width: 78px;
+        min-width: 0;
         display: flex;
         align-items: center;
-        gap: 7px;
+        gap: 6px;
         background: #0b0f16;
         border: 1px solid #30363d;
         border-radius: 9px;
-        padding: 7px 9px;
+        padding: 6px 8px;
         cursor: pointer;
         color: #9aa7b5;
         font: inherit;
-        font-size: 12px;
+        font-size: 11.5px;
         transition: all 0.15s;
       }
       .seg:hover {
@@ -201,8 +201,8 @@ const STEPS: Step[] = [
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        width: 20px;
-        height: 20px;
+        width: 18px;
+        height: 18px;
         border-radius: 50%;
         background: #21262d;
         font-size: 11px;
