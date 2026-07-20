@@ -89,6 +89,14 @@ skill is unnecessary.
   (good for SEO / no-JS). Do not access `window`/`document` at construction time.
 - **Clean up side effects.** Any component using `setInterval`/`setTimeout`/listeners must
   clear them in `ngOnDestroy` — the route detaches and destroys mounted views on navigation.
+- **Multi-chip rows (steppers, tab bars) must fit the ~660px content column.** A horizontal
+  row of N labeled "chips" wraps two ugly ways at blog width: labels break mid-phrase when chips
+  are forced to equal width with `flex: 1 1 0` (flex-basis `0` ignores the label), or a lone chip
+  drops to a second row when the chips' natural total exceeds the column and each is allowed to
+  grow. Author chips to size to their content and keep labels on one line — `flex: 1 1 auto;
+  min-width: 0` on the chip, `white-space: nowrap` on the label — and keep the per-chip footprint
+  small (compact padding, gap, and any number badge) so all N fit one row at ~660px. It still
+  wraps as whole chips on true mobile. See the stepper block in `references/component-templates.md`.
 
 ## Canonical examples in the repo
 
@@ -110,5 +118,14 @@ Shared engine: `src/app/blog/charts/` (`bar-chart.component.ts`, `chart.types.ts
    `http://localhost:<port>/blog/<slug>` (reload with cache ignored), confirm each widget
    mounts, is interactive, AND that content **after** every widget still renders (catches the
    inline-tag truncation gotcha).
+   - **Check layout at the real content width (~640–720px), not a wide 900px+ viewport** — a
+     wide window lets chip/stepper rows fit and hides mid-label wrapping. "Mounts and is
+     clickable" is NOT enough; a stepper can be fully functional and still visually ragged.
+   - ShadowDom hides a widget's internals from a plain `document.querySelector`. To measure
+     chips, find the host (`[...document.querySelectorAll('*')].find(e => e.shadowRoot?.querySelector('.stepper'))`)
+     and inspect `host.shadowRoot`; confirm each chip is one row (`labelEl.scrollHeight` ≈ one
+     line) and the stepper is a single row at that width.
+   - Prefer verifying on the PR's **Vercel preview** (clean build) over a long-lived local dev
+     server, which can serve a stale glob for brand-new content files.
 
 See `references/component-templates.md` for copy-paste skeletons.
