@@ -78,6 +78,52 @@ That first bullet — the compression gap on a single bundle — is the biggest 
 
 <div data-chart="compression">Chart: transfer size of a 500 KB JS bundle uncompressed vs. gzip vs. brotli. Enable JavaScript to view.</div>
 
+## A real snapshot: green where it's easy, slow where it sells
+
+None of this is hypothetical. Here is the same battery of checks run against a live storefront — an Angular/AnalogJS app SSR'd on a managed Google runtime — captured with PageSpeed Insights and `curl` on the same afternoon. The scores look great, until you put the **product** page next to the **home** page, and mobile next to desktop:
+
+| | Home · mobile | Home · desktop | Product · mobile | Product · desktop |
+|---|---|---|---|---|
+| Performance | 93 | 100 | **76** | 98 |
+| Accessibility | 100 | 100 | 100 | 100 |
+| Best Practices | 100 | 100 | 100 | 100 |
+| SEO | 100 | 100 | 100 | 100 |
+| LCP | 2.9 s | 0.6 s | **5.9 s** | 1.1 s |
+
+Same product URL: **98 on desktop, 76 on mobile** — a 22-point swing that lives entirely in the throttling. Neither page has field (CrUX) data yet, so nothing from real users contradicts the flattering desktop number. Lesson #4, in the wild.
+
+The wire shows where the mobile time goes — and, just as usefully, where it *doesn't*. Almost everything the audit *would* grade is already handled:
+
+```bash
+# Static bundle: already doing everything right.
+$ curl -sSI -H 'Accept-Encoding: br' https://…/assets/index-*.js
+content-encoding: br
+cache-control: public, max-age=31536000, immutable      # 128 KB, brotli, immutable ✓
+
+# Catalog images: write-path fix + backfill already shipped.
+$ curl -sSI https://<image-bucket>/…/photo-1_1600.webp
+cache-control: public, max-age=31536000, immutable      # ✓
+
+# SSR HTML, though, ships raw — identical bytes with or without br:
+$ curl -sS -H 'Accept-Encoding: br, gzip' https://…/products/… | wc -c
+16427
+$ curl -sS -H 'Accept-Encoding: identity'  https://…/products/… | wc -c
+16427                                                   # no content-encoding at all
+```
+
+And the LCP element is already prioritized — this is *not* the blanket-lazy-load anti-pattern:
+
+```html
+<img fetchpriority="high" src="…/photo-1_1600.webp" ...>   <!-- eager, high priority ✓ -->
+```
+
+So what is left on a page scoring 76/100 on mobile? Precisely the two costs a page score can't see:
+
+- The hero is a **1600 px, ~143 KB webp** handed to a ~400 px mobile viewport with no responsive `srcset`, fetched from a **cross-origin** image bucket that pays its own DNS and TLS. Prioritized and cached — and still the heaviest single byte on a throttled-4G LCP path.
+- The **HTML document is uncompressed**. Tiny in absolute terms (~16 KB → ~5 KB with brotli) and, exactly as the essay warns, an order of magnitude below the static win — which is why it never becomes a scored failure, only a diagnostic you have to go read.
+
+Green on every surface that is easy to grade; the real mobile cost sits in a cross-origin hero image and a raw document — visible only when you throttle on purpose and read the wire.
+
 ## Lessons learned
 
 1. **Grade the transport, not the page.** One `curl -I` answers questions no score will. Check `Content-Encoding`, `Cache-Control`, and the status code before you read any number out of a lab tool.
