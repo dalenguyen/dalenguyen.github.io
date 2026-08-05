@@ -238,7 +238,9 @@ onRender() {
 
 ```html
 <!-- grid: only the first row is above the fold -->
-<card *for="item, i of items" [priority]="i < 4" />
+@for (item of items; track item.id; let i = $index) {
+  <product-card [item]="item" [priority]="i < 4" />
+}
 ```
 
 ### 7. Defer third-party SDK side effects to the interaction that needs them
