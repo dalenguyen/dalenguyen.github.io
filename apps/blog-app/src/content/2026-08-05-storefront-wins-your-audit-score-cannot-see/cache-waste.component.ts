@@ -27,13 +27,13 @@ const fmt = (kb: number): string => (kb < 1000 ? Math.round(kb) + ' KB' : (kb / 
       </div>
 
       <div class="slider-row">
-        <span class="muted">Repeat visits</span>
+        <span class="muted">Visits</span>
         <input
           type="range"
           min="1"
           max="20"
           step="1"
-          aria-label="Number of repeat visits"
+          aria-label="Number of visits"
           [value]="visits()"
           [attr.aria-valuetext]="visits() + ' visits'"
           (input)="visits.set(+$any($event.target).value)"
@@ -67,8 +67,10 @@ const fmt = (kb: number): string => (kb < 1000 ? Math.round(kb) + ' KB' : (kb / 
       </p>
 
       <p class="note">
-        A 200 with a fresh body every time looks identical to success. The write-path fix is one header — but
-        everything already uploaded keeps the old policy until you backfill.
+        Worst case: no validator, so every visit is a full re-download. With an ETag, max-age=0 becomes a
+        revalidation round trip — a 304, not the body — smaller, but still a per-asset cost every visit. An immutable
+        policy skips it entirely, and the write-path fix is one header — but everything already uploaded keeps the old
+        policy until you backfill.
       </p>
     </div>
   `,

@@ -1,11 +1,11 @@
 ---
 title: "The Storefront Wins Your Audit Score Can't See"
-slug: 2026-08-04-storefront-wins-your-audit-score-cannot-see
+slug: 2026-08-05-storefront-wins-your-audit-score-cannot-see
 description: An ecommerce site can score 100 on SEO and accessibility, report a sub-second LCP, and still waste hundreds of kilobytes on every visit and compete with itself in search. Here's where the biggest wins actually hide — in the headers, status codes, and platform defaults nobody grades.
 categories: ['web-performance', 'seo', 'ecommerce', 'frontend', 'core-web-vitals']
-coverImage: https://dalenguyen.me/assets/images/blog/storefront-wins-your-audit-score-cannot-see.png
+coverImage: https://dalenguyen.me/assets/images/blog/2026-08-05-storefront-wins-your-audit-score-cannot-see.png
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2026-08-04T09:00:00.000Z
+published: 2026-08-05T09:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
@@ -45,7 +45,7 @@ Step through those blind spots below. The green score on the left never moves �
 
 An audit is a **single rendered DOM plus a fast page load**. Ecommerce cost is mostly *not* in the DOM:
 
-```
+```text
              what a page audit actually grades
         ┌──────────────────────────────────────┐
         │  DOM · a11y tree · meta tags         │
@@ -67,7 +67,7 @@ Three structural reasons the gap persists:
 ## Symptoms (generic examples)
 
 - A storefront's client bundle goes out at **~500 KB uncompressed**; brotli would make it **~130 KB**. Nothing in the app is misconfigured — the SSR runtime just ships static files as-is and there's no CDN in front of it.
-- Product photos in a managed object store default to `private, max-age=0`. A 40-thumbnail category page **refetches every image on every visit**, and no edge can hold any of them.
+- Product photos in a managed object store can ship with a weak default — say `private, max-age=0`, or no `Cache-Control` at all (exact value varies by provider). A 40-thumbnail category page then **refetches every image on every visit**, and no edge can hold any of them.
 - Fingerprinted asset URLs (content-hashed, never rewritten) carry only `ETag` and `Last-Modified`, so a repeat visitor still pays a revalidation round trip per file.
 - `/shoes?color=red&sort=price` returns 200 with the **same `&lt;title&gt;`** as `/shoes`, and no canonical — so every facet combination is a crawlable near-duplicate competing with the listing it came from.
 - `/robots-old.txt`, `/anything`, `/a/b/c` all return **200 with the empty app shell**. Crawlers spend budget on them and may index them as homepage duplicates.
@@ -80,7 +80,7 @@ That first bullet — the compression gap on a single bundle — is the biggest 
 
 ## A real snapshot: green where it's easy, slow where it sells
 
-None of this is hypothetical. Here is the same battery of checks run against a live storefront — an Angular/AnalogJS app SSR'd on a managed Google runtime — captured with PageSpeed Insights and `curl` on the same afternoon. The scores look great, until you put the **product** page next to the **home** page, and mobile next to desktop:
+None of this is hypothetical. Here is the same battery of checks run against a live storefront — [Ruby Rose Bloom](https://rubyrosebloom.com), an Angular/AnalogJS app SSR'd on a managed Google runtime — captured with PageSpeed Insights and `curl` on the same afternoon. Two pages went under the lens: the [home page](https://rubyrosebloom.com) and a representative [product page](https://rubyrosebloom.com/products/vintage-takahashi-san-francisco-city-cat-mug). The scores look great, until you put the **product** page next to the **home** page, and mobile next to desktop:
 
 | | Home · mobile | Home · desktop | Product · mobile | Product · desktop |
 |---|---|---|---|---|
@@ -92,22 +92,26 @@ None of this is hypothetical. Here is the same battery of checks run against a l
 
 Same product URL: **98 on desktop, 76 on mobile** — a 22-point swing that lives entirely in the throttling. Neither page has field (CrUX) data yet, so nothing from real users contradicts the flattering desktop number. Lesson #4, in the wild.
 
+Toggle between the score and the LCP that drives it — the gap is the whole point:
+
+<div data-chart="snapshot">Chart: Lighthouse Performance score and LCP for the home and product pages, mobile vs. desktop. Enable JavaScript to view.</div>
+
 The wire shows where the mobile time goes — and, just as usefully, where it *doesn't*. Almost everything the audit *would* grade is already handled:
 
 ```bash
 # Static bundle: already doing everything right.
-$ curl -sSI -H 'Accept-Encoding: br' https://…/assets/index-*.js
+$ curl -sSI -H 'Accept-Encoding: br' https://rubyrosebloom.com/assets/index-*.js
 content-encoding: br
 cache-control: public, max-age=31536000, immutable      # 128 KB, brotli, immutable ✓
 
-# Catalog images: write-path fix + backfill already shipped.
-$ curl -sSI https://<image-bucket>/…/photo-1_1600.webp
+# Catalog images (Firebase Storage): write-path fix + backfill already shipped.
+$ curl -sSI 'https://firebasestorage.googleapis.com/…/photo-1_1600.webp'
 cache-control: public, max-age=31536000, immutable      # ✓
 
 # SSR HTML, though, ships raw — identical bytes with or without br:
-$ curl -sS -H 'Accept-Encoding: br, gzip' https://…/products/… | wc -c
+$ curl -sS -H 'Accept-Encoding: br, gzip' https://rubyrosebloom.com/products/… | wc -c
 16427
-$ curl -sS -H 'Accept-Encoding: identity'  https://…/products/… | wc -c
+$ curl -sS -H 'Accept-Encoding: identity'  https://rubyrosebloom.com/products/… | wc -c
 16427                                                   # no content-encoding at all
 ```
 
@@ -199,6 +203,8 @@ log(`${total} objects — ${updated} updated, ${skipped} already correct`);
 ```
 
 Then verify **on the live URL**, not in the script's own output, and re-run to confirm it reports zero changes.
+
+One caveat that makes `immutable` safe: it only belongs on URLs that change when the bytes change. Fingerprinted asset filenames get this for free; for catalog media, put the version in the path (`…/photo-1_v2.webp`, or a content hash) so a re-upload is a *new* URL. If you overwrite an image at the same path, `immutable` will happily serve the stale bytes for a year — there use a shorter `max-age` with revalidation instead.
 
 ### 4. Canonicalize once, centrally — and suppress it on error pages
 

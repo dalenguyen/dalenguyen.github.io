@@ -6,11 +6,13 @@ import { ChartManifest } from '../../app/blog/charts/mount-charts'
 import { BlindSpotsComponent } from './blind-spots.component'
 import { CacheWasteComponent } from './cache-waste.component'
 import { compressionConfig } from './compression.data'
+import { snapshotConfig } from './snapshot.data'
 
 const manifest: ChartManifest = {
   'blind-spots': { component: BlindSpotsComponent },
   compression: { component: BarChartComponent, inputs: { config: compressionConfig } },
   'cache-cost': { component: CacheWasteComponent },
+  snapshot: { component: BarChartComponent, inputs: { config: snapshotConfig } },
 }
 
 export default manifest
