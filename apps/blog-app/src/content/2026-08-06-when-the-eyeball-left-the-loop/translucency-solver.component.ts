@@ -406,41 +406,51 @@ export class TranslucencySolverComponent {
     const b2 = this.bg2()
     const trueC = this.overlay()
 
-    // Solve per channel where the two backgrounds differ enough to be reliable.
+    // Estimate the shared alpha from each channel whose two backgrounds differ
+    // enough to be reliable. Alpha is shared across channels, so a single
+    // reliable channel is sufficient — the others only reveal the 8-bit wobble.
     const alphas: number[] = []
-    const colors: (number | null)[] = [null, null, null]
     for (let i = 0; i < 3; i++) {
       const denom = b1[i] - b2[i]
       if (Math.abs(denom) < 8) continue // backgrounds too close on this channel
       const oneMinusA = (c1[i] - c2[i]) / denom
-      const a = Math.max(0, Math.min(1, 1 - oneMinusA))
-      alphas.push(a)
-      if (a > 0.02) colors[i] = (c1[i] - (1 - a) * b1[i]) / a
+      alphas.push(Math.max(0, Math.min(1, 1 - oneMinusA)))
     }
 
-    if (alphas.length < 2) {
-      return {
-        ok: false,
-        reason: 'Pick two backgrounds that differ — one sample (or near-identical backgrounds) can’t separate color from opacity.',
-        perChannelAlpha: [],
-        meanAlpha: 0,
-        snappedAlpha: 0,
-        wobble: 0,
-        color: [0, 0, 0],
-        colorHex: '#000000',
-        colorDelta: 0,
-        suspicious: false,
-      }
+    const unrecoverable = (reason: string): Recovery => ({
+      ok: false,
+      reason,
+      perChannelAlpha: [],
+      meanAlpha: 0,
+      snappedAlpha: 0,
+      wobble: 0,
+      color: [0, 0, 0],
+      colorHex: '#000000',
+      colorDelta: 0,
+      suspicious: false,
+    })
+
+    if (alphas.length < 1) {
+      return unrecoverable(
+        'Pick two backgrounds that differ — identical backgrounds paint identical pixels, so nothing separates color from opacity.',
+      )
     }
 
     const meanAlpha = alphas.reduce((s, a) => s + a, 0) / alphas.length
+    if (meanAlpha < 0.02) {
+      return unrecoverable(
+        'At ~0% opacity the overlay leaves no trace — its color is unrecoverable, no matter how many samples you take.',
+      )
+    }
+
     const wobble = Math.max(...alphas) - Math.min(...alphas)
     const snappedAlpha = Math.round(meanAlpha * 100) / 100 // nearest 1%
 
-    // Recover color per channel; fall back to the true value on any channel we
-    // couldn't solve (backgrounds equal there) so the swatch stays meaningful.
-    const color = colors.map((c, i) =>
-      c == null ? trueC[i] : Math.max(0, Math.min(255, Math.round(c))),
+    // With the shared alpha known, recover every channel from one composite
+    // sample — no per-channel background difference needed, and no peeking at the
+    // true overlay. (trueC below is used only to score the delta, never to solve.)
+    const color = c1.map((comp, i) =>
+      Math.max(0, Math.min(255, Math.round((comp - (1 - meanAlpha) * b1[i]) / meanAlpha))),
     ) as RGB
     const colorDelta = Math.max(...color.map((c, i) => Math.abs(c - trueC[i])))
 

@@ -49,7 +49,7 @@ The shift in one line: **you stopped being the author and became the instrument.
 Between what an agent writes and what a user sees are layers that only exist at
 runtime:
 
-```
+```text
 [ intent ]      [ authored code ]      [ resolved style ]      [ composited pixels ]
 "borderless" ─► variant="ghost"   ─►   cascade decides    ─►   alpha blended over
                 + base classes         among conflicting        whatever ancestor
@@ -161,7 +161,7 @@ what the render actually shows:
 two different colors over two different backgrounds, it's an overlay with alpha. Two
 samples are enough to recover both the color and the opacity:
 
-```
+```text
 composite = a·C + (1-a)·background        (per channel)
 
   ⇒  (1-a) = (composite₁ - composite₂) / (background₁ - background₂)

@@ -44,11 +44,11 @@ const ROWS: Row[] = [
         <span class="goal">goal: drop the border</span>
       </div>
 
-      <div class="toggle" role="tablist" aria-label="View mode">
-        <button class="tab" role="tab" [class.on]="mode() === 'code'" [attr.aria-selected]="mode() === 'code'" (click)="mode.set('code')">
+      <div class="toggle" role="group" aria-label="View mode">
+        <button class="tab" type="button" [class.on]="mode() === 'code'" [attr.aria-pressed]="mode() === 'code'" (click)="mode.set('code')">
           Read the diff
         </button>
-        <button class="tab" role="tab" [class.on]="mode() === 'render'" [attr.aria-selected]="mode() === 'render'" (click)="mode.set('render')">
+        <button class="tab" type="button" [class.on]="mode() === 'render'" [attr.aria-pressed]="mode() === 'render'" (click)="mode.set('render')">
           Measure the render
         </button>
       </div>
