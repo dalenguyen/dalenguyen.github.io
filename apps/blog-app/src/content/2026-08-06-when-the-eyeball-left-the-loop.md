@@ -49,17 +49,7 @@ The shift in one line: **you stopped being the author and became the instrument.
 Between what an agent writes and what a user sees are layers that only exist at
 runtime:
 
-```text
-[ intent ]      [ authored code ]      [ resolved style ]      [ composited pixels ]
-"borderless" ─► variant="ghost"   ─►   cascade decides    ─►   alpha blended over
-                + base classes         among conflicting        whatever ancestor
-                  the shared           declarations             is behind it
-                  component adds
-
-     ▲                  ▲                      ▲                       ▲
- agent reasons     CI checks here          nothing              nothing
-    here                                 checks here          checks here
-```
+<div data-chart="layers">Diagram: the pipeline from intent ("borderless") to authored code (variant="ghost" plus the shared component's base classes) to resolved style (the cascade deciding among conflicting declarations) to composited pixels (alpha-blended over whatever ancestor is behind it). The agent reasons at the intent layer and CI checks the authored code, but nothing checks the resolved style or the composited pixels. Enable JavaScript to view.</div>
 
 Three concrete ways the right-hand side bites:
 
