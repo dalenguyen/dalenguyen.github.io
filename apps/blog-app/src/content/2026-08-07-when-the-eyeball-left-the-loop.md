@@ -5,7 +5,7 @@ description: Delegating frontend work to a coding agent quietly removes the one 
 categories: ['ai-agents', 'frontend', 'css', 'verification', 'developer-workflow']
 coverImage: https://dalenguyen.me/assets/images/blog/when-the-eyeball-left-the-loop.png
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2026-08-07T00:00:00.000Z
+published: 2026-08-07T10:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
