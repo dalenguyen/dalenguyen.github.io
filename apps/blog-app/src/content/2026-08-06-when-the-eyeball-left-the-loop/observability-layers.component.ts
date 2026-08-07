@@ -46,9 +46,9 @@ const LAYERS: Layer[] = [
       </div>
 
       <p class="caption">
-        Left of the boundary, the agent and CI can observe the consequences of a change. Right of it, the
-        resolved style and composited pixels exist only at runtime — unit tests, component tests, and code
-        review are all blind. <b>Trust follows observability.</b>
+        In the green layers, the agent and CI can observe the consequences of a change. The red layers
+        exist only at runtime — unit tests, component tests, and code review are all blind there.
+        <b>Trust follows observability.</b>
       </p>
     </div>
   `,
