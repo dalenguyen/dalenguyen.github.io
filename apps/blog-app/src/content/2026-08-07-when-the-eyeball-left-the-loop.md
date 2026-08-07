@@ -1,11 +1,11 @@
 ---
 title: "When the Eyeball Left the Loop"
-slug: 2026-08-06-when-the-eyeball-left-the-loop
+slug: 2026-08-07-when-the-eyeball-left-the-loop
 description: Delegating frontend work to a coding agent quietly removes the one verification step nobody ever wrote down — the human glance. Here's why code review can't recover it, and how your job shifts from writing the styling to measuring the render.
 categories: ['ai-agents', 'frontend', 'css', 'verification', 'developer-workflow']
 coverImage: https://dalenguyen.me/assets/images/blog/when-the-eyeball-left-the-loop.png
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2026-08-06T00:00:00.000Z
+published: 2026-08-07T00:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
