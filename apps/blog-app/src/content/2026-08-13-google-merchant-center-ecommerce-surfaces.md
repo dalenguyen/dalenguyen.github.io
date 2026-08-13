@@ -1,7 +1,7 @@
 ---
 title: "Rich Results, Shopping, and AI Mode: What Google Merchant Center Actually Gets You"
 slug: 2026-08-13-google-merchant-center-ecommerce-surfaces
-description: Which Google surfaces a product feed actually reaches — organic rich results, the Shopping tab, AI Mode — and the report I should have opened first, which said 5 of my 436 pages were indexed.
+description: Which Google surfaces Product JSON-LD and a Merchant Center feed each make you eligible for — organic rich results, the Shopping tab, AI Mode — and the report I should have opened first, which said 5 of my 436 pages were indexed.
 categories: ['seo', 'ecommerce', 'google-merchant-center', 'google-search']
 coverImage: https://dalenguyen.me/assets/images/blog/2026-08-13-google-merchant-center-ecommerce-surfaces.png
 profileImage: assets/images/dale-nguyen-avatar.webp
@@ -33,7 +33,7 @@ Free listings is the whole story for this shop. Worth saying plainly since most 
 
 ## The surfaces, one by one
 
-"Merchant Center" isn't a single destination. Registering a feed there feeds several different Google surfaces, and each one is driven by a different mechanism. Conflating them is the easiest way to misdiagnose why a product isn't showing up somewhere.
+"Merchant Center" isn't a single destination. Registering a feed there can make your products eligible for several different Google surfaces, and each one is driven by a different mechanism. Conflating them is the easiest way to misdiagnose why a product isn't showing up somewhere.
 
 ### Organic Search: JSON-LD earns this one, no Merchant Center required
 
@@ -72,7 +72,7 @@ Here's the part worth sitting with. Look at what AI Mode actually quoted back in
 
 But I want to be precise about what this evidence does and doesn't show, because it's thinner than it looks. Google documents no Merchant Center requirement for AI Mode at all — AI Mode cites ordinary web pages routinely, and a shop with no feed is not locked out of being quoted. So this is an observation about *shape*, not a mechanism I can point to in anyone's documentation: the facts those answers reached for were structured facts, and a feed is the artifact that forces you to state them precisely and identically everywhere. Not free, either — a feed is a second place your prices and availability have to stay true, and every consistency contract you sign is one you can breach. Cheap relative to what it buys, is the most I'd claim.
 
-What it isn't is evidence that the feed gets you cited. I have zero AI Mode citations for Ruby Rose Bloom and no timeline on which I expect that to change. Etsy and eBay are winning these answers today on depth, account age, and inventory density that a three-day-old account with 431 items doesn't have, and no amount of clean markup substitutes for that. Whether the work pays off here is an open question I can only answer by watching.
+What it isn't is evidence that the feed gets you cited. I have zero AI Mode citations for Ruby Rose Bloom and no timeline on which I expect that to change. The sources winning these answers have depth, account age, and inventory density that a three-day-old account with 431 items doesn't — I'd guess that's why they're there rather than me, but a guess is all it is; Google doesn't publish the ranking. Whether the work pays off here is an open question I can only answer by watching.
 
 ## Approved isn't visible yet
 
@@ -89,13 +89,13 @@ Approval is permission to compete for placement, not placement itself. I origina
   <figcaption>The number that explains everything else: 5 indexed, 60 not. No amount of Merchant Center approval competes with a page Google hasn't indexed.</figcaption>
 </figure>
 
-Fifty-nine product pages sat in **"Discovered – currently not indexed"** — Google knew the URLs existed and had decided they weren't worth fetching. One click and three impressions in the performance report is exactly what five indexed pages earns you.
+Fifty-nine product pages sat in **"Discovered – currently not indexed"** — Google knew the URLs existed and had decided they weren't worth fetching. One click and three impressions in the performance report is exactly the order of magnitude you'd expect from five indexed pages.
 
 Everything else in Search Console was clean, which is what made this easy to miss: no manual actions, no security issues, HTTPS fine, breadcrumbs valid, sitemap read successfully with all 436 URLs, every product page returning 200 with real server-rendered HTML, a canonical, and complete Product JSON-LD. Every report I'd been checking was green. The one I hadn't opened said the site was effectively invisible.
 
 The cause turned out to be crawl shape, and I found it by curling my own shop page:
 
-```
+```bash
 $ curl -s https://rubyrosebloom.com/shop | grep -oE 'href="/products/[a-z0-9-]+"' | sort -u | wc -l
 24
 $ curl -s https://rubyrosebloom.com/shop | grep -oE 'href="/shop\?[^"]*"'
@@ -104,10 +104,12 @@ href="/shop?before=1786502561613"
 
 Twenty-four products, and exactly one way forward: a cursor. I wrote a script to walk the chain. **Eighteen sequential hops to reach all 431 products.** Two things wrong with that, and the second is worse than the first:
 
-1. **Depth.** Products on hop fifteen are invisible in practice to a crawler budgeting a new, low-authority domain.
-2. **Instability.** That cursor is an epoch-millisecond timestamp. Sell one item, add one item, and every downstream cursor URL changes. Googlebot doesn't recrawl a stable page 12 — it discovers a brand new URL, forever. That is how a site manufactures its own "Discovered – currently not indexed" pile.
+1. **Depth.** Products fifteen hops in are a long way down for a crawler deciding how much of a new, low-authority domain is worth fetching.
+2. **Instability.** That cursor is an epoch-millisecond timestamp. Sell one item, add one item, and every downstream cursor URL changes — so instead of recrawling a stable page 12, Googlebot meets a URL it has never seen, again, on every pass.
 
-The fix was three server-rendered routes — `/shop/page/:page`, `/shop/:category`, and `/shop/:category/page/:page` — replacing the opaque cursor with offset paging, plus a category nav and a full pager of plain `<a href>` links. The interactive infinite scroll still uses the cursor; the crawler now has stable paths beside it. Categories had been query parameters only (`/shop?category=drinkware` was a 200, `/shop/drinkware` a 404), so they became real paths too.
+To be clear about what that second point is: a mechanism I'm inferring, not documented Googlebot behaviour. Google describes link-based discovery and algorithmic crawl decisions, and doesn't promise or forbid any of this. What I have is the correlation — a catalogue reachable only through churning URLs, and 59 of its pages parked in "Discovered – currently not indexed" — plus the fact that the churn is trivially avoidable. That was enough for me to stop theorising and change the URLs.
+
+The fix was three server-rendered routes — `/shop/page/:page`, `/shop/:category`, and `/shop/:category/page/:page` — replacing the opaque cursor with offset paging, plus a category nav and a full pager of plain server-rendered links — real anchors with an `href`, not click handlers. The interactive infinite scroll still uses the cursor; the crawler now has stable paths beside it. Categories had been query parameters only (`/shop?category=drinkware` was a 200, `/shop/drinkware` a 404), so they became real paths too.
 
 Measured against the deployed site, breadth-first, following only server-rendered anchors:
 
@@ -118,17 +120,17 @@ Measured against the deployed site, breadth-first, following only server-rendere
 | products reachable | 431 | 431 |
 | URLs in `sitemap.xml` | 435 | 475 |
 
-One detail that matters more than it looks: unknown categories and out-of-range pages now return a genuine **404 with `noindex`**, not an empty grid with a 200. A soft 404 is a page Google keeps in its "discovered" pile indefinitely, which is precisely the pit I was trying to climb out of.
+One detail that matters more than it looks: unknown categories and out-of-range pages now return a genuine **404 with `noindex`**, not an empty grid with a 200. A soft 404 can sit unindexed while still consuming crawl activity — spending the budget I was trying to conserve, on pages that were never going to rank.
 
 There's a cost, and it's fair to name it: offset paging bills a database read per skipped document, so `/shop/page/18` costs roughly 408 reads where the cursor cost 24. That is the price of a URL that means the same thing tomorrow. For this catalogue it's worth paying. At ten thousand products it wouldn't be, and I'd be looking at keyset pagination on a stable sort key instead.
 
-If you take one thing from this post, take this: **I spent three days on structured data and feed fields while the actual problem was that Google had indexed five pages.** The feed work was not wasted — it's a prerequisite, and the disapproval count stayed at zero because of it — but I was optimising the quality of a signal that almost nothing could see. Open the Pages report first.
+If you take one thing from this post, take this: **I spent three days on structured data and feed fields while the actual problem was that Google had indexed five pages.** The feed work was not wasted — it's a prerequisite for the Shopping tab either way, and it coincided with a disapproval count of zero — but I was optimising the quality of a signal that almost nothing could see. Open the Pages report first.
 
 ## What it takes to get in
 
 The mechanics, once you know which surface you're aiming at. Two blockers turned out to matter more than the field-level detail: no policy pages, and no way for structured data to say "there will never be an identifier for this."
 
-**Policy pages, first.** Merchant Center requires a shopper to reach a returns policy and a clearly available way to contact the shop. What it asks for is contact information that's clear and consistent wherever it appears; a form is one accepted way to provide it, and so are an address, a phone number, or a social profile. Ruby Rose Bloom offered none of them. This is a top rejection cause and it's a code fix, not a console setting: `/returns` (shipping, final sale, damaged-in-transit) and `/contact`. This shop went with a form — honeypot, server-side validation, transactional email with `Reply-To` set to the visitor — because I didn't want a mailbox sitting in crawlable HTML, but a published address would have cleared the policy just as well. Both pages linked from the footer on every page and listed in `sitemap.xml`. The feed genuinely could not ship before these did — its own field choices (the shipping rate it advertises) depend on `/returns` existing and agreeing with checkout.
+**Policy pages, first.** Merchant Center requires a shopper to reach a returns policy and a clearly available way to contact the shop. What it asks for is contact information that's clear and consistent wherever it appears; a form is one accepted way to provide it, and so are an address, a phone number, or a social profile. Ruby Rose Bloom offered none of them. This is a documented rejection cause and it's a code fix, not a console setting: `/returns` (shipping, final sale, damaged-in-transit) and `/contact`. This shop went with a form — honeypot, server-side validation, transactional email with `Reply-To` set to the visitor — because I didn't want a mailbox sitting in crawlable HTML, but a published address would have cleared the policy just as well. Both pages linked from the footer on every page and listed in `sitemap.xml`. The feed genuinely could not ship before these did — its own field choices (the shipping rate it advertises) depend on `/returns` existing and agreeing with checkout.
 
 **The feed, second**, at `/feed/google-merchant.xml` — the whole live catalogue as RSS 2.0, built by a pure, unit-tested mapper with the route kept thin. The field discipline that mattered:
 
