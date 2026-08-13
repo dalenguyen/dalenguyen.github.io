@@ -1,7 +1,7 @@
 ---
 title: "Rich Results, Shopping, and AI Mode: What Google Merchant Center Actually Gets You"
 slug: 2026-08-13-google-merchant-center-ecommerce-surfaces
-description: A product feed isn't just a Shopping-tab checkbox. Which Google surfaces it actually reaches — organic rich results, the Shopping tab, AI Mode — and which ones it demonstrably doesn't, mapped with screenshots.
+description: Which Google surfaces a product feed actually reaches — organic rich results, the Shopping tab, AI Mode — and the report I should have opened first, which said 5 of my 436 pages were indexed.
 categories: ['seo', 'ecommerce', 'google-merchant-center', 'google-search']
 coverImage: https://dalenguyen.me/assets/images/blog/2026-08-13-google-merchant-center-ecommerce-surfaces.png
 profileImage: assets/images/dale-nguyen-avatar.webp
@@ -13,6 +13,8 @@ draft: false
 [Ruby Rose Bloom](https://rubyrosebloom.com) sells one-of-a-kind vintage — a self-hosted storefront, no Shopify, no marketplace underneath it. Search Console's "Merchant opportunities" report told me 3 active products weren't showing up on the Shopping tab, and I went looking for the setting to fix. There wasn't one. What I actually found, three days of digging later, is that "get into Merchant Center" is not one thing — it's several different surfaces, each fed by a different mechanism, and the one everyone talks about (the Shopping tab) turned out to be the least interesting of them.
 
 This post is the question I actually had, answered with screenshots taken today: **I have a storefront. What does getting into Merchant Center buy me, and where do my products actually end up?**
+
+It also has an ending I didn't plan. After three days of feed fields and structured data I opened one Search Console report I'd been ignoring and found that Google had indexed **5 of my 436 pages**. That section is the most useful thing here, and it's the part I'd read first if I were you.
 
 ## What Merchant Center actually is
 
@@ -74,9 +76,53 @@ What it isn't is evidence that the feed gets you cited. I have zero AI Mode cita
 
 ## Approved isn't visible yet
 
-Before the "does it work" question, one honest gap. A Shopping tab search for the exact product title — `"Vintage Arcopal France milk glass teacup set of 3"` — returns Etsy, eBay, and Poshmark listings, not Ruby Rose Bloom's, despite that exact item being **approved** in Merchant Center today. A bare `rubyrosebloom` Shopping query comes back empty too.
+Before the "does it work" question, one honest gap. A Shopping tab search for the exact product title — `"Vintage Arcopal France milk glass teacup set of 3"` — returns Etsy, eBay, and Poshmark listings, not Ruby Rose Bloom's, despite that exact item being **approved** in Merchant Center. A bare `rubyrosebloom` Shopping query returns rose bushes from Home Depot and offers "Did you mean: ruby rose bloom."
 
-Approval is permission to compete for placement, not placement itself. There's a real lag between "Google's review process signed off on this item" and "this item is actually being surfaced" — plausibly indexing time, plausibly a cold-start ranking penalty against listings with years of click history, probably both. I don't have a number for how long that lag runs; I only have three days of data and it hasn't closed yet. If you ship a feed and check the Shopping tab the same week expecting to see your own products, don't be surprised when you don't.
+Approval is permission to compete for placement, not placement itself. I originally wrote that the lag was "plausibly indexing time, plausibly a cold-start ranking penalty, probably both," and left it there. That was the lazy version. When I went back and actually opened the rest of Search Console, the answer was sitting in the Pages report.
+
+## The real bottleneck was indexing, and it wasn't subtle
+
+**Five pages indexed. Four hundred and thirty-six submitted.**
+
+<figure>
+  <img src="assets/images/blog/2026-08-13-search-console-page-indexing.png" alt="Google Search Console Page indexing report showing 5 indexed pages and 60 not indexed, with two reasons listed" width="100%" height="auto" />
+  <figcaption>The number that explains everything else: 5 indexed, 60 not. No amount of Merchant Center approval competes with a page Google hasn't indexed.</figcaption>
+</figure>
+
+Fifty-nine product pages sat in **"Discovered – currently not indexed"** — Google knew the URLs existed and had decided they weren't worth fetching. One click and three impressions in the performance report is exactly what five indexed pages earns you.
+
+Everything else in Search Console was clean, which is what made this easy to miss: no manual actions, no security issues, HTTPS fine, breadcrumbs valid, sitemap read successfully with all 436 URLs, every product page returning 200 with real server-rendered HTML, a canonical, and complete Product JSON-LD. Every report I'd been checking was green. The one I hadn't opened said the site was effectively invisible.
+
+The cause turned out to be crawl shape, and I found it by curling my own shop page:
+
+```
+$ curl -s https://rubyrosebloom.com/shop | grep -oE 'href="/products/[a-z0-9-]+"' | sort -u | wc -l
+24
+$ curl -s https://rubyrosebloom.com/shop | grep -oE 'href="/shop\?[^"]*"'
+href="/shop?before=1786502561613"
+```
+
+Twenty-four products, and exactly one way forward: a cursor. I wrote a script to walk the chain. **Eighteen sequential hops to reach all 431 products.** Two things wrong with that, and the second is worse than the first:
+
+1. **Depth.** Products on hop fifteen are invisible in practice to a crawler budgeting a new, low-authority domain.
+2. **Instability.** That cursor is an epoch-millisecond timestamp. Sell one item, add one item, and every downstream cursor URL changes. Googlebot doesn't recrawl a stable page 12 — it discovers a brand new URL, forever. That is how a site manufactures its own "Discovered – currently not indexed" pile.
+
+The fix was three server-rendered routes — `/shop/page/:page`, `/shop/:category`, and `/shop/:category/page/:page` — replacing the opaque cursor with offset paging, plus a category nav and a full pager of plain `<a href>` links. The interactive infinite scroll still uses the cursor; the crawler now has stable paths beside it. Categories had been query parameters only (`/shop?category=drinkware` was a 200, `/shop/drinkware` a 404), so they became real paths too.
+
+Measured against the deployed site, breadth-first, following only server-rendered anchors:
+
+| | before | after |
+| --- | --- | --- |
+| listing links on `/shop` | 1 | 27 |
+| **deepest product from `/shop`** | **18 hops** | **2 hops** |
+| products reachable | 431 | 431 |
+| URLs in `sitemap.xml` | 435 | 475 |
+
+One detail that matters more than it looks: unknown categories and out-of-range pages now return a genuine **404 with `noindex`**, not an empty grid with a 200. A soft 404 is a page Google keeps in its "discovered" pile indefinitely, which is precisely the pit I was trying to climb out of.
+
+There's a cost, and it's fair to name it: offset paging bills a database read per skipped document, so `/shop/page/18` costs roughly 408 reads where the cursor cost 24. That is the price of a URL that means the same thing tomorrow. For this catalogue it's worth paying. At ten thousand products it wouldn't be, and I'd be looking at keyset pagination on a stable sort key instead.
+
+If you take one thing from this post, take this: **I spent three days on structured data and feed fields while the actual problem was that Google had indexed five pages.** The feed work was not wasted — it's a prerequisite, and the disapproval count stayed at zero because of it — but I was optimising the quality of a signal that almost nothing could see. Open the Pages report first.
 
 ## What it takes to get in
 
@@ -104,7 +150,21 @@ if (product.salePriceCents !== null) push('g:sale_price', money(product.salePric
 
 `identifier_exists` is a Merchant Center feed attribute with no equivalent in page markup: schema.org gives you fields for a GTIN or MPN you *have*, and none for declaring that one will never exist. That gap is a real reason to run a feed on top of JSON-LD that's already earning rich results — not because organic Search demands an identifier (it doesn't), but because feed validation is a different, stricter reviewer.
 
-One honest caveat on the snippet above: it sets `no` for the entire catalogue, and the spec wants it computed per product — `no` only when there's no GTIN and no brand/MPN pair. Plenty of these pieces do carry a brand (Arcopal, Paragon), so the per-product version is the correct one and the blanket value is a simplification that has cost nothing yet. Worth fixing before it does.
+The snippet above has a bug, and I'm leaving it visible because a reviewer caught it and the catch is the useful part. It sets `no` for the *entire* catalogue. The spec wants it computed per product — `no` only when there's no GTIN and no brand/MPN pair — and 35 of these 431 items were already submitting a `g:brand` while simultaneously declaring that no identifier existed. Contradicting yourself in the same item is not a thing you want a validator to notice on its own schedule.
+
+Fixed since: emit the brand where there is one, fall back to `identifier_exists: no` only where there genuinely isn't. 35 items now submit real matchable brands — Wedgwood, Royal Albert, Waterford, Spode, Georg Jensen — and 396 keep the honest `no`. Worth checking your own feed for this exact contradiction; it produced zero disapprovals for months and was still wrong.
+
+The other field Google asked for, via Search Console's Merchant listings report, was `deliveryTime` inside `offers.shippingDetails` — missing on every item. Adding it is easy. Getting it *right* is a business question dressed as a schema question, because `deliveryTime` is a public promise, not a tag:
+
+```json
+"deliveryTime": {
+  "@type": "ShippingDeliveryTime",
+  "handlingTime": { "minValue": 1, "maxValue": 2, "unitCode": "DAY" },
+  "transitTime": { "minValue": 2, "maxValue": 8, "unitCode": "DAY" }
+}
+```
+
+Handling time is sourced: the returns page already promised a carrier handoff within two business days. Transit time is an estimate — the real number comes from the carrier per destination, long after the feed is built — so it errs wide deliberately, and it lives in one shared constant that both the page markup and the feed's `<g:shipping>` read. Same rule as the shipping rate: one number, one place, or the two drift apart and the mismatch becomes a disapproval.
 
 A few more rules, briefly. I can't prove any single one of them prevented a specific rejection — Merchant Center doesn't itemise the disapprovals you didn't get — but each is a documented way to earn one:
 
@@ -177,12 +237,16 @@ Search Console's own crawl-based report — the one that started all this — no
   <figcaption>Merchant Center's product status, same day: 22 approved, 0 limited, 0 not approved, 409 under review.</figcaption>
 </figure>
 
-The feed itself: 431 products, fetched daily. Merchant Center's breakdown at capture time: 22 approved, 0 limited, 0 not approved, 409 under review. "Under review" is most of the catalogue. My read is that a new account's first feed gets worked through in batches rather than all at once, which would explain 22 decided against 409 waiting on a three-day-old account — but that's an interpretation of one screenshot, not something Google told me. The number that matters isn't 22, it's the zero next to "not approved" — with the caveat that it's a zero measured against 22 decided items, and the 409 still in the queue can only move it upward.
+The feed itself: 431 products, fetched daily. Merchant Center's breakdown when I took that screenshot: 22 approved, 0 limited, 0 not approved, 409 under review. By the end of the same day it read **410 approved, 0 limited, 0 not approved, 21 under review** — the queue drained in hours, not the weeks I'd braced for, and nothing failed on the way through. So the batch-review reading held up, though I'd still call it an interpretation of two screenshots rather than documented behaviour. The number that matters isn't 22, it's the zero next to "not approved" — with the caveat that it's a zero measured against 22 decided items, and the 409 still in the queue can only move it upward.
 
-Across the surfaces: organic Search rich results, already working, feed-independent. Shopping tab, approved but not yet found for the exact items I checked. AI Mode, zero citations so far, on a feed three days old competing against marketplaces with years of inventory density. The crawl saw 5 items; the feed delivered 431 with nothing marked "not approved" so far — but that's a statement about correctness, and about the portion Google has actually ruled on, not about traffic. I don't have traffic to report yet.
+Across the surfaces: organic Search rich results, already working, feed-independent. Shopping tab, approved but not yet found for the exact items I checked. AI Mode, zero citations so far, on a feed three days old competing against marketplaces with years of inventory density. The crawl saw 5 items; the feed delivered 431 with nothing marked "not approved" — but that's a statement about correctness, not about traffic, and there is no traffic to report.
+
+And underneath all of it, the number that reframes the rest: **5 pages indexed out of 436.** The catalogue is now two hops deep on stable URLs instead of eighteen deep on cursors that change whenever inventory does, and the sitemap has been resubmitted. Whether that moves the indexing count is a question for next week's Pages report, not this post. Recrawling is not instant and I am not going to pretend I've already seen the result.
 
 ## What I won't claim
 
-The account is three days old. There are no Shopping tab clicks, no AI Mode citations, no conversion numbers — nothing that would let me say this drove traffic or revenue, because it hasn't had time to. What I can say concretely: 431 items submitted with zero marked "not approved" at capture time and 409 still under review, a rate limiter that trades precision for cost on a route worth neither, a hydration bug only a real browser would have caught, a 1000-item ceiling that's a named limitation rather than a surprise, and a real, observed gap between "approved in Merchant Center" and "found on the Shopping tab" that I'm not going to paper over with optimism.
+The account is three days old. There are no Shopping tab clicks, no AI Mode citations, no conversion numbers — nothing that would let me say this drove traffic or revenue, because it hasn't had time to. The crawl fix shipped hours ago and I have no idea yet whether it works; "two hops instead of eighteen" is a measurement of my own site, not of Google's behaviour toward it.
 
-The AI Mode angle is the speculative part of this post, and I want it to stay speculative on the page rather than only in my head: the facts those answers quoted — price, discount, condition, availability — are the same facts a feed makes you pin down, which is a decent reason to have one. It is not evidence that a feed gets you cited, and Google doesn't claim a feed is required for AI Mode either. If you're running your own storefront and Search Console just nudged you about the same thing: check for a returns page and a contact page before you touch anything structured-data-related, then ship the feed. The Shopping tab does require Merchant Center. The Shopping Graph is looser than that — Google builds it from product information across the web, structured data included — so a feed is one way to contribute to it, not the only door. Then wait and watch, honestly, for whether it was enough.
+What I can say concretely: 431 items submitted, 410 approved and zero marked "not approved"; a rate limiter that trades precision for cost on a route worth neither, and whose per-IP bucket is only sound if the ingress overwrites the header it keys on; a hydration bug only a real browser would have caught; a 1000-item ceiling that's a named limitation rather than a surprise; a feed that contradicted itself on 35 items for months without a single disapproval; and a real, observed gap between "approved in Merchant Center" and "found on the Shopping tab" that I'm not going to paper over with optimism.
+
+The AI Mode angle is the speculative part of this post, and I want it to stay speculative on the page rather than only in my head: the facts those answers quoted — price, discount, condition, availability — are the same facts a feed makes you pin down, which is a decent reason to have one. It is not evidence that a feed gets you cited, and Google doesn't claim a feed is required for AI Mode either. If you're running your own storefront and Search Console just nudged you about the same thing, do it in this order: **open the Pages report and find out how much of your site Google has actually indexed**, because every other optimisation is downstream of that. Then check for a returns page and a contact page. Then ship the feed. The Shopping tab does require Merchant Center. The Shopping Graph is looser than that — Google builds it from product information across the web, structured data included — so a feed is one way to contribute to it, not the only door. Then wait and watch, honestly, for whether it was enough.
