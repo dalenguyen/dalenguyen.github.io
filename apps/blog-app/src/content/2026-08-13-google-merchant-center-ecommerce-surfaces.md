@@ -1,16 +1,16 @@
 ---
 title: "Rich Results, Shopping, and AI Mode: What Google Merchant Center Actually Gets You"
-slug: 2026-08-13-google-shopping-tab-product-feed-analogjs
-description: A product feed isn't just a Shopping-tab checkbox. It's the same structured data an AI agent quotes back when someone asks where to buy something — mapped across the surfaces, with screenshots.
-categories: ['seo', 'ecommerce', 'analogjs', 'angular', 'google-merchant-center']
-coverImage: https://dalenguyen.me/assets/images/blog/2026-08-13-google-shopping-tab-product-feed-analogjs.png
+slug: 2026-08-13-google-merchant-center-ecommerce-surfaces
+description: A product feed isn't just a Shopping-tab checkbox. Which Google surfaces it actually reaches — organic rich results, the Shopping tab, AI Mode — and which ones it demonstrably doesn't, mapped with screenshots.
+categories: ['seo', 'ecommerce', 'google-merchant-center', 'google-search']
+coverImage: https://dalenguyen.me/assets/images/blog/2026-08-13-google-merchant-center-ecommerce-surfaces.png
 profileImage: assets/images/dale-nguyen-avatar.webp
 published: 2026-08-13T10:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
 
-[Ruby Rose Bloom](https://rubyrosebloom.com) sells one-of-a-kind vintage — Angular/AnalogJS on Cloud Run, Firestore for the catalogue, Stripe for checkout. Search Console's "Merchant opportunities" report told me 3 active products weren't showing up on the Shopping tab, and I went looking for the setting to fix. There wasn't one. What I actually found, three days of digging later, is that "get into Merchant Center" is not one thing — it's several different surfaces, each fed by a different mechanism, and the one everyone talks about (the Shopping tab) turned out to be the least interesting of them.
+[Ruby Rose Bloom](https://rubyrosebloom.com) sells one-of-a-kind vintage — a self-hosted storefront, no Shopify, no marketplace underneath it. Search Console's "Merchant opportunities" report told me 3 active products weren't showing up on the Shopping tab, and I went looking for the setting to fix. There wasn't one. What I actually found, three days of digging later, is that "get into Merchant Center" is not one thing — it's several different surfaces, each fed by a different mechanism, and the one everyone talks about (the Shopping tab) turned out to be the least interesting of them.
 
 This post is the question I actually had, answered with screenshots taken today: **I have a storefront. What does getting into Merchant Center buy me, and where do my products actually end up?**
 
@@ -42,7 +42,7 @@ This is the surface that surprised me, because it doesn't need Merchant Center a
   <figcaption>Organic Search, not Shopping: price and availability rendered straight from the page's own Product JSON-LD.</figcaption>
 </figure>
 
-That's the Product JSON-LD already on every product page — the same `price`, `availability`, `itemCondition`, `shippingDetails`, `hasMerchantReturnPolicy` block I assumed, at the start of all this, must be broken because the Shopping tab report was complaining. It isn't broken. It's driving a different surface, and it was doing that before the Merchant Center account existed at all. The distinction worth keeping straight: **JSON-LD earns rich results in ordinary Search. The feed earns placement in Shopping and the Shopping Graph.** Two mechanisms, two surfaces, and the Search Console report that started this whole investigation was only ever describing one of them.
+That's the Product JSON-LD already on every product page — the same `price`, `availability`, `itemCondition`, `shippingDetails`, `hasMerchantReturnPolicy` block I assumed, at the start of all this, must be broken because the Shopping tab report was complaining. It isn't broken. It's driving a different surface, and it was doing that before the Merchant Center account existed at all. The distinction worth keeping straight: **Product JSON-LD on the page can earn rich results in ordinary Search. Merchant Center product data can earn free listings across Shopping, Search, and Google's AI surfaces.** Two overlapping paths, not two sealed lanes — they feed some of the same places, and either one buys you *eligibility*, never display. The Search Console report that started this whole investigation was only ever describing the first of them.
 
 ### Shopping tab and the Shopping Graph: what the feed is for
 
@@ -66,9 +66,11 @@ Then I asked about a specific item the shop actually has listed: *"Paragon Warra
   <figcaption>AI Mode citing a competing Etsy listing by price, discount, and condition — the exact fields a product feed standardises.</figcaption>
 </figure>
 
-Here's the part worth sitting with. Look at what AI Mode actually quoted back in both cases: price, a discount, condition, availability. Those are not paragraph-summary facts pulled from prose — they're structured fields. That's not a coincidence. **The fields a product feed standardises are the same fields that make a listing quotable by a machine, rather than merely readable by a person.** A shop with clean structured data isn't just easier for a crawler to parse; it's the kind of source an AI answer can lift a fact from with confidence, instead of having to summarize ambiguous page text and hope.
+Here's the part worth sitting with. Look at what AI Mode actually quoted back in both cases: price, a discount, condition, availability. Those aren't paragraph-summary impressions pulled from prose — they're discrete, checkable values. **The facts an AI answer reaches for are the same facts a product feed forces you to state exactly: one price, one condition, one availability, identical everywhere they appear.** A shop whose numbers are unambiguous is a shop an answer can lift a fact from without hedging.
 
-But I want to be precise about what this evidence does and doesn't show. Being in the feed is **necessary, not sufficient.** Etsy and eBay are winning these citations today because they bring depth, account age, and inventory density to the Shopping Graph that a three-day-old Merchant Center account with 431 items does not. I have zero AI Mode citations to show for Ruby Rose Bloom, and I'm not going to claim the feed will change that on any timeline — I don't have the data to back that claim, and this post isn't going to manufacture it. What I can say is the inverse, and it's the actual argument for doing this work: **you cannot be cited by an agent in a channel where you have no presence at all.** The feed is the entry ticket, not the result. Whether it pays off is a separate, unproven question I'll only be able to answer by watching over time.
+But I want to be precise about what this evidence does and doesn't show, because it's thinner than it looks. Google documents no Merchant Center requirement for AI Mode at all — AI Mode cites ordinary web pages routinely, and a shop with no feed is not locked out of being quoted. So this is an observation about *shape*, not a mechanism I can point to in anyone's documentation: the facts those answers reached for were structured facts, and a feed is the artifact that forces you to state them precisely and identically everywhere. That's cheap to do and it can't hurt.
+
+What it isn't is evidence that the feed gets you cited. I have zero AI Mode citations for Ruby Rose Bloom and no timeline on which I expect that to change. Etsy and eBay are winning these answers today on depth, account age, and inventory density that a three-day-old account with 431 items doesn't have, and no amount of clean markup substitutes for that. Whether the work pays off here is an open question I can only answer by watching.
 
 ## Approved isn't visible yet
 
@@ -80,7 +82,7 @@ Approval is permission to compete for placement, not placement itself. There's a
 
 The mechanics, once you know which surface you're aiming at. Two blockers turned out to matter more than the field-level detail: no policy pages, and no way for structured data to say "there will never be an identifier for this."
 
-**Policy pages, first.** Merchant Center requires a shopper to reach a returns policy and a way to contact the shop. Ruby Rose Bloom had neither. This is a top rejection cause and it's a code fix, not a console setting: `/returns` (shipping, final sale, damaged-in-transit) and `/contact` — a real reactive form, not a mailto link, with a honeypot, server-side validation, and delivery via Resend with `Reply-To` set to the visitor. Both linked from the footer on every page and listed in `sitemap.xml`. The feed genuinely could not ship before these did — its own field choices (the shipping rate it advertises) depend on `/returns` existing and agreeing with checkout.
+**Policy pages, first.** Merchant Center requires a shopper to reach a returns policy and a clearly available way to contact the shop. A form, an email address, a phone number, a social profile — any of them satisfies it; Ruby Rose Bloom published none of them. This is a top rejection cause and it's a code fix, not a console setting: `/returns` (shipping, final sale, damaged-in-transit) and `/contact`. This shop went with a form — honeypot, server-side validation, transactional email with `Reply-To` set to the visitor — because I didn't want a mailbox sitting in crawlable HTML, but a published address would have cleared the policy just as well. Both pages linked from the footer on every page and listed in `sitemap.xml`. The feed genuinely could not ship before these did — its own field choices (the shipping rate it advertises) depend on `/returns` existing and agreeing with checkout.
 
 **The feed, second**, at `/feed/google-merchant.xml` — the whole live catalogue as RSS 2.0, built by a pure, unit-tested mapper with the route kept thin. The field discipline that mattered:
 
@@ -100,15 +102,17 @@ push('g:price', money(product.priceCents));
 if (product.salePriceCents !== null) push('g:sale_price', money(product.salePriceCents));
 ```
 
-`identifier_exists: no` is the whole reason a feed exists on top of the JSON-LD that was already earning rich results in Search. A crawler working from page markup alone has no channel to declare "there will never be a barcode for this" — it just holds the item, waiting for an identifier that's never coming. A feed has a field for that.
+`identifier_exists` is a Merchant Center feed attribute with no equivalent in page markup: schema.org gives you fields for a GTIN or MPN you *have*, and none for declaring that one will never exist. That gap is a real reason to run a feed on top of JSON-LD that's already earning rich results — not because organic Search demands an identifier (it doesn't), but because feed validation is a different, stricter reviewer.
+
+One honest caveat on the snippet above: it sets `no` for the entire catalogue, and the spec wants it computed per product — `no` only when there's no GTIN and no brand/MPN pair. Plenty of these pieces do carry a brand (Arcopal, Paragon), so the per-product version is the correct one and the blanket value is a simplification that has cost nothing yet. Worth fixing before it does.
 
 A few more rules, briefly, because each one is a real disapproval avoided:
 
-- `google_product_category` is deliberately **omitted** — Google infers it from title, description, and images, and a hand-guessed taxonomy path is the kind of wrong that gets an item disapproved rather than miscategorised.
+- `google_product_category` is optional and deliberately **omitted** — Google assigns a category from the product's own signals when you leave it out. Two different failures if you don't: an *invalid* taxonomy value can get the item disapproved outright, and a *valid but wrong* one quietly applies that category's requirements instead. Override it when the inferred category is actually wrong, not on principle.
 - `g:size` and `g:color` are lifted out of the product's own spec rows, because apparel gets held without them.
 - Additional images cap at 10 — an eleventh invalidates the *whole item*, not just the extra photo.
 - Products with no photo are skipped entirely; `image_link` is required, so including them could only inflate the error count.
-- Sold items leave the feed on their own (they drop out of the Firestore query that backs it); items held by a pending checkout stay in as `out_of_stock`.
+- Sold items leave the feed on their own (they drop out of the query that backs it); items held by a pending checkout stay in as `out_of_stock`.
 - The route 404s without `SITE_URL`, same rule as `robots.txt` and `sitemap.xml` — every link in a feed is absolute, and a feed of wrong links is worse than no feed.
 - A 1000-item ceiling from `listLive({ limit: 1000 })` — a full-catalogue fetch in one request, because Merchant Center delists anything missing from a fetch, so paginating the feed would silently drop products every refresh. It's a real ceiling and an honest limitation, not a number chosen for looks — the first thing to revisit once the catalogue gets close to it.
 
@@ -119,7 +123,7 @@ Registering it: create the Merchant Center account from the link Search Console 
   <figcaption>The feed registered as a scheduled daily fetch — 431 products, last pulled today.</figcaption>
 </figure>
 
-One rule that cuts across all of it: **any number stated in two places has to agree, or the mismatch is a disapproval.** The flat shipping rate in Merchant Center's settings, the `<g:shipping><g:price>` the feed advertises, and what checkout actually charges at Stripe — three places, one number. Drift in any one of them and the whole catalogue starts failing shipping validation at once, not gracefully.
+One rule that cuts across all of it: **any number stated in two places has to agree, or the mismatch is a disapproval.** The flat shipping rate in Merchant Center's settings, the `<g:shipping><g:price>` the feed advertises, and what checkout actually charges the shopper — three places, one number. Drift in any one of them and the whole catalogue starts failing shipping validation at once, not gracefully.
 
 ## Two bugs the work surfaced
 
@@ -136,18 +140,11 @@ if (!limiter.allow(callerKey(getRequestHeader(event, 'x-forwarded-for')))) {
 }
 ```
 
-The honest limitation: memory is per Cloud Run instance, and this shop runs up to 4, so the true ceiling is 20/hour spread across instances an attacker doesn't control. That's the gap between "nuisance" and "unusable inbox," not "safe" and "unsafe." A Firestore-backed counter would be exact, but it trades a flood of emails for a flood of writes — the wrong trade for a route this size.
+The honest limitation: the counter lives in memory on one server instance, and this shop scales to four, so the real ceiling is 20/hour spread across instances an attacker doesn't get to choose between. That's the gap between "nuisance" and "unusable inbox," not between "safe" and "unsafe." A shared counter in the database would be exact, but it trades a flood of emails for a flood of writes — the wrong trade for a route this size.
 
-**The submit button was enabled from first paint.** A classic SSR hydration trap, caught only by driving a real browser — every unit test passed, because unit tests don't render server HTML and then wait for Angular to attach. A click landing between server render and hydration set no state and silently did nothing.
+**The submit button was enabled from first paint.** A classic server-rendering trap, caught only by driving a real browser: the page ships fully formed HTML, including an enabled submit button, before any client-side JavaScript has attached handlers to it. A click landing in that window is accepted by the browser and observed by nothing. Every unit test passed, because unit tests never render server HTML and then wait for a framework to wake up.
 
-```diff
-- <button type="submit" [disabled]="submitting()">Send message</button>
-+ <!-- A server-rendered submit that's always enabled accepts a click
-+      Angular hasn't seen yet, and that click silently does nothing. -->
-+ <button type="submit" [disabled]="form.invalid || submitting()">Send message</button>
-```
-
-The fix doubles as how you detect hydration in an e2e test: fill the form and poll until the button enables, instead of filling once and clicking immediately.
+The fix was to render the button disabled until the form is both hydrated and valid — and it doubles as how you detect hydration in an e2e test: fill the form and poll until the button enables, instead of filling once and clicking immediately.
 
 ```ts
 await expect(async () => {
@@ -158,7 +155,7 @@ await expect(async () => {
 }).toPass({ timeout: 15_000 });
 ```
 
-If your e2e suite fills a form and clicks in the same beat on a server-rendered app, you likely have this bug on some form and just haven't hit the timing window yet.
+If your e2e suite fills a form and clicks in the same beat on a server-rendered app, you probably have this bug on some form already and just haven't hit the timing window yet.
 
 ## The results
 
@@ -176,12 +173,12 @@ Search Console's own crawl-based report — the one that started all this — no
   <figcaption>Merchant Center's product status, same day: 22 approved, 0 limited, 0 not approved, 409 under review.</figcaption>
 </figure>
 
-The feed itself: 431 products, fetched daily. Merchant Center's breakdown: 22 approved, 0 limited, 0 not approved, 409 under review. "Under review" is most of the catalogue, and that's expected — the account is three days old and Google reviews a new feed in batches, not all at once. The number that matters isn't 22, it's the zero next to "not approved."
+The feed itself: 431 products, fetched daily. Merchant Center's breakdown at capture time: 22 approved, 0 limited, 0 not approved, 409 under review. "Under review" is most of the catalogue, and that's expected — the account is three days old and Google reviews a new feed in batches, not all at once. The number that matters isn't 22, it's the zero next to "not approved" — with the caveat that it's a zero measured against 22 decided items, and the 409 still in the queue can only move it upward.
 
-Across the surfaces: organic Search rich results, already working, feed-independent. Shopping tab, approved but not yet found for the exact items I checked. AI Mode, zero citations so far, on a feed three days old competing against marketplaces with years of inventory density. The crawl saw 5 items; the feed delivered 431 with nothing disapproved — but "nothing disapproved" is a statement about correctness, not about traffic, and I don't have traffic to report yet.
+Across the surfaces: organic Search rich results, already working, feed-independent. Shopping tab, approved but not yet found for the exact items I checked. AI Mode, zero citations so far, on a feed three days old competing against marketplaces with years of inventory density. The crawl saw 5 items; the feed delivered 431 with nothing marked "not approved" so far — but that's a statement about correctness, and about the portion Google has actually ruled on, not about traffic. I don't have traffic to report yet.
 
 ## What I won't claim
 
-The account is three days old. There are no Shopping tab clicks, no AI Mode citations, no conversion numbers — nothing that would let me say this drove traffic or revenue, because it hasn't had time to. What I can say concretely: zero disapprovals on 431 submitted items, a rate limiter that trades precision for cost on a route worth neither, a hydration bug only a real browser would have caught, a 1000-item ceiling that's a named limitation rather than a surprise, and a real, observed gap between "approved in Merchant Center" and "found on the Shopping tab" that I'm not going to paper over with optimism.
+The account is three days old. There are no Shopping tab clicks, no AI Mode citations, no conversion numbers — nothing that would let me say this drove traffic or revenue, because it hasn't had time to. What I can say concretely: 431 items submitted with zero marked "not approved" at capture time and 409 still under review, a rate limiter that trades precision for cost on a route worth neither, a hydration bug only a real browser would have caught, a 1000-item ceiling that's a named limitation rather than a surprise, and a real, observed gap between "approved in Merchant Center" and "found on the Shopping tab" that I'm not going to paper over with optimism.
 
-The AI Mode angle is the speculative part of this post, and I want it to stay speculative on the page, not just in my head: the fields those answers quoted — price, discount, condition, availability — are exactly the fields a feed standardises, which is a real reason to have the feed. It is not evidence the feed gets you cited. I have none of that evidence yet. If you're running your own storefront and Search Console just nudged you about the same thing: check for a returns page and a contact page before you touch anything structured-data-related, ship the feed because it's the entry ticket to surfaces your JSON-LD alone can't reach, and then wait and watch, honestly, for whether it was enough.
+The AI Mode angle is the speculative part of this post, and I want it to stay speculative on the page rather than only in my head: the facts those answers quoted — price, discount, condition, availability — are exactly the facts a feed makes you pin down, which is a decent reason to have one. It is not evidence that a feed gets you cited, and Google doesn't claim a feed is required for AI Mode either. If you're running your own storefront and Search Console just nudged you about the same thing: check for a returns page and a contact page before you touch anything structured-data-related, ship the feed because the Shopping tab and the Shopping Graph genuinely can't be reached without one, and then wait and watch, honestly, for whether it was enough.
