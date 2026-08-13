@@ -139,13 +139,13 @@ Nothing is technically blocking them, which is what makes this the kind of bug y
 - The image URL returns **200** with `content-type: image/webp`, and serves identically to `Googlebot-Image/1.0`.
 - **No `X-Robots-Tag`** header anywhere.
 - The host's `robots.txt` is a 404 — no directives at all, so nothing is disallowed.
-- The Product JSON-LD carries a populated `image` array, there's an `og:image`, and the `<img>` has a real descriptive `alt`.
+- The Product JSON-LD carries a populated `image` array, there's an `og:image`, and the `&lt;img&gt;` has a real descriptive `alt`.
 
 Every box ticked. Still not indexed. Two differences from the shops that are, and both are mine to fix:
 
 **The photos live on someone else's domain.** They're served from `firebasestorage.googleapis.com`, not `rubyrosebloom.com`. That host isn't blocked in general — `site:firebasestorage.googleapis.com` in the Images tab returns plenty — so this isn't "Firebase Storage can't be indexed." It's subtler and worse: images on a domain you don't own inherit none of your site's crawl signals, can't be declared in your sitemap in the way Google expects, and don't show up in your Search Console property at all. You have no instrument pointed at them.
 
-**The sitemap declares no images whatsoever.** No `xmlns:image` namespace, zero `<image:image>` entries, across all 475 URLs. Image sitemap extensions exist precisely for the case where images sit on a CDN or a different host — which is exactly my case — and I'd shipped the sitemap without them.
+**The sitemap declares no images whatsoever.** No `xmlns:image` namespace, zero `&lt;image:image&gt;` entries, across all 475 URLs. Image sitemap extensions exist precisely for the case where images sit on a CDN or a different host — which is exactly my case — and I'd shipped the sitemap without them.
 
 The fix I'd expect to work is to serve product photos from `rubyrosebloom.com` (a proxy route or a CDN on the domain) and to declare them in the sitemap. I haven't shipped it yet, so I'm not going to tell you it works.
 
@@ -191,7 +191,7 @@ The other field Google asked for, via Search Console's Merchant listings report,
 }
 ```
 
-Handling time is sourced: the returns page already promised a carrier handoff within two business days. Transit time is an estimate — the real number comes from the carrier per destination, long after the feed is built — so it errs wide deliberately, and it lives in one shared constant that both the page markup and the feed's `<g:shipping>` read. Same rule as the shipping rate: one number, one place, or the two drift apart and the mismatch becomes a disapproval.
+Handling time is sourced: the returns page already promised a carrier handoff within two business days. Transit time is an estimate — the real number comes from the carrier per destination, long after the feed is built — so it errs wide deliberately, and it lives in one shared constant that both the page markup and the feed's `&lt;g:shipping&gt;` read. Same rule as the shipping rate: one number, one place, or the two drift apart and the mismatch becomes a disapproval.
 
 A few more rules, briefly. I can't prove any single one of them prevented a specific rejection — Merchant Center doesn't itemise the disapprovals you didn't get — but each is a documented way to earn one:
 
@@ -210,7 +210,7 @@ Registering it: create the Merchant Center account from the link Search Console 
   <figcaption>The feed registered as a scheduled daily fetch — 431 products, last pulled today.</figcaption>
 </figure>
 
-One rule that cuts across all of it: **any number stated in two places has to agree.** The flat shipping rate in Merchant Center's settings, the `<g:shipping><g:price>` the feed advertises, and what checkout actually charges the shopper — three places, one number. A mismatch disapproves the items it affects, and because a flat rate is a single account-level setting, "the items it affects" is potentially everything. Keep mismatching and the consequences escalate past individual items. It's a bad category of mistake to make repeatedly.
+One rule that cuts across all of it: **any number stated in two places has to agree.** The flat shipping rate in Merchant Center's settings, the `&lt;g:shipping&gt;&lt;g:price&gt;` the feed advertises, and what checkout actually charges the shopper — three places, one number. A mismatch disapproves the items it affects, and because a flat rate is a single account-level setting, "the items it affects" is potentially everything. Keep mismatching and the consequences escalate past individual items. It's a bad category of mistake to make repeatedly.
 
 ## Two bugs the work surfaced
 
