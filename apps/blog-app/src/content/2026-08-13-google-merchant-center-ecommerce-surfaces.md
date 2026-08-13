@@ -14,7 +14,7 @@ draft: false
 
 This post is the question I actually had, answered with screenshots taken today: **I have a storefront. What does getting into Merchant Center buy me, and where do my products actually end up?**
 
-It also has an ending I didn't plan. After three days of feed fields and structured data I opened one Search Console report I'd been ignoring and found that Google had indexed **5 of my 436 pages**. That section is the most useful thing here, and it's the part I'd read first if I were you.
+It also has an ending I didn't plan. After three days of feed fields and structured data I opened one Search Console report I'd been ignoring and found that Google had indexed **5 of my 436 pages** — and, chasing that, that essentially none of my product photos were in the image index either. Those two sections are the most useful thing here, and they're the part I'd read first if I were you.
 
 ## What Merchant Center actually is
 
@@ -125,6 +125,31 @@ One detail that matters more than it looks: unknown categories and out-of-range 
 There's a cost, and it's fair to name it: offset paging bills a database read per skipped document, so `/shop/page/18` costs roughly 408 reads where the cursor cost 24. That is the price of a URL that means the same thing tomorrow. For this catalogue it's worth paying. At ten thousand products it wouldn't be, and I'd be looking at keyset pagination on a stable sort key instead.
 
 If you take one thing from this post, take this: **I spent three days on structured data and feed fields while the actual problem was that Google had indexed five pages.** The feed work was not wasted — it's a prerequisite for the Shopping tab either way, and it coincided with a disapproval count of zero — but I was optimising the quality of a signal that almost nothing could see. Open the Pages report first.
+
+## The photos aren't indexed either
+
+Then a second one surfaced, and I only found it because I looked at my own result properly instead of celebrating the rank.
+
+Search the exact title, `Collectible Vintage Sadler horse illustration mug`. Ruby Rose Bloom is the **first organic result**, above Etsy and eBay, with price and "In stock" rendered in the snippet. It looks like a win. But the Etsy result below it has a thumbnail, the eBay result below that has a thumbnail, and mine has none. For a shop selling one-of-a-kind objects that people buy with their eyes, the missing 100×100 square is arguably worth more than the position.
+
+So I checked what Google actually holds. `site:rubyrosebloom.com` in the Images tab returns **"It looks like there aren't many 'Images' matches on this topic."** Essentially nothing from the domain is in the image index. The same query for `dapperbleu.com` — another small independent vintage shop, no bigger than mine, competing for the same searches — returns a full grid. Searching the product itself returns 55 images from Etsy, eBay, Poshmark, and dapperbleu. None from me.
+
+Nothing is technically blocking them, which is what makes this the kind of bug you can stare past:
+
+- The image URL returns **200** with `content-type: image/webp`, and serves identically to `Googlebot-Image/1.0`.
+- **No `X-Robots-Tag`** header anywhere.
+- The host's `robots.txt` is a 404 — no directives at all, so nothing is disallowed.
+- The Product JSON-LD carries a populated `image` array, there's an `og:image`, and the `<img>` has a real descriptive `alt`.
+
+Every box ticked. Still not indexed. Two differences from the shops that are, and both are mine to fix:
+
+**The photos live on someone else's domain.** They're served from `firebasestorage.googleapis.com`, not `rubyrosebloom.com`. That host isn't blocked in general — `site:firebasestorage.googleapis.com` in the Images tab returns plenty — so this isn't "Firebase Storage can't be indexed." It's subtler and worse: images on a domain you don't own inherit none of your site's crawl signals, can't be declared in your sitemap in the way Google expects, and don't show up in your Search Console property at all. You have no instrument pointed at them.
+
+**The sitemap declares no images whatsoever.** No `xmlns:image` namespace, zero `<image:image>` entries, across all 475 URLs. Image sitemap extensions exist precisely for the case where images sit on a CDN or a different host — which is exactly my case — and I'd shipped the sitemap without them.
+
+The fix I'd expect to work is to serve product photos from `rubyrosebloom.com` (a proxy route or a CDN on the domain) and to declare them in the sitemap. I haven't shipped it yet, so I'm not going to tell you it works.
+
+One honest caveat before you go checking your own: **thumbnails in results are algorithmic, not guaranteed**, and they show far more often on mobile than desktop. A missing thumbnail on one query proves nothing on its own. What made this diagnosable wasn't the missing square — it was the Images tab being empty for the whole domain while a comparably-sized competitor's was full.
 
 ## What it takes to get in
 
@@ -242,6 +267,8 @@ Search Console's own crawl-based report — the one that started all this — no
 The feed itself: 431 products, fetched daily. Merchant Center's breakdown when I took that screenshot: 22 approved, 0 limited, 0 not approved, 409 under review. By the end of the same day it read **410 approved, 0 limited, 0 not approved, 21 under review** — the queue drained in hours, not the weeks I'd braced for, and nothing failed on the way through. So the batch-review reading held up, though I'd still call it an interpretation of two screenshots rather than documented behaviour. The number that matters isn't 22, it's the zero next to "not approved" — with the caveat that it's a zero measured against 22 decided items, and the 409 still in the queue can only move it upward.
 
 Across the surfaces: organic Search rich results, already working, feed-independent. Shopping tab, approved but not yet found for the exact items I checked. AI Mode, zero citations so far, on a feed three days old competing against marketplaces with years of inventory density. The crawl saw 5 items; the feed delivered 431 with nothing marked "not approved" — but that's a statement about correctness, not about traffic, and there is no traffic to report.
+
+Images: effectively zero indexed, on a domain whose photos are the product. The one query where the shop ranks first, it ranks first without a thumbnail while both listings below it have one.
 
 And underneath all of it, the number that reframes the rest: **5 pages indexed out of 436.** The catalogue is now two hops deep on stable URLs instead of eighteen deep on cursors that change whenever inventory does, and the sitemap has been resubmitted. Whether that moves the indexing count is a question for next week's Pages report, not this post. Recrawling is not instant and I am not going to pretend I've already seen the result.
 
