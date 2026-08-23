@@ -1,3 +1,5 @@
+
+
 # Dale Nguyen Portfolio Website
 
 An [Nx](https://nx.dev) monorepo powering [dalenguyen.me](https://dalenguyen.me) —
@@ -66,7 +68,7 @@ nx e2e <app>-e2e        # Cypress / Playwright
 nx storybook <project>  # Storybook
 ```
 
-Use `nx affected -t build|test|lint` to run only what changed against `origin/dev`.
+Use `nx affected -t build -t test -t lint --base=origin/dev` to run only what changed against `origin/dev`.
 
 ## Deployment
 
