@@ -2,6 +2,16 @@ import { ChangeDetectionStrategy, Component, ErrorHandler, inject, Injectable, s
 import { RouterLink, RouterModule } from '@angular/router'
 import { FooterComponent, NavService, ThemeToggleComponent } from '@dalenguyen/portfolio/shell/ui'
 
+interface NavItem {
+  id: string
+  label: string
+  route: string
+  fragment: string
+  svg: string
+  external?: boolean
+  href?: string
+}
+
 @Injectable()
 export class SentryErrorHandler implements ErrorHandler {
   // Sentry is lazy-loaded so the SDK stays out of the initial bundle; it is only
@@ -20,100 +30,189 @@ export class SentryErrorHandler implements ErrorHandler {
   imports: [RouterModule, RouterLink, FooterComponent, ThemeToggleComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
-  <div class="flex flex-col min-h-screen">
-    <!-- Header Navigation -->
-    <header class="sticky top-0 z-40 border-b border-border bg-bg/80 backdrop-blur-md supports-[backdrop-filter]:bg-bg/60">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-16 gap-4">
-          <!-- Logo and Brand -->
-          <a routerLink="/" class="flex items-center gap-2.5 shrink-0 group">
-            <img class="h-8 w-8 rounded-full ring-1 ring-border transition group-hover:ring-accent" src="/assets/images/dale-nguyen-avatar.webp" alt="Dale Nguyen" />
-            <span class="hidden sm:block text-sm font-semibold tracking-tight text-fg">Dale Nguyen</span>
-          </a>
+    <div class="flex flex-col min-h-screen">
+      <!-- Header Navigation -->
+      <header
+        class="sticky top-0 z-40 border-b border-border bg-bg/80 backdrop-blur-md supports-[backdrop-filter]:bg-bg/60"
+      >
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="flex justify-between items-center h-16 gap-4">
+            <!-- Logo and Brand -->
+            <a routerLink="/" class="flex items-center gap-2.5 shrink-0 group">
+              <img
+                class="h-8 w-8 rounded-full ring-1 ring-border transition group-hover:ring-accent"
+                src="/assets/images/dale-nguyen-avatar.webp"
+                alt="Dale Nguyen"
+              />
+              <span class="hidden sm:block text-sm font-semibold tracking-tight text-fg">Dale Nguyen</span>
+            </a>
 
-          <!-- Desktop Navigation -->
-          <nav class="hidden lg:flex items-center gap-1">
-            @for (item of navItems; track item) {
-              <a
-                [id]="item.id + '-link'"
-                [routerLink]="item.route"
-                [fragment]="item.fragment"
-                [class.text-fg]="isActive(item.id)"
-                [class.bg-surface-2]="isActive(item.id)"
-                [class.text-fg-muted]="!isActive(item.id)"
-                class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
-                (click)="setActive(item.id)"
-                >
-                <svg class="w-[18px] h-[18px]" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
-                </svg>
-                {{ item.label }}
-              </a>
-            }
-          </nav>
+            <!-- Desktop Navigation -->
+            <nav class="hidden lg:flex items-center gap-1">
+              @for (item of navItems; track item) {
+                @if (item.external) {
+                  <a
+                    [id]="item.id + '-link'"
+                    [attr.href]="item.href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    [class.text-fg]="isActive(item.id)"
+                    [class.bg-surface-2]="isActive(item.id)"
+                    [class.text-fg-muted]="!isActive(item.id)"
+                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
+                    (click)="setActive(item.id)"
+                  >
+                    <svg
+                      class="w-[18px] h-[18px]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
+                    </svg>
+                    {{ item.label }}
+                  </a>
+                } @else {
+                  <a
+                    [id]="item.id + '-link'"
+                    [routerLink]="item.route"
+                    [fragment]="item.fragment"
+                    [class.text-fg]="isActive(item.id)"
+                    [class.bg-surface-2]="isActive(item.id)"
+                    [class.text-fg-muted]="!isActive(item.id)"
+                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
+                    (click)="setActive(item.id)"
+                  >
+                    <svg
+                      class="w-[18px] h-[18px]"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
+                    </svg>
+                    {{ item.label }}
+                  </a>
+                }
+              }
+            </nav>
 
-          <!-- Right side: theme toggle + mobile menu button -->
-          <div class="flex items-center gap-2">
-            <dalenguyen-theme-toggle />
-            <button
-              type="button"
-              class="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border text-fg-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-colors"
-              (click)="toggleMobileMenu()"
-              [attr.aria-expanded]="isMobileMenuOpen()"
-              aria-label="Toggle mobile menu"
+            <!-- Right side: theme toggle + mobile menu button -->
+            <div class="flex items-center gap-2">
+              <dalenguyen-theme-toggle />
+              <button
+                type="button"
+                class="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-lg border border-border text-fg-muted hover:text-fg hover:bg-surface-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent transition-colors"
+                (click)="toggleMobileMenu()"
+                [attr.aria-expanded]="isMobileMenuOpen()"
+                aria-label="Toggle mobile menu"
               >
-              @if (!isMobileMenuOpen()) {
-                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-                </svg>
-              }
-              @if (isMobileMenuOpen()) {
-                <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              }
-            </button>
-          </div>
-
-        </div>
-      </div>
-
-      <!-- Mobile menu, show/hide based on menu state -->
-      @if (isMobileMenuOpen()) {
-        <div class="lg:hidden border-t border-border bg-bg/95 backdrop-blur-md">
-          <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-            @for (item of navItems; track item) {
-              <a
-                [id]="item.id + '-mobile-link'"
-                [routerLink]="item.route"
-                [fragment]="item.fragment"
-                [class.bg-surface-2]="isActive(item.id)"
-                [class.text-fg]="isActive(item.id)"
-                [class.text-fg-muted]="!isActive(item.id)"
-                class="px-3 py-2 rounded-lg text-base font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-2"
-                (click)="setActive(item.id); toggleMobileMenu()"
-                >
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
-                </svg>
-                {{ item.label }}
-              </a>
-            }
+                @if (!isMobileMenuOpen()) {
+                  <svg
+                    class="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+                    />
+                  </svg>
+                }
+                @if (isMobileMenuOpen()) {
+                  <svg
+                    class="block h-6 w-6"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="currentColor"
+                    aria-hidden="true"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                }
+              </button>
+            </div>
           </div>
         </div>
-      }
-    </header>
 
-    <!-- Main content with flex-grow to push footer down -->
-    <main class="flex-grow flex flex-col h-full">
-      <router-outlet />
-    </main>
+        <!-- Mobile menu, show/hide based on menu state -->
+        @if (isMobileMenuOpen()) {
+          <div class="lg:hidden border-t border-border bg-bg/95 backdrop-blur-md">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+              @for (item of navItems; track item) {
+                @if (item.external) {
+                  <a
+                    [id]="item.id + '-mobile-link'"
+                    [attr.href]="item.href"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    [class.bg-surface-2]="isActive(item.id)"
+                    [class.text-fg]="isActive(item.id)"
+                    [class.text-fg-muted]="!isActive(item.id)"
+                    class="px-3 py-2 rounded-lg text-base font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-2"
+                    (click)="setActive(item.id); toggleMobileMenu()"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
+                    </svg>
+                    {{ item.label }}
+                  </a>
+                } @else {
+                  <a
+                    [id]="item.id + '-mobile-link'"
+                    [routerLink]="item.route"
+                    [fragment]="item.fragment"
+                    [class.bg-surface-2]="isActive(item.id)"
+                    [class.text-fg]="isActive(item.id)"
+                    [class.text-fg-muted]="!isActive(item.id)"
+                    class="px-3 py-2 rounded-lg text-base font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-2"
+                    (click)="setActive(item.id); toggleMobileMenu()"
+                  >
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke-width="1.5"
+                      stroke="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.svg" />
+                    </svg>
+                    {{ item.label }}
+                  </a>
+                }
+              }
+            </div>
+          </div>
+        }
+      </header>
 
-    <!-- Footer rendered directly (lightweight) so it stays in the SSR HTML and
+      <!-- Main content with flex-grow to push footer down -->
+      <main class="flex-grow flex flex-col h-full">
+        <router-outlet />
+      </main>
+
+      <!-- Footer rendered directly (lightweight) so it stays in the SSR HTML and
          avoids a placeholder→footer layout shift. The component renders its own
          <footer> landmark, so there is no wrapper here (avoids nested landmarks). -->
-    <dalenguyen-footer/>
-  </div>
+      <dalenguyen-footer />
+    </div>
   `,
 })
 export class AppComponent {
@@ -126,7 +225,7 @@ export class AppComponent {
   // Navigation items with their inline-SVG icon paths (Heroicons outline),
   // routes and fragments. Inline SVG replaces Angular Material's <mat-icon> so
   // the shell no longer pulls in @angular/material or the Material Icons web font.
-  navItems = [
+  navItems: NavItem[] = [
     {
       id: 'blog',
       label: 'Thoughts',
@@ -168,6 +267,15 @@ export class AppComponent {
       route: '/',
       fragment: 'contact',
       svg: 'M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75',
+    },
+    {
+      id: 'shop',
+      label: 'Shop',
+      route: '',
+      fragment: '',
+      svg: 'M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z',
+      external: true,
+      href: 'https://rubyrosebloom.com/',
     },
   ]
 
