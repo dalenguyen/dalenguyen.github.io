@@ -2,6 +2,12 @@
   "name": "dalenguyen",
   "version": "1.0.0",
   "license": "MIT",
+  "packageManager": "pnpm@10.32.1",
+  "pnpm": {
+    "patchedDependencies": {
+      "@analogjs/content@2.6.1": "patches/@analogjs__content@2.6.1.patch"
+    }
+  },
   "scripts": {
     "nx": "node --max-old-space-size=8192 ./node_modules/.bin/nx",
     "ng": "nx",

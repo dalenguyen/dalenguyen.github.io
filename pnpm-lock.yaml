@@ -4,16 +4,21 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  '@analogjs/content@2.6.1':
+    hash: 7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9
+    path: patches/@analogjs__content@2.6.1.patch
+
 importers:
 
   .:
     dependencies:
       '@analogjs/content':
         specifier: 2.6.1
-        version: 2.6.1(19ba9adfe9a280cbd2b274087622deb1)
+        version: 2.6.1(patch_hash=7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9)(19ba9adfe9a280cbd2b274087622deb1)
       '@analogjs/router':
         specifier: 2.6.1
-        version: 2.6.1(@analogjs/content@2.6.1(19ba9adfe9a280cbd2b274087622deb1))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@20.3.4(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@20.3.4(@angular/animations@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))
+        version: 2.6.1(@analogjs/content@2.6.1(patch_hash=7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9)(19ba9adfe9a280cbd2b274087622deb1))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@20.3.4(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@20.3.4(@angular/animations@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))
       '@angular/animations':
         specifier: 20.3.4
         version: 20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))
@@ -18396,7 +18401,7 @@ snapshots:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
 
-  '@analogjs/content@2.6.1(19ba9adfe9a280cbd2b274087622deb1)':
+  '@analogjs/content@2.6.1(patch_hash=7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9)(19ba9adfe9a280cbd2b274087622deb1)':
     dependencies:
       '@angular/common': 20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7)
       '@angular/core': 20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)
@@ -18466,9 +18471,9 @@ snapshots:
       - uploadthing
       - xml2js
 
-  '@analogjs/router@2.6.1(@analogjs/content@2.6.1(19ba9adfe9a280cbd2b274087622deb1))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@20.3.4(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@20.3.4(@angular/animations@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))':
+  '@analogjs/router@2.6.1(@analogjs/content@2.6.1(patch_hash=7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9)(19ba9adfe9a280cbd2b274087622deb1))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/router@20.3.4(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@20.3.4(@angular/animations@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7))':
     dependencies:
-      '@analogjs/content': 2.6.1(19ba9adfe9a280cbd2b274087622deb1)
+      '@analogjs/content': 2.6.1(patch_hash=7178e23f0096051bd61bfbd719f772b3a35f02d9173cf62455ac8ca1a69a13d9)(19ba9adfe9a280cbd2b274087622deb1)
       '@angular/core': 20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)
       '@angular/router': 20.3.4(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(@angular/platform-browser@20.3.4(@angular/animations@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(@angular/common@20.3.4(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0))(rxjs@7.5.7))(@angular/core@20.3.17(@angular/compiler@20.3.4)(rxjs@7.5.7)(zone.js@0.15.0)))(rxjs@7.5.7)
       tslib: 2.8.1

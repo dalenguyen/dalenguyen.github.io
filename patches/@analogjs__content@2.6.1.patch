@@ -1,0 +1,25 @@
+diff --git a/fesm2022/analogjs-content.mjs b/fesm2022/analogjs-content.mjs
+index 85fbf48aa853ca42392f9d8130de278d5fb345ce..d94d2d06d497d8093e1dfbad5ce2a74d8adbbf5a 100644
+--- a/fesm2022/analogjs-content.mjs
++++ b/fesm2022/analogjs-content.mjs
+@@ -23,7 +23,19 @@ class AnchorNavigationDirective {
+             hasTargetSelf(element) &&
+             !hasDownloadAttribute(element)) {
+             const { pathname, search, hash } = element;
+-            const url = this.location.normalize(`${pathname}${search}${hash}`);
++            // A `<base href>` makes fragment-only hrefs (e.g. "#some-id") resolve
++            // `pathname`/`search` against the base ("/") instead of the current
++            // document, sending same-page anchor links to the wrong route (and
++            // dropping any existing query string). Use the current location for
++            // those instead.
++            const isFragmentOnly = element.getAttribute('href')?.startsWith('#');
++            const resolvedPathname = isFragmentOnly
++                ? this.document.location.pathname
++                : pathname;
++            const resolvedSearch = isFragmentOnly
++                ? this.document.location.search
++                : search;
++            const url = this.location.normalize(`${resolvedPathname}${resolvedSearch}${hash}`);
+             this.router.navigateByUrl(url);
+             return false;
+         }
