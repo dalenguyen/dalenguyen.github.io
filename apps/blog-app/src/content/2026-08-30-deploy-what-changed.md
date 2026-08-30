@@ -1,11 +1,11 @@
 ---
 title: "Deploy What Changed: Nx affected + Cloud Run + Workload Identity Federation"
-slug: 2026-08-29-deploy-what-changed
+slug: 2026-08-30-deploy-what-changed
 description: A merge to main should ship the services that merge touched, and nothing else. The whole pipeline — keyless GitHub-to-Google auth, one deploy target per app, and the dependency-graph work that makes "affected" trustworthy.
 categories: ['github-actions', 'cloud-run', 'nx', 'devops']
-coverImage: https://dalenguyen.me/assets/images/blog/2026-08-29-deploy-what-changed.png
+coverImage: https://dalenguyen.me/assets/images/blog/2026-08-30-deploy-what-changed.png
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2026-08-29T10:00:00.000Z
+published: 2026-08-30T10:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
