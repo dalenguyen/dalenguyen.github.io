@@ -40,7 +40,12 @@ Deploy identity: the nx targets pass `--account ${GCLOUD_ACCOUNT:-dale@dalenguye
 `dale@dalenguyen.me` is the default because it's the only account with access to
 `dalenguyen-prod` (the usual active account, `dale.nguyen@noibu.com`, does not). In CI or
 any other environment, set `GCLOUD_ACCOUNT` to the authenticated (service) account that
-has `roles/run.admin` + `roles/cloudbuild.builds.editor` on the project.
+has `roles/run.admin` + `roles/cloudbuild.builds.editor` + `roles/artifactregistry.writer`
++ `roles/iam.serviceAccountUser` + `roles/storage.admin` (project-scoped — `builds submit`
+checks bucket existence via a project-scoped `storage.buckets.list`, so a bucket-scoped
+grant isn't enough) + `roles/viewer` (`builds submit` needs it to stream build logs back
+to the CLI; without it the command fails even after the build itself succeeds) on the
+project.
 
 Targets: `build-server` (node-server build), `build-docker` (stage `analog/` into
 `.cloudrun/` + Cloud Build), `deploy` (Cloud Run). Image: nginx-free `node:22-slim`
@@ -63,6 +68,8 @@ dale@dalenguyen.me can run — exact commands are in the workflow file's header
 comment. Until that setup is done, the job fails harmlessly at the auth step;
 it doesn't block merges, it just means blog-app still needs a manual
 `nx run blog-app:deploy` after merging.
+
+Confirmed working end-to-end on 2026-08-30 (`blog-app-00041-vs8`, 100% traffic).
 
 ## Static vs SSR per route
 

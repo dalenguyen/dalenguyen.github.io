@@ -29,10 +29,27 @@
 # # 2. Roles this deploy actually needs: Cloud Build submit (build-docker),
 # #    Artifact Registry push, Cloud Run deploy, and SA impersonation for
 # #    the Cloud Run runtime identity.
+# #
+# #    storage.admin and viewer are NOT optional, despite not looking related
+# #    to "deploy" on paper — `gcloud builds submit` fails without them even
+# #    though cloudbuild.builds.editor sounds like it should be enough:
+# #      - storage.admin must be granted at the PROJECT level (not just on the
+# #        cloudbuild staging bucket). `builds submit` calls a project-scoped
+# #        `storage.buckets.list` to confirm the staging bucket exists, and no
+# #        bucket-level IAM binding can satisfy a project-scoped list call.
+# #      - viewer is required for `builds submit` to stream build logs back to
+# #        the CLI. Without it the command exits non-zero (and nx treats the
+# #        target as failed) even though the underlying Cloud Build + image
+# #        push already succeeded — check `gcloud builds describe` before
+# #        assuming a real failure. roles/logging.viewer is NOT sufficient;
+# #        the CLI's own error message literally checks for "Viewer/Owner of
+# #        the project" (a primitive-role check), not a fine-grained permission.
 # for R in roles/run.admin \
 #          roles/cloudbuild.builds.editor \
 #          roles/artifactregistry.writer \
-#          roles/iam.serviceAccountUser; do
+#          roles/iam.serviceAccountUser \
+#          roles/storage.admin \
+#          roles/viewer; do
 #   gcloud projects add-iam-policy-binding $PROJECT \
 #     --member="serviceAccount:$SA" --role=$R --condition=None
 # done
