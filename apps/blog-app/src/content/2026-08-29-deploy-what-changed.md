@@ -49,6 +49,10 @@ The tutorial answer is `gcloud iam service-accounts keys create`, paste the JSON
 
 Workload Identity Federation replaces it. GitHub already signs a short-lived OIDC token for every workflow run, describing the repo, the branch, the workflow. You teach Google to trust that issuer, then narrow the trust to exactly one repository. No key exists, so no key can leak.
 
+Before the `gcloud` commands, here's the whole exchange as a diagram — step through it to see where a token from the wrong repository actually gets rejected:
+
+<div data-chart="wif-flow">Diagram: GitHub Actions requests an OIDC token → GitHub signs it → Google's Workload Identity Pool verifies the issuer and repository, rejecting any repo that doesn't match → on a match, Google exchanges it for short-lived credentials scoped to the deploy service account → those credentials deploy to Cloud Run. No long-lived key exists at any step. Enable JavaScript to step through it.</div>
+
 ### Create the deploy identity
 
 ```bash
