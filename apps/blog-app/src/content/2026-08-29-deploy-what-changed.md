@@ -41,13 +41,15 @@ In an Nx workspace that means a `deploy` target per app:
 
 Now a human types `nx deploy web` and CI runs `nx affected -t deploy`. Same command, same flags, same memory limits, no drift. The rest of this post is the two hard parts: proving to Google who GitHub is, and proving to Nx what actually changed.
 
+> **New project? Create the registry first.** Container Registry stopped accepting writes on March 18, 2025 — `gcr.io` hostnames now proxy to Artifact Registry, but only for repositories that already exist. An established project usually has that mirror already; a brand-new one doesn't, and `docker push` fails with a 404 the first time. Create it once: `gcloud artifacts repositories create gcr.io --repository-format=docker --location=us --project=$PROJECT`. New projects are better off skipping the mirror entirely and pushing to `us-docker.pkg.dev/$PROJECT/gcr.io/web:latest` instead.
+
 ## 01. Identity
 
 ### Stop putting service account keys in GitHub
 
 The tutorial answer is `gcloud iam service-accounts keys create`, paste the JSON into a repo secret, done. That key is a permanent credential with deploy rights, sitting in a place many people can read, that nothing rotates and nobody revokes.
 
-Workload Identity Federation replaces it. GitHub already signs a short-lived OIDC token for every workflow run, describing the repo, the branch, the workflow. You teach Google to trust that issuer, then narrow the trust to exactly one repository. No key exists, so no key can leak.
+Workload Identity Federation replaces it. GitHub already signs a short-lived OpenID Connect (OIDC) token for every workflow run, describing the repo, the branch, the workflow. You teach Google to trust that issuer, then narrow the trust to exactly one repository. No key exists, so no key can leak.
 
 Before the `gcloud` commands, here's the whole exchange as a diagram — step through it to see where a token from the wrong repository actually gets rejected:
 
@@ -109,7 +111,10 @@ echo "$SA"      | gh secret set WIF_SERVICE_ACCOUNT
 echo "$PROJECT" | gh secret set GCP_PROJECT
 ```
 
-Tighten further when you can. `assertion.ref=='refs/heads/main'` in the condition means a pull request from a fork cannot obtain deploy credentials even if someone adds a workflow that asks for them.
+> **Tighten further before this touches production.** The condition above is repo-only, which means it trusts *any* branch and *any* workflow in `my-org/my-repo` — not just `deploy.yml` on `main`. Two changes close that gap:
+>
+> - **Restrict to the deploy ref.** Add `&& assertion.ref=='refs/heads/main'` to the condition. Now a workflow triggered from a feature branch — even one added by someone with ordinary write access — can't mint a usable token.
+> - **Bind to the repository ID, not its name.** `assertion.repository` is a name, and names get reused: delete `my-org/my-repo` and recreate it (or let the org rename), and a new, unrelated repository inherits the trust. Map `attribute.repository_id=assertion.repository_id` and `attribute.repository_owner_id=assertion.repository_owner_id` in `--attribute-mapping`, then condition and bind on those IDs instead — they don't get reassigned when a name does.
 
 ## 02. The workflow
 
@@ -144,6 +149,11 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    env:
+      # The deploy target expands $PROJECT (see apps/web/project.json above).
+      # auth@v2 exports GCP_PROJECT/GOOGLE_CLOUD_PROJECT, not PROJECT — without
+      # this line the image ref silently becomes gcr.io//web:latest.
+      PROJECT: ${{ secrets.GCP_PROJECT }}
     steps:
       # Full history: `affected` diffs two commits.
       - uses: actions/checkout@v4
@@ -273,7 +283,7 @@ They passed locally because the developer's virtualenv still held a months-old b
 ### The rest of the punch list
 
 - **Registry permissions are two roles, not one.** `gcr.io` is backed by Artifact Registry but still consults the legacy Cloud Storage bucket. Grant both `artifactregistry.writer` and `storage.admin` until you have fully migrated to `*-docker.pkg.dev`.
-- **`--update-env-vars` merges, it does not replace.** Rolling a config change back means setting every variable back to its old value, not unsetting one.
+- **`--update-env-vars` merges, it does not replace.** Rolling a config change back means setting every variable back to its old value — it won't unset one. If the newer revision *added* a variable, `--update-env-vars` can't remove it; use `--remove-env-vars KEY` for that one key, or `--clear-env-vars` to wipe all of them.
 - **Pin the platform.** `docker build --platform linux/amd64` in the deploy target, so a deploy from an Apple Silicon laptop produces the same image the runner does.
 - **Keep `latest` honest.** Tagging with the commit SHA as well as `latest` makes a rollback a one-line `gcloud run deploy --image ...:<sha>` instead of a rebuild.
 
