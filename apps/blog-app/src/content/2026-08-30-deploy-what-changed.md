@@ -116,6 +116,20 @@ echo "$PROJECT" | gh secret set GCP_PROJECT
 > - **Restrict to the deploy ref.** Add `&& assertion.ref=='refs/heads/main'` to the condition. Now a workflow triggered from a feature branch — even one added by someone with ordinary write access — can't mint a usable token.
 > - **Bind to the repository ID, not its name.** `assertion.repository` is a name, and names get reused: delete `my-org/my-repo` and recreate it (or let the org rename), and a new, unrelated repository inherits the trust. Map `attribute.repository_id=assertion.repository_id` and `attribute.repository_owner_id=assertion.repository_owner_id` in `--attribute-mapping`, then condition and bind on those IDs instead — they don't get reassigned when a name does.
 
+### The roles nobody's tutorial lists
+
+The role list above already includes `storage.admin` at the *project* level — for a reason we only learned by getting it wrong first. Wiring this up for a real project, we started tighter: `storage.admin` scoped to just the Cloud Build staging bucket, on the theory that project-wide storage admin is a lot of blast radius for one deploy pipeline. Two failed deploys later, the reason became clear: `gcloud builds submit` doesn't only read and write objects in that bucket — before it uploads anything, it calls a *project-scoped* `storage.buckets.list` to confirm the bucket exists. No bucket-level binding, however permissive, can satisfy a call scoped to the whole project. The advice above is right; don't "improve" it.
+
+The second gap isn't in the role list at all. **`roles/viewer` is required to stream build logs back to the CLI**, separate from anything Cloud Build- or Storage-specific. Without it, `gcloud builds submit` exits non-zero and the whole `nx deploy` chain reports failure — even though the Cloud Build job itself finished and pushed the image successfully. We nearly chased a phantom second bug before running `gcloud builds describe <id> --format="value(status)"` and seeing `SUCCESS` on a build the CLI, and therefore CI, had just reported as failed. `roles/logging.viewer` looks like the fix and isn't: the CLI's own error text checks for "Viewer/Owner of the project" — a primitive-role check, not a fine-grained permission.
+
+The lesson generalizes past this one pipeline: **an error from a wrapper CLI ("forbidden from accessing bucket") describes where the failure surfaced, not why.** When a permission error survives an IAM grant that should have fixed it, stop guessing at roles and get the client's raw HTTP trace instead:
+
+```bash
+gcloud builds submit apps/web --tag $IMAGE --project $PROJECT --verbosity=debug
+```
+
+It names the exact API call and scope that got denied — in less time than a second guess costs.
+
 ## 02. The workflow
 
 ### Ask Nx what to ship
