@@ -5,8 +5,10 @@ serves the public site:
 - **Cloud Run** (`dalenguyen-prod`) — **production: this is what serves
   `dalenguyen.me`.** Nitro `node-server`: prerendered routes served as static HTML,
   everything else SSR'd on demand, API routes live. Ship it with
-  `nx run blog-app:deploy` (see Deployment). Merging to `dev` does NOT update the
-  public site on its own — you must run the Cloud Run deploy.
+  `nx run blog-app:deploy` (see Deployment). Once `.github/workflows/deploy.yml`
+  has its WIF secrets configured (see Deployment), merging to `dev` with changes
+  under `apps/blog-app/**` or `libs/portfolio/shared/**` triggers this
+  automatically — otherwise you still must run the Cloud Run deploy by hand.
 - **Vercel** (project `analogjs-blog`) — **preview only.** Every PR gets a preview
   deploy (`analogjs-blog-git-<branch>-…vercel.app`) for verification; static SSG,
   every route prerendered. It is NOT the public apex.
@@ -44,6 +46,23 @@ Targets: `build-server` (node-server build), `build-docker` (stage `analog/` int
 `.cloudrun/` + Cloud Build), `deploy` (Cloud Run). Image: nginx-free `node:22-slim`
 running `analog/server/index.mjs`. Service URL:
 `https://blog-app-185772516206.us-central1.run.app`.
+
+### CI (Workload Identity Federation)
+
+`.github/workflows/deploy.yml` runs `nx run blog-app:deploy` in CI on push to
+`dev` (scoped to `apps/blog-app/**` and `libs/portfolio/shared/**`), using
+[Workload Identity Federation](https://github.com/google-github-actions/auth)
+instead of a stored key: `google-github-actions/auth@v2` mints short-lived
+credentials for a `github-deploy` service account, and the workflow sets
+`GCLOUD_ACCOUNT` on the deploy step to that service account so `gcloud` doesn't
+fall back to `dale@dalenguyen.me`.
+
+This requires a one-time GCP setup (IAM service account, workload identity pool
++ provider, `WIF_PROVIDER`/`WIF_SERVICE_ACCOUNT` repo secrets) that only
+dale@dalenguyen.me can run — exact commands are in the workflow file's header
+comment. Until that setup is done, the job fails harmlessly at the auth step;
+it doesn't block merges, it just means blog-app still needs a manual
+`nx run blog-app:deploy` after merging.
 
 ## Static vs SSR per route
 

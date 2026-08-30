@@ -1,0 +1,121 @@
+# Deploys blog-app to Cloud Run (project dalenguyen-prod) via
+# `nx run blog-app:deploy` — the same command you'd run by hand. This
+# workflow does not know how to deploy anything itself; it just calls the
+# existing target in apps/blog-app/project.json (build-server -> build-docker
+# -> deploy) with GCLOUD_ACCOUNT pointed at a Workload Identity Federation
+# (WIF) service account instead of dale@dalenguyen.me.
+#
+# Required repo secrets (Settings -> Secrets and variables -> Actions):
+#   WIF_PROVIDER        projects/<PROJECT_NUMBER>/locations/global/workloadIdentityPools/github/providers/github-provider
+#   WIF_SERVICE_ACCOUNT github-deploy@dalenguyen-prod.iam.gserviceaccount.com
+#
+# (GCP_PROJECT is intentionally not used here — the nx deploy target already
+# hardcodes --project dalenguyen-prod, so there's nothing for it to fill in.)
+#
+# ---------------------------------------------------------------------------
+# ONE-TIME SETUP (run once by dale@dalenguyen.me, with gcloud auth'd against
+# dalenguyen-prod, BEFORE this workflow can succeed):
+# ---------------------------------------------------------------------------
+#
+# PROJECT=dalenguyen-prod
+# REPO=dalenguyen/dalenguyen.github.io
+#
+# # 1. Service account CI will impersonate. No key is ever created for it.
+# gcloud iam service-accounts create github-deploy \
+#   --display-name="GitHub Actions deploy (blog-app)" --project=$PROJECT
+#
+# SA=github-deploy@$PROJECT.iam.gserviceaccount.com
+#
+# # 2. Roles this deploy actually needs: Cloud Build submit (build-docker),
+# #    Artifact Registry push, Cloud Run deploy, and SA impersonation for
+# #    the Cloud Run runtime identity.
+# for R in roles/run.admin \
+#          roles/cloudbuild.builds.editor \
+#          roles/artifactregistry.writer \
+#          roles/iam.serviceAccountUser; do
+#   gcloud projects add-iam-policy-binding $PROJECT \
+#     --member="serviceAccount:$SA" --role=$R --condition=None
+# done
+#
+# # 3. Trust GitHub's OIDC issuer, scoped to this repo only.
+# gcloud iam workload-identity-pools create github \
+#   --location=global --project=$PROJECT
+#
+# gcloud iam workload-identity-pools providers create-oidc github-provider \
+#   --location=global --workload-identity-pool=github --project=$PROJECT \
+#   --issuer-uri="https://token.actions.githubusercontent.com" \
+#   --attribute-mapping="google.subject=assertion.sub,attribute.repository=assertion.repository,attribute.ref=assertion.ref" \
+#   --attribute-condition="assertion.repository=='dalenguyen/dalenguyen.github.io' && assertion.ref=='refs/heads/dev'"
+#
+# #    (Hardening for later: repository/ref are mutable name claims. Once this
+# #    is proven working, prefer mapping+conditioning on the immutable
+# #    attribute.repository_id / attribute.repository_owner_id claims instead
+# #    — a deleted-and-recreated repo can't inherit the trust that way.)
+#
+# # 4. Let only this repo's provider impersonate the deploy SA.
+# PN=$(gcloud projects describe $PROJECT --format='value(projectNumber)')
+#
+# gcloud iam service-accounts add-iam-policy-binding $SA --project=$PROJECT \
+#   --role=roles/iam.workloadIdentityUser \
+#   --member="principalSet://iam.googleapis.com/projects/$PN/locations/global/workloadIdentityPools/github/attribute.repository/$REPO"
+#
+# # 5. Store the two values this workflow reads as repo secrets.
+# echo "projects/$PN/locations/global/workloadIdentityPools/github/providers/github-provider" \
+#   | gh secret set WIF_PROVIDER --repo $REPO
+# echo "$SA" | gh secret set WIF_SERVICE_ACCOUNT --repo $REPO
+#
+# Until these secrets exist, this workflow will run and fail at the
+# google-github-actions/auth step — that's expected and harmless: it does
+# not block merges to dev, it just means blog-app still needs a manual
+# `nx run blog-app:deploy`.
+# ---------------------------------------------------------------------------
+
+name: Deploy blog-app
+
+on:
+  push:
+    branches: [dev]
+    paths:
+      - 'apps/blog-app/**'
+      - 'libs/portfolio/shared/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+# One Cloud Run deploy at a time — a second one racing the first would be bad.
+concurrency:
+  group: deploy-blog-app
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy blog-app to Cloud Run
+        run: pnpm exec nx run blog-app:deploy
+        env:
+          # Overrides the dale@dalenguyen.me fallback baked into
+          # apps/blog-app/project.json's build-docker/deploy targets.
+          GCLOUD_ACCOUNT: ${{ secrets.WIF_SERVICE_ACCOUNT }}
