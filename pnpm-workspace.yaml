@@ -1,2 +1,0 @@
-patchedDependencies:
-  '@analogjs/content@2.6.1': patches/@analogjs__content@2.6.1.patch
