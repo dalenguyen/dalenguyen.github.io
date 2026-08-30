@@ -1,0 +1,33 @@
+name: Debug WIF bucket access
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+
+      - uses: google-github-actions/setup-gcloud@v2
+
+      - name: Whoami
+        run: gcloud auth list --format="table(account,status)"
+
+      - name: Describe bucket
+        run: gcloud storage buckets describe gs://dalenguyen-prod_cloudbuild --verbosity=debug 2>&1 || true
+
+      - name: List bucket
+        run: gcloud storage ls gs://dalenguyen-prod_cloudbuild --verbosity=debug 2>&1 || true
+
+      - name: IAM policy on SA
+        run: gcloud projects get-iam-policy dalenguyen-prod --flatten="bindings[].members" --filter="bindings.members:${{ secrets.WIF_SERVICE_ACCOUNT }}" --format="table(bindings.role)" 2>&1 || true
