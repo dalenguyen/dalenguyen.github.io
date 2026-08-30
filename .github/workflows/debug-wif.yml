@@ -20,14 +20,11 @@ jobs:
 
       - uses: google-github-actions/setup-gcloud@v2
 
-      - name: Whoami
-        run: gcloud auth list --format="table(account,status)"
+      - name: Upload test object
+        run: |
+          echo "debug" > /tmp/test.txt
+          gcloud storage cp /tmp/test.txt gs://dalenguyen-prod_cloudbuild/debug-test.txt --verbosity=debug 2>&1 || true
 
-      - name: Describe bucket
-        run: gcloud storage buckets describe gs://dalenguyen-prod_cloudbuild --verbosity=debug 2>&1 || true
-
-      - name: List bucket
-        run: gcloud storage ls gs://dalenguyen-prod_cloudbuild --verbosity=debug 2>&1 || true
-
-      - name: IAM policy on SA
-        run: gcloud projects get-iam-policy dalenguyen-prod --flatten="bindings[].members" --filter="bindings.members:${{ secrets.WIF_SERVICE_ACCOUNT }}" --format="table(bindings.role)" 2>&1 || true
+      - name: Builds submit with debug verbosity
+        run: |
+          gcloud builds submit apps/blog-app --tag us-central1-docker.pkg.dev/dalenguyen-prod/blog/blog-app --project dalenguyen-prod --quiet --verbosity=debug 2>&1 || true
