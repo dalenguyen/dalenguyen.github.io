@@ -75,8 +75,9 @@ Resolve the key from most-specific to least, then fall back only if the resource
 key="${RESOURCE_KEY:-$(scope_id || basename "$PWD")}"
 base="$STATE_ROOT/$key"
 
-# Anchored: trailing delimiter stops "$base" matching "$base-c3d4"
-in_use() { pgrep -f -- "--data-dir=$1[[:space:]]" >/dev/null 2>&1; }
+# Anchored on a delimiter OR end-of-string: "$base" cannot match
+# "$base-c3d4", and still matches when --data-dir is the last argument.
+in_use() { pgrep -f -- "--data-dir=$1([[:space:]]|\$)" >/dev/null 2>&1; }
 
 path="$base"
 if in_use "$base"; then
@@ -123,10 +124,18 @@ sed 's|^exec .*|echo "WOULD USE: $path"|' wrapper.sh | sh
 Then prove the boundary case directly with a synthetic holder, because this is the part most likely to be silently wrong:
 
 ```bash
-# fake a holder on the SUFFIXED name, then ask about the BASE name
+# 1. fake a holder on the SUFFIXED name, then ask about the BASE name
 launch_fake --data-dir="$STATE_ROOT/test-sfx" &
 in_use "$STATE_ROOT/test" && echo "BUG: base reported busy"
+
+# 2. the other direction: --data-dir as the LAST argument, nothing after it
+launch_fake --other-flag --data-dir="$STATE_ROOT/test" &
+in_use "$STATE_ROOT/test" || echo "BUG: live holder reported free"
 ```
+
+Assert both. A delimiter-only anchor (`[[:space:]]` with no `|$`) passes the
+first test and silently fails the second, because the process it is looking for
+has nothing after the path to match.
 
 ### Map holders to owners before reclaiming
 
@@ -154,8 +163,8 @@ Concurrency bugs are environmental, so prove them in the environment. Every assu
 
 - [ ] What can there be two of at once? Is my isolation key at least that fine-grained?
 - [ ] Does the key stay stable across a restart, so state survives?
-- [ ] Is the "in use" pattern anchored, so hierarchical names cannot match each other?
-- [ ] Have I asserted the false-positive case with a synthetic holder?
+- [ ] Is the "in use" pattern anchored on a delimiter *or* end-of-string, so hierarchical names cannot match each other and a last-argument holder is not missed?
+- [ ] Have I asserted BOTH failure directions with a synthetic holder - the false positive and the miss?
 - [ ] Does the identity source actually resolve inside the real execution context?
 - [ ] Is there a last-resort unique branch when identity is unresolvable?
 - [ ] Does the config change need a restart, and have I verified the new value is live?

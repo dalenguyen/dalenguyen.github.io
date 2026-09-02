@@ -72,9 +72,9 @@ const TAIL: Record<Mode, Step[]> = {
     {
       label: 'A back',
       title: '4 · Session A relaunches',
-      event: 'The anchored pattern requires whitespace right after the path.',
-      query: `pgrep -f -- "--data-dir=${ROOT}[[:space:]]"`,
-      match: `--data-dir=${ROOT}-B has "-" there, not a space → no match`,
+      event: 'The anchored pattern requires a delimiter or the end of the line right after the path.',
+      query: `pgrep -f -- "--data-dir=${ROOT}([[:space:]]|$)"`,
+      match: `--data-dir=${ROOT}-B has "-" after the path, not a delimiter or line end → no match`,
       verdict: 'FREE → A is back on the warm profile',
       bad: false,
       slots: [
@@ -87,7 +87,7 @@ const TAIL: Record<Mode, Step[]> = {
       label: 'C up',
       title: '5 · Session C launches',
       event: 'A third tab arrives.',
-      query: `pgrep -f -- "--data-dir=${ROOT}[[:space:]]"`,
+      query: `pgrep -f -- "--data-dir=${ROOT}([[:space:]]|$)"`,
       match: 'matches the base path, held by A',
       verdict: 'BUSY → C falls back to profile-C',
       bad: false,
