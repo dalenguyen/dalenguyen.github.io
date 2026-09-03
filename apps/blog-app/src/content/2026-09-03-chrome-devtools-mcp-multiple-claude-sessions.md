@@ -84,8 +84,10 @@ profile="$profiles/$key"
 if profile_busy "$profile"; then
     if tty=$(owner_tty); then
         profile="$profiles/$key-$(safe "$tty")"
-    else
-        # No tty to key on. Unique beats shared.
+    fi
+    # The tty profile can be held too, and owner_tty may have
+    # found nothing. Degrade to unique, never to shared.
+    if profile_busy "$profile"; then
         profile="$profiles/$key-pid$$"
     fi
 fi
@@ -203,6 +205,22 @@ profile_busy "$R/proj-sfx" || echo "BUG: live holder reported free"
 
 A delimiter-only anchor passes the first test and silently fails the second. That is exactly how the bug survived my own review: I asserted the false positive and never asserted the miss.
 
+## Where this still loses
+
+I measured this rather than assuming it. Three MCP servers launched at once in one repo, each asked to open a page, counting how many ended up with a working browser:
+
+| sessions | terminals | start | working browsers |
+|---|---|---|---|
+| 3 | same tty | staggered 3s | 3 of 3 |
+| 3 | distinct ttys | same instant | 3 of 3 |
+| 3 | same tty | same instant | **1 of 3** |
+
+The first two rows are the cases you actually hit: separate tabs, or the same tab used twice. Both work.
+
+The last row is a genuine limit. `profile_busy` is a check-then-act, so servers that start in the *same millisecond* all check before any of them has registered, and all three take the base profile. Nothing in a wrapper of this shape closes that window without an atomic reservation. In practice a human opening a second tab is orders of magnitude slower than the race, so this stays theoretical - but it is the honest boundary of the technique, and worth knowing before you build a script that launches ten sessions in a loop. If you do that, set `CDP_PROFILE` explicitly per session and skip the detection entirely.
+
+The re-check matters more than it looks. An earlier version of my wrapper picked the tty profile and used it without asking whether *that* one was busy, which quietly re-created the original bug one level down: two sessions in one terminal tab both landed on `-ttys010`. Any fallback chain needs a last resort that is unique rather than merely different.
+
 ## Trap 3 - fanning out multiplies the browser
 
 If you hand a browser task to three subagents, you have not parallelised the work - you have cold-started three Chromes, none of them logged in.
@@ -229,6 +247,7 @@ There is a sharper version of this. Subagents in one Claude session share that s
 - [ ] Have I asserted both failure directions with a synthetic holder - the false positive and the miss?
 - [ ] Does the tty lookup actually resolve inside Claude's detached shell, not just in my own terminal?
 - [ ] Is there a last-resort unique branch when no identity resolves?
+- [ ] Does the fallback re-check the profile it falls back TO, not just the base?
 - [ ] Did I restart every running session after editing the wrapper?
 - [ ] Does my parallel plan launch one browser, or one per subagent?
 
