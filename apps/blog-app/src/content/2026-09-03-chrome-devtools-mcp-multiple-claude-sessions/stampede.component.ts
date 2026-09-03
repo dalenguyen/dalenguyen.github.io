@@ -1,7 +1,7 @@
 import { Component, computed, OnDestroy, signal, ViewEncapsulation } from '@angular/core'
 
-type Mode = 'naive' | 'anchored'
-type SlotState = 'live-warm' | 'live-cold' | 'idle-warm' | 'idle-cold'
+type Mode = 'chromeOnly' | 'both'
+type SlotState = 'mcp' | 'chrome' | 'refused'
 
 interface Slot {
   name: string
@@ -18,157 +18,150 @@ interface Step {
   verdict: string
   bad: boolean
   slots: Slot[]
-  logins: number
+  working: number
 }
 
-const ROOT = '/p/profile'
+const BASE = 'dalenguyen.github.io-85156b57'
 
-// Shared prefix of both timelines: A takes the warm profile, B is correctly
-// pushed onto a fallback, A exits.
+// Terminal 1 starts first. Both timelines share only this step; the in-use
+// check runs for the first time in step 2, which is where they diverge.
 const SHARED: Step[] = [
   {
-    label: 'A up',
-    title: '1 · Session A launches',
-    event: 'Nothing holds the profile. It still has yesterday’s login cookies.',
-    query: `pgrep -f -- "--data-dir=${ROOT}"`,
-    match: 'no running process',
-    verdict: 'FREE → A uses the warm profile',
-    bad: false,
-    slots: [{ name: 'profile', state: 'live-warm', who: 'A' }],
-    logins: 0,
-  },
-  {
-    label: 'B up',
-    title: '2 · Session B launches',
-    event: 'A second terminal tab, same repo, same directory.',
-    query: `pgrep -f -- "--data-dir=${ROOT}"`,
-    match: `matches --data-dir=${ROOT} (held by A)`,
-    verdict: 'BUSY → B falls back to profile-B (blank, must log in)',
-    bad: false,
-    slots: [
-      { name: 'profile', state: 'live-warm', who: 'A' },
-      { name: 'profile-B', state: 'live-cold', who: 'B' },
-    ],
-    logins: 1,
-  },
-  {
-    label: 'A exits',
-    title: '3 · Session A finishes',
-    event: 'A’s browser closes. The profile is idle again - and still logged in.',
+    label: 'T1 up',
+    title: '1 · Terminal 1 starts Claude',
+    event:
+      'The wrapper keys the profile on the git root. Nothing holds it, so Terminal 1 takes the base profile. chrome-devtools-mcp is now the holder - Chrome has not launched yet, and will not until the first browser call.',
     query: '-',
     match: '-',
-    verdict: 'profile is now free and warm',
+    verdict: 'FREE → Terminal 1 takes the base profile',
     bad: false,
-    slots: [
-      { name: 'profile', state: 'idle-warm', who: 'free' },
-      { name: 'profile-B', state: 'live-cold', who: 'B' },
-    ],
-    logins: 1,
+    slots: [{ name: BASE, state: 'mcp', who: 'held by T1 (MCP only)' }],
+    working: 1,
   },
 ]
 
 const TAIL: Record<Mode, Step[]> = {
-  anchored: [
+  both: [
     {
-      label: 'A back',
-      title: '4 · Session A relaunches',
-      event: 'The anchored pattern requires a delimiter or the end of the line right after the path.',
-      query: `pgrep -f -- "--data-dir=${ROOT}([[:space:]]|$)"`,
-      match: `--data-dir=${ROOT}-B has "-" after the path, not a delimiter or line end → no match`,
-      verdict: 'FREE → A is back on the warm profile',
+      label: 'T2 up',
+      title: '2 · Terminal 2 starts, same repo',
+      event: 'The pattern matches either spelling, anchored on a delimiter or the end of the line.',
+      query: `pgrep -f -- "--user-?[dD]ata-?[dD]ir=$base([[:space:]]|$)"`,
+      match: `matches npm exec … --userDataDir=…/${BASE}`,
+      verdict: 'BUSY → Terminal 2 falls back to its own tty-suffixed profile',
       bad: false,
       slots: [
-        { name: 'profile', state: 'live-warm', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
+        { name: BASE, state: 'mcp', who: 'held by T1 (MCP only)' },
+        { name: `${BASE}-ttys002`, state: 'mcp', who: 'held by T2 (MCP only)' },
       ],
-      logins: 1,
+      working: 2,
     },
     {
-      label: 'C up',
-      title: '5 · Session C launches',
-      event: 'A third tab arrives.',
-      query: `pgrep -f -- "--data-dir=${ROOT}([[:space:]]|$)"`,
-      match: 'matches the base path, held by A',
-      verdict: 'BUSY → C falls back to profile-C',
+      label: 'T1 opens',
+      title: '3 · Terminal 1 makes its first browser call',
+      event: 'Chrome launches on the base profile and writes its SingletonLock.',
+      query: '-',
+      match: '-',
+      verdict: 'Terminal 1 has a working browser',
       bad: false,
       slots: [
-        { name: 'profile', state: 'live-warm', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
-        { name: 'profile-C', state: 'live-cold', who: 'C' },
+        { name: BASE, state: 'chrome', who: 'Chrome live · T1' },
+        { name: `${BASE}-ttys002`, state: 'mcp', who: 'held by T2 (MCP only)' },
       ],
-      logins: 2,
+      working: 2,
+    },
+    {
+      label: 'T2 opens',
+      title: '4 · Terminal 2 makes its first browser call',
+      event: 'It launches on a different profile directory, so there is no lock to contend for.',
+      query: '-',
+      match: '-',
+      verdict: 'Terminal 2 has its own working browser',
+      bad: false,
+      slots: [
+        { name: BASE, state: 'chrome', who: 'Chrome live · T1' },
+        { name: `${BASE}-ttys002`, state: 'chrome', who: 'Chrome live · T2' },
+      ],
+      working: 2,
     },
     {
       label: 'Result',
-      title: '6 · End state',
-      event: 'One session on the warm profile; the fallbacks are stable per session, so B and C stay logged in across restarts.',
+      title: '5 · End state',
+      event:
+        'Two terminals, two browsers, two stable profile paths. Restart either terminal and it resolves to the same profile it had, still logged in.',
       query: '-',
       match: '-',
-      verdict: 'warm state preserved, no session locked out',
+      verdict: 'both sessions working, both profiles stay warm',
       bad: false,
       slots: [
-        { name: 'profile', state: 'live-warm', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
-        { name: 'profile-C', state: 'live-cold', who: 'C' },
+        { name: BASE, state: 'chrome', who: 'Chrome live · T1' },
+        { name: `${BASE}-ttys002`, state: 'chrome', who: 'Chrome live · T2' },
       ],
-      logins: 2,
+      working: 2,
     },
   ],
-  naive: [
+  chromeOnly: [
     {
-      label: 'A back',
-      title: '4 · Session A relaunches',
-      event: 'The unanchored pattern is a plain substring test.',
-      query: `pgrep -f -- "--data-dir=${ROOT}"`,
-      match: `${ROOT} is a substring of ${ROOT}-B → match`,
-      verdict: 'BUSY (wrong) → A takes a blank profile-A and logs in again',
+      label: 'T2 up',
+      title: '2 · Terminal 2 starts, same repo',
+      event:
+        "The pattern only knows Chrome's spelling. But Chrome has not launched yet - the process actually holding the profile is npm, and it spells the flag --userDataDir.",
+      query: `pgrep -f -- "--user-data-dir=$base[[:space:]]"`,
+      match: `npm exec … --userDataDir=…/${BASE} - different spelling → no match`,
+      verdict: 'FREE (wrong) → Terminal 2 takes the SAME base profile',
       bad: true,
-      slots: [
-        { name: 'profile', state: 'idle-warm', who: 'unused' },
-        { name: 'profile-A', state: 'live-cold', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
-      ],
-      logins: 2,
+      slots: [{ name: BASE, state: 'mcp', who: 'held by T1 and T2' }],
+      working: 2,
     },
     {
-      label: 'C up',
-      title: '5 · Session C launches',
-      event: 'A third tab arrives and asks the same question.',
-      query: `pgrep -f -- "--data-dir=${ROOT}"`,
-      match: `matches ${ROOT}-A and ${ROOT}-B`,
-      verdict: 'BUSY → C takes a blank profile-C',
+      label: 'T1 opens',
+      title: '3 · Terminal 1 makes its first browser call',
+      event: 'Chrome launches on the base profile and writes its SingletonLock. Nothing looks wrong yet.',
+      query: '-',
+      match: '-',
+      verdict: 'Terminal 1 has a working browser',
+      bad: false,
+      slots: [{ name: BASE, state: 'chrome', who: 'Chrome live · T1, T2 also points here' }],
+      working: 2,
+    },
+    {
+      label: 'T2 opens',
+      title: '4 · Terminal 2 makes its first browser call',
+      event:
+        'Chrome refuses to open twice against one user-data directory. The lock is held by a live process, so retrying does nothing.',
+      query: '-',
+      match: '-',
+      verdict: `Error: The browser is already running for …/${BASE}`,
       bad: true,
       slots: [
-        { name: 'profile', state: 'idle-warm', who: 'unused' },
-        { name: 'profile-A', state: 'live-cold', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
-        { name: 'profile-C', state: 'live-cold', who: 'C' },
+        { name: BASE, state: 'chrome', who: 'Chrome live · T1' },
+        { name: BASE, state: 'refused', who: 'T2 refused' },
       ],
-      logins: 3,
+      working: 1,
     },
     {
       label: 'Result',
-      title: '6 · End state',
-      event: 'The warm profile is stranded: every future launch sees a suffixed sibling and rules the base out. Nothing errors - it is just slow and logged out.',
+      title: '5 · End state',
+      event:
+        'Terminal 2 has no browser for the rest of the session. Fixing the wrapper now will not help it either: the MCP server read its arguments at startup and never re-reads them. Terminal 2 has to be restarted.',
       query: '-',
       match: '-',
-      verdict: 'the cached state is never reachable again',
+      verdict: 'one session working out of two',
       bad: true,
       slots: [
-        { name: 'profile', state: 'idle-warm', who: 'stranded' },
-        { name: 'profile-A', state: 'live-cold', who: 'A' },
-        { name: 'profile-B', state: 'live-cold', who: 'B' },
-        { name: 'profile-C', state: 'live-cold', who: 'C' },
+        { name: BASE, state: 'chrome', who: 'Chrome live · T1' },
+        { name: BASE, state: 'refused', who: 'T2 refused' },
       ],
-      logins: 3,
+      working: 1,
     },
   ],
 }
 
 /**
- * Step-through of three agent sessions contending for one browser profile.
- * Toggling the in-use check between an unanchored substring test and an
- * anchored one changes the outcome from step 4 onwards.
+ * Step-through of two Claude Code terminals starting in one repo, comparing an
+ * in-use check that only knows Chrome's --user-data-dir spelling against one
+ * that also matches the MCP server's --userDataDir. The MCP holds the profile
+ * before Chrome ever launches, which is the window the narrow check misses.
  */
 @Component({
   selector: 'blog-stampede',
@@ -177,16 +170,17 @@ const TAIL: Record<Mode, Step[]> = {
   template: `
     <div class="card">
       <div class="header">
-        <span class="title">"Is it already in use?"</span>
+        <span class="title">Two terminals, one repo</span>
         <span class="counter">Step {{ idx() + 1 }} / {{ steps().length }}</span>
       </div>
 
       <div class="toggle" role="group" aria-label="In-use check style">
-        <button class="tg" [class.on]="mode() === 'naive'" (click)="setMode('naive')">Substring check</button>
-        <button class="tg" [class.on]="mode() === 'anchored'" (click)="setMode('anchored')">Anchored check</button>
+        <button class="tg" [class.on]="mode() === 'chromeOnly'" (click)="setMode('chromeOnly')">
+          Chrome's spelling only
+        </button>
+        <button class="tg" [class.on]="mode() === 'both'" (click)="setMode('both')">Either spelling</button>
       </div>
-
-      <p class="hint">The first three steps are identical. The two checks diverge at step 4.</p>
+      <p class="hint">Step 1 is the same either way. The in-use check first runs in step 2.</p>
 
       <div class="stepper">
         @for (s of steps(); track $index; let i = $index) {
@@ -214,7 +208,7 @@ const TAIL: Record<Mode, Step[]> = {
       </div>
 
       <div class="shelf">
-        @for (s of step().slots; track s.name) {
+        @for (s of step().slots; track $index) {
           <div class="slot" [attr.data-state]="s.state">
             <code class="slot-name">{{ s.name }}</code>
             <span class="slot-state">{{ stateLabel(s.state) }}</span>
@@ -224,7 +218,9 @@ const TAIL: Record<Mode, Step[]> = {
       </div>
 
       <div class="footer">
-        <span class="logins">Logins paid so far: <b [class.bad]="step().bad">{{ step().logins }}</b></span>
+        <span class="logins"
+          >Sessions with a working browser: <b [class.bad]="step().working < 2">{{ step().working }} of 2</b></span
+        >
         <div class="controls">
           <button class="btn" (click)="prev()" [disabled]="idx() === 0">‹ Prev</button>
           <button class="btn play" (click)="togglePlay()">{{ playing() ? '❚❚ Pause' : '▶ Play' }}</button>
@@ -382,6 +378,7 @@ const TAIL: Record<Mode, Step[]> = {
         font-family: ui-monospace, Menlo, Consolas, monospace;
         font-size: 11.5px;
         color: #8b98a8;
+        word-break: break-word;
       }
       .verdict {
         margin: 0;
@@ -398,31 +395,33 @@ const TAIL: Record<Mode, Step[]> = {
         flex-wrap: wrap;
       }
       .slot {
-        flex: 1 1 140px;
+        flex: 1 1 200px;
         display: grid;
         gap: 2px;
         background: #0b0f16;
         border: 1px solid #30363d;
         border-radius: 10px;
         padding: 9px 11px;
+        min-width: 0;
       }
-      .slot[data-state='live-warm'] {
+      .slot[data-state='chrome'] {
         border-color: #2ea04366;
         background: #0d1f15;
       }
-      .slot[data-state='live-cold'] {
-        border-color: #ff8a5c66;
-      }
-      .slot[data-state='idle-warm'] {
+      .slot[data-state='mcp'] {
         border-style: dashed;
+      }
+      .slot[data-state='refused'] {
+        border-color: #ff8a5c66;
+        background: #1f1210;
       }
       .slot-name {
         font-family: ui-monospace, Menlo, Consolas, monospace;
-        font-size: 12px;
+        font-size: 11.5px;
         color: #7c9cff;
-        white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        white-space: nowrap;
       }
       .slot-state {
         font-size: 10.5px;
@@ -430,10 +429,10 @@ const TAIL: Record<Mode, Step[]> = {
         text-transform: uppercase;
         color: #8b98a8;
       }
-      .slot[data-state='live-warm'] .slot-state {
+      .slot[data-state='chrome'] .slot-state {
         color: #5ad19a;
       }
-      .slot[data-state='live-cold'] .slot-state {
+      .slot[data-state='refused'] .slot-state {
         color: #ff8a5c;
       }
       .slot-who {
@@ -490,7 +489,7 @@ const TAIL: Record<Mode, Step[]> = {
   ],
 })
 export class StampedeComponent implements OnDestroy {
-  readonly mode = signal<Mode>('naive')
+  readonly mode = signal<Mode>('chromeOnly')
   readonly idx = signal(0)
   readonly playing = signal(false)
 
@@ -500,13 +499,7 @@ export class StampedeComponent implements OnDestroy {
   private timer: ReturnType<typeof setInterval> | null = null
 
   stateLabel(s: SlotState): string {
-    return s === 'live-warm'
-      ? 'in use · logged in'
-      : s === 'live-cold'
-        ? 'in use · blank'
-        : s === 'idle-warm'
-          ? 'idle · logged in'
-          : 'idle · blank'
+    return s === 'chrome' ? 'chrome running' : s === 'mcp' ? 'mcp holds it · no chrome yet' : 'launch refused'
   }
 
   setMode(m: Mode) {
@@ -542,7 +535,7 @@ export class StampedeComponent implements OnDestroy {
         return
       }
       this.idx.update((i) => i + 1)
-    }, 2200)
+    }, 2400)
   }
 
   private stop() {

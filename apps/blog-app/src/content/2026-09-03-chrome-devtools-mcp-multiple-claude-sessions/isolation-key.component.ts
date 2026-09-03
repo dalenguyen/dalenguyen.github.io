@@ -3,30 +3,32 @@ import { Component, computed, signal, ViewEncapsulation } from '@angular/core'
 type Strategy = 'dir' | 'branch' | 'session'
 
 interface Session {
-  id: string
+  tty: string
   branch: string
 }
 
-// Five agent sessions, all started in the SAME checkout. Branches vary, so a
-// branch-scoped key helps a little - and still collides.
+// Five Claude Code terminals, all started in the SAME checkout. Branches vary,
+// so a branch-scoped key helps a little - and still collides.
 const SESSIONS: Session[] = [
-  { id: 'A', branch: 'main' },
-  { id: 'B', branch: 'main' },
-  { id: 'C', branch: 'feat/cart' },
-  { id: 'D', branch: 'feat/cart' },
-  { id: 'E', branch: 'main' },
+  { tty: 'ttys002', branch: 'main' },
+  { tty: 'ttys003', branch: 'main' },
+  { tty: 'ttys004', branch: 'feat/cart' },
+  { tty: 'ttys005', branch: 'feat/cart' },
+  { tty: 'ttys006', branch: 'main' },
 ]
 
+const ROOT = 'dalenguyen.github.io-85156b57'
+
 const STRATEGIES: { key: Strategy; label: string; hint: string }[] = [
-  { key: 'dir', label: 'Directory', hint: 'hash of the working directory' },
-  { key: 'branch', label: 'Directory + branch', hint: 'directory hash plus the checked-out branch' },
-  { key: 'session', label: 'Session', hint: 'directory hash plus a per-session id' },
+  { key: 'dir', label: 'Git root', hint: 'basename of the git root plus a hash of its path' },
+  { key: 'branch', label: '+ branch', hint: 'git root key plus the checked-out branch' },
+  { key: 'session', label: '+ tty', hint: "git root key plus the owning terminal's tty" },
 ]
 
 const slug = (s: string) => s.replace(/[^a-z0-9]+/gi, '-')
 
 interface Row {
-  id: string
+  tty: string
   branch: string
   key: string
   blocked: boolean
@@ -45,7 +47,7 @@ interface Row {
     <div class="card">
       <div class="header">
         <span class="title">What do you key the profile on?</span>
-        <span class="subtitle">all sessions in /work/app</span>
+        <span class="subtitle">~/.cache/chrome-devtools-mcp/profiles/</span>
       </div>
 
       <div class="toggle" role="group" aria-label="Isolation key strategy">
@@ -56,7 +58,7 @@ interface Row {
       <p class="hint">Key = {{ activeHint() }}</p>
 
       <div class="slider-row">
-        <span class="muted">Concurrent sessions</span>
+        <span class="muted">Concurrent terminals</span>
         <input
           type="range"
           min="1"
@@ -70,9 +72,9 @@ interface Row {
       </div>
 
       <div class="rows">
-        @for (r of rows(); track r.id) {
+        @for (r of rows(); track r.tty) {
           <div class="row" [class.bad]="r.blocked">
-            <span class="sid">Session {{ r.id }}</span>
+            <span class="sid">{{ r.tty }}</span>
             <span class="branch">{{ r.branch }}</span>
             <code class="key">{{ r.key }}</code>
             <span class="badge" [class.bad]="r.blocked">{{ r.blocked ? 'already running' : 'owns it' }}</span>
@@ -82,8 +84,8 @@ interface Row {
 
       <p class="verdict" [class.bad]="blocked() > 0">
         @if (blocked() > 0) {
-          <b>{{ blocked() }} of {{ count() }}</b> sessions refused - the key is coarser than the unit that can be
-          concurrent.
+          <b>{{ blocked() }} of {{ count() }}</b> terminals refused with "browser is already running" - the key is
+          coarser than the unit that can be concurrent.
         } @else {
           <b>0 of {{ count() }}</b> refused - the key is at least as fine-grained as the concurrency unit.
         }
@@ -262,14 +264,10 @@ export class IsolationKeyComponent {
     const seen = new Set<string>()
     return SESSIONS.slice(0, this.count()).map((s) => {
       const key =
-        mode === 'dir'
-          ? 'profile-a1b2'
-          : mode === 'branch'
-            ? `profile-a1b2-${slug(s.branch)}`
-            : `profile-a1b2-${s.id.toLowerCase()}`
+        mode === 'dir' ? ROOT : mode === 'branch' ? `${ROOT}-${slug(s.branch)}` : `${ROOT}-${s.tty}`
       const blocked = seen.has(key)
       seen.add(key)
-      return { id: s.id, branch: s.branch, key, blocked }
+      return { tty: s.tty, branch: s.branch, key, blocked }
     })
   })
 
