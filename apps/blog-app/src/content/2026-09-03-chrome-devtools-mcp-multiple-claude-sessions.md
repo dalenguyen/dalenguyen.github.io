@@ -1,7 +1,7 @@
 ---
 title: "Running Chrome DevTools MCP in Multiple Claude Code Sessions"
 slug: 2026-09-03-chrome-devtools-mcp-multiple-claude-sessions
-description: Open a second Claude Code terminal in the same repo and the browser stops working. Here is a wrapper that gives every session its own Chrome profile, how to install it, and the two subtle ways the "is it already in use?" check gets written wrong.
+description: Open a second Claude Code terminal in the same repo and the browser stops working. Here is a wrapper that gives every session its own Chrome profile, the two subtle ways the "is it already in use?" check gets written wrong, and why isolation leaves every agent logged out - plus the one-shared-browser wrapper that fixes that.
 categories: ['claude-code', 'mcp', 'chrome-devtools', 'ai-agents', 'developer-tools']
 coverImage: https://dalenguyen.me/assets/images/blog/chrome-devtools-mcp-multiple-claude-sessions.png
 profileImage: assets/images/dale-nguyen-avatar.webp
@@ -21,6 +21,8 @@ Use --isolated to run multiple browser instances.
 Retrying does not help. The lock is held by a live process.
 
 This post is the wrapper I use to fix that, how to install it, and - more usefully - the two ways I got the wrapper itself wrong. Both bugs were silent, and one of them was still shipping on my machine while I wrote the first draft of this article.
+
+It ends somewhere I did not expect when I started: a week of running the isolation wrapper under a pipeline of subagents showed that partitioning the browser is the wrong default for agents that need a login. The fix is the opposite move - one Chrome, many clients - and the wrapper that does it is at the end.
 
 ## Why it breaks
 
@@ -227,9 +229,94 @@ If you hand a browser task to three subagents, you have not parallelised the wor
 
 <div data-chart="fanout">Chart: wall clock and logins required when N Claude subagents share one warm browser versus each launching their own. Enable JavaScript to view.</div>
 
-Keep work that needs the authenticated, warmed browser in one session. Fan out the parts that do not touch it.
+I assumed at first that subagents inside one Claude session share that session's MCP server. They do not. Each subagent runs in its own pane with its own tty, spawns its own `chrome-devtools-mcp`, and - under the wrapper above - lands on its own `-<tty>` profile. Measured twice, a week apart, with three `general-purpose` subagents each time: three MCP processes, three Chromes, three fresh profiles, three login pages. That is exactly what the isolation wrapper is designed to do, and it is exactly wrong for this workload.
 
-There is a sharper version of this. Subagents in one Claude session share that session's MCP server, so they share one browser. If you have each open its own tab and then close it by index, they will close each other's tabs - `pageId` is a positional index into a shared list, not a stable handle. I did this while testing this very post and closed a tab belonging to the human.
+Two smaller things worth knowing when several agents do share one browser. Current `chrome-devtools-mcp` routes page-scoped tools by a `pageId` (`--pageIdRouting`, on by default), and that id is stable for the life of the tab - so agents do not close each other's tabs by accident the way a positional index would let them. They can still *see* each other's tabs in `list_pages`, so the rule for a fan-out is: act only on tabs you opened yourself.
+
+## The cost of isolation - every agent is logged out
+
+Here is the run that changed my mind. Three stacked merge requests, each implemented by one subagent and verified by another, six agents in a row. Every verifier reached the browser step and stopped at `/auth/login`. Logging in for one of them did nothing for the next - and the human doing the logging in was, understandably, unimpressed the third time.
+
+Two facts, both obvious in hindsight:
+
+1. **The login lives in the profile directory.** Cookies and `localStorage` are stored under `--user-data-dir`. A different profile per agent means a different, empty storage per agent. Isolation working as designed.
+2. **Storage is per origin, and the port is part of the origin.** `localhost:4200` and `localhost:4202` do not share a token even inside one profile. If your worktrees serve on different ports, one login per port.
+
+The workaround I used in the meantime was ugly but instructive: from a logged-in tab on `:4200`, `window.open` a tab on `:4202` and `postMessage` the auth keys across, so the token moved between origins without ever passing through the agent's transcript. It works. It is also a sign the architecture is fighting you.
+
+## Step 4 - one browser, many agents
+
+The premise of Steps 1-3 was "each MCP server needs its own Chrome". It does not. Chrome's DevTools protocol accepts many clients on one browser, and `chrome-devtools-mcp` has a flag for exactly this:
+
+```
+--browserUrl  Connect to a running, debuggable Chrome instance
+              (e.g. http://127.0.0.1:9222)
+```
+
+So run **one** Chrome with `--remote-debugging-port`, log in once, and have every session and every subagent attach to it instead of launching its own. The profile is stable, the login persists, and a fan-out costs zero extra browsers.
+
+The wrapper becomes attach-or-launch, with the isolation logic kept as a fallback:
+
+```bash
+#!/usr/bin/env bash
+# One shared Chrome for every Claude Code session and subagent.
+# stdout is the MCP protocol stream - diagnostics go to stderr.
+set -euo pipefail
+
+CDP_PORT=${CDP_PORT:-9222}
+profiles="$HOME/.cache/chrome-devtools-mcp/profiles"
+shared_profile="$profiles/shared"
+chrome_bin=${CDP_CHROME_BIN:-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"}
+
+shared_ready() {
+    curl -sf --max-time 1 "http://127.0.0.1:$CDP_PORT/json/version" \
+        >/dev/null 2>&1
+}
+
+# Launch the shared Chrome if nothing is listening. A mkdir lock
+# stops parallel subagents racing to start two; losers wait.
+start_shared() {
+    local lock="$profiles/.shared-launch.lock"
+    mkdir -p "$profiles"
+    if mkdir "$lock" 2>/dev/null; then
+        trap 'rmdir "$lock" 2>/dev/null || true' RETURN
+        if [[ -x $chrome_bin ]] && ! pgrep -f -- \
+            "--user-data-dir=$shared_profile([[:space:]]|\$)" >/dev/null; then
+            mkdir -p "$shared_profile"
+            nohup "$chrome_bin" \
+                --remote-debugging-port="$CDP_PORT" \
+                --user-data-dir="$shared_profile" \
+                --no-first-run --no-default-browser-check \
+                about:blank >/dev/null 2>&1 &
+            disown
+        fi
+    fi
+    for _ in $(seq 1 40); do shared_ready && return 0; sleep 0.25; done
+    return 1
+}
+
+if [[ -z "${CDP_NO_SHARED:-}" ]]; then
+    if shared_ready || start_shared; then
+        echo "attaching to shared Chrome at :$CDP_PORT" >&2
+        exec npx -y chrome-devtools-mcp@latest \
+            --browserUrl="http://127.0.0.1:$CDP_PORT" "$@"
+    fi
+    echo "shared Chrome unavailable, using a private profile" >&2
+fi
+
+# ---- fallback: the per-session wrapper from Step 1 goes here ----
+```
+
+Things that bit, or nearly did:
+
+- **Chrome refuses `--remote-debugging-port` on its default profile** (since 136). Give the shared instance its own `--user-data-dir`, as above, and it is fine.
+- **The lock is `mkdir`, not a busy-check.** Two subagents starting in the same millisecond both find the port closed; only one may launch. `mkdir` is atomic, which is the reservation the Step 1 wrapper never had - so this also closes the "same instant" race from the table above.
+- **The MCP server does not own the browser any more.** Attaching means the shared Chrome survives the session that started it. That is the point, but it also means nobody closes it for you.
+- **Everyone sees every tab.** Rely on `pageId` routing and the "act only on your own tabs" rule.
+- **One login per origin still applies.** Log in once per port you serve on. It persists after that.
+- **Restart the sessions.** MCP arguments are read at process start; a running session keeps its private Chrome until it is restarted.
+
+The isolation wrapper is not wasted work. It is the fallback when there is no shared browser to attach to, and `CDP_NO_SHARED=1` brings it back on purpose - for a session that must not share cookies with the others.
 
 ## Traps that look like something else
 
@@ -250,7 +337,10 @@ There is a sharper version of this. Subagents in one Claude session share that s
 - [ ] Does the fallback re-check the profile it falls back TO, not just the base?
 - [ ] Did I restart every running session after editing the wrapper?
 - [ ] Does my parallel plan launch one browser, or one per subagent?
+- [ ] Do the agents that need a login attach to one shared Chrome (`--browserUrl`), or does each get a fresh, logged-out profile?
+- [ ] Have I logged the shared browser in once per origin - every port I serve on counts as its own?
+- [ ] Is the shared-browser launch guarded by an atomic reservation (`mkdir` lock), not a check-then-act?
 
 ## In one line
 
-> Give every terminal its own persistent Chrome profile, key it on something terminal-scoped, and make the "already in use?" check match either flag spelling anchored on a delimiter or end-of-string - otherwise your second session either takes a profile it should not, or refuses one it should have taken.
+> Agents that must not share a browser get their own persistent profile, keyed on something terminal-scoped, with an in-use check that matches either flag spelling anchored on a delimiter or end-of-string. Agents that must share a login get the opposite: one Chrome with remote debugging on, and every MCP server attached to it.
