@@ -309,8 +309,25 @@ if [[ -z "${CDP_NO_SHARED:-}" ]]; then
     echo "shared Chrome unavailable, using a private profile" >&2
 fi
 
-# ---- fallback: the per-session wrapper from Step 1 goes here ----
+# ---- fallback: the per-session wrapper from Step 1 ----
+# Keep Step 1's script alongside this one, as
+# ~/.claude/mcp-wrappers/chrome-devtools-private.sh, and hand off.
+# exec replaces this process, so the MCP server still owns stdio.
+exec ~/.claude/mcp-wrappers/chrome-devtools-private.sh "$@"
 ```
+
+The last line is not decoration. Without it the script prints "using a private
+profile" and then exits without starting an MCP server at all - the session comes
+up with no browser tools and no error explaining why. Save Step 1's wrapper under
+the second name before you install this one:
+
+```bash
+cp ~/.claude/mcp-wrappers/chrome-devtools.sh \
+   ~/.claude/mcp-wrappers/chrome-devtools-private.sh
+```
+
+Then write the attach-or-launch script above to `chrome-devtools.sh`. Nothing in
+the MCP config changes - it still points at `chrome-devtools.sh`.
 
 Things that bit, or nearly did:
 
