@@ -266,7 +266,8 @@ set -euo pipefail
 CDP_PORT=${CDP_PORT:-9222}
 profiles="$HOME/.cache/chrome-devtools-mcp/profiles"
 shared_profile="$profiles/shared"
-chrome_bin=${CDP_CHROME_BIN:-"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"}
+chrome_app="/Applications/Google Chrome.app/Contents/MacOS"
+chrome_bin=${CDP_CHROME_BIN:-"$chrome_app/Google Chrome"}
 
 shared_ready() {
     curl -sf --max-time 1 "http://127.0.0.1:$CDP_PORT/json/version" \
@@ -281,7 +282,8 @@ start_shared() {
     if mkdir "$lock" 2>/dev/null; then
         trap 'rmdir "$lock" 2>/dev/null || true' RETURN
         if [[ -x $chrome_bin ]] && ! pgrep -f -- \
-            "--user-data-dir=$shared_profile([[:space:]]|\$)" >/dev/null; then
+            "--user-data-dir=$shared_profile([[:space:]]|\$)" \
+            >/dev/null; then
             mkdir -p "$shared_profile"
             nohup "$chrome_bin" \
                 --remote-debugging-port="$CDP_PORT" \
@@ -291,7 +293,10 @@ start_shared() {
             disown
         fi
     fi
-    for _ in $(seq 1 40); do shared_ready && return 0; sleep 0.25; done
+    for _ in $(seq 1 40); do
+        shared_ready && return 0
+        sleep 0.25
+    done
     return 1
 }
 
