@@ -228,6 +228,13 @@ main a:not([class]) {
     padding-left: 1rem;
   }
 
+  /* Task list items ("- [ ] ...") already show a checkbox; drop the bullet
+     so they don't render a disc AND a box. */
+  li:has(> input[type='checkbox']) {
+    list-style: none;
+    margin-left: -0.5rem;
+  }
+
   ol {
     list-style-type: decimal;
     margin-left: 1rem;
