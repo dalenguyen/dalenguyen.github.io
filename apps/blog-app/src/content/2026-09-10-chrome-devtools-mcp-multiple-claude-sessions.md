@@ -1,11 +1,11 @@
 ---
 title: "Running Chrome DevTools MCP in Multiple Claude Code Sessions"
-slug: 2026-09-03-chrome-devtools-mcp-multiple-claude-sessions
+slug: 2026-09-10-chrome-devtools-mcp-multiple-claude-sessions
 description: Open a second Claude Code terminal in the same repo and the browser stops working. Here is a wrapper that gives every session its own Chrome profile, the two subtle ways the "is it already in use?" check gets written wrong, and why isolation leaves every agent logged out - plus the one-shared-browser wrapper that fixes that.
 categories: ['claude-code', 'mcp', 'chrome-devtools', 'ai-agents', 'developer-tools']
 coverImage: https://dalenguyen.me/assets/images/blog/chrome-devtools-mcp-multiple-claude-sessions.png
 profileImage: assets/images/dale-nguyen-avatar.webp
-published: 2026-09-03T00:00:00.000Z
+published: 2026-09-10T12:00:00.000Z
 author: Dale Nguyen
 draft: false
 ---
