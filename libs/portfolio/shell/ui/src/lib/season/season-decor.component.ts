@@ -1,5 +1,6 @@
 import { NgComponentOutlet } from '@angular/common'
 import { ChangeDetectionStrategy, Component, effect, inject, signal, Type } from '@angular/core'
+import { SeasonId } from './season.data'
 import { SeasonService } from './season.service'
 
 /** What a season's `index.ts` default-exports. */
@@ -44,13 +45,21 @@ export class SeasonDecorComponent {
   constructor() {
     effect(() => {
       const id = this.seasons.season()
+      // Drop the current layer on every change, including the change to "no
+      // season". Without this, turning seasons off leaves the previous
+      // season's component mounted and its animation loop running.
+      this.effects.set(null)
       if (id) void this.load(id)
     })
   }
 
-  private async load(id: string): Promise<void> {
+  private async load(id: SeasonId): Promise<void> {
     const loader = themes[`./themes/${id}/index.ts`]
     if (!loader) return // a season with tokens but no decorations is fine
-    this.effects.set((await loader()).default?.effects ?? null)
+
+    const effects = (await loader()).default?.effects ?? null
+    // The await means a slow load can land after the visitor has already
+    // picked something else; only commit if this season is still the active one.
+    if (this.seasons.season() === id) this.effects.set(effects)
   }
 }

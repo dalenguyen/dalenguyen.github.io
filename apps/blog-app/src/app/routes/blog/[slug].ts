@@ -345,7 +345,11 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     }
 
     const allPosts = runInInjectionContext(this.injector, () => {
-      return injectContentFiles<PostAttributes>((contentFile) => contentFile.filename.includes('src/content'))
+      return injectContentFiles<PostAttributes>(
+        // Drafts are excluded here for the same reason as on the blog index:
+        // an unpublished post must not surface in series navigation.
+        (contentFile) => contentFile.filename.includes('src/content') && !contentFile.attributes.draft,
+      )
     })
 
     const seriesPosts = allPosts

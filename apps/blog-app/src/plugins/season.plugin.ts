@@ -55,10 +55,17 @@ export function seasonPlugin(): Plugin {
     if (forced === 'none') {
       season = null
     } else if (forced && forced !== 'auto') {
-      season = null
+      var picked = null
       for (var j = 0; j < windows.length; j++) {
-        if (windows[j].id === forced) season = windows[j]
+        if (windows[j].id === forced) {
+          picked = windows[j]
+          break
+        }
       }
+      // Only override on a real match. An unknown id — a typo in the query
+      // param, or a stored choice for a season that has since been removed —
+      // falls back to the calendar, matching SeasonService.read().
+      if (picked) season = picked
     }
 
     if (season) {
