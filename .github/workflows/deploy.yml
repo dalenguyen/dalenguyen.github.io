@@ -94,7 +94,12 @@ on:
     branches: [dev]
     paths:
       - 'apps/blog-app/**'
-      - 'libs/portfolio/shared/**'
+      # All of libs/portfolio, not just shared: blog-app imports home/feature,
+      # resume/feature, shell/feature and shell/ui as well. Listing only
+      # 'shared' silently skipped the deploy for a shell/ui fix (PR #252) and
+      # left production serving the old chunk.
+      - 'libs/portfolio/**'
+      - '.github/workflows/deploy.yml'
   workflow_dispatch:
 
 permissions:
