@@ -82,6 +82,60 @@ API routes: `src/server/routes/**` → served under `/api` (e.g. `/api/v1/subscr
 SSR/API only run on the Cloud Run node-server build, not the static Vercel build.
 Unmatched `/api/*` paths fall through to `src/server/routes/[...].ts`.
 
+## Seasonal themes
+
+The site can put on a costume for a date range (Halloween ships today; the
+system is built so Christmas/New Year are folder-only additions). Code lives in
+`libs/portfolio/shell/ui/src/lib/season/`.
+
+**Why it is resolved in the browser, not at build time.** Every public route is
+prerendered, so a build-time date check would bake October's costume into HTML
+still being served in December. `src/plugins/season.plugin.ts` injects a
+pre-paint inline script into `<head>` that reads the date on each page view and
+sets `data-season` on `<html>` — the same rail the dark/light script rides, so
+the tokens are correct at first paint with no flash. Nothing is written during
+SSR, so prerendered HTML stays season-neutral and hydration never mismatches.
+
+**Two independent axes.** `.light` (dark/light) and `data-season` are separate
+attributes on `<html>`, so every season has both a dark and a light variant.
+
+**The picker.** `SeasonSelectComponent` sits beside the dark/light toggle and
+stores a `SeasonChoice` under the `season` localStorage key: `auto` (default —
+follow the calendar), a season id (pin it on), or `none` (off). Precedence is
+`?season=` query param > stored choice > calendar. The inline script reads the
+same key, so a pinned season is already applied at first paint.
+
+### Adding a season
+
+1. Add a `SeasonId` + `SEASON_WINDOWS` entry in `season.data.ts` (the single
+   source of truth — the Vite plugin serializes it into the inline script).
+2. Add TWO blocks to `src/styles.css`, after `.light`:
+   `[data-season='x']` and `.light[data-season='x']`.
+3. Copy `season/themes/_template/` to `season/themes/x/`. The glob in
+   `season-decor.component.ts` discovers it; there is no registry to edit.
+
+Full checklist in `season/themes/_template/README.md`.
+
+### Three traps
+
+- **Specificity.** `[data-season='x']` has the SAME specificity as `.light`, so
+  the seasonal blocks only win by coming after it in the file. A token declared
+  only in the bare block leaks into light mode and wrecks it. Declare every
+  token twice.
+- **tsconfig include.** Season theme folders are reached only via
+  `import.meta.glob`, which is invisible to TypeScript's static graph. They must
+  stay in `tsconfig.app.json`'s `include` or they ship as untranspiled TS and
+  fail at runtime with `SyntaxError: Missing initializer in const declaration`.
+  Same trap as `src/content/**/*.ts` for interactive posts.
+- **Reduced motion.** An effects layer must not mount at all under
+  `prefers-reduced-motion: reduce` — skip it, do not merely slow it down.
+
+### Verifying
+
+`?season=halloween` forces a season on out of calendar order; `?season=none`
+forces it off, without touching the stored choice. Check both light and dark,
+and confirm the effects layer does not mount under `prefers-reduced-motion`.
+
 ## Notes
 - SSR enabled in production only
 - Content dir: `src/content/`

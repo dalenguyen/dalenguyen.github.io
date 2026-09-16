@@ -8,6 +8,7 @@ import { join } from 'node:path'
 import { defineConfig } from 'vite'
 import { learnManifestPlugin } from './src/plugins/learn-manifest.plugin'
 import { readingTimeManifestPlugin } from './src/plugins/reading-time-manifest.plugin'
+import { seasonPlugin } from './src/plugins/season.plugin'
 
 const learnDir = join(__dirname, '../../libs/portfolio/shared/learn')
 const contentDir = join(__dirname, 'src/content')
@@ -231,6 +232,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      seasonPlugin(),
       learnManifestPlugin(learnDir),
       readingTimeManifestPlugin(contentDir),
       nxViteTsPaths(),
