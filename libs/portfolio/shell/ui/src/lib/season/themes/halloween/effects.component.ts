@@ -138,13 +138,16 @@ export class HalloweenEffectsComponent implements OnDestroy {
 
   constructor() {
     afterNextRender(() => {
-      // Skip entirely for visitors who asked for less motion, and on very
-      // narrow screens where drifting emoji just get in the way.
+      // Skip entirely for visitors who asked for less motion.
       const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-      if (reduced || window.innerWidth < 640) return
+      if (reduced) return
 
-      const count = Math.round(rand(3, 6))
-      this.ghosts.set(Array.from({ length: count }, (_, id) => ({ id, size: rand(20, 34) })))
+      // Phones get a smaller, thinner flock. A 34px ghost crossing a 375px
+      // screen is a big moving object; the same one on a desktop is ambience.
+      const narrow = window.innerWidth < 640
+      const count = narrow ? Math.round(rand(2, 3)) : Math.round(rand(3, 6))
+      const [minSize, maxSize] = narrow ? [14, 22] : [20, 34]
+      this.ghosts.set(Array.from({ length: count }, (_, id) => ({ id, size: rand(minSize, maxSize) })))
       this.show.set(true)
       window.addEventListener('resize', this.onResize, { passive: true })
       document.addEventListener('visibilitychange', this.onVisibility)
