@@ -1,0 +1,9 @@
+// Rename to index.ts when you copy this folder. See README.md.
+import { SeasonTheme } from '../../season-decor.component'
+import { YourSeasonEffectsComponent } from './effects.component'
+
+const theme: SeasonTheme = {
+  effects: YourSeasonEffectsComponent,
+}
+
+export default theme

@@ -92,7 +92,7 @@ interface PostAttributes {
 })
 export class RecentPostsComponent {
   readonly recentPosts = injectContentFiles<PostAttributes>(
-    (f) => f.filename.includes('/src/content') && !f.attributes['draft'],
+    (f) => f.filename.includes('src/content') && !f.attributes['draft'],
   )
     .sort((a, b) => b.attributes.published.localeCompare(a.attributes.published))
     .slice(0, 3)

@@ -101,7 +101,7 @@ export const routeMeta: RouteMeta = {
             <!-- Categories display -->
             <div class="flex flex-wrap justify-center gap-2 mb-6">
               @for (category of post.attributes.categories; track category) {
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-600/15 text-accent ring-1 ring-border">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-accent-fill/15 text-accent ring-1 ring-border">
                   {{ category | titlecase }}
                 </span>
               }
@@ -147,7 +147,7 @@ export const routeMeta: RouteMeta = {
               <div class="text-left mx-auto max-w-md text-base">
                 @for (post of series()!.posts; track post.slug; let i = $index) {
                   <div class="my-2">
-                      <span class="mr-2 font-medium bg-indigo-600/15 text-accent px-2 py-1 rounded-full">{{ i + 1 }}</span>
+                      <span class="mr-2 font-medium bg-accent-fill/15 text-accent px-2 py-1 rounded-full">{{ i + 1 }}</span>
                       @if (post.isCurrent) {
                         <span class="font-semibold text-accent">{{ post.displayTitle }}</span>
                       } @else {
@@ -345,7 +345,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     }
 
     const allPosts = runInInjectionContext(this.injector, () => {
-      return injectContentFiles<PostAttributes>((contentFile) => contentFile.filename.includes('/src/content'))
+      return injectContentFiles<PostAttributes>((contentFile) => contentFile.filename.includes('src/content'))
     })
 
     const seriesPosts = allPosts

@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ErrorHandler, inject, Injectable, signal } from '@angular/core'
 import { RouterLink, RouterModule } from '@angular/router'
-import { FooterComponent, NavService, ThemeToggleComponent } from '@dalenguyen/portfolio/shell/ui'
+import { FooterComponent, NavService, SeasonSelectComponent, ThemeToggleComponent } from '@dalenguyen/portfolio/shell/ui'
 
 interface NavItem {
   id: string
@@ -27,7 +27,7 @@ export class SentryErrorHandler implements ErrorHandler {
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-root',
-  imports: [RouterModule, RouterLink, FooterComponent, ThemeToggleComponent],
+  imports: [RouterModule, RouterLink, FooterComponent, SeasonSelectComponent, ThemeToggleComponent],
   providers: [{ provide: ErrorHandler, useClass: SentryErrorHandler }],
   template: `
     <div class="flex flex-col min-h-screen">
@@ -103,6 +103,7 @@ export class SentryErrorHandler implements ErrorHandler {
 
             <!-- Right side: theme toggle + mobile menu button -->
             <div class="flex items-center gap-2">
+              <dalenguyen-season-select />
               <dalenguyen-theme-toggle />
               <button
                 type="button"

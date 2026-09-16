@@ -64,7 +64,7 @@ interface BucketListItem {
                   [id]="'item-' + i"
                   [checked]="item.completed"
                   (change)="toggleComplete(item)"
-                  class="h-5 w-5 rounded border-border bg-surface-2 accent-indigo-600 focus:ring-2 focus:ring-accent cursor-pointer"
+                  class="h-5 w-5 rounded border-border bg-surface-2 accent-[rgb(var(--accent-fill))] focus:ring-2 focus:ring-accent cursor-pointer"
                 />
               </div>
               <label

@@ -28,6 +28,7 @@
   --accent: 129 140 248; /* #818cf8 indigo-400 — links/text, ~6:1 on bg */
   --accent-fill: 94 106 210; /* #5e6ad2 — fills/glow (matches learn pages) */
   --accent-fg: 8 17 31; /* #08111f — text on accent fill */
+  --accent-2: 34 211 238; /* #22d3ee cyan-400 — far stop of hero gradients */
 
   /* code (GitHub-dark inspired, verified on --code-bg) */
   --code-bg: 22 27 34; /* #161b22 */
@@ -65,6 +66,7 @@
   --accent: 79 70 229; /* #4f46e5 indigo-600 — AA on white */
   --accent-fill: 79 70 229;
   --accent-fg: 255 255 255;
+  --accent-2: 34 211 238; /* #22d3ee — unchanged from the dark theme */
 
   /* code — high-contrast palette tuned for the light #f6f8fa background */
   --code-bg: 246 248 250; /* #f6f8fa */
@@ -88,6 +90,71 @@
 
   color-scheme: light;
 }
+
+/* ============================================================================
+   Seasonal themes — a SECOND, independent axis layered on top of dark/light.
+   Set as `data-season="…"` on <html> by the pre-paint script that
+   `src/plugins/season.plugin.ts` injects; the windows live in
+   libs/portfolio/shell/ui/src/lib/season/season.data.ts.
+
+   SPECIFICITY TRAP — read before adding a season:
+   `[data-season='x']` and `.light` have the SAME specificity (0,1,0), so these
+   blocks only win because they come AFTER `.light` in this file. That means a
+   token overridden only in the bare block would also apply in light mode and
+   wreck it. Every token a season touches MUST be declared twice: once bare
+   (dark) and once as `.light[data-season='x']` (0,2,0, wins over both).
+
+   Contrast is not optional here either — every pairing below was measured to
+   meet WCAG AA (>=4.5:1) against its own background, same as the base themes.
+   ========================================================================= */
+
+/* --- Halloween: dark --------------------------------------------------- */
+[data-season='halloween'] {
+  --bg: 18 10 6; /* #120a06 */
+  --surface: 28 17 10; /* #1c110a */
+  --surface-2: 38 24 14; /* #26180e */
+  --border: 58 38 24; /* #3a2618 */
+
+  --fg: 245 230 216; /* #f5e6d8 — 16.0:1 on bg */
+  --fg-muted: 194 168 146; /* #c2a892 — 8.7:1 on bg */
+
+  --accent: 255 157 77; /* #ff9d4d — 9.5:1 on bg */
+  --accent-fill: 179 84 30; /* #b3541e — white text on it is 5.0:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 251 191 36; /* #fbbf24 — candle gold, 11.6:1 on bg */
+
+  --chart-card: #1c110a;
+  --chart-border: #3a2618;
+  --chart-fg: #f5e6d8;
+  --chart-muted: #c2a892;
+  --chart-axis: #8a6a52;
+  --chart-toggle: #150c07;
+}
+
+/* --- Halloween: light -------------------------------------------------- */
+.light[data-season='halloween'] {
+  --bg: 255 250 245; /* #fffaf5 */
+  --surface: 255 255 255;
+  --surface-2: 255 244 234; /* #fff4ea */
+  --border: 240 221 201; /* #f0ddc9 */
+
+  --fg: 43 21 8; /* #2b1508 — 16.7:1 on bg */
+  --fg-muted: 107 74 51; /* #6b4a33 — 7.6:1 on bg */
+
+  /* Darker than the dark-mode orange: #ff9d4d on white is only 2.1:1. */
+  --accent: 168 69 26; /* #a8451a — 5.7:1 on bg */
+  --accent-fill: 168 69 26; /* white text on it is 6.0:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 180 83 9; /* #b45309 — 4.8:1 on bg (gold is unreadable on cream) */
+
+  --chart-card: #ffffff;
+  --chart-border: #f0ddc9;
+  --chart-fg: #2b1508;
+  --chart-muted: #6b4a33;
+  --chart-axis: #8a6a52;
+  --chart-toggle: #fff4ea;
+}
+
 
 html,
 body {
