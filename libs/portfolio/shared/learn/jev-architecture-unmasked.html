@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jev's Architecture Unmasked: Probability Readouts Instead of Text</title>
+  <meta name="description" content="Interactive breakdown of how Jev, TypeSafe's decision-classification model, was reverse-engineered from 10,000 black-box API calls - probability readouts, shared state with isolated questions, causal attention, listwise options, and outcome-trained calibration.">
+  <meta name="date" content="2026-09-22">
+  <meta name="timestamp" content="2026-09-22T14:30:00">
+  <style>
+    :root {
+      --bg: #0f0f13;
+      --surface: #1a1a22;
+      --surface2: #22222e;
+      --border: #2e2e3e;
+      --accent: #5e6ad2;
+      --accent-glow: rgba(94,106,210,0.25);
+      --green: #4ade80;
+      --amber: #fbbf24;
+      --red: #f87171;
+      --text: #e8e8f0;
+      --muted: #7a7a99;
+      --code-bg: #12121a;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.65;
+      font-size: 16px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    code, .mono {
+      font-family: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+    }
+
+    .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+
+    /* ---------- HERO ---------- */
+    .hero { padding: 72px 0 32px; text-align: center; }
+    .hero-label {
+      display: inline-block; font-size: 12px; font-weight: 600; letter-spacing: 1px;
+      color: var(--accent); margin-bottom: 14px; text-transform: uppercase;
+    }
+    .hero h1 { font-size: 40px; line-height: 1.2; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 14px; }
+    .hero p.sub { font-size: 17px; color: var(--muted); max-width: 640px; margin: 0 auto; }
+
+    .progress-wrap {
+      display: flex; align-items: center; gap: 14px;
+      max-width: 460px; margin: 32px auto 0;
+    }
+    .progress-bar-track { flex: 1; height: 4px; background: var(--border); border-radius: 99px; overflow: hidden; }
+    .progress-bar-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 0.4s ease; }
+    .progress-text { font-size: 12px; color: var(--muted); white-space: nowrap; font-weight: 500; }
+
+    /* ---------- SECTION ---------- */
+    .section {
+      margin-bottom: 20px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: var(--surface);
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .section.active {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 1px var(--accent-glow), 0 8px 32px rgba(0,0,0,0.4);
+    }
+    .section-head {
+      display: flex; align-items: center; gap: 14px;
+      padding: 20px 24px; cursor: pointer; user-select: none;
+    }
+    .section-head:hover { background: rgba(94,106,210,0.04); }
+    .section-num {
+      width: 30px; height: 30px; flex-shrink: 0; border-radius: 8px;
+      background: var(--surface2); border: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: var(--muted);
+    }
+    .section.active .section-num { background: var(--accent); border-color: var(--accent); color: #fff; }
+    .section-title { flex: 1; font-size: 18px; font-weight: 600; letter-spacing: -0.2px; }
+    .section-hint { font-size: 12px; color: var(--muted); }
+    .chev { color: var(--muted); transition: transform 0.25s; font-size: 13px; }
+    .section.active .chev { transform: rotate(90deg); color: var(--accent); }
+
+    .section-body { display: none; padding: 0 24px 24px; }
+    .section.active .section-body { display: block; }
+    .section-body p { margin-bottom: 14px; font-size: 15px; }
+    .section-body h4 { font-size: 14px; font-weight: 600; margin: 22px 0 10px; letter-spacing: 0.2px; }
+
+    /* ---------- BITS ---------- */
+    .callout {
+      border-left: 3px solid var(--accent);
+      background: rgba(94,106,210,0.06);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px; font-size: 14px; margin: 16px 0;
+    }
+    .callout.warn { border-left-color: var(--amber); background: rgba(251,191,36,0.06); }
+    .callout.good { border-left-color: var(--green); background: rgba(74,222,128,0.06); }
+    .callout strong { color: var(--text); }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0; }
+    .kv-chip { display: flex; border-radius: 6px; border: 1px solid var(--border); overflow: hidden; font-size: 12px; }
+    .kv-chip-key { padding: 4px 9px; background: var(--surface2); color: var(--muted); font-weight: 500; }
+    .kv-chip-val { padding: 4px 9px; color: var(--text); font-family: "SF Mono", ui-monospace, Menlo, monospace; }
+
+    .demo {
+      background: var(--code-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 18px;
+      margin: 18px 0;
+    }
+    .demo-label {
+      font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+      color: var(--muted); font-weight: 600; margin-bottom: 14px;
+    }
+
+    .btn {
+      padding: 8px 15px; border-radius: 8px; border: 1px solid var(--accent);
+      background: var(--accent); color: #fff; font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: inherit; transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn-outline { background: none; color: var(--accent); }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+
+    .toggle-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .tab {
+      padding: 6px 14px; border-radius: 8px; border: 1px solid var(--border);
+      background: none; color: var(--muted); font-size: 13px; cursor: pointer; font-family: inherit;
+    }
+    .tab:hover { border-color: var(--accent); }
+    .tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+    .out {
+      margin-top: 14px; padding: 11px 14px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-size: 13px; line-height: 1.55; min-height: 40px;
+    }
+
+    /* prob bars */
+    .pb-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .pb-name { width: 130px; font-size: 12px; color: var(--muted); flex-shrink: 0; text-align: right; }
+    .pb-track { flex: 1; height: 22px; background: var(--surface2); border-radius: 5px; overflow: hidden; }
+    .pb-fill {
+      height: 100%; width: 0%; background: var(--accent); border-radius: 5px;
+      transition: width 0.6s cubic-bezier(0.22,1,0.36,1);
+    }
+    .pb-fill.g { background: var(--green); }
+    .pb-fill.a { background: var(--amber); }
+    .pb-fill.r { background: var(--red); }
+    .pb-fill.dim { background: #3f3f56; }
+    .pb-val { width: 52px; font-size: 12px; font-family: "SF Mono", ui-monospace, monospace; flex-shrink: 0; }
+
+    /* typing sim */
+    .typebox {
+      min-height: 70px; padding: 12px 14px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 8px;
+      font-family: "SF Mono", ui-monospace, monospace; font-size: 13px; line-height: 1.6;
+    }
+    .caret { display: inline-block; width: 7px; background: var(--accent); animation: blink 0.9s steps(1) infinite; }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .stat-row { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+    .stat {
+      flex: 1; min-width: 110px; padding: 10px 12px; background: var(--surface2);
+      border: 1px solid var(--border); border-radius: 8px;
+    }
+    .stat-k { font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); }
+    .stat-v { font-size: 19px; font-weight: 700; font-family: "SF Mono", ui-monospace, monospace; margin-top: 2px; }
+
+    /* token strip */
+    .strip { display: flex; flex-wrap: wrap; gap: 5px; margin: 12px 0; }
+    .tok {
+      padding: 5px 9px; border-radius: 6px; font-size: 11px;
+      border: 1px solid var(--border); background: var(--surface2); color: var(--muted);
+      font-family: "SF Mono", ui-monospace, monospace;
+    }
+    .tok.card { border-color: var(--amber); color: var(--amber); background: rgba(251,191,36,0.08); font-weight: 600; }
+    .tok.sees { border-color: var(--green); color: var(--green); background: rgba(74,222,128,0.08); }
+    .tok.blind { opacity: 0.32; }
+    .tok.decide { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); font-weight: 600; }
+
+    /* calibration bins */
+    .bins { display: flex; align-items: flex-end; gap: 8px; height: 150px; margin: 14px 0 6px; }
+    .bin { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 2px; cursor: pointer; height: 100%; }
+    .bin-pair { display: flex; align-items: flex-end; gap: 3px; height: 100%; }
+    .bin-b { flex: 1; border-radius: 3px 3px 0 0; transition: height 0.35s ease; }
+    .bin-b.conf { background: #3f4a9e; }
+    .bin-b.acc { background: var(--green); }
+    .bin-x { font-size: 9px; color: var(--muted); text-align: center; font-family: "SF Mono", ui-monospace, monospace; }
+    .bin.sel .bin-b.conf { background: var(--accent); }
+    .legend { display: flex; gap: 14px; font-size: 11px; color: var(--muted); margin-bottom: 8px; }
+    .swatch { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+
+    input[type=range] { width: 100%; accent-color: var(--accent); }
+
+    /* race */
+    .race-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .race-name { width: 150px; font-size: 12px; color: var(--muted); flex-shrink: 0; text-align: right; }
+    .race-track { flex: 1; height: 26px; background: var(--surface2); border-radius: 6px; overflow: hidden; }
+    .race-fill {
+      height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 9px;
+      font-size: 11px; font-weight: 700; width: 0%;
+      transition: width 0.85s cubic-bezier(0.22,1,0.36,1); white-space: nowrap;
+    }
+    .race-fill.fast { background: linear-gradient(90deg, #4ade8055, #4ade80); color: #052e16; }
+    .race-fill.medium { background: linear-gradient(90deg, #fbbf2455, #fbbf24); color: #1c1003; }
+    .race-fill.slow { background: linear-gradient(90deg, #ef444455, #ef4444); color: #fff; }
+
+    /* arch stack + tooltips */
+    .arch-stack { display: flex; flex-direction: column; gap: 8px; }
+    .arch-node {
+      padding: 11px 14px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface2); cursor: help; display: flex; align-items: center; gap: 10px;
+      transition: border-color 0.2s;
+    }
+    .arch-node:hover { border-color: var(--accent); }
+    .arch-icon { font-size: 15px; }
+    .arch-name { font-size: 13px; font-weight: 600; }
+    .arch-sub { font-size: 11px; color: var(--muted); margin-left: auto; font-family: "SF Mono", ui-monospace, monospace; }
+    .arch-arrow { text-align: center; color: var(--muted); font-size: 11px; line-height: 1; }
+    .arch-tooltip {
+      display: none; position: fixed; z-index: 1000; pointer-events: none;
+      width: 220px; background: var(--surface2); border: 1px solid var(--accent);
+      border-radius: 8px; padding: 10px 14px; font-size: 12.5px; line-height: 1.5;
+      color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    }
+
+    /* compare grid */
+    .cmp { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .cmp-col { padding: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 9px; }
+    .cmp-col.win { border-color: var(--green); }
+    .cmp-col.lose { border-color: var(--red); }
+    .cmp-h { font-size: 12px; font-weight: 700; margin-bottom: 9px; }
+    @media (max-width: 640px) { .cmp { grid-template-columns: 1fr; } .pb-name { width: 96px; } .race-name { width: 100px; } }
+
+    /* walkthrough */
+    .walk {
+      border: 1px solid var(--border); border-radius: 14px; background: var(--surface);
+      overflow: hidden; margin-bottom: 30px;
+    }
+    .walk-top {
+      display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+      padding: 16px 20px; border-bottom: 1px solid var(--border); background: var(--surface2);
+    }
+    .walk-top h3 { font-size: 15px; font-weight: 600; flex: 1; }
+    .walk-clock {
+      font-family: "SF Mono", ui-monospace, monospace; font-size: 13px; font-weight: 700;
+      color: var(--accent); padding: 4px 10px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--bg);
+    }
+    .walk-grid { display: grid; grid-template-columns: 230px 1fr; }
+    .walk-stages { border-right: 1px solid var(--border); padding: 12px; }
+    .wstage {
+      display: flex; align-items: center; gap: 9px; padding: 8px 10px; border-radius: 8px;
+      font-size: 12px; color: var(--muted); cursor: pointer; transition: background 0.2s, color 0.2s;
+    }
+    .wstage:hover { background: rgba(94,106,210,0.06); }
+    .wstage-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--border);
+      flex-shrink: 0; transition: background 0.25s, box-shadow 0.25s;
+    }
+    .wstage.done { color: var(--text); }
+    .wstage.done .wstage-dot { background: var(--green); }
+    .wstage.on { background: var(--accent-glow); color: var(--text); font-weight: 600; }
+    .wstage.on .wstage-dot { background: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+    .wstage-ms { margin-left: auto; font-family: "SF Mono", ui-monospace, monospace; font-size: 10px; opacity: 0.7; }
+
+    .walk-viz { padding: 20px; min-height: 260px; display: flex; flex-direction: column; }
+    .w-title { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; margin-bottom: 14px; }
+    .w-sub { font-size: 12px; color: var(--muted); margin-top: 10px; }
+    .w-badge {
+      display: inline-block; padding: 2px 8px; border-radius: 5px; font-size: 11px; font-weight: 600;
+      border: 1px solid var(--border); background: var(--surface2);
+    }
+    .w-badge.ok { border-color: var(--green); color: var(--green); background: rgba(74,222,128,0.08); }
+    .w-badge.no { border-color: var(--red); color: var(--red); background: rgba(248,113,113,0.08); }
+    .walk-cap {
+      padding: 13px 20px; border-top: 1px solid var(--border); background: var(--code-bg);
+      font-size: 13px; line-height: 1.55; min-height: 52px;
+    }
+
+    .wtok {
+      width: 15px; height: 15px; border-radius: 3px; background: var(--surface2);
+      border: 1px solid var(--border); transition: background 0.2s, border-color 0.2s;
+    }
+    .wtok.lit { background: var(--accent); border-color: var(--accent); }
+
+    .w-meter { height: 8px; background: var(--surface2); border-radius: 99px; overflow: hidden; margin-top: 14px; }
+    .w-meter-fill { height: 100%; width: 0%; background: var(--accent); border-radius: 99px; transition: width 1.1s linear; }
+
+    .wbranch-row { display: flex; gap: 10px; margin-top: 12px; }
+    .wbranch {
+      flex: 1; padding: 10px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--surface2); font-size: 11px; text-align: center;
+      opacity: 0; transform: translateY(10px); transition: opacity 0.4s, transform 0.4s, border-color 0.3s;
+    }
+    .wbranch.in { opacity: 1; transform: none; }
+    .wbranch.focus { border-color: var(--accent); background: var(--accent-glow); }
+
+    .wopt {
+      padding: 6px 11px; border-radius: 7px; border: 1px solid var(--border);
+      background: var(--surface2); font-size: 12px; margin-right: 6px; margin-bottom: 6px;
+      display: inline-block; opacity: 0; transform: translateX(-8px);
+      transition: opacity 0.3s, transform 0.3s, border-color 0.3s;
+    }
+    .wopt.in { opacity: 1; transform: none; }
+    .wopt.hl { border-color: var(--accent); color: var(--text); }
+
+    .waxis { position: relative; height: 20px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
+    .waxis::after { content: ''; position: absolute; left: 50%; top: 0; bottom: 0; width: 1px; background: var(--border); }
+    .waxis-bar { position: absolute; top: 0; bottom: 0; width: 0%; left: 50%; border-radius: 3px; transition: width 0.6s ease, left 0.6s ease; }
+    .waxis-bar.p { background: var(--green); }
+    .waxis-bar.n { background: var(--red); }
+
+    .wthresh { position: relative; }
+    .wthresh-line { position: absolute; top: -4px; bottom: -4px; width: 2px; background: var(--amber); z-index: 2; }
+    .wthresh-lbl { position: absolute; top: -20px; font-size: 10px; color: var(--amber); transform: translateX(-50%); white-space: nowrap; }
+
+    @media (max-width: 680px) {
+      .walk-grid { grid-template-columns: 1fr; }
+      .walk-stages { border-right: none; border-bottom: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; }
+    }
+
+    /* appendix */
+    .apx-head {
+      margin: 40px 0 18px; padding-top: 26px; border-top: 1px solid var(--border);
+      display: flex; align-items: baseline; gap: 12px;
+    }
+    .apx-head h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.2px; }
+    .apx-head span { font-size: 12px; color: var(--muted); }
+    .section.apx .section-num { font-size: 11px; }
+    .formula {
+      background: var(--code-bg); border: 1px solid var(--border); border-radius: 9px;
+      padding: 14px 16px; margin: 14px 0; text-align: center;
+      font-family: "SF Mono", ui-monospace, Menlo, monospace; font-size: 15px; color: var(--text);
+      overflow-x: auto;
+    }
+    .formula small { display: block; margin-top: 7px; font-size: 11px; color: var(--muted); font-family: inherit; }
+
+    .slider-row { display: flex; align-items: center; gap: 10px; margin-bottom: 7px; }
+    .slider-name { width: 130px; font-size: 11px; color: var(--muted); flex-shrink: 0; text-align: right; }
+    .slider-row input[type=range] { flex: 1; }
+    .slider-val {
+      width: 46px; font-size: 12px; font-family: "SF Mono", ui-monospace, monospace;
+      flex-shrink: 0; text-align: right;
+    }
+
+    .mat { display: grid; gap: 4px; margin: 10px 0; font-size: 11px; }
+    .mat-cell {
+      padding: 6px 4px; border-radius: 5px; text-align: center;
+      font-family: "SF Mono", ui-monospace, monospace;
+      background: var(--surface2); border: 1px solid var(--border); color: var(--muted);
+      transition: transform 0.2s, background 0.2s, border-color 0.2s, color 0.2s;
+    }
+    .mat-cell.hdr { background: none; border: none; color: var(--muted); font-size: 10px; }
+    .mat-cell.on { border-color: var(--accent); color: var(--text); background: var(--accent-glow); }
+    .mat-cell.pulse {
+      border-color: var(--amber); background: rgba(251,191,36,0.18); color: var(--amber);
+      transform: scale(1.07); font-weight: 700;
+    }
+
+    .terms { font-family: "SF Mono", ui-monospace, monospace; font-size: 12px; line-height: 1.9; }
+    .terms .pos { color: var(--green); }
+    .terms .neg { color: var(--red); }
+    .term-row { opacity: 0; transform: translateY(-5px); transition: opacity 0.35s, transform 0.35s; }
+    .term-row.in { opacity: 1; transform: none; }
+    .slider-row.on .slider-name { color: var(--amber); font-weight: 700; }
+    .slider-row.on .slider-val { color: var(--amber); font-weight: 700; }
+    .runsum {
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+      font-family: "SF Mono", ui-monospace, monospace; font-size: 13px;
+    }
+    .runsum b { color: var(--accent); font-size: 15px; }
+
+    .zphase { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+    .zphase-step {
+      flex: 1; min-width: 96px; padding: 7px 9px; border-radius: 7px; text-align: center;
+      border: 1px solid var(--border); background: var(--surface2);
+      font-size: 11px; color: var(--muted); transition: all 0.3s;
+    }
+    .zphase-step.on {
+      border-color: var(--accent); background: var(--accent-glow); color: var(--text); font-weight: 600;
+    }
+    .zphase-step.past { border-color: var(--green); color: var(--green); }
+
+    /* quiz */
+    .quiz { margin-top: 20px; padding-top: 18px; border-top: 1px solid var(--border); }
+    .quiz-q { font-size: 14px; font-weight: 600; margin-bottom: 12px; }
+    .quiz-opts { display: flex; flex-direction: column; gap: 8px; }
+    .quiz-opt {
+      padding: 10px 14px; border-radius: 7px; border: 1px solid var(--border);
+      background: var(--bg); color: var(--text); font-size: 14px; text-align: left;
+      cursor: pointer; font-family: inherit; transition: border-color 0.15s;
+    }
+    .quiz-opt:hover:not(:disabled) { border-color: var(--accent); }
+    .quiz-opt:disabled { cursor: default; }
+    .quiz-opt.correct { border-color: var(--green); background: rgba(74,222,128,0.08); color: var(--green); }
+    .quiz-opt.wrong { border-color: var(--red); background: rgba(248,113,113,0.08); color: var(--red); }
+    .quiz-fb { display: none; margin-top: 11px; font-size: 13px; line-height: 1.55; }
+    .quiz-fb.show { display: block; }
+    .quiz-fb.ok { color: var(--green); }
+    .quiz-fb.no { color: var(--amber); }
+
+    /* completion */
+    .completion {
+      display: none; margin: 30px 0 50px; padding: 30px; text-align: center;
+      border: 1px solid var(--green); border-radius: 14px; background: rgba(74,222,128,0.05);
+    }
+    .completion.show { display: block; }
+    .completion h3 { font-size: 21px; margin-bottom: 8px; }
+    .completion p { font-size: 14px; color: var(--muted); max-width: 560px; margin: 0 auto; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <div class="hero">
+      <div class="hero-label">Model Architecture · 2026</div>
+      <h1>Jev's Architecture, Unmasked</h1>
+      <p class="sub">
+        What 10,000 black-box API calls reveal about a model that returns probabilities
+        instead of sentences - and why that one change rewrites the whole design.
+      </p>
+      <div class="progress-wrap">
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progress-fill"></div></div>
+        <div class="progress-text" id="progress-text">0 / 6 sections</div>
+      </div>
+    </div>
+
+    <div class="callout warn" style="margin-bottom:26px;">
+      <strong>Read this first.</strong> Nothing here comes from TypeSafe's source code. Every claim is an
+      inference from black-box API behaviour - 1,029 initial probes plus 446 follow-up trials against
+      <code>jev-1.13.0</code> on one account and one region, with latencies read off the
+      <code>x-envoy-upstream-service-time</code> header. Published claims, observed behaviour, and
+      architectural guesses are three different things. This page keeps them labelled.
+    </div>
+
+    <!-- ============ ANIMATED WALKTHROUGH ============ -->
+    <div class="walk">
+      <div class="walk-top">
+        <h3>▶ One request, end to end</h3>
+        <div class="walk-clock" id="walk-clock">0 ms</div>
+        <button class="btn" id="walk-play" onclick="walkToggle()">Play</button>
+        <button class="tab" onclick="walkNext()">Step ›</button>
+        <button class="tab" onclick="walkReset()">Reset</button>
+        <button class="tab" id="walk-speed" onclick="walkCycleSpeed()">1×</button>
+      </div>
+      <div class="walk-grid">
+        <div class="walk-stages" id="walk-stages"></div>
+        <div class="walk-viz" id="walk-viz"></div>
+      </div>
+      <div class="walk-cap" id="walk-cap">
+        Press <strong>Play</strong> to watch one support ticket and three questions travel the whole pipeline.
+        The clock on the right is the real latency budget - watch which stage eats it.
+      </div>
+    </div>
+
+    <!-- ============ SECTION 1 ============ -->
+    <div class="section" id="s1">
+      <div class="section-head" onclick="toggleSection('s1')">
+        <div class="section-num">1</div>
+        <div class="section-title">Numbers, not sentences</div>
+        <div class="section-hint">the probability readout</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          Ask a normal chat model how sure it is and you get the string <code>"I'm about 91% confident"</code>.
+          That number was <em>generated</em> - sampled token by token, the same way it would write a poem.
+          It is a plausible-looking sequence of characters, not a measurement of anything inside the model.
+        </p>
+        <p>
+          Jev takes a different exit. The final hidden state goes through a prediction head - a matrix
+          <code>W</code>, then a softmax - and the resulting distribution <em>is</em> the answer. No decode
+          loop, no parsing, no "please respond in JSON". The number never passes through the text channel,
+          so it never has to be re-read back out of one.
+        </p>
+        <div class="chips">
+          <div class="kv-chip"><span class="kv-chip-key">head</span><span class="kv-chip-val">softmax(W · h)</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">decode steps</span><span class="kv-chip-val">0</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">output</span><span class="kv-chip-val">float[n_options]</span></div>
+        </div>
+        <div class="callout">
+          <strong>The catch.</strong> A softmax will hand you numbers whether or not they mean anything.
+          Direct readout only buys you <em>calibration</em> if the head was trained against real outcomes.
+          That is section 5.
+        </div>
+        <div class="callout good">
+          <strong>New to <code>W</code> and softmax?</strong> Appendix A and B at the bottom of this page
+          take both apart with live sliders. Nothing else here depends on reading them first.
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Demo · two ways to produce "91%"</div>
+          <div class="toggle-row">
+            <button class="tab active" id="m-text" onclick="setMode('text')">Text model</button>
+            <button class="tab" id="m-read" onclick="setMode('read')">Probability readout</button>
+          </div>
+          <div id="mode-text">
+            <div class="typebox" id="typebox">Press run to generate an answer.</div>
+            <div class="btn-row" style="margin-top:12px;margin-bottom:0;">
+              <button class="btn" onclick="runTyping()">Run</button>
+            </div>
+          </div>
+          <div id="mode-read" style="display:none;">
+            <div id="readout-bars"></div>
+            <div class="btn-row" style="margin-top:12px;margin-bottom:0;">
+              <button class="btn" onclick="runReadout()">Run</button>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-k">Decode steps</div><div class="stat-v" id="st-steps">-</div></div>
+            <div class="stat"><div class="stat-k">Wall time</div><div class="stat-v" id="st-time">-</div></div>
+            <div class="stat"><div class="stat-k">Parseable</div><div class="stat-v" id="st-parse">-</div></div>
+          </div>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">A chat model writes "I am 91% confident". Why is that not a probability?</div>
+          <div class="quiz-opts" id="q1-opts">
+            <button class="quiz-opt" onclick="answer(this,'q1',false)">Because 91% is too high to be honest</button>
+            <button class="quiz-opt" onclick="answer(this,'q1',true)">Because it is sampled text imitating how confident writing looks, not a value read off the model's own state</button>
+            <button class="quiz-opt" onclick="answer(this,'q1',false)">Because softmax outputs cannot exceed 90%</button>
+            <button class="quiz-opt" onclick="answer(this,'q1',false)">Because the model has no hidden states to read from</button>
+          </div>
+          <div class="quiz-fb" id="q1-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SECTION 2 ============ -->
+    <div class="section" id="s2">
+      <div class="section-head" onclick="toggleSection('s2')">
+        <div class="section-num">2</div>
+        <div class="section-title">One shared state, many isolated questions</div>
+        <div class="section-hint">O(Q×S) → O(S)</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          You have one support ticket and forty questions about it. The naive approach re-sends the ticket
+          forty times - forty prefills of the same tokens. Jev encodes the shared state <strong>once</strong>,
+          then runs each question as its own branch that attends back into that state.
+        </p>
+        <p>
+          Attention masks do the fencing. Every question branch can read the state; no branch can read
+          another branch. So the answers stay independent while the expensive part gets paid for once.
+          Compute drops from <code>O(Q × S)</code> to <code>O(S)</code>, where <code>Q</code> is questions
+          and <code>S</code> is state tokens.
+        </p>
+        <h4>The visibility test</h4>
+        <p>
+          Hume planted a secret phrase and then asked unrelated questions whether they could see it.
+          Put it inside <em>Question 2's option descriptions</em> and the other questions score
+          <strong>0.00</strong>. Move the same phrase into the <em>shared state</em> and detection jumps to
+          <strong>0.90-0.92</strong>. Two facts in one experiment: branches are isolated, and all of them
+          reach the state.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · plant the secret, then probe</div>
+          <div class="toggle-row">
+            <button class="tab active" id="p-opt" onclick="setPlant('opt')">Secret in Q2's options</button>
+            <button class="tab" id="p-state" onclick="setPlant('state')">Secret in shared state</button>
+          </div>
+          <div id="vis-bars"></div>
+          <div class="out" id="vis-out">Pick a placement, then probe the other questions.</div>
+          <div class="btn-row" style="margin-top:12px;margin-bottom:0;">
+            <button class="btn" onclick="runVisibility()">Probe Q1 and Q3</button>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Demo · what the shared state saves</div>
+          <div style="font-size:13px;color:var(--muted);margin-bottom:6px;">
+            Questions asked about one 6,000-token ticket: <span class="mono" id="q-count" style="color:var(--text);">40</span>
+          </div>
+          <input type="range" min="1" max="200" value="40" id="q-slider" oninput="updateCompute()">
+          <div class="cmp" style="margin-top:14px;">
+            <div class="cmp-col lose">
+              <div class="cmp-h" style="color:var(--red);">Re-send per question · O(Q×S)</div>
+              <div class="stat-v" id="naive-tok" style="font-size:22px;">240,000</div>
+              <div style="font-size:11px;color:var(--muted);">state tokens encoded</div>
+            </div>
+            <div class="cmp-col win">
+              <div class="cmp-h" style="color:var(--green);">Shared state · O(S)</div>
+              <div class="stat-v" id="shared-tok" style="font-size:22px;">6,000</div>
+              <div style="font-size:11px;color:var(--muted);">state tokens encoded</div>
+            </div>
+          </div>
+          <div class="out" id="compute-out">40× less state encoding.</div>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">The secret phrase scores 0.00 from Q1 when planted in Q2's options, but 0.91 when planted in the shared state. What does that pair of results establish?</div>
+          <div class="quiz-opts" id="q2-opts">
+            <button class="quiz-opt" onclick="answer(this,'q2',false)">The model cannot read option descriptions at all</button>
+            <button class="quiz-opt" onclick="answer(this,'q2',false)">Questions are answered in a random order</button>
+            <button class="quiz-opt" onclick="answer(this,'q2',true)">Question branches are masked off from each other, but every branch attends into the shared state</button>
+            <button class="quiz-opt" onclick="answer(this,'q2',false)">The shared state is re-encoded once per question</button>
+          </div>
+          <div class="quiz-fb" id="q2-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SECTION 3 ============ -->
+    <div class="section" id="s3">
+      <div class="section-head" onclick="toggleSection('s3')">
+        <div class="section-num">3</div>
+        <div class="section-title">Causal, not bidirectional</div>
+        <div class="section-hint">position leaks the mask</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          A classifier could plausibly use a bidirectional encoder - every token seeing every other token.
+          Jev does not. It behaves like a standard left-to-right decoder: a token can only attend to what
+          came <em>before</em> it.
+        </p>
+        <p>
+          The tell is positional. Hume gave the model three options -
+          <code>[Alpha, Beta, Gamma]</code> - plus a "reference card" stating which one was correct, and
+          moved the card around. If attention were bidirectional, position would not matter. It mattered a lot.
+        </p>
+        <div class="callout">
+          <strong>Why last beats first.</strong> A card placed <em>before</em> the option descriptions is
+          visible to them, but the descriptions then talk past it. A card placed <em>after</em> all
+          descriptions sits right where the decision is read - and causal attention lets the decision
+          position look back over everything, card included. Put it in the shared state and every branch
+          gets it cleanly.
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Demo · move the reference card</div>
+          <div class="toggle-row">
+            <button class="tab active" id="pos-first" onclick="setPos('first')">First</button>
+            <button class="tab" id="pos-mid" onclick="setPos('mid')">Middle</button>
+            <button class="tab" id="pos-last" onclick="setPos('last')">Last</button>
+            <button class="tab" id="pos-state" onclick="setPos('state')">Shared state</button>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">
+            Token order (left to right) · <span style="color:var(--green);">green = can see the card</span>
+          </div>
+          <div class="strip" id="pos-strip"></div>
+          <div class="pb-row" style="margin-top:14px;">
+            <div class="pb-name">Accuracy</div>
+            <div class="pb-track"><div class="pb-fill g" id="pos-bar"></div></div>
+            <div class="pb-val" id="pos-val">-</div>
+          </div>
+          <div class="out" id="pos-out">Pick a placement for the reference card.</div>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">Why does moving the reference card from first to last raise accuracy from ~50% to ~88%?</div>
+          <div class="quiz-opts" id="q3-opts">
+            <button class="quiz-opt" onclick="answer(this,'q3',false)">The model weights later tokens more heavily by design</button>
+            <button class="quiz-opt" onclick="answer(this,'q3',true)">Causal attention means the decision position can look back over the whole option list including a card placed after it, while a card placed first gets buried by descriptions that follow</button>
+            <button class="quiz-opt" onclick="answer(this,'q3',false)">The tokenizer splits early tokens differently</button>
+            <button class="quiz-opt" onclick="answer(this,'q3',false)">Options are scored in reverse order</button>
+          </div>
+          <div class="quiz-fb" id="q3-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SECTION 4 ============ -->
+    <div class="section" id="s4">
+      <div class="section-head" onclick="toggleSection('s4')">
+        <div class="section-num">4</div>
+        <div class="section-title">Options compete with each other</div>
+        <div class="section-hint">listwise, not pointwise</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          There are two ways to score a list of options. <strong>Pointwise:</strong> each option gets a score
+          on its own, then you softmax the pile. <strong>Listwise:</strong> the model reads the whole list as
+          context, so options influence each other before any score exists.
+        </p>
+        <p>
+          These make a clean, falsifiable split. Under pointwise scoring, adding an irrelevant fifth option
+          just renormalises - the <em>ratio</em> between two existing options is mathematically untouched.
+          Under listwise scoring, the ratio is free to move.
+        </p>
+        <p>
+          Hume added "weather caused it" to a four-option payout-failure classification, across 10 blocks.
+          The log-odds between the surviving options shifted by
+          <strong>-0.28</strong> (95% CI -0.36 to -0.19). Pointwise predicts exactly 0. It is not 0.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · add an irrelevant option, watch the ratio</div>
+          <div class="toggle-row">
+            <button class="tab active" id="o-4" onclick="setOptSet(4)">4 options</button>
+            <button class="tab" id="o-5" onclick="setOptSet(5)">5 options (+ "weather caused it")</button>
+          </div>
+          <div class="cmp">
+            <div class="cmp-col">
+              <div class="cmp-h">Pointwise prediction</div>
+              <div id="bars-point"></div>
+            </div>
+            <div class="cmp-col">
+              <div class="cmp-h">Observed from Jev</div>
+              <div id="bars-obs"></div>
+            </div>
+          </div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-k">ln ratio · pointwise</div><div class="stat-v" id="lr-point">1.082</div></div>
+            <div class="stat"><div class="stat-k">ln ratio · observed</div><div class="stat-v" id="lr-obs">1.082</div></div>
+            <div class="stat"><div class="stat-k">Shift</div><div class="stat-v" id="lr-shift">0.00</div></div>
+          </div>
+          <div class="out" id="opt-out">Ratio measured is p(customer) / p(unknown). Toggle the fifth option.</div>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">Adding an irrelevant option changed the log-odds between two existing options by -0.28. What does that rule out?</div>
+          <div class="quiz-opts" id="q4-opts">
+            <button class="quiz-opt" onclick="answer(this,'q4',false)">That the model is causal</button>
+            <button class="quiz-opt" onclick="answer(this,'q4',true)">That each option gets a fixed independent score which is only renormalised at the end</button>
+            <button class="quiz-opt" onclick="answer(this,'q4',false)">That the probabilities sum to 1</button>
+            <button class="quiz-opt" onclick="answer(this,'q4',false)">That the shared state is cached</button>
+          </div>
+          <div class="quiz-fb" id="q4-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SECTION 5 ============ -->
+    <div class="section" id="s5">
+      <div class="section-head" onclick="toggleSection('s5')">
+        <div class="section-num">5</div>
+        <div class="section-title">Calibration comes from outcomes</div>
+        <div class="section-hint">ECE 0.031 over 1,200 items</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          TypeSafe describes a post-training stage they call <strong>RLCD</strong> - Reinforcement Learning
+          for Calibrated Decisions. The methodology is unpublished, but the fingerprint is measurable:
+          when Jev says 0.8, it is right about 80% of the time.
+        </p>
+        <div class="chips">
+          <div class="kv-chip"><span class="kv-chip-key">ECE</span><span class="kv-chip-val">0.031</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">items</span><span class="kv-chip-val">1,200 MMLU</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">in 0.9-1.0 bin</span><span class="kv-chip-val">990 / 1,200</span></div>
+          <div class="kv-chip"><span class="kv-chip-key">MMLU-Pro</span><span class="kv-chip-val">84.6%</span></div>
+        </div>
+        <h4>The freshly-generated check</h4>
+        <p>
+          Benchmark calibration can be contamination. So Hume generated new maths problems and compared
+          claimed probability against realised accuracy: 3-digit multiplication drew
+          <strong>83%</strong> confidence against <strong>86.7%</strong> accuracy; word problems drew
+          <strong>30%</strong> against <strong>32%</strong>. The model does not just know the answers -
+          it tracks how likely it is to be wrong, and the tracking moves with task difficulty.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · reliability diagram, and what ECE measures</div>
+          <div class="legend">
+            <span><span class="swatch" style="background:#3f4a9e;"></span>predicted confidence</span>
+            <span><span class="swatch" style="background:var(--green);"></span>observed accuracy</span>
+          </div>
+          <div class="bins" id="bins"></div>
+          <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:14px;">
+            <span>low confidence</span><span>high confidence</span>
+          </div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">
+            Drag to inject overconfidence: <span class="mono" id="skew-val" style="color:var(--text);">0.00</span>
+          </div>
+          <input type="range" min="-20" max="40" value="0" id="skew" oninput="renderBins()">
+          <div class="stat-row">
+            <div class="stat"><div class="stat-k">Expected calibration error</div><div class="stat-v" id="ece-val">0.031</div></div>
+            <div class="stat"><div class="stat-k">Verdict</div><div class="stat-v" id="ece-verdict" style="font-size:15px;">calibrated</div></div>
+          </div>
+          <div class="out" id="bin-out">Click a bar to inspect that bin. A perfectly calibrated model has both bars equal in every bin.</div>
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">Why did Hume test calibration on freshly generated maths problems as well as MMLU?</div>
+          <div class="quiz-opts" id="q5-opts">
+            <button class="quiz-opt" onclick="answer(this,'q5',false)">Maths is the only domain where probabilities apply</button>
+            <button class="quiz-opt" onclick="answer(this,'q5',false)">MMLU has too few items to compute ECE</button>
+            <button class="quiz-opt" onclick="answer(this,'q5',true)">Benchmark items may be in training data, so fresh problems test whether the confidence tracks real difficulty rather than memorisation</button>
+            <button class="quiz-opt" onclick="answer(this,'q5',false)">Because the API rate-limits benchmark traffic</button>
+          </div>
+          <div class="quiz-fb" id="q5-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ SECTION 6 ============ -->
+    <div class="section" id="s6">
+      <div class="section-head" onclick="toggleSection('s6')">
+        <div class="section-num">6</div>
+        <div class="section-title">Where the speed comes from</div>
+        <div class="section-hint">~30k tokens in ~160ms</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          The latency numbers are the loudest evidence in the whole investigation. A 255-option response was
+          billed at <strong>2,714 output tokens</strong> and came back as fast as a 2-option question. That
+          only makes sense if output tokens are a <em>billing calculation applied after the fact</em>, not a
+          count of generation steps.
+        </p>
+        <p>
+          What actually scales is the state. One question over a 29.8k-token state: <strong>214ms</strong>.
+          Fifteen hundred questions over a short state: <strong>~600ms</strong>. Prefill dominates; repeated
+          state gets cheaper, which is the signature of prefix caching. And ~30k tokens in ~160ms is hard to
+          hit with dense parameters - conditional computation, most likely a sparse
+          mixture-of-experts, fits the budget.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · the request pipeline (hover a stage)</div>
+          <div class="arch-stack">
+            <div class="arch-node">
+              <span class="arch-icon">📥</span><span class="arch-name">Prefill shared state</span>
+              <span class="arch-sub">O(S)</span>
+              <div class="arch-tooltip">Ticket text encoded once. Repeat requests with the same prefix hit the cache, which is why a 29.8k-token state still returns in ~214ms.</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node">
+              <span class="arch-icon">🔀</span><span class="arch-name">Fan out question branches</span>
+              <span class="arch-sub">batch units</span>
+              <div class="arch-tooltip">Each question is scheduled as an independent work unit, not a turn in a conversation. 1,500 of them fit in ~600ms.</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node">
+              <span class="arch-icon">🧠</span><span class="arch-name">Causal transformer · sparse MoE</span>
+              <span class="arch-sub">inferred</span>
+              <div class="arch-tooltip">Left-to-right decoder. Sparse experts are an inference from the latency budget, not something the API exposes directly.</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node">
+              <span class="arch-icon">📋</span><span class="arch-name">Read full option list</span>
+              <span class="arch-sub">listwise</span>
+              <div class="arch-tooltip">All options enter as context before any score exists, which is why a fifth irrelevant option moves the ratio between the other four.</div>
+            </div>
+            <div class="arch-arrow">↓</div>
+            <div class="arch-node">
+              <span class="arch-icon">📊</span><span class="arch-name">Probability head</span>
+              <span class="arch-sub">1 step</span>
+              <div class="arch-tooltip">softmax(W · h) per question. One decision, no decode loop - which is why 255 options cost no more wall time than 2.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Demo · latency race</div>
+          <div class="race-row"><div class="race-name">2 options</div><div class="race-track"><div class="race-fill fast" id="r1"></div></div></div>
+          <div class="race-row"><div class="race-name">255 options</div><div class="race-track"><div class="race-fill fast" id="r2"></div></div></div>
+          <div class="race-row"><div class="race-name">29.8k-token state</div><div class="race-track"><div class="race-fill medium" id="r3"></div></div></div>
+          <div class="race-row"><div class="race-name">1,500 questions</div><div class="race-track"><div class="race-fill medium" id="r4"></div></div></div>
+          <div class="race-row"><div class="race-name">if it decoded 2,714 tok</div><div class="race-track"><div class="race-fill slow" id="r5"></div></div></div>
+          <div class="btn-row" style="margin-top:12px;margin-bottom:0;">
+            <button class="btn" onclick="runRace()">Run race</button>
+          </div>
+          <div class="out">Scale is 0-700ms. The last bar is hypothetical: what the same response would cost if those 2,714 billed tokens were actually generated one at a time.</div>
+        </div>
+
+        <div class="callout warn">
+          <strong>Still unknown.</strong> The tokenizer matches none of 192 public ones tested - Qwen is
+          closest at 348/415 probe matches, but digit splitting and merge patterns differ. The base model is
+          not identified. The MoE is inferred from latency, never observed. And the RLCD loss function -
+          log loss, Brier, some other proper scoring rule - is anyone's guess.
+        </div>
+
+        <div class="callout good">
+          <strong>Why it matters in practice.</strong> The design separates three jobs: the transformer
+          builds a useful representation, the outcome-trained head turns it into a number you can trust, and
+          <em>your</em> policy decides what to do - <code>escalate if p(urgent) &gt; 0.1</code>. The threshold
+          lives in your code, in the open, where you can tune it. That is the opposite of reading a
+          self-reported confidence out of a sentence.
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">A 255-option response was billed 2,714 output tokens but returned as fast as a 2-option one. What follows?</div>
+          <div class="quiz-opts" id="q6-opts">
+            <button class="quiz-opt" onclick="answer(this,'q6',false)">The billing system undercounts long responses</button>
+            <button class="quiz-opt" onclick="answer(this,'q6',false)">Options are processed in parallel on separate GPUs</button>
+            <button class="quiz-opt" onclick="answer(this,'q6',true)">Output tokens are a billing figure computed after the fact, not a count of generation steps - there is no autoregressive decode</button>
+            <button class="quiz-opt" onclick="answer(this,'q6',false)">The 255-option request was served entirely from cache</button>
+          </div>
+          <div class="quiz-fb" id="q6-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="completion" id="completion">
+      <h3>🎉 All six sections opened</h3>
+      <p>
+        One design choice - return a probability instead of a sentence - cascades into everything else:
+        no decode loop, so speed stops scaling with option count; a state/question split, so compute
+        collapses to O(S); listwise options, so the list is context rather than a scoring queue; and an
+        outcome-trained head, so the number is worth putting a threshold on.
+      </p>
+    </div>
+
+    <!-- ============ APPENDIX ============ -->
+    <div class="apx-head">
+      <h2>Appendix</h2>
+      <span>the two pieces of maths the whole design rests on · optional, not counted in progress</span>
+    </div>
+
+    <!-- ---- APPENDIX A ---- -->
+    <div class="section apx" id="apx-a">
+      <div class="section-head" onclick="toggleSection('apx-a')">
+        <div class="section-num">A</div>
+        <div class="section-title">What "matrix W" actually is</div>
+        <div class="section-hint">the prediction head</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          When the transformer finishes reading, it leaves behind a <strong>hidden state</strong> -
+          written <code>h</code>. It is just a list of numbers, typically a few thousand of them. Nobody
+          assigns those numbers meanings; training does, and the meanings end up smeared across many
+          dimensions at once. But the useful mental model is: <em>h is everything the model noticed,
+          compressed into coordinates.</em>
+        </p>
+        <p>
+          <code>W</code> is a matrix of learned weights that turns those coordinates into one score per
+          option. If <code>h</code> has <code>d</code> numbers and there are <code>n</code> options, then
+          <code>W</code> is <code>d × n</code> - and each <strong>column</strong> is a direction in
+          h-space that means "this option". The score is a dot product: multiply matching entries, add
+          them up.
+        </p>
+        <div class="formula">
+          logit<sub>i</sub> &nbsp;=&nbsp; h · W[:, i] &nbsp;=&nbsp; h₁W₁ᵢ + h₂W₂ᵢ + … + h_dW_dᵢ
+          <small>one number per option · can be negative · not yet a probability</small>
+        </div>
+        <p>
+          That is the entire "prediction head". A matrix multiply. No loop, no sampling, no text - which is
+          why it costs one step instead of one step per token.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · move the hidden state, watch the logits</div>
+          <div style="font-size:12px;color:var(--muted);margin-bottom:10px;">
+            A toy <code>h</code> with 4 readable dimensions instead of 4,096. Drag them.
+          </div>
+          <div id="h-sliders"></div>
+          <div style="font-size:11px;color:var(--muted);margin:16px 0 6px;">
+            W · each column is one option's direction (fixed by training)
+          </div>
+          <div class="mat" id="w-mat"></div>
+          <div class="toggle-row" style="margin-top:14px;" id="w-tabs"></div>
+          <div class="btn-row" style="margin-bottom:12px;">
+            <button class="btn" id="w-play" onclick="animateDotProduct()">▶ Animate the dot product</button>
+          </div>
+          <div class="terms" id="w-terms"></div>
+          <div style="font-size:11px;color:var(--muted);margin:16px 0 6px;">Resulting logits</div>
+          <div id="logit-bars"></div>
+          <div class="out" id="w-out"></div>
+        </div>
+
+        <div class="callout warn">
+          <strong>One honest wrinkle.</strong> A fixed <code>d × n</code> matrix only works when
+          <code>n</code> is fixed. Jev takes a different option list on every call - up to 255 of them. So
+          the columns almost certainly are not stored weights; they are built from each option's own text
+          as the model reads it. Same arithmetic, same dot product, but the "directions" arrive with the
+          request. That is also why options can influence each other (section 4).
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">What does one column of W represent?</div>
+          <div class="quiz-opts" id="qa-opts">
+            <button class="quiz-opt" onclick="answer(this,'qa',false)">One token in the input</button>
+            <button class="quiz-opt" onclick="answer(this,'qa',true)">A direction in hidden-state space whose dot product with h scores one option</button>
+            <button class="quiz-opt" onclick="answer(this,'qa',false)">The probability assigned to one option</button>
+            <button class="quiz-opt" onclick="answer(this,'qa',false)">One layer of the transformer</button>
+          </div>
+          <div class="quiz-fb" id="qa-fb"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---- APPENDIX B ---- -->
+    <div class="section apx" id="apx-b">
+      <div class="section-head" onclick="toggleSection('apx-b')">
+        <div class="section-num">B</div>
+        <div class="section-title">What softmax does to those logits</div>
+        <div class="section-hint">and the property section 4 tests</div>
+        <div class="chev">▶</div>
+      </div>
+      <div class="section-body">
+        <p>
+          Logits are unbounded - <code>1.55</code>, <code>-0.81</code>, <code>0.22</code>. You cannot hand
+          those to a downstream rule. Softmax exponentiates each one (killing the negatives, since
+          <code>exp</code> is always positive) and divides by the total, so the results are positive and
+          sum to exactly 1.
+        </p>
+        <div class="formula">
+          p<sub>i</sub> &nbsp;=&nbsp; exp(z<sub>i</sub>) / Σ<sub>j</sub> exp(z<sub>j</sub>)
+          <small>z = logits · output is a probability distribution over the options</small>
+        </div>
+        <h4>Three properties worth internalising</h4>
+        <p>
+          <strong>1. Shift-invariant.</strong> Add the same constant to every logit and the output does not
+          move at all - the constant cancels top and bottom. Only <em>differences</em> between logits carry
+          information.
+        </p>
+        <p>
+          <strong>2. Ratios are logit differences.</strong> Divide two probabilities and the shared
+          denominator cancels:
+        </p>
+        <div class="formula">
+          ln( p<sub>i</sub> / p<sub>j</sub> ) &nbsp;=&nbsp; z<sub>i</sub> − z<sub>j</sub>
+          <small>this is the "log-odds" quantity measured in section 4</small>
+        </div>
+        <p>
+          <strong>3. Temperature sharpens or flattens.</strong> Divide the logits by T before
+          exponentiating. Small T pushes everything toward a single winner; large T flattens toward a
+          uniform guess.
+        </p>
+
+        <div class="demo">
+          <div class="demo-label">Demo · logits in, probabilities out</div>
+          <div id="z-sliders"></div>
+          <div class="slider-row" style="margin-top:12px;">
+            <div class="slider-name">temperature T</div>
+            <input type="range" min="20" max="300" value="100" id="z-temp" oninput="renderSoftmax()">
+            <div class="slider-val" id="z-temp-val">1.00</div>
+          </div>
+          <div class="btn-row" style="margin:14px 0 0;">
+            <button class="btn" id="z-play" onclick="animateSoftmax()">▶ Animate the transform</button>
+            <button class="tab" id="z-shift" onclick="toggleShift()">Add +5 to every logit</button>
+            <button class="tab" id="z-extra" onclick="toggleExtra()">Add a 4th option</button>
+            <button class="btn btn-outline" onclick="resetSoftmax()">Reset</button>
+          </div>
+          <div class="zphase" style="margin-top:18px;">
+            <div class="zphase-step" id="zp-0">1 · raw logits z</div>
+            <div class="zphase-step" id="zp-1">2 · exp(z)</div>
+            <div class="zphase-step" id="zp-2">3 · ÷ total</div>
+            <div class="zphase-step" id="zp-3">4 · probabilities</div>
+          </div>
+          <div id="z-bars"></div>
+          <div class="stat-row">
+            <div class="stat"><div class="stat-k">Sum</div><div class="stat-v" id="z-sum">1.000</div></div>
+            <div class="stat"><div class="stat-k">ln(p₁/p₂)</div><div class="stat-v" id="z-lr">2.360</div></div>
+            <div class="stat"><div class="stat-k">z₁ − z₂</div><div class="stat-v" id="z-diff">2.360</div></div>
+          </div>
+          <div class="out" id="z-out"></div>
+        </div>
+
+        <div class="callout">
+          <strong>Now section 4 reads differently.</strong> Press "Add a 4th option" above and watch
+          <code>ln(p₁/p₂)</code> sit perfectly still while every probability moves. That immovability is
+          not a modelling choice - it is arithmetic, true of any pointwise scorer. Jev moved it by
+          <strong>-0.28</strong>. So the logits themselves must have changed when the new option was
+          added, meaning the options were read together rather than scored apart.
+        </div>
+
+        <div class="quiz">
+          <div class="quiz-q">You add a fifth option to a pointwise scorer. What happens to ln(p₁/p₂) for two existing options?</div>
+          <div class="quiz-opts" id="qb-opts">
+            <button class="quiz-opt" onclick="answer(this,'qb',false)">It shrinks toward zero as probability mass is taken away</button>
+            <button class="quiz-opt" onclick="answer(this,'qb',true)">Nothing - it equals z₁ − z₂, and neither logit changed</button>
+            <button class="quiz-opt" onclick="answer(this,'qb',false)">It grows, because the denominator got larger</button>
+            <button class="quiz-opt" onclick="answer(this,'qb',false)">It becomes undefined until the softmax is renormalised</button>
+          </div>
+          <div class="quiz-fb" id="qb-fb"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="max-width:920px;margin:0 auto 48px;padding:0 24px;">
+    <div style="border-top:1px solid #2e2e3e;padding-top:20px;display:flex;align-items:center;gap:8px;font-size:13px;color:#7a7a99;">
+      <span>Learning Reference</span>
+      <span>·</span>
+      <a href="https://archerhume.com/posts/jevs-architecture-unmasked" target="_blank" rel="noopener"
+         style="color:#5e6ad2;text-decoration:none;font-weight:500;">Jev's Architecture Unmasked - Archer Hume</a>
+    </div>
+  </div>
+
+<script>
+  /* ---------- progress ---------- */
+  var opened = new Set();
+  var TOTAL = 6;
+
+  function toggleSection(id) {
+    var el = document.getElementById(id);
+    el.classList.toggle('active');
+    if (el.classList.contains('active')) {
+      if (id.charAt(0) !== 's') return;   // appendices do not count toward progress
+      opened.add(id);
+      var pct = (opened.size / TOTAL) * 100;
+      document.getElementById('progress-fill').style.width = pct + '%';
+      document.getElementById('progress-text').textContent = opened.size + ' / ' + TOTAL + ' sections';
+      if (opened.size === TOTAL) document.getElementById('completion').classList.add('show');
+    }
+  }
+
+  /* ---------- quiz ---------- */
+  var explanations = {
+    q1: 'The string is produced by the same sampling process that writes prose. It mimics the shape of confident writing. Jev skips the text channel and reads softmax(W·h) directly.',
+    q2: 'Isolation and shared access in one experiment: 0.00 across branches means the attention mask blocks cross-question flow; 0.90-0.92 from the state means every branch attends into it.',
+    q3: 'Causal attention only looks backwards. A card placed last sits just before the decision position, so the decision can see it. Placed first, the option descriptions that follow drown it out.',
+    q4: 'Pointwise scoring renormalises when you add an option, which leaves the ratio between two existing options mathematically fixed. A -0.28 shift falsifies that.',
+    q5: 'MMLU items may be in training data. Fresh problems show the confidence moving with genuine task difficulty - 83% on multiplication it gets right 86.7% of the time, 30% on word problems it gets right 32% of the time.',
+    q6: 'Wall time tracks prefill, not the billed token count. The billed number is arithmetic applied to the response afterwards.',
+    qa: 'Column i of W is a direction in hidden-state space. The dot product h · W[:,i] asks how strongly h points that way, and that number is option i\'s logit.',
+    qb: 'Softmax ratios depend only on logit differences, and the new option leaves z₁ and z₂ untouched. That is precisely why the observed -0.28 shift falsifies pointwise scoring.'
+  };
+
+  function answer(btn, qid, isCorrect) {
+    var opts = document.getElementById(qid + '-opts');
+    if (opts.querySelector('.correct, .wrong')) return;
+    var all = opts.querySelectorAll('.quiz-opt');
+    for (var i = 0; i < all.length; i++) all[i].disabled = true;
+    btn.classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) {
+      for (var j = 0; j < all.length; j++) {
+        if (all[j].getAttribute('onclick').indexOf('true') !== -1) all[j].classList.add('correct');
+      }
+    }
+    var fb = document.getElementById(qid + '-fb');
+    fb.textContent = (isCorrect ? '✓ Correct - ' : '✗ Not quite - ') + explanations[qid];
+    fb.className = 'quiz-fb show ' + (isCorrect ? 'ok' : 'no');
+  }
+
+  /* ---------- S1: text vs readout ---------- */
+  var typeTimer = null;
+
+  function setMode(m) {
+    document.getElementById('m-text').classList.toggle('active', m === 'text');
+    document.getElementById('m-read').classList.toggle('active', m === 'read');
+    document.getElementById('mode-text').style.display = m === 'text' ? 'block' : 'none';
+    document.getElementById('mode-read').style.display = m === 'read' ? 'block' : 'none';
+    document.getElementById('st-steps').textContent = '-';
+    document.getElementById('st-time').textContent = '-';
+    document.getElementById('st-parse').textContent = '-';
+  }
+
+  function runTyping() {
+    if (typeTimer) clearInterval(typeTimer);
+    var toks = ['Looking', ' at', ' the', ' ticket', ',', ' I', ' would', ' say', ' this', ' is',
+                ' a', ' billing', ' issue', '.', ' I', ' am', ' about', ' 91', '%', ' confident', '.'];
+    var box = document.getElementById('typebox');
+    box.innerHTML = '<span class="caret">&nbsp;</span>';
+    var i = 0, t0 = Date.now();
+    document.getElementById('st-parse').textContent = 'regex';
+    typeTimer = setInterval(function () {
+      if (i >= toks.length) {
+        clearInterval(typeTimer); typeTimer = null;
+        box.textContent = toks.join('');
+        document.getElementById('st-time').textContent = (Date.now() - t0) + 'ms';
+        return;
+      }
+      box.innerHTML = toks.slice(0, i + 1).join('') + '<span class="caret">&nbsp;</span>';
+      document.getElementById('st-steps').textContent = (i + 1);
+      document.getElementById('st-time').textContent = (Date.now() - t0) + 'ms';
+      i++;
+    }, 95);
+  }
+
+  var readoutData = [
+    { name: 'billing', p: 0.91, c: 'g' },
+    { name: 'shipping', p: 0.05, c: 'dim' },
+    { name: 'account access', p: 0.03, c: 'dim' },
+    { name: 'other', p: 0.01, c: 'dim' }
+  ];
+
+  function buildReadout() {
+    var h = '';
+    for (var i = 0; i < readoutData.length; i++) {
+      h += '<div class="pb-row"><div class="pb-name">' + readoutData[i].name + '</div>' +
+           '<div class="pb-track"><div class="pb-fill ' + readoutData[i].c + '" id="ro-' + i + '"></div></div>' +
+           '<div class="pb-val" id="rov-' + i + '">-</div></div>';
+    }
+    document.getElementById('readout-bars').innerHTML = h;
+  }
+
+  function runReadout() {
+    for (var i = 0; i < readoutData.length; i++) {
+      document.getElementById('ro-' + i).style.width = '0%';
+      document.getElementById('rov-' + i).textContent = '-';
+    }
+    setTimeout(function () {
+      for (var k = 0; k < readoutData.length; k++) {
+        document.getElementById('ro-' + k).style.width = (readoutData[k].p * 100) + '%';
+        document.getElementById('rov-' + k).textContent = readoutData[k].p.toFixed(2);
+      }
+    }, 60);
+    document.getElementById('st-steps').textContent = '1';
+    document.getElementById('st-time').textContent = '~160ms';
+    document.getElementById('st-parse').textContent = 'native';
+  }
+
+  /* ---------- S2: visibility ---------- */
+  var plant = 'opt';
+
+  function setPlant(p) {
+    plant = p;
+    document.getElementById('p-opt').classList.toggle('active', p === 'opt');
+    document.getElementById('p-state').classList.toggle('active', p === 'state');
+    document.getElementById('vis-out').textContent = 'Secret planted ' +
+      (p === 'opt' ? 'inside Question 2’s option descriptions.' : 'inside the shared ticket state.') +
+      ' Now probe.';
+    var b = document.querySelectorAll('#vis-bars .pb-fill');
+    for (var i = 0; i < b.length; i++) b[i].style.width = '0%';
+    var v = document.querySelectorAll('#vis-bars .pb-val');
+    for (var j = 0; j < v.length; j++) v[j].textContent = '-';
+  }
+
+  function buildVisibility() {
+    var names = ['Q1 detects secret', 'Q3 detects secret'];
+    var h = '';
+    for (var i = 0; i < names.length; i++) {
+      h += '<div class="pb-row"><div class="pb-name">' + names[i] + '</div>' +
+           '<div class="pb-track"><div class="pb-fill" id="vb-' + i + '"></div></div>' +
+           '<div class="pb-val" id="vv-' + i + '">-</div></div>';
+    }
+    document.getElementById('vis-bars').innerHTML = h;
+  }
+
+  function runVisibility() {
+    var vals = plant === 'opt' ? [0.00, 0.00] : [0.91, 0.90];
+    for (var i = 0; i < 2; i++) {
+      var bar = document.getElementById('vb-' + i);
+      bar.className = 'pb-fill ' + (vals[i] > 0.5 ? 'g' : 'r');
+      bar.style.width = '0%';
+    }
+    setTimeout(function () {
+      for (var k = 0; k < 2; k++) {
+        document.getElementById('vb-' + k).style.width = (vals[k] * 100) + '%';
+        document.getElementById('vv-' + k).textContent = vals[k].toFixed(2);
+      }
+    }, 60);
+    document.getElementById('vis-out').innerHTML = plant === 'opt'
+      ? '<strong style="color:var(--red);">0.00 from both.</strong> Question branches are masked off from each other - what lives in Q2’s options never reaches Q1 or Q3.'
+      : '<strong style="color:var(--green);">0.90-0.92 from both.</strong> Every branch attends into the shared state, so the same phrase is now visible everywhere.';
+  }
+
+  function updateCompute() {
+    var q = parseInt(document.getElementById('q-slider').value, 10);
+    var S = 6000;
+    document.getElementById('q-count').textContent = q;
+    document.getElementById('naive-tok').textContent = (q * S).toLocaleString();
+    document.getElementById('shared-tok').textContent = S.toLocaleString();
+    document.getElementById('compute-out').textContent = q + '× less state encoding' +
+      (q > 1 ? ' - and the gap grows linearly with every question you add.' : '. At one question there is nothing to save.');
+  }
+
+  /* ---------- S3: causal position ---------- */
+  var posData = {
+    first: { acc: 0.50, label: 'card before the options',
+      note: 'The descriptions that follow can see the card, but they spend their tokens describing themselves. By the decision point the signal is diluted. ~50% - coin flip on three options after partial credit.' },
+    mid: { acc: 0.50, label: 'card between Beta and Gamma',
+      note: 'Alpha and Beta were written before the card existed, so they never saw it. Same ~50%.' },
+    last: { acc: 0.88, label: 'card after all option descriptions',
+      note: 'Every option has been read, and the card sits immediately before the decision position - which causal attention lets look back over everything. ~88%.' },
+    state: { acc: 1.00, label: 'card in the shared state',
+      note: 'The state is prefilled before any option exists, so every token downstream - descriptions and decision alike - can attend to it. ~100%.' }
+  };
+
+  var stripLayouts = {
+    first: [['state','Ticket state',false],['card','REF CARD: Beta',true],['tok','Alpha desc',true],['tok','Beta desc',true],['tok','Gamma desc',true],['decide','DECIDE',true]],
+    mid: [['state','Ticket state',false],['tok','Alpha desc',false],['tok','Beta desc',false],['card','REF CARD: Beta',true],['tok','Gamma desc',true],['decide','DECIDE',true]],
+    last: [['state','Ticket state',false],['tok','Alpha desc',false],['tok','Beta desc',false],['tok','Gamma desc',false],['card','REF CARD: Beta',true],['decide','DECIDE',true]],
+    state: [['card','Ticket state + REF CARD: Beta',true],['tok','Alpha desc',true],['tok','Beta desc',true],['tok','Gamma desc',true],['decide','DECIDE',true]]
+  };
+
+  function setPos(p) {
+    var ids = ['first','mid','last','state'];
+    for (var i = 0; i < ids.length; i++) {
+      document.getElementById('pos-' + ids[i]).classList.toggle('active', ids[i] === p);
+    }
+    var rows = stripLayouts[p], h = '';
+    for (var k = 0; k < rows.length; k++) {
+      var kind = rows[k][0], text = rows[k][1], sees = rows[k][2];
+      var cls = 'tok';
+      if (kind === 'card') cls += ' card';
+      else if (kind === 'decide') cls += ' decide';
+      else if (sees) cls += ' sees';
+      else cls += ' blind';
+      h += '<div class="' + cls + '">' + text + '</div>';
+      if (k < rows.length - 1) h += '<div class="tok" style="border:none;background:none;padding:5px 1px;">→</div>';
+    }
+    document.getElementById('pos-strip').innerHTML = h;
+
+    var d = posData[p];
+    document.getElementById('pos-bar').style.width = (d.acc * 100) + '%';
+    document.getElementById('pos-val').textContent = Math.round(d.acc * 100) + '%';
+    document.getElementById('pos-out').innerHTML = '<strong>' + d.label + '</strong> - ' + d.note;
+  }
+
+  /* ---------- S4: listwise options ---------- */
+  var base4 = [
+    { n: 'customer error', p: 0.62 },
+    { n: 'unknown', p: 0.21 },
+    { n: 'merchant config', p: 0.12 },
+    { n: 'network timeout', p: 0.05 }
+  ];
+  var point5 = [
+    { n: 'customer error', p: 0.6014 },
+    { n: 'unknown', p: 0.2037 },
+    { n: 'merchant config', p: 0.1164 },
+    { n: 'network timeout', p: 0.0485 },
+    { n: 'weather caused it', p: 0.0300 }
+  ];
+  var obs5 = [
+    { n: 'customer error', p: 0.565 },
+    { n: 'unknown', p: 0.253 },
+    { n: 'merchant config', p: 0.112 },
+    { n: 'network timeout', p: 0.040 },
+    { n: 'weather caused it', p: 0.030 }
+  ];
+
+  function renderOptBars(elId, data) {
+    var h = '';
+    for (var i = 0; i < data.length; i++) {
+      var cls = data[i].n === 'weather caused it' ? 'a' : (i === 0 ? 'g' : 'dim');
+      h += '<div class="pb-row"><div class="pb-name" style="width:96px;font-size:11px;">' + data[i].n + '</div>' +
+           '<div class="pb-track" style="height:16px;"><div class="pb-fill ' + cls + '" style="width:' +
+           (data[i].p * 100) + '%"></div></div>' +
+           '<div class="pb-val" style="width:44px;font-size:11px;">' + data[i].p.toFixed(3) + '</div></div>';
+    }
+    document.getElementById(elId).innerHTML = h;
+  }
+
+  function setOptSet(n) {
+    document.getElementById('o-4').classList.toggle('active', n === 4);
+    document.getElementById('o-5').classList.toggle('active', n === 5);
+
+    var pointSet = n === 4 ? base4 : point5;
+    var obsSet = n === 4 ? base4 : obs5;
+    renderOptBars('bars-point', pointSet);
+    renderOptBars('bars-obs', obsSet);
+
+    var lrP = Math.log(pointSet[0].p / pointSet[1].p);
+    var lrO = Math.log(obsSet[0].p / obsSet[1].p);
+    var baseLR = Math.log(base4[0].p / base4[1].p);
+
+    document.getElementById('lr-point').textContent = lrP.toFixed(3);
+    document.getElementById('lr-obs').textContent = lrO.toFixed(3);
+    document.getElementById('lr-shift').textContent = (lrO - baseLR).toFixed(2);
+
+    document.getElementById('opt-out').innerHTML = n === 4
+      ? 'Baseline. ln[ p(customer) / p(unknown) ] = <span class="mono">1.082</span>.'
+      : 'Pointwise scoring predicts the ratio holds at <span class="mono">1.082</span> - renormalising cannot move it. Jev returned <span class="mono">0.803</span>, a shift of <strong style="color:var(--amber);">-0.28</strong> (95% CI -0.36 to -0.19). The options were read as a list.';
+  }
+
+  /* ---------- S5: calibration ---------- */
+  var binData = [
+    { x: '0-.5', n: 30, conf: 0.38, acc: 0.30 },
+    { x: '.5-.6', n: 25, conf: 0.55, acc: 0.45 },
+    { x: '.6-.7', n: 45, conf: 0.65, acc: 0.58 },
+    { x: '.7-.8', n: 45, conf: 0.75, acc: 0.70 },
+    { x: '.8-.9', n: 65, conf: 0.85, acc: 0.80 },
+    { x: '.9-1', n: 990, conf: 0.97, acc: 0.946 }
+  ];
+  var selBin = -1;
+
+  function buildBins() {
+    var h = '';
+    for (var i = 0; i < binData.length; i++) {
+      h += '<div class="bin" id="bin-' + i + '" onclick="selectBin(' + i + ')">' +
+           '<div class="bin-pair"><div class="bin-b conf" id="bc-' + i + '"></div>' +
+           '<div class="bin-b acc" id="ba-' + i + '"></div></div>' +
+           '<div class="bin-x">' + binData[i].x + '</div></div>';
+    }
+    document.getElementById('bins').innerHTML = h;
+    renderBins();
+  }
+
+  function skewedAcc(i) {
+    var s = parseInt(document.getElementById('skew').value, 10) / 100;
+    var a = binData[i].acc - s * binData[i].conf;
+    return Math.max(0, Math.min(1, a));
+  }
+
+  function renderBins() {
+    var s = parseInt(document.getElementById('skew').value, 10) / 100;
+    document.getElementById('skew-val').textContent = s.toFixed(2);
+
+    var totalN = 0, weighted = 0;
+    for (var i = 0; i < binData.length; i++) {
+      var a = skewedAcc(i);
+      document.getElementById('bc-' + i).style.height = (binData[i].conf * 100) + '%';
+      document.getElementById('ba-' + i).style.height = (a * 100) + '%';
+      totalN += binData[i].n;
+      weighted += binData[i].n * Math.abs(a - binData[i].conf);
+    }
+    var ece = weighted / totalN;
+    document.getElementById('ece-val').textContent = ece.toFixed(3);
+    var v = document.getElementById('ece-verdict');
+    if (ece < 0.05) { v.textContent = 'calibrated'; v.style.color = 'var(--green)'; }
+    else if (ece < 0.12) { v.textContent = 'drifting'; v.style.color = 'var(--amber)'; }
+    else { v.textContent = 'overconfident'; v.style.color = 'var(--red)'; }
+    if (selBin >= 0) selectBin(selBin, true);
+  }
+
+  function selectBin(i, keep) {
+    selBin = i;
+    for (var k = 0; k < binData.length; k++) {
+      document.getElementById('bin-' + k).classList.toggle('sel', k === i);
+    }
+    var a = skewedAcc(i);
+    var gap = Math.abs(a - binData[i].conf);
+    document.getElementById('bin-out').innerHTML =
+      '<strong>Bin ' + binData[i].x + '</strong> · ' + binData[i].n + ' items · says <span class="mono">' +
+      binData[i].conf.toFixed(2) + '</span>, right <span class="mono">' + a.toFixed(3) + '</span> of the time · gap <span class="mono">' +
+      gap.toFixed(3) + '</span>. ECE is the item-weighted average of these gaps, which is why the 990-item top bin dominates the score.';
+    if (!keep) { /* no-op, kept for symmetry */ }
+  }
+
+  /* ---------- S6: race + tooltips ---------- */
+  var raceData = [
+    { id: 'r1', pct: 23, label: '~160ms' },
+    { id: 'r2', pct: 25, label: '~175ms' },
+    { id: 'r3', pct: 31, label: '214ms' },
+    { id: 'r4', pct: 86, label: '~600ms' },
+    { id: 'r5', pct: 100, label: '~8,000ms (off the chart)' }
+  ];
+
+  function runRace() {
+    for (var i = 0; i < raceData.length; i++) {
+      var el = document.getElementById(raceData[i].id);
+      el.style.width = '0%';
+      el.textContent = '';
+    }
+    setTimeout(function () {
+      raceData.forEach(function (r, i) {
+        setTimeout(function () {
+          var el = document.getElementById(r.id);
+          el.style.width = r.pct + '%';
+          el.textContent = r.label;
+        }, i * 150);
+      });
+    }, 100);
+  }
+
+  function initTooltips() {
+    var nodes = document.querySelectorAll('.arch-node');
+    for (var i = 0; i < nodes.length; i++) {
+      (function (node) {
+        var tooltip = node.querySelector('.arch-tooltip');
+        if (!tooltip) return;
+        node.addEventListener('mouseenter', function () {
+          var rect = node.getBoundingClientRect();
+          var ttWidth = 230, gap = 12;
+          tooltip.style.display = 'block';
+          tooltip.style.top = (rect.top + rect.height / 2) + 'px';
+          tooltip.style.transform = 'translateY(-50%)';
+          if (window.innerWidth - rect.right - gap >= ttWidth) {
+            tooltip.style.left = (rect.right + gap) + 'px';
+          } else if (rect.left - gap >= ttWidth) {
+            tooltip.style.left = (rect.left - ttWidth - gap) + 'px';
+          } else {
+            tooltip.style.top = (rect.bottom + gap) + 'px';
+            tooltip.style.left = Math.max(8, rect.left + rect.width / 2 - ttWidth / 2) + 'px';
+            tooltip.style.transform = 'none';
+          }
+        });
+        node.addEventListener('mouseleave', function () {
+          tooltip.style.display = 'none';
+        });
+      })(nodes[i]);
+    }
+  }
+
+  /* ---------- ANIMATED WALKTHROUGH ---------- */
+  var walkStages = [
+    {
+      name: 'Prefill shared state', ms: 132,
+      cap: 'The ticket text is encoded <strong>once</strong> into a key/value cache. This is 86% of the whole request - everything after it is nearly free. Send the same ticket again and even this stage is skipped.',
+      fn: vizPrefill
+    },
+    {
+      name: 'Fan out questions', ms: 6,
+      cap: 'Three questions become three independent branches. Attention masks let every branch read the state, and stop any branch from reading another. This is what the secret-phrase test in section 2 measures.',
+      fn: vizFanout
+    },
+    {
+      name: 'Read the option list', ms: 9,
+      cap: 'Branch 1 reads all four options as context <em>before</em> any score exists. Causal attention means each option sees the ones before it - and the decision position at the end sees them all.',
+      fn: vizOptions
+    },
+    {
+      name: 'Hidden state h', ms: 3,
+      cap: 'Reading is finished. What remains is <code>h</code> - a vector summarising everything the branch noticed. Four toy dimensions shown here; a real one has thousands.',
+      fn: vizHidden
+    },
+    {
+      name: 'Project through W', ms: 2,
+      cap: 'One dot product per option: <code>logit_i = h · W[:,i]</code>. Raw, unbounded, sometimes negative. This is the single matrix multiply that replaces the entire decode loop.',
+      fn: vizProject
+    },
+    {
+      name: 'Softmax', ms: 1,
+      cap: 'Exponentiate, divide by the total. Now every number is positive and they sum to 1 - a real distribution, not a sentence claiming to be one.',
+      fn: vizSoftmax
+    },
+    {
+      name: 'Your policy decides', ms: 0,
+      cap: 'Jev stops here. <strong>You</strong> own the threshold, in your own code, where you can see and tune it - <code>route to billing if p &gt; 0.5</code>. That is the whole point of getting a number instead of a paragraph.',
+      fn: vizPolicy
+    }
+  ];
+
+  var walkStep = -1, walkTimer = null, walkPlaying = false, walkSpeed = 1;
+
+  function buildWalk() {
+    var h = '';
+    for (var i = 0; i < walkStages.length; i++) {
+      h += '<div class="wstage" id="ws-' + i + '" onclick="walkGo(' + i + ')">' +
+           '<div class="wstage-dot"></div><span>' + walkStages[i].name + '</span>' +
+           '<span class="wstage-ms">' + walkStages[i].ms + 'ms</span></div>';
+    }
+    document.getElementById('walk-stages').innerHTML = h;
+    walkReset();
+  }
+
+  function walkGo(i) {
+    walkPause();
+    walkStep = i;
+    var clock = 0;
+    for (var k = 0; k < walkStages.length; k++) {
+      var el = document.getElementById('ws-' + k);
+      el.classList.toggle('on', k === i);
+      el.classList.toggle('done', k < i);
+      if (k <= i) clock += walkStages[k].ms;
+    }
+    document.getElementById('walk-clock').textContent = clock + ' ms';
+    document.getElementById('walk-cap').innerHTML = walkStages[i].cap;
+    walkStages[i].fn();
+  }
+
+  function walkNext() {
+    if (walkStep >= walkStages.length - 1) { walkReset(); return; }
+    walkGo(walkStep + 1);
+  }
+
+  function walkToggle() {
+    if (walkPlaying) { walkPause(); return; }
+    if (walkStep >= walkStages.length - 1) walkStep = -1;
+    walkPlaying = true;
+    document.getElementById('walk-play').textContent = 'Pause';
+    walkTick();
+  }
+
+  function walkTick() {
+    var next = walkStep + 1;
+    if (next >= walkStages.length) { walkPause(); return; }
+    var wasPlaying = true;
+    walkGo(next);
+    walkPlaying = wasPlaying;
+    document.getElementById('walk-play').textContent = 'Pause';
+    walkTimer = setTimeout(walkTick, 2300 / walkSpeed);
+  }
+
+  function walkPause() {
+    walkPlaying = false;
+    if (walkTimer) { clearTimeout(walkTimer); walkTimer = null; }
+    var b = document.getElementById('walk-play');
+    if (b) b.textContent = 'Play';
+  }
+
+  function walkCycleSpeed() {
+    walkSpeed = walkSpeed === 1 ? 2 : (walkSpeed === 2 ? 0.5 : 1);
+    document.getElementById('walk-speed').textContent =
+      (walkSpeed === 0.5 ? '0.5' : walkSpeed) + '×';
+  }
+
+  function walkReset() {
+    walkPause();
+    walkStep = -1;
+    for (var i = 0; i < walkStages.length; i++) {
+      var el = document.getElementById('ws-' + i);
+      if (el) el.classList.remove('on', 'done');
+    }
+    document.getElementById('walk-clock').textContent = '0 ms';
+    document.getElementById('walk-cap').innerHTML =
+      'Press <strong>Play</strong> to watch one support ticket and three questions travel the whole pipeline. ' +
+      'The clock on the right is the real latency budget - watch which stage eats it.';
+    document.getElementById('walk-viz').innerHTML =
+      '<div class="w-title">Idle</div>' +
+      '<div style="flex:1;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:13px;text-align:center;">' +
+      'A payout-failure support ticket · 3 questions · 4 options each</div>';
+  }
+
+  function viz(html) { document.getElementById('walk-viz').innerHTML = html; }
+  function soon(fn) { setTimeout(fn, 40); }
+
+  /* stage 1 */
+  function vizPrefill() {
+    var chips = '';
+    for (var i = 0; i < 40; i++) chips += '<div class="wtok" id="wt-' + i + '"></div>';
+    viz('<div class="w-title">Ticket text → key/value cache</div>' +
+        '<div style="display:flex;flex-wrap:wrap;gap:4px;">' + chips + '</div>' +
+        '<div class="w-meter"><div class="w-meter-fill" id="w-prefill"></div></div>' +
+        '<div class="w-sub"><span class="mono" id="w-count">0</span> / 6,000 state tokens · ' +
+        '<span class="w-badge" id="w-cache">encoding…</span></div>');
+    soon(function () {
+      document.getElementById('w-prefill').style.width = '100%';
+      for (var i = 0; i < 40; i++) {
+        (function (k) {
+          setTimeout(function () {
+            var t = document.getElementById('wt-' + k);
+            if (t) t.classList.add('lit');
+            var c = document.getElementById('w-count');
+            if (c) c.textContent = Math.round((k + 1) / 40 * 6000).toLocaleString();
+          }, k * 26 / walkSpeed);
+        })(i);
+      }
+      setTimeout(function () {
+        var b = document.getElementById('w-cache');
+        if (b) { b.textContent = 'cached ✓ — reusable'; b.className = 'w-badge ok'; }
+      }, 1150 / walkSpeed);
+    });
+  }
+
+  /* stage 2 */
+  function vizFanout() {
+    viz('<div class="w-title">One state → three masked branches</div>' +
+        '<div style="padding:8px 12px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);font-size:12px;text-align:center;">shared state · 6,000 tokens · cached</div>' +
+        '<div style="text-align:center;color:var(--muted);font-size:11px;margin:6px 0;">↓ every branch may read ↓</div>' +
+        '<div class="wbranch-row">' +
+        '<div class="wbranch" id="wb-0">Q1<br><span style="color:var(--muted);">root cause?</span></div>' +
+        '<div class="wbranch" id="wb-1">Q2<br><span style="color:var(--muted);">urgent?</span></div>' +
+        '<div class="wbranch" id="wb-2">Q3<br><span style="color:var(--muted);">refund owed?</span></div>' +
+        '</div>' +
+        '<div style="display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap;">' +
+        '<span class="w-badge ok">state → branch: allowed</span>' +
+        '<span class="w-badge no" id="wb-mask">branch ↔ branch: masked</span></div>');
+    soon(function () {
+      for (var i = 0; i < 3; i++) {
+        (function (k) {
+          setTimeout(function () {
+            var b = document.getElementById('wb-' + k);
+            if (b) b.classList.add('in');
+          }, k * 260 / walkSpeed);
+        })(i);
+      }
+    });
+  }
+
+  /* stage 3 */
+  function vizOptions() {
+    var opts = ['customer error', 'unknown', 'merchant config', 'network timeout'];
+    var h = '<div class="w-title">Branch Q1 reads its options — listwise</div>' +
+            '<div style="padding:7px 11px;border:1px solid var(--accent);border-radius:8px;background:var(--accent-glow);font-size:11px;display:inline-block;margin-bottom:14px;">Q1 · why did the payout fail?</div><div>';
+    for (var i = 0; i < opts.length; i++) h += '<span class="wopt" id="wo-' + i + '">' + opts[i] + '</span>';
+    h += '<span class="wopt" id="wo-4" style="border-style:dashed;">DECIDE</span></div>' +
+         '<div class="w-sub" id="wo-note">Each option can see the ones before it. None can see the ones after.</div>';
+    viz(h);
+    soon(function () {
+      for (var i = 0; i < 5; i++) {
+        (function (k) {
+          setTimeout(function () {
+            var o = document.getElementById('wo-' + k);
+            if (o) o.classList.add('in');
+            if (k === 4) {
+              for (var j = 0; j < 5; j++) {
+                var e = document.getElementById('wo-' + j);
+                if (e) e.classList.add('hl');
+              }
+              var n = document.getElementById('wo-note');
+              if (n) n.innerHTML = 'The decision position sits last, so it looks back over <strong>all four</strong> - which is why adding a fifth option moves the others.';
+            }
+          }, k * 300 / walkSpeed);
+        })(i);
+      }
+    });
+  }
+
+  /* stage 4 */
+  function vizHidden() {
+    var dims = [
+      { n: 'money mentioned', v: 0.9 },
+      { n: 'address mentioned', v: -0.4 },
+      { n: 'angry tone', v: 1.2 },
+      { n: 'login mentioned', v: 0.3 }
+    ];
+    var h = '<div class="w-title">h · what the branch ended up noticing</div>';
+    for (var i = 0; i < dims.length; i++) {
+      h += '<div class="pb-row"><div class="pb-name">h' + (i + 1) + ' · ' + dims[i].n + '</div>' +
+           '<div class="waxis" style="flex:1;"><div class="waxis-bar ' + (dims[i].v >= 0 ? 'p' : 'n') +
+           '" id="wh-' + i + '"></div></div>' +
+           '<div class="pb-val">' + dims[i].v.toFixed(1) + '</div></div>';
+    }
+    h += '<div class="w-sub">Negative is not "absent" - it is evidence pointing the other way.</div>';
+    viz(h);
+    soon(function () {
+      for (var i = 0; i < dims.length; i++) {
+        var w = Math.abs(dims[i].v) / 2 * 50;
+        var bar = document.getElementById('wh-' + i);
+        if (!bar) continue;
+        bar.style.width = w + '%';
+        bar.style.left = dims[i].v >= 0 ? '50%' : (50 - w) + '%';
+      }
+    });
+  }
+
+  /* stage 5 */
+  function vizProject() {
+    var rows = [
+      { n: 'billing', z: 1.55 },
+      { n: 'shipping', z: -0.81 },
+      { n: 'account access', z: 0.22 }
+    ];
+    var h = '<div class="w-title">logit = h · W[:, i] &nbsp;·&nbsp; one dot product per option</div>';
+    for (var i = 0; i < rows.length; i++) {
+      h += '<div class="pb-row"><div class="pb-name">' + rows[i].n + '</div>' +
+           '<div class="waxis" style="flex:1;"><div class="waxis-bar ' + (rows[i].z >= 0 ? 'p' : 'n') +
+           '" id="wz-' + i + '"></div></div>' +
+           '<div class="pb-val" id="wzv-' + i + '">-</div></div>';
+    }
+    h += '<div class="w-sub">Unbounded and signed. Not probabilities yet - nothing here sums to anything.</div>';
+    viz(h);
+    soon(function () {
+      for (var i = 0; i < rows.length; i++) {
+        (function (k) {
+          setTimeout(function () {
+            var w = Math.abs(rows[k].z) / 2 * 50;
+            var bar = document.getElementById('wz-' + k);
+            if (!bar) return;
+            bar.style.width = w + '%';
+            bar.style.left = rows[k].z >= 0 ? '50%' : (50 - w) + '%';
+            document.getElementById('wzv-' + k).textContent = rows[k].z.toFixed(2);
+          }, k * 260 / walkSpeed);
+        })(i);
+      }
+    });
+  }
+
+  /* stage 6 */
+  function vizSoftmax() {
+    var rows = [
+      { n: 'billing', z: 1.55, p: 0.736 },
+      { n: 'shipping', z: -0.81, p: 0.069 },
+      { n: 'account access', z: 0.22, p: 0.195 }
+    ];
+    var h = '<div class="w-title">exp(z) / Σ exp(z)</div>';
+    for (var i = 0; i < rows.length; i++) {
+      h += '<div class="pb-row"><div class="pb-name">' + rows[i].n +
+           ' <span style="opacity:0.55;">z=' + rows[i].z.toFixed(2) + '</span></div>' +
+           '<div class="pb-track"><div class="pb-fill ' + (i === 0 ? 'g' : 'dim') + '" id="wp-' + i + '"></div></div>' +
+           '<div class="pb-val" id="wpv-' + i + '">-</div></div>';
+    }
+    h += '<div class="w-sub">Sum: <span class="mono" id="wp-sum">0.000</span> — by construction, always exactly 1.</div>';
+    viz(h);
+    soon(function () {
+      var running = 0;
+      for (var i = 0; i < rows.length; i++) {
+        (function (k) {
+          setTimeout(function () {
+            var bar = document.getElementById('wp-' + k);
+            if (!bar) return;
+            bar.style.width = (rows[k].p * 100) + '%';
+            document.getElementById('wpv-' + k).textContent = rows[k].p.toFixed(3);
+            running += rows[k].p;
+            document.getElementById('wp-sum').textContent = running.toFixed(3);
+          }, k * 300 / walkSpeed);
+        })(i);
+      }
+    });
+  }
+
+  /* stage 7 */
+  function vizPolicy() {
+    var rows = [
+      { n: 'billing', p: 0.736 },
+      { n: 'shipping', p: 0.069 },
+      { n: 'account access', p: 0.195 }
+    ];
+    var h = '<div class="w-title">Your rule: route to billing if p &gt; 0.5</div><div class="wthresh">' +
+            '<div class="wthresh-lbl" style="left:calc(130px + 10px + (100% - 130px - 10px - 52px) * 0.5);">threshold 0.50</div>';
+    for (var i = 0; i < rows.length; i++) {
+      h += '<div class="pb-row" style="position:relative;"><div class="pb-name">' + rows[i].n + '</div>' +
+           '<div class="pb-track" style="position:relative;">' +
+           '<div class="pb-fill ' + (rows[i].p > 0.5 ? 'g' : 'dim') + '" id="wy-' + i + '"></div>' +
+           '<div class="wthresh-line" style="left:50%;"></div></div>' +
+           '<div class="pb-val">' + rows[i].p.toFixed(3) + '</div></div>';
+    }
+    h += '</div><div class="w-sub" id="wy-out">Evaluating…</div>';
+    viz(h);
+    soon(function () {
+      for (var i = 0; i < rows.length; i++) {
+        var bar = document.getElementById('wy-' + i);
+        if (bar) bar.style.width = (rows[i].p * 100) + '%';
+      }
+      setTimeout(function () {
+        var o = document.getElementById('wy-out');
+        if (o) o.innerHTML = '<span class="w-badge ok">route → billing</span> &nbsp; 0.736 clears 0.50. ' +
+          'Total elapsed <strong>153ms</strong>, of which 132ms was prefill. Change the threshold to 0.9 and the ticket ' +
+          'goes to a human instead — no retraining, no reprompting, just a different number in your <code>if</code>.';
+      }, 700 / walkSpeed);
+    });
+  }
+
+  /* ---------- APPENDIX A: matrix W ---------- */
+  var hFeat = [
+    { name: 'money mentioned', v: 0.9 },
+    { name: 'address mentioned', v: -0.4 },
+    { name: 'angry tone', v: 1.2 },
+    { name: 'login mentioned', v: 0.3 }
+  ];
+  var wCols = [
+    { name: 'billing', w: [1.4, -0.2, 0.3, -0.5] },
+    { name: 'shipping', w: [-0.3, 1.5, 0.1, -0.2] },
+    { name: 'account access', w: [-0.6, -0.1, 0.2, 1.6] }
+  ];
+  var selCol = 0;
+
+  function buildAppendixA() {
+    var h = '';
+    for (var i = 0; i < hFeat.length; i++) {
+      h += '<div class="slider-row"><div class="slider-name">h' + (i + 1) + ' · ' + hFeat[i].name + '</div>' +
+           '<input type="range" min="-20" max="20" value="' + Math.round(hFeat[i].v * 10) +
+           '" id="hs-' + i + '" oninput="onHChange(' + i + ')">' +
+           '<div class="slider-val" id="hv-' + i + '">' + hFeat[i].v.toFixed(1) + '</div></div>';
+    }
+    document.getElementById('h-sliders').innerHTML = h;
+
+    var t = '';
+    for (var c = 0; c < wCols.length; c++) {
+      t += '<button class="tab' + (c === selCol ? ' active' : '') + '" id="wt-' + c +
+           '" onclick="selectCol(' + c + ')">' + wCols[c].name + '</button>';
+    }
+    document.getElementById('w-tabs').innerHTML = t;
+
+    var m = '<div class="mat-cell hdr"></div>';
+    for (var k = 0; k < wCols.length; k++) m += '<div class="mat-cell hdr">' + wCols[k].name + '</div>';
+    for (var r = 0; r < 4; r++) {
+      m += '<div class="mat-cell hdr" style="text-align:right;">h' + (r + 1) + '</div>';
+      for (var q = 0; q < wCols.length; q++) {
+        m += '<div class="mat-cell" id="wm-' + r + '-' + q + '">' + wCols[q].w[r].toFixed(1) + '</div>';
+      }
+    }
+    var mat = document.getElementById('w-mat');
+    mat.style.gridTemplateColumns = '70px repeat(' + wCols.length + ', 1fr)';
+    mat.innerHTML = m;
+
+    var b = '';
+    for (var j = 0; j < wCols.length; j++) {
+      b += '<div class="pb-row"><div class="pb-name">' + wCols[j].name + '</div>' +
+           '<div class="pb-track"><div class="pb-fill" id="lb-' + j + '"></div></div>' +
+           '<div class="pb-val" id="lv-' + j + '">-</div></div>';
+    }
+    document.getElementById('logit-bars').innerHTML = b;
+    selectCol(0);
+  }
+
+  function onHChange(i) {
+    hFeat[i].v = parseInt(document.getElementById('hs-' + i).value, 10) / 10;
+    document.getElementById('hv-' + i).textContent = hFeat[i].v.toFixed(1);
+    renderW();
+  }
+
+  function selectCol(c) {
+    selCol = c;
+    for (var i = 0; i < wCols.length; i++) {
+      document.getElementById('wt-' + i).classList.toggle('active', i === c);
+    }
+    renderW();
+  }
+
+  function logitFor(c) {
+    var s = 0;
+    for (var i = 0; i < 4; i++) s += hFeat[i].v * wCols[c].w[i];
+    return s;
+  }
+
+  var aAnimating = false;
+
+  function renderW() {
+    for (var r = 0; r < 4; r++) {
+      for (var q = 0; q < wCols.length; q++) {
+        document.getElementById('wm-' + r + '-' + q).classList.toggle('on', q === selCol);
+      }
+    }
+
+    var terms = '', total = 0;
+    for (var i = 0; i < 4; i++) {
+      var prod = hFeat[i].v * wCols[selCol].w[i];
+      total += prod;
+      terms += '<div class="term-row' + (aAnimating ? '' : ' in') + '" id="term-' + i + '">' +
+               'h' + (i + 1) + ' × W<sub>' + (i + 1) + '</sub> = <span class="mono">' +
+               hFeat[i].v.toFixed(1) + ' × ' + wCols[selCol].w[i].toFixed(1) + '</span> = ' +
+               '<span class="' + (prod >= 0 ? 'pos' : 'neg') + '">' + prod.toFixed(2) + '</span></div>';
+    }
+    terms += '<div class="runsum">running sum &nbsp;<b id="w-runsum">' +
+             (aAnimating ? '0.00' : total.toFixed(2)) + '</b>' +
+             '<span style="color:var(--muted);"> &nbsp;=&nbsp; logit(' + wCols[selCol].name + ')</span></div>';
+    document.getElementById('w-terms').innerHTML = terms;
+
+    var ls = [], max = 0;
+    for (var c = 0; c < wCols.length; c++) {
+      ls.push(logitFor(c));
+      if (Math.abs(ls[c]) > max) max = Math.abs(ls[c]);
+    }
+    if (max < 0.5) max = 0.5;
+    for (var k = 0; k < wCols.length; k++) {
+      var bar = document.getElementById('lb-' + k);
+      bar.className = 'pb-fill ' + (ls[k] < 0 ? 'r' : (k === selCol ? 'g' : 'dim'));
+      bar.style.width = (Math.abs(ls[k]) / max * 100) + '%';
+      document.getElementById('lv-' + k).textContent = ls[k].toFixed(2);
+    }
+
+    var best = 0;
+    for (var m2 = 1; m2 < ls.length; m2++) if (ls[m2] > ls[best]) best = m2;
+    document.getElementById('w-out').innerHTML =
+      'Highest logit: <strong>' + wCols[best].name + '</strong> at <span class="mono">' +
+      ls[best].toFixed(2) + '</span>. Bars show magnitude - red means the logit is negative, which softmax ' +
+      'handles fine. Feed these three numbers into Appendix B to get probabilities.';
+  }
+
+  function clearAHighlights() {
+    for (var r = 0; r < 4; r++) {
+      for (var q = 0; q < wCols.length; q++) {
+        document.getElementById('wm-' + r + '-' + q).classList.remove('pulse');
+      }
+    }
+    var rows = document.querySelectorAll('#h-sliders .slider-row');
+    for (var i = 0; i < rows.length; i++) rows[i].classList.remove('on');
+  }
+
+  function animateDotProduct() {
+    if (aAnimating) return;
+    aAnimating = true;
+    document.getElementById('w-play').textContent = 'running…';
+    renderW();
+    clearAHighlights();
+
+    var sum = 0;
+    var STEP = 950;
+    for (var i = 0; i < 4; i++) {
+      (function (k) {
+        setTimeout(function () {
+          clearAHighlights();
+          document.getElementById('wm-' + k + '-' + selCol).classList.add('pulse');
+          var rows = document.querySelectorAll('#h-sliders .slider-row');
+          if (rows[k]) rows[k].classList.add('on');
+          var t = document.getElementById('term-' + k);
+          if (t) t.classList.add('in');
+          sum += hFeat[k].v * wCols[selCol].w[k];
+          var rs = document.getElementById('w-runsum');
+          if (rs) rs.textContent = sum.toFixed(2);
+          document.getElementById('w-out').innerHTML =
+            'Step ' + (k + 1) + ' of 4 · pairing <strong>h' + (k + 1) + '</strong> with the ' +
+            wCols[selCol].name + ' column. Running sum <span class="mono">' + sum.toFixed(2) + '</span>.';
+        }, k * STEP);
+      })(i);
+    }
+
+    setTimeout(function () {
+      clearAHighlights();
+      aAnimating = false;
+      document.getElementById('w-play').textContent = '▶ Animate the dot product';
+      renderW();
+    }, 4 * STEP + 700);
+  }
+
+  /* ---------- APPENDIX B: softmax ---------- */
+  var zBase = [1.55, -0.81, 0.22];
+  var zNames = ['billing', 'shipping', 'account access'];
+  var zVals = zBase.slice();
+  var shiftOn = false;
+  var extraOn = false;
+
+  function buildAppendixB() {
+    var h = '';
+    for (var i = 0; i < zVals.length; i++) {
+      h += '<div class="slider-row"><div class="slider-name">z' + (i + 1) + ' · ' + zNames[i] + '</div>' +
+           '<input type="range" min="-30" max="30" value="' + Math.round(zVals[i] * 10) +
+           '" id="zs-' + i + '" oninput="onZChange(' + i + ')">' +
+           '<div class="slider-val" id="zv-' + i + '">' + zVals[i].toFixed(2) + '</div></div>';
+    }
+    document.getElementById('z-sliders').innerHTML = h;
+    renderSoftmax();
+  }
+
+  function onZChange(i) {
+    zVals[i] = parseInt(document.getElementById('zs-' + i).value, 10) / 10;
+    document.getElementById('zv-' + i).textContent = zVals[i].toFixed(2);
+    renderSoftmax();
+  }
+
+  function toggleShift() {
+    shiftOn = !shiftOn;
+    document.getElementById('z-shift').classList.toggle('active', shiftOn);
+    renderSoftmax();
+  }
+
+  function toggleExtra() {
+    extraOn = !extraOn;
+    document.getElementById('z-extra').classList.toggle('active', extraOn);
+    renderSoftmax();
+  }
+
+  function resetSoftmax() {
+    zVals = zBase.slice();
+    shiftOn = false;
+    extraOn = false;
+    document.getElementById('z-shift').classList.remove('active');
+    document.getElementById('z-extra').classList.remove('active');
+    document.getElementById('z-temp').value = 100;
+    for (var i = 0; i < zVals.length; i++) {
+      document.getElementById('zs-' + i).value = Math.round(zVals[i] * 10);
+      document.getElementById('zv-' + i).textContent = zVals[i].toFixed(2);
+    }
+    renderSoftmax();
+  }
+
+  var zAnimating = false;
+
+  /* current logit set, honouring the shift and 4th-option toggles */
+  function zCurrent() {
+    var T = parseInt(document.getElementById('z-temp').value, 10) / 100;
+    var off = shiftOn ? 5 : 0;
+    var names = zNames.slice(), zs = [];
+    for (var i = 0; i < zVals.length; i++) zs.push(zVals[i] + off);
+    if (extraOn) { names.push('weather caused it'); zs.push(-1.5 + off); }
+    return { T: T, names: names, zs: zs };
+  }
+
+  function zPhaseMark(p) {
+    for (var i = 0; i < 4; i++) {
+      var el = document.getElementById('zp-' + i);
+      el.classList.toggle('on', i === p);
+      el.classList.toggle('past', i < p);
+    }
+  }
+
+  /* one frame of the animation — phase 0..3 */
+  function renderZPhase(p) {
+    var cur = zCurrent(), zs = cur.zs, names = cur.names, T = cur.T;
+    var exps = [], sum = 0;
+    for (var i = 0; i < zs.length; i++) { var e = Math.exp(zs[i] / T); exps.push(e); sum += e; }
+
+    zPhaseMark(p);
+
+    var vals = [], maxAbs = 0, signed = (p === 0);
+    for (var k = 0; k < zs.length; k++) {
+      vals.push(p === 0 ? zs[k] : (p === 3 ? exps[k] / sum : exps[k]));
+      if (Math.abs(vals[k]) > maxAbs) maxAbs = Math.abs(vals[k]);
+    }
+    if (maxAbs < 0.001) maxAbs = 1;
+
+    /* Phase 3 is the division itself: keep the exp() labels but rescale the bars
+       against the total instead of the largest bar, so they visibly shrink into
+       the widths they will keep as probabilities. Phase 4 scales by 1, which lands
+       on those same widths — the bars hold still while only the labels change. */
+    var scale = (p === 2) ? sum : (p === 3 ? 1 : maxAbs);
+
+    var h = '', decimals = (p === 0 || p === 3) ? 3 : 2;
+    for (var j = 0; j < vals.length; j++) {
+      var pctw = Math.abs(vals[j]) / scale * 100;
+      var cls = (j === 3) ? 'a' : (j === 0 ? 'g' : 'dim');
+      if (signed) {
+        h += '<div class="pb-row"><div class="pb-name">' + names[j] + '</div>' +
+             '<div class="waxis" style="flex:1;"><div class="waxis-bar ' + (vals[j] >= 0 ? 'p' : 'n') +
+             '" style="width:' + (pctw / 2) + '%;left:' + (vals[j] >= 0 ? 50 : 50 - pctw / 2) + '%;"></div></div>' +
+             '<div class="pb-val">' + vals[j].toFixed(decimals) + '</div></div>';
+      } else {
+        h += '<div class="pb-row"><div class="pb-name">' + names[j] + '</div>' +
+             '<div class="pb-track"><div class="pb-fill ' + cls + '" style="width:' + pctw + '%"></div></div>' +
+             '<div class="pb-val">' + vals[j].toFixed(decimals) + '</div></div>';
+      }
+    }
+    document.getElementById('z-bars').innerHTML = h;
+
+    var caps = [
+      'Raw logits. Signed, unbounded, and they add up to nothing in particular. <strong>shipping is negative</strong> — you cannot hand this to a threshold.',
+      'Every logit goes through <code>exp()</code>. The negative is gone (exp never returns a negative) and the gaps have stretched — exp is steep, so a lead of 2.4 in logit space becomes a lead of ~11× here. Total: <span class="mono">' + sum.toFixed(3) + '</span>.',
+      'Divide by that total of <span class="mono">' + sum.toFixed(3) + '</span>. The bars shrink to their share of the whole — the labels still read exp(z), but the <em>widths</em> are already the probabilities.',
+      'Same bars, renamed. Positive, summing to exactly 1.000, ready for <code>if (p &gt; threshold)</code>. The ranking never changed from step 1 — softmax rescales, it does not reorder.'
+    ];
+    document.getElementById('z-out').innerHTML = caps[p];
+
+    var p1 = exps[0] / sum, p2 = exps[1] / sum;
+    document.getElementById('z-sum').textContent = (p === 3 ? '1.000' : (p === 0 ? '—' : sum.toFixed(3)));
+    document.getElementById('z-lr').textContent = Math.log(p1 / p2).toFixed(3);
+    document.getElementById('z-diff').textContent = ((zs[0] - zs[1]) / T).toFixed(3);
+  }
+
+  function animateSoftmax() {
+    if (zAnimating) return;
+    zAnimating = true;
+    document.getElementById('z-play').textContent = 'running…';
+    var STEP = 1700;
+    for (var i = 0; i < 4; i++) {
+      (function (p) { setTimeout(function () { renderZPhase(p); }, p * STEP); })(i);
+    }
+    setTimeout(function () {
+      zAnimating = false;
+      document.getElementById('z-play').textContent = '▶ Animate the transform';
+      renderSoftmax();
+    }, 4 * STEP);
+  }
+
+  function renderSoftmax() {
+    if (zAnimating) return;
+    zPhaseMark(3);
+    var T = parseInt(document.getElementById('z-temp').value, 10) / 100;
+    document.getElementById('z-temp-val').textContent = T.toFixed(2);
+
+    var off = shiftOn ? 5 : 0;
+    var names = zNames.slice();
+    var zs = [];
+    for (var i = 0; i < zVals.length; i++) zs.push(zVals[i] + off);
+    if (extraOn) { names.push('weather caused it'); zs.push(-1.5 + off); }
+
+    var exps = [], sum = 0;
+    for (var k = 0; k < zs.length; k++) { var e = Math.exp(zs[k] / T); exps.push(e); sum += e; }
+
+    var bars = '', total = 0;
+    for (var j = 0; j < zs.length; j++) {
+      var p = exps[j] / sum;
+      total += p;
+      var cls = (j === 3) ? 'a' : (j === 0 ? 'g' : 'dim');
+      bars += '<div class="pb-row"><div class="pb-name">' + names[j] +
+              ' <span style="opacity:0.6;">z=' + zs[j].toFixed(2) + '</span></div>' +
+              '<div class="pb-track"><div class="pb-fill ' + cls + '" style="width:' + (p * 100) + '%"></div></div>' +
+              '<div class="pb-val">' + p.toFixed(3) + '</div></div>';
+    }
+    document.getElementById('z-bars').innerHTML = bars;
+
+    var p1 = exps[0] / sum, p2 = exps[1] / sum;
+    var lr = Math.log(p1 / p2);
+    var diff = (zs[0] - zs[1]) / T;
+    document.getElementById('z-sum').textContent = total.toFixed(3);
+    document.getElementById('z-lr').textContent = lr.toFixed(3);
+    document.getElementById('z-diff').textContent = diff.toFixed(3);
+
+    var msg = [];
+    if (shiftOn) msg.push('<strong style="color:var(--green);">+5 on every logit changed nothing.</strong> The constant cancels in the fraction.');
+    if (extraOn) msg.push('<strong style="color:var(--amber);">A 4th option took mass from all three - but ln(p₁/p₂) did not budge.</strong> That is the pointwise prediction Jev broke.');
+    if (T < 0.6) msg.push('Low temperature: the winner is taking almost everything.');
+    else if (T > 1.8) msg.push('High temperature: the distribution is flattening toward a uniform guess.');
+    if (!msg.length) msg.push('ln(p₁/p₂) and (z₁ − z₂)/T always match - probability ratios are just logit differences.');
+    document.getElementById('z-out').innerHTML = msg.join(' ');
+  }
+
+  /* ---------- init ---------- */
+  window.addEventListener('load', function () {
+    buildReadout();
+    buildVisibility();
+    updateCompute();
+    setPos('first');
+    setOptSet(4);
+    buildBins();
+    buildWalk();
+    buildAppendixA();
+    buildAppendixB();
+    initTooltips();
+  });
+</script>
+</body>
+</html>
