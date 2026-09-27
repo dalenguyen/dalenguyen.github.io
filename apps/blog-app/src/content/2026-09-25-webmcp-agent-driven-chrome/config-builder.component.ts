@@ -4,6 +4,8 @@ type Launch = 'launch' | 'attach'
 type Scope = 'project' | 'user'
 
 const FLAG = '--enable-features=WebMCP'
+// Native list_webmcp_tools / execute_webmcp_tool (chrome-devtools-mcp 1.10+, Chrome 150+).
+const CATEGORY = '--categoryExperimentalWebmcp'
 
 /**
  * Config builder. Pick how Claude Code gets its Chrome and where the server
@@ -18,7 +20,7 @@ const FLAG = '--enable-features=WebMCP'
     <div class="card">
       <div class="header">
         <span class="title">Build your Claude Code config</span>
-        <span class="subtitle">chrome-devtools-mcp</span>
+        <span class="subtitle">chrome-devtools-mcp 1.10+ · Chrome 150+</span>
       </div>
 
       <div class="field">
@@ -170,8 +172,8 @@ export class ConfigBuilderComponent {
   readonly blocks = computed<{ label: string; code: string }[]>(() => {
     const attaching = this.launch() === 'attach'
     const args = attaching
-      ? ['chrome-devtools-mcp@latest', '--browserUrl=http://127.0.0.1:9222']
-      : ['chrome-devtools-mcp@latest', `--chromeArg=${FLAG}`]
+      ? ['chrome-devtools-mcp@latest', '--browserUrl=http://127.0.0.1:9222', CATEGORY]
+      : ['chrome-devtools-mcp@latest', `--chromeArg=${FLAG}`, CATEGORY]
 
     const server =
       this.scope() === 'project'
@@ -184,7 +186,7 @@ export class ConfigBuilderComponent {
           }
         : {
             label: 'terminal',
-            code: `claude mcp add chrome-devtools -s user \\\n  -- npx -y ${args.join(' ')}`,
+            code: `claude mcp add chrome-devtools -s user -- \\\n  npx -y ${args.join(' \\\n  ')}`,
           }
 
     if (!attaching) return [server]
