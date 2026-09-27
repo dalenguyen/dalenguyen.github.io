@@ -18,7 +18,9 @@ This is the setup, end to end, plus an honest account of what it costs. WebMCP i
 
 ## 1. Give Claude Code a Chrome with the flag
 
-WebMCP is behind `--enable-features=WebMCP`, and that flag has to be on the Chrome the MCP server drives - which is never your everyday browser. `chrome-devtools-mcp` runs its own profile, so a toggle in `chrome://flags` and an extension you installed do not reach it.
+WebMCP needs Chrome 150 or newer, and it sits behind `--enable-features=WebMCP`. That flag has to be on the Chrome the MCP server drives - which is never your everyday browser. `chrome-devtools-mcp` runs its own profile, so a toggle in `chrome://flags` and an extension you installed do not reach it.
+
+Since version 1.10, `chrome-devtools-mcp` also has native WebMCP support behind a second switch, `--categoryExperimentalWebmcp`. It adds two MCP tools - `list_webmcp_tools` and `execute_webmcp_tool` - so Claude Code calls your page's tools directly instead of going through `evaluate_script`. Turn it on; every config below includes it.
 
 There are two shapes, and each takes a different config. Build yours:
 
@@ -27,6 +29,10 @@ There are two shapes, and each takes a different config. Build yours:
 Two rules make this less fiddly than it looks. Chrome reads feature flags **only at launch**, and Claude Code reads MCP server arguments **only when the session starts**. Editing either file changes nothing until the relevant process restarts.
 
 Let the MCP launch Chrome if you can - it restarts the browser for you, so one `/exit` and a new session is the whole loop. Attaching to your own debug Chrome is worth it when you need a logged-in profile that survives across sessions, but then you own the restart, and a Chrome started with `--no-startup-window` can survive SIGTERM, a scripted Quit, and the DevTools `Browser.close` command. Check the PID is really gone. If other sessions are attached to that browser, they lose their tabs when it goes - tell them first.
+
+One honest caveat. In my own testing on Chrome 154 stable, the command-line switch alone did not expose the API on a fresh profile. Chrome has two `chrome://flags` entries for this - `#enable-webmcp-testing` and `#devtools-webmcp-support` - and they persist in the profile. If the switch is not enough on your build, open `chrome://flags` inside the agent's Chrome, turn both on, and restart it.
+
+That is also why `--isolated` is a trap here. It creates a throwaway profile on every launch, so any flag you toggled is gone next session - and the failure is silent: the server starts fine and the tool list just comes back empty. Get it working on a persistent profile first, then decide whether you still want isolation.
 
 ## 2. Confirm it landed
 
@@ -39,7 +45,9 @@ ps -axo command | grep -- "--remote-debugging-port" | grep -v -- "--type=" \
 
 No output means the running browser does not have the flag, whatever the config says.
 
-Then the page. Ask Claude Code to run this through `evaluate_script` - probe by feature on both objects rather than trusting a name, because current builds expose `document.modelContext` while older guides tell you to check `navigator.modelContext`:
+Then the page. With `--categoryExperimentalWebmcp` on, ask Claude Code to call `list_webmcp_tools`. That is the whole check.
+
+On an older `chrome-devtools-mcp`, or to see where the API lives, run this probe through `evaluate_script` instead. Probe by feature on both objects rather than trusting a name - current builds expose `document.modelContext`, while older guides tell you to check `navigator.modelContext`:
 
 ```js
 () => {
@@ -55,7 +63,7 @@ Three inputs produce three different-looking failures, and only one of them is a
 
 <div data-chart="probe">Interactive: toggle the flag, the Chrome build and whether the page registers tools, and see which output each combination gives. Enable JavaScript to view.</div>
 
-The one that catches people is the middle state: everything is configured, and `getTools()` returns `[]`. Nothing is broken. The flag is plumbing - it does nothing until your app registers something.
+The one that catches people is the middle state: everything is configured, and `list_webmcp_tools` (or `getTools()`) comes back empty. Nothing is broken. The flag is plumbing - it does nothing until your app registers something.
 
 ## 3. Register tools in your app
 
@@ -79,7 +87,18 @@ document.modelContext.registerTool({
 
 Three things to get right. Register behind a dev or test build flag if these should not ship to production. Call your app's own logic, not a synthetic click - the point is to skip the DOM, and going through it gives up most of the benefit. And return structured state, not `true`: the returned object is what the agent reasons about next, so spend a field on the row count or the new ID.
 
-Then tell Claude Code the tools exist. It reaches them through `evaluate_script` like anything else in the page:
+Then Claude Code calls them through `execute_webmcp_tool`. It takes the tool's name, and its input as a JSON **string** - not an object:
+
+```json
+{
+  "toolName": "add_chart_series",
+  "input": "{\"seriesName\": \"Page views\"}"
+}
+```
+
+The result comes back as `{ status, output, errorText }`, so a validation failure in your handler reaches the agent as a readable message rather than a stack trace.
+
+Without the WebMCP category - an older server, or a build where it is off - the fallback is `evaluate_script`:
 
 ```js
 async () => await document.modelContext.executeTool('add_chart_series', { seriesName: 'Page views' })
@@ -121,10 +140,12 @@ It does not pay off for a one-off task, for an app you do not ship code to, or f
 
 ## Checklist
 
+- Chrome is 150 or newer, and `chrome-devtools-mcp` is 1.10 or newer.
 - The flag is on the launch Claude Code actually uses - `--chromeArg`, or your debug Chrome's own arguments.
+- The server runs with `--categoryExperimentalWebmcp`, and not with `--isolated` until it works once.
 - `ps` shows `--enable-features=WebMCP` on the running browser process.
 - The Claude Code session was restarted after the MCP arguments changed.
 - The probe finds the API on `document` or `navigator`, and lists its methods.
-- `getTools()` returns your tools. If it returns `[]`, the app has not registered them yet.
+- `list_webmcp_tools` returns your tools. If it returns `[]`, either the app has not registered them yet, or the flag did not reach the page - check `chrome://flags` in the agent's Chrome.
 - Tools call app logic, return structured state, and are gated out of production.
 - Visual claims still rest on screenshots and computed styles, not on tool results.
