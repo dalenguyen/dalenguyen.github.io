@@ -495,6 +495,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
         setTimeout(() => {
           this.addCopyButtons()
           void this.mountCharts().catch((error) => console.error('Failed to mount charts', error))
+          void this.renderMermaid().catch((error) => console.error('Failed to render mermaid', error))
         })
       }
     }, { injector: this.injector })
@@ -518,6 +519,41 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     this.chartRefs = await mountInteractiveCharts(this.document, this.envInjector, this.appRef, slug)
   }
 
+  // Render ```mermaid blocks. The prerendered HTML has them as
+  // `<pre><code class="language-mermaid">`, Analog's client renderer as
+  // `<pre class="mermaid">`; normalize to the latter, which mermaid expects.
+  // Lazy-loaded so only posts with diagrams pull mermaid in. Browser-only.
+  // Dark "figure card" palette in both site themes, matching chart widgets.
+  private async renderMermaid() {
+    if (!isPlatformBrowser(this.platformId)) return
+    this.document.querySelectorAll('pre > code.language-mermaid').forEach((code) => {
+      const pre = this.document.createElement('pre')
+      pre.className = 'mermaid'
+      pre.textContent = code.textContent
+      code.parentElement!.replaceWith(pre)
+    })
+    const nodes = this.document.querySelectorAll<HTMLElement>('pre.mermaid:not([data-processed])')
+    if (!nodes.length) return
+    const { default: mermaid } = await import('mermaid')
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        background: '#161b22',
+        primaryColor: '#0b0f16',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#30363d',
+        lineColor: '#9aa7b5',
+        clusterBkg: '#0b0f16',
+        clusterBorder: '#30363d',
+        titleColor: '#9aa7b5',
+        edgeLabelBackground: '#161b22',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      },
+    })
+    await mermaid.run({ nodes: Array.from(nodes) })
+  }
+
   // Detach and destroy any charts mounted by a previous render so their views
   // don't leak on the ApplicationRef across navigations.
   private destroyMountedCharts() {
@@ -532,6 +568,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     if (!isPlatformBrowser(this.platformId)) return
     const doc = this.document
     doc.querySelectorAll('pre').forEach((pre) => {
+      if (pre.matches('.mermaid') || pre.querySelector('code.language-mermaid')) return
       const wrapper = doc.createElement('div')
       wrapper.style.cssText = 'position:relative'
       pre.parentNode!.insertBefore(wrapper, pre)

@@ -328,6 +328,14 @@ main a:not([class]) {
     border: 1px solid rgb(var(--code-border));
   }
 
+  /* Mermaid diagrams keep the dark figure-card look in both themes */
+  pre.mermaid {
+    background-color: #161b22;
+    border-color: #30363d;
+    color: #e6edf3;
+    text-align: center;
+  }
+
   pre code {
     background-color: transparent;
     padding: 0;
