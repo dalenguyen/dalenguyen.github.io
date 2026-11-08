@@ -202,6 +202,99 @@
   --chart-toggle: #f8efe2;
 }
 
+/* --- Christmas: dark --------------------------------------------------- */
+[data-season='christmas'] {
+  --bg: 10 20 16; /* #0a1410 */
+  --surface: 17 30 24; /* #111e18 */
+  --surface-2: 26 42 34; /* #1a2a22 */
+  --border: 42 61 51; /* #2a3d33 */
+
+  --fg: 238 245 239; /* #eef5ef - 16.9:1 on bg */
+  --fg-muted: 169 194 178; /* #a9c2b2 - 9.9:1 on bg */
+
+  --accent: 255 107 107; /* #ff6b6b - berry red, 6.8:1 on bg */
+  --accent-fill: 179 38 46; /* #b3262e - white text on it is 6.5:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 242 193 78; /* #f2c14e - star gold, 11.2:1 on bg */
+
+  --chart-card: #111e18;
+  --chart-border: #2a3d33;
+  --chart-fg: #eef5ef;
+  --chart-muted: #a9c2b2;
+  --chart-axis: #a9c2b2; /* 9.0:1 on chart-card */
+  --chart-toggle: #0d1813;
+}
+
+/* --- Christmas: light -------------------------------------------------- */
+.light[data-season='christmas'] {
+  --bg: 248 251 248; /* #f8fbf8 */
+  --surface: 255 255 255;
+  --surface-2: 238 245 239; /* #eef5ef */
+  --border: 212 227 216; /* #d4e3d8 */
+
+  --fg: 15 36 25; /* #0f2419 - 15.7:1 on bg */
+  --fg-muted: 74 102 86; /* #4a6656 - 6.1:1 on bg */
+
+  --accent: 179 32 42; /* #b3202a - 6.4:1 on bg */
+  --accent-fill: 179 32 42; /* white text on it is 6.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 31 107 58; /* #1f6b3a - pine, 6.3:1 on bg (gold is unreadable on white) */
+
+  --chart-card: #ffffff;
+  --chart-border: #d4e3d8;
+  --chart-fg: #0f2419;
+  --chart-muted: #4a6656;
+  --chart-axis: #4a6656; /* 6.3:1 on chart-card */
+  --chart-toggle: #eef5ef;
+}
+
+/* --- Winter: dark ------------------------------------------------------ */
+[data-season='winter'] {
+  --bg: 12 17 24; /* #0c1118 */
+  --surface: 19 26 36; /* #131a24 */
+  --surface-2: 28 37 50; /* #1c2532 */
+  --border: 44 58 76; /* #2c3a4c */
+
+  --fg: 232 238 245; /* #e8eef5 - 16.2:1 on bg */
+  --fg-muted: 167 182 200; /* #a7b6c8 - 9.2:1 on bg */
+
+  --accent: 124 196 242; /* #7cc4f2 - ice blue, 10.0:1 on bg */
+  --accent-fill: 31 106 165; /* #1f6aa5 - white text on it is 5.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 201 214 255; /* #c9d6ff - frost, 13.1:1 on bg */
+
+  --chart-card: #131a24;
+  --chart-border: #2c3a4c;
+  --chart-fg: #e8eef5;
+  --chart-muted: #a7b6c8;
+  --chart-axis: #a7b6c8; /* 8.5:1 on chart-card */
+  --chart-toggle: #0f151d;
+}
+
+/* --- Winter: light ----------------------------------------------------- */
+.light[data-season='winter'] {
+  --bg: 246 249 252; /* #f6f9fc */
+  --surface: 255 255 255;
+  --surface-2: 235 241 247; /* #ebf1f7 */
+  --border: 211 223 235; /* #d3dfeb */
+
+  --fg: 14 26 40; /* #0e1a28 - 16.6:1 on bg */
+  --fg-muted: 75 93 114; /* #4b5d72 - 6.4:1 on bg */
+
+  /* Darker than the dark-mode ice blue: #7cc4f2 on white is far below AA. */
+  --accent: 29 95 148; /* #1d5f94 - 6.4:1 on bg */
+  --accent-fill: 29 95 148; /* white text on it is 6.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 75 79 168; /* #4b4fa8 - 6.7:1 on bg */
+
+  --chart-card: #ffffff;
+  --chart-border: #d3dfeb;
+  --chart-fg: #0e1a28;
+  --chart-muted: #4b5d72;
+  --chart-axis: #4b5d72; /* 6.8:1 on chart-card */
+  --chart-toggle: #ebf1f7;
+}
+
 html,
 body {
   height: 100%;
