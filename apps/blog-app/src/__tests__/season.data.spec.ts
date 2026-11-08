@@ -16,18 +16,22 @@ describe('resolveSeason', () => {
     expect(resolveSeason(on(6, 1))).toBeNull()
   })
 
-  it('matches inside the halloween window', () => {
-    expect(resolveSeason(on(10, 28))).toBe('halloween')
+  it('runs autumn from the equinox to the solstice eve', () => {
+    expect(resolveSeason(on(9, 22))).toBe('autumn')
+    expect(resolveSeason(on(11, 7))).toBe('autumn')
+    expect(resolveSeason(on(12, 20))).toBe('autumn')
   })
 
-  it('covers the whole of October, boundary days included', () => {
-    expect(resolveSeason(on(10, 1))).toBe('halloween')
+  it('lets halloween take over autumn for its week only', () => {
+    expect(resolveSeason(on(10, 24))).toBe('autumn')
+    expect(resolveSeason(on(10, 25))).toBe('halloween')
     expect(resolveSeason(on(10, 31))).toBe('halloween')
+    expect(resolveSeason(on(11, 1))).toBe('autumn')
   })
 
-  it('excludes the days just outside the boundaries', () => {
-    expect(resolveSeason(on(9, 30))).toBeNull()
-    expect(resolveSeason(on(11, 1))).toBeNull()
+  it('excludes the days just outside autumn', () => {
+    expect(resolveSeason(on(9, 21))).toBeNull()
+    expect(resolveSeason(on(12, 21))).toBeNull()
   })
 })
 

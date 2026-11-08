@@ -155,6 +155,52 @@
   --chart-toggle: #fff4ea;
 }
 
+/* --- Autumn: dark ------------------------------------------------------ */
+[data-season='autumn'] {
+  --bg: 21 16 12; /* #15100c */
+  --surface: 30 23 18; /* #1e1712 */
+  --surface-2: 42 32 25; /* #2a2019 */
+  --border: 61 47 36; /* #3d2f24 */
+
+  --fg: 243 233 220; /* #f3e9dc — 15.7:1 on bg */
+  --fg-muted: 196 176 154; /* #c4b09a — 9.0:1 on bg */
+
+  --accent: 242 145 95; /* #f2915f — maple, 8.1:1 on bg */
+  --accent-fill: 165 66 31; /* #a5421f — white text on it is 6.2:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 227 180 72; /* #e3b448 — harvest gold, 9.8:1 on bg */
+
+  --chart-card: #1e1712;
+  --chart-border: #3d2f24;
+  --chart-fg: #f3e9dc;
+  --chart-muted: #c4b09a;
+  --chart-axis: #c4b09a; /* 8.4:1 on chart-card */
+  --chart-toggle: #18120e;
+}
+
+/* --- Autumn: light ----------------------------------------------------- */
+.light[data-season='autumn'] {
+  --bg: 253 248 241; /* #fdf8f1 */
+  --surface: 255 255 255;
+  --surface-2: 248 239 226; /* #f8efe2 */
+  --border: 234 217 194; /* #ead9c2 */
+
+  --fg: 42 26 14; /* #2a1a0e — 15.9:1 on bg */
+  --fg-muted: 106 80 57; /* #6a5039 — 7.0:1 on bg */
+
+  /* Darker than the dark-mode maple: #f2915f on cream is far below AA. */
+  --accent: 156 61 26; /* #9c3d1a — 6.4:1 on bg */
+  --accent-fill: 156 61 26; /* white text on it is 6.8:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 127 86 0; /* #7f5600 — 6.1:1 on bg (gold is unreadable on cream) */
+
+  --chart-card: #ffffff;
+  --chart-border: #ead9c2;
+  --chart-fg: #2a1a0e;
+  --chart-muted: #6a5039;
+  --chart-axis: #6a5039; /* 7.5:1 on chart-card */
+  --chart-toggle: #f8efe2;
+}
 
 html,
 body {
@@ -167,6 +213,19 @@ body {
   color: rgb(var(--fg));
   /* Smooth theme switch, but never animate the page on first paint. */
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Logichat widget: its iframe document picks dark/light ONCE, from `hostTheme`
+   in its src at load. If the visitor then flips the theme, the iframe element
+   inherits the new color-scheme, and a color-scheme mismatch between an iframe
+   and its document makes the browser paint an opaque backdrop (a dark square
+   around the button on a light page). Pin the element to the theme the
+   document actually loaded with, so the backdrop stays transparent. */
+#logichat-faq-widget iframe[src*='hostTheme=dark'] {
+  color-scheme: dark;
+}
+#logichat-faq-widget iframe[src*='hostTheme=light'] {
+  color-scheme: light;
 }
 
 /* Ensure the app container takes full height */
