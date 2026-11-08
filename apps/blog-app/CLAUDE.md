@@ -85,7 +85,8 @@ Unmatched `/api/*` paths fall through to `src/server/routes/[...].ts`.
 ## Seasonal themes
 
 The site can put on a costume for a date range (Halloween, Christmas, Autumn and Winter
-ship today; the system is built so New Year is a folder-only addition). Code lives in
+ship today; New Year needs its commented-out `SEASON_WINDOWS` entry enabled,
+its two CSS blocks, and a theme folder - see Adding a season below). Code lives in
 `libs/portfolio/shell/ui/src/lib/season/`.
 
 **Why it is resolved in the browser, not at build time.** Every public route is
