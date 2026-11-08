@@ -10,8 +10,8 @@ import { SeasonService } from './season.service'
  * added. The options come from the season registry, so shipping a new season
  * adds its entry here without touching this file.
  *
- * "Auto" is the default and means "follow the calendar" — Halloween appears on
- * its own through October. The picker is for visitors who want it early, or
+ * "Auto" is the default and means "follow the calendar" — Autumn appears on
+ * its own from late September, and Halloween takes over for its last week of October. The picker is for visitors who want it early, or
  * not at all.
  */
 @Component({

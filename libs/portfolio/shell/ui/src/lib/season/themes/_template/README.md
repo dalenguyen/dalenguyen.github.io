@@ -3,8 +3,10 @@
 Four steps. Nothing shared needs editing beyond the first two.
 
 1. **Window** — add a `SeasonId` and a `SEASON_WINDOWS` entry in
-   `../../season.data.ts`. Keep it short (a week or so) and non-overlapping;
-   the first matching window wins. A window whose `to` sorts before its `from`
+   `../../season.data.ts`. An occasion (Halloween, Christmas) runs about
+   a week and goes in the occasions block; a season (Autumn) runs ~3 months and
+   goes in the seasons block below it. The first matching window wins, so an
+   occasion inside a season takes over for its week. A window whose `to` sorts before its `from`
    wraps the year end (`12-31` → `01-02`).
 
 2. **Tokens** — add TWO blocks to `apps/blog-app/src/styles.css`, after the
