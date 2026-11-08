@@ -59,7 +59,7 @@ export class SentryErrorHandler implements ErrorHandler {
                     [class.text-fg]="isActive(item.id)"
                     [class.bg-surface-2]="isActive(item.id)"
                     [class.text-fg-muted]="!isActive(item.id)"
-                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
+                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap"
                     (click)="setActive(item.id)"
                   >
                     <svg
@@ -82,7 +82,7 @@ export class SentryErrorHandler implements ErrorHandler {
                     [class.text-fg]="isActive(item.id)"
                     [class.bg-surface-2]="isActive(item.id)"
                     [class.text-fg-muted]="!isActive(item.id)"
-                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5"
+                    class="px-3 py-2 rounded-lg text-sm font-medium hover:bg-surface-2 hover:text-fg transition-colors duration-150 flex items-center gap-1.5 whitespace-nowrap"
                     (click)="setActive(item.id)"
                   >
                     <svg
@@ -247,20 +247,6 @@ export class AppComponent {
       route: '/projects',
       fragment: '',
       svg: 'M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z',
-    },
-    {
-      id: 'bucket-list',
-      label: 'Bucket List',
-      route: '/bucket-list',
-      fragment: '',
-      svg: 'M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
-    },
-    {
-      id: 'about',
-      label: 'Biography',
-      route: '/',
-      fragment: 'about',
-      svg: 'M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z',
     },
     {
       id: 'contact',
