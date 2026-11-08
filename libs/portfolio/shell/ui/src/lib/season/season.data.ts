@@ -13,7 +13,7 @@
  * in `apps/blog-app/src/styles.css`, and copy `themes/_template`.
  */
 
-export type SeasonId = 'halloween' | 'autumn' | 'christmas' | 'newyear'
+export type SeasonId = 'halloween' | 'christmas' | 'autumn' | 'winter' | 'newyear'
 
 export interface SeasonWindow {
   id: SeasonId
@@ -42,7 +42,7 @@ export const SEASON_STORAGE_KEY = 'season'
 /**
  * ORDER MATTERS — first match wins. Two kinds of window live here:
  *   - Occasions (Halloween, Christmas, ...): about one week. Listed FIRST.
- *   - Seasons (Autumn, ...): the long backdrop, ~3 months. Listed AFTER.
+ *   - Seasons (Autumn, Winter, ...): the long backdrop, ~3 months. Listed AFTER.
  * An occasion may sit inside a season; because it comes first, it takes over
  * for its week and the season resumes on either side. Occasions must not
  * overlap each other, and seasons must not overlap each other.
@@ -50,13 +50,13 @@ export const SEASON_STORAGE_KEY = 'season'
 export const SEASON_WINDOWS: readonly SeasonWindow[] = [
   // --- Occasions ---
   { id: 'halloween', label: 'Halloween', icon: '🎃', from: '10-25', to: '10-31', themeColor: '#120a06' },
-  // Not shipped yet — the folders under themes/ do not exist. Listed here so
-  // the shape of a year-wrapping window is obvious when they are added.
-  // { id: 'christmas', label: 'Christmas', icon: '🎄', from: '12-18', to: '12-26', themeColor: '#0a1410' },
+  { id: 'christmas', label: 'Christmas', icon: '🎄', from: '12-18', to: '12-26', themeColor: '#0a1410' },
+  // Not shipped yet — the folder under themes/ does not exist.
   // { id: 'newyear', label: 'New Year', icon: '🎆', from: '12-31', to: '01-02', themeColor: '#0b0a16' },
 
   // --- Seasons ---
   { id: 'autumn', label: 'Autumn', icon: '🍂', from: '09-22', to: '12-20', themeColor: '#15100c' },
+  { id: 'winter', label: 'Winter', icon: '❄️', from: '12-21', to: '03-19', themeColor: '#0c1118' },
 ]
 
 /** `MM-DD` for a date, in LOCAL time (the visitor's calendar, not UTC). */

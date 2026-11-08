@@ -16,10 +16,10 @@ describe('resolveSeason', () => {
     expect(resolveSeason(on(6, 1))).toBeNull()
   })
 
-  it('runs autumn from the equinox to the solstice eve', () => {
+  it('runs autumn from the equinox until christmas takes over', () => {
     expect(resolveSeason(on(9, 22))).toBe('autumn')
     expect(resolveSeason(on(11, 7))).toBe('autumn')
-    expect(resolveSeason(on(12, 20))).toBe('autumn')
+    expect(resolveSeason(on(12, 17))).toBe('autumn')
   })
 
   it('lets halloween take over autumn for its week only', () => {
@@ -29,9 +29,22 @@ describe('resolveSeason', () => {
     expect(resolveSeason(on(11, 1))).toBe('autumn')
   })
 
-  it('excludes the days just outside autumn', () => {
+  it('runs christmas across the autumn/winter boundary', () => {
+    expect(resolveSeason(on(12, 18))).toBe('christmas')
+    expect(resolveSeason(on(12, 21))).toBe('christmas')
+    expect(resolveSeason(on(12, 26))).toBe('christmas')
+    expect(resolveSeason(on(12, 27))).toBe('winter')
+  })
+
+  it('runs winter across the year end until the spring equinox', () => {
+    expect(resolveSeason(on(1, 1))).toBe('winter')
+    expect(resolveSeason(on(2, 14))).toBe('winter')
+    expect(resolveSeason(on(3, 19))).toBe('winter')
+    expect(resolveSeason(on(3, 20))).toBeNull()
+  })
+
+  it('excludes the day just before autumn', () => {
     expect(resolveSeason(on(9, 21))).toBeNull()
-    expect(resolveSeason(on(12, 21))).toBeNull()
   })
 })
 

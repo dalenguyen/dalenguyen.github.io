@@ -11,8 +11,9 @@ import { SeasonService } from './season.service'
  * adds its entry here without touching this file.
  *
  * "Auto" is the default and means "follow the calendar" — Autumn appears on
- * its own from late September, and Halloween takes over for its last week of October. The picker is for visitors who want it early, or
- * not at all.
+ * its own from late September and Winter from late December. Halloween takes
+ * over for its last week of October, and Christmas for Dec 18-26. The picker
+ * is for visitors who want it early, or not at all.
  */
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
