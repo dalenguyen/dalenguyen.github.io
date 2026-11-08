@@ -174,7 +174,7 @@
   --chart-border: #3d2f24;
   --chart-fg: #f3e9dc;
   --chart-muted: #c4b09a;
-  --chart-axis: #8c735c;
+  --chart-axis: #c4b09a; /* 8.4:1 on chart-card */
   --chart-toggle: #18120e;
 }
 
@@ -198,7 +198,7 @@
   --chart-border: #ead9c2;
   --chart-fg: #2a1a0e;
   --chart-muted: #6a5039;
-  --chart-axis: #8c735c;
+  --chart-axis: #6a5039; /* 7.5:1 on chart-card */
   --chart-toggle: #f8efe2;
 }
 
