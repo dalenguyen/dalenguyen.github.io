@@ -22,8 +22,12 @@ export class SeasonService {
   /** What the visitor picked: follow the calendar, pin one, or turn them off. */
   readonly choice = signal<SeasonChoice>('auto')
 
-  /** Everything the picker offers. Data-driven, so a new season shows up free. */
-  readonly options = SEASON_WINDOWS.map((w) => ({ id: w.id, label: w.label, icon: w.icon }))
+  /** Everything the picker offers. Data-driven, so a new season shows up free.
+   *  Sorted by start date, so the list reads in calendar order (SEASON_WINDOWS
+   *  itself is in match-priority order, occasions first). */
+  readonly options = [...SEASON_WINDOWS]
+    .sort((a, b) => a.from.localeCompare(b.from))
+    .map((w) => ({ id: w.id, label: w.label, icon: w.icon }))
 
   constructor() {
     afterNextRender(() => {
