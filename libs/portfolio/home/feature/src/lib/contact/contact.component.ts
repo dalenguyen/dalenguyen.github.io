@@ -9,7 +9,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
       <!-- accent glow -->
       <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 -bottom-48 -z-10 flex justify-center blur-3xl">
         <div
-          class="aspect-[1100/600] w-[60rem] max-w-none bg-gradient-to-tr from-accent-fill/30 via-accent/20 to-cyan-400/20 opacity-40 bg-[length:200%_200%] animate-gradient-pan"
+          class="aspect-[1100/600] w-[60rem] max-w-none bg-gradient-to-tr from-accent-fill/30 via-accent/20 to-accent-2/20 opacity-40 bg-[length:200%_200%] animate-gradient-pan"
         ></div>
       </div>
 
@@ -22,7 +22,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
           <div class="mt-8 flex justify-center">
             <a
               href="mailto:dale@dalenguyen.me"
-              class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+              class="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-fill/90 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             >
               <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />

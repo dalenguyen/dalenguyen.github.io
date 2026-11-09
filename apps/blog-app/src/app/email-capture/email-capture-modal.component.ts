@@ -79,7 +79,7 @@ import { EmailCaptureService } from './email-capture.service'
             <button
               type="button"
               (click)="dismiss()"
-              class="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+              class="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-fill/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
             >
               Close
             </button>
@@ -106,7 +106,7 @@ import { EmailCaptureService } from './email-capture.service'
               <button
                 type="submit"
                 [disabled]="service.status() === 'submitting'"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px disabled:opacity-60"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-fill/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px disabled:opacity-60"
               >
                 {{ service.status() === 'submitting' ? 'Subscribing…' : ctaLabel }}
               </button>

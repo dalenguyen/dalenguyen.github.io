@@ -30,7 +30,7 @@ const NAV_HTML = `<link href="https://fonts.googleapis.com/icon?family=Material+
 #learn-app-nav{position:sticky;top:0;z-index:9999;background:#1e293b;box-shadow:0 1px 3px rgba(0,0,0,.4);display:flex;align-items:center;padding:0 24px;height:64px;gap:4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 #learn-app-nav .nav-logo{flex-shrink:0;margin-right:12px;display:flex;align-items:center;}
 #learn-app-nav .nav-logo img{width:32px;height:32px;border-radius:50%;}
-#learn-app-nav a{display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:6px;color:#cbd5e1;text-decoration:none;font-size:14px;font-weight:500;transition:background .15s,color .15s;}
+#learn-app-nav a{display:flex;align-items:center;gap:4px;padding:8px 12px;border-radius:6px;color:#cbd5e1;text-decoration:none;font-size:14px;font-weight:500;white-space:nowrap;transition:background .15s,color .15s;}
 #learn-app-nav a:hover{background:#334155;color:#fff;}
 #learn-app-nav .material-icons{font-size:18px;}
 @media(max-width:640px){#learn-app-nav a .nav-label{display:none;}}
@@ -40,8 +40,6 @@ const NAV_HTML = `<link href="https://fonts.googleapis.com/icon?family=Material+
   <a href="/blog"><span class="material-icons">edit</span><span class="nav-label">Thoughts</span></a>
   <a href="/learn"><span class="material-icons">menu_book</span><span class="nav-label">Learning</span></a>
   <a href="/#portfolio"><span class="material-icons">grid_view</span><span class="nav-label">Digital Portfolio</span></a>
-  <a href="/bucket-list"><span class="material-icons">checklist</span><span class="nav-label">Bucket List</span></a>
-  <a href="/#about"><span class="material-icons">person</span><span class="nav-label">Biography</span></a>
   <a href="/#contact"><span class="material-icons">email</span><span class="nav-label">Contact</span></a>
 </nav>`
 

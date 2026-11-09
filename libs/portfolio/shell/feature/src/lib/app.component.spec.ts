@@ -21,6 +21,10 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy()
   })
 
+  it('keeps Bucket List and Biography out of the header nav', () => {
+    expect(component.navItems.map((item) => item.id)).toEqual(['blog', 'learn', 'portfolio', 'contact', 'shop'])
+  })
+
   it('adds an external Shop nav item pointing at rubyrosebloom.com', () => {
     const shopItem = component.navItems.find((item) => item.id === 'shop')
 

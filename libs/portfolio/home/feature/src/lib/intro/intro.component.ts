@@ -10,7 +10,7 @@ import { RouterModule } from '@angular/router'
       <!-- Animated accent glow -->
       <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 -top-48 -z-10 flex justify-center blur-3xl">
         <div
-          class="aspect-[1100/600] w-[72rem] max-w-none bg-gradient-to-tr from-accent-fill/40 via-accent/30 to-cyan-400/30 opacity-40 bg-[length:200%_200%] animate-gradient-pan"
+          class="aspect-[1100/600] w-[72rem] max-w-none bg-gradient-to-tr from-accent-fill/40 via-accent/30 to-accent-2/30 opacity-40 bg-[length:200%_200%] animate-gradient-pan"
         ></div>
       </div>
       <!-- Subtle grid texture -->
@@ -37,7 +37,7 @@ import { RouterModule } from '@angular/router'
 
         <h1 class="mt-6 text-4xl font-bold tracking-tight text-fg sm:text-6xl animate-fade-up [animation-delay:160ms]">
           Howdy <span class="inline-block">👋</span> I'm
-          <span class="bg-gradient-to-r from-accent to-cyan-400 bg-clip-text text-transparent">Dale</span>
+          <span class="bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-transparent">Dale</span>
         </h1>
 
         <p class="mx-auto mt-6 max-w-2xl text-lg leading-8 text-fg-muted animate-fade-up [animation-delay:240ms]">
@@ -47,7 +47,7 @@ import { RouterModule } from '@angular/router'
 
         <div class="mt-10 flex flex-wrap items-center justify-center gap-3 animate-fade-up [animation-delay:320ms]">
           <a
-            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
+            class="inline-flex items-center gap-2 rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-fill/90 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
             [routerLink]="'/'"
             fragment="contact"
           >

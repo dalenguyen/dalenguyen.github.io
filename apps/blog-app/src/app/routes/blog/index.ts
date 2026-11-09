@@ -29,7 +29,7 @@ interface YearBar {
         <div class="text-center mb-12">
           <h1 class="text-4xl font-bold tracking-tight text-fg sm:text-5xl md:text-6xl">
             Insights &amp; Ideas
-            <span class="mt-2 block bg-gradient-to-r from-accent to-cyan-400 bg-clip-text text-transparent">
+            <span class="mt-2 block bg-gradient-to-r from-accent to-accent-2 bg-clip-text text-transparent">
               From the Blog
             </span>
           </h1>
@@ -87,7 +87,7 @@ interface YearBar {
                 <div class="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                   <div class="mb-3 flex flex-wrap items-center gap-2">
                     @for (category of post.attributes.categories; track category) {
-                      <span class="inline-flex items-center rounded-full bg-indigo-600 px-3 py-1 text-xs font-medium text-white">
+                      <span class="inline-flex items-center rounded-full bg-accent-fill px-3 py-1 text-xs font-medium text-white">
                         {{ category | titlecase }}
                       </span>
                     }
@@ -171,7 +171,10 @@ interface YearBar {
 })
 export default class BlogComponent {
   readonly allPosts = injectContentFiles<PostAttributes>(
-    (contentFile) => contentFile.filename.includes('/src/content') && !contentFile.attributes.draft,
+    // NOTE: no leading slash. Analog's content plugin keys these files
+    // '/src/content/…' in a production build but 'src/content/…' in the dev
+    // server, so matching on '/src/content' silently yields zero posts in dev.
+    (contentFile) => contentFile.filename.includes('src/content') && !contentFile.attributes.draft,
   ).sort((a, b) => b.attributes.published.localeCompare(a.attributes.published))
 
   readonly selectedCategory = signal<string | null>(null)
@@ -223,7 +226,7 @@ export default class BlogComponent {
   chipClass(name: string | null): string {
     const base = 'rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors cursor-pointer'
     return this.selectedCategory() === name
-      ? `${base} border-transparent bg-indigo-600 text-white`
+      ? `${base} border-transparent bg-accent-fill text-white`
       : `${base} border-border text-fg-muted hover:bg-surface-2 hover:text-fg`
   }
 }

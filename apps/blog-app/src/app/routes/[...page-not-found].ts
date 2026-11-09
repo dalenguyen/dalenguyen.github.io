@@ -26,7 +26,7 @@ export const routeMeta: RouteMeta = {
           <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
             <a
               routerLink="/"
-              class="rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-500 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
+              class="rounded-lg bg-accent-fill px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-accent-fill/90 hover:shadow-glow focus:outline-none focus-visible:ring-2 focus-visible:ring-accent"
             >
               Go back home
             </a>

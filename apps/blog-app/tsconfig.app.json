@@ -12,7 +12,8 @@
     "src/app/routes/**/*.ts",
     "src/app/pages/**/*.page.ts",
     "src/app/blog/**/*.ts",
-    "src/content/**/*.ts"
+    "src/content/**/*.ts",
+    "../../libs/portfolio/shell/ui/src/lib/season/themes/**/*.ts"
   ],
   "exclude": ["**/*.test.ts", "**/*.spec.ts"]
 }

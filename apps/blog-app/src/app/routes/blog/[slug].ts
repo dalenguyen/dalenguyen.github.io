@@ -101,7 +101,7 @@ export const routeMeta: RouteMeta = {
             <!-- Categories display -->
             <div class="flex flex-wrap justify-center gap-2 mb-6">
               @for (category of post.attributes.categories; track category) {
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-600/15 text-accent ring-1 ring-border">
+                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-accent-fill/15 text-accent ring-1 ring-border">
                   {{ category | titlecase }}
                 </span>
               }
@@ -147,7 +147,7 @@ export const routeMeta: RouteMeta = {
               <div class="text-left mx-auto max-w-md text-base">
                 @for (post of series()!.posts; track post.slug; let i = $index) {
                   <div class="my-2">
-                      <span class="mr-2 font-medium bg-indigo-600/15 text-accent px-2 py-1 rounded-full">{{ i + 1 }}</span>
+                      <span class="mr-2 font-medium bg-accent-fill/15 text-accent px-2 py-1 rounded-full">{{ i + 1 }}</span>
                       @if (post.isCurrent) {
                         <span class="font-semibold text-accent">{{ post.displayTitle }}</span>
                       } @else {
@@ -345,7 +345,11 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     }
 
     const allPosts = runInInjectionContext(this.injector, () => {
-      return injectContentFiles<PostAttributes>((contentFile) => contentFile.filename.includes('/src/content'))
+      return injectContentFiles<PostAttributes>(
+        // Drafts are excluded here for the same reason as on the blog index:
+        // an unpublished post must not surface in series navigation.
+        (contentFile) => contentFile.filename.includes('src/content') && !contentFile.attributes.draft,
+      )
     })
 
     const seriesPosts = allPosts
@@ -491,6 +495,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
         setTimeout(() => {
           this.addCopyButtons()
           void this.mountCharts().catch((error) => console.error('Failed to mount charts', error))
+          void this.renderMermaid().catch((error) => console.error('Failed to render mermaid', error))
         })
       }
     }, { injector: this.injector })
@@ -514,6 +519,41 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     this.chartRefs = await mountInteractiveCharts(this.document, this.envInjector, this.appRef, slug)
   }
 
+  // Render ```mermaid blocks. The prerendered HTML has them as
+  // `<pre><code class="language-mermaid">`, Analog's client renderer as
+  // `<pre class="mermaid">`; normalize to the latter, which mermaid expects.
+  // Lazy-loaded so only posts with diagrams pull mermaid in. Browser-only.
+  // Dark "figure card" palette in both site themes, matching chart widgets.
+  private async renderMermaid() {
+    if (!isPlatformBrowser(this.platformId)) return
+    this.document.querySelectorAll('pre > code.language-mermaid').forEach((code) => {
+      const pre = this.document.createElement('pre')
+      pre.className = 'mermaid'
+      pre.textContent = code.textContent
+      code.parentElement!.replaceWith(pre)
+    })
+    const nodes = this.document.querySelectorAll<HTMLElement>('pre.mermaid:not([data-processed])')
+    if (!nodes.length) return
+    const { default: mermaid } = await import('mermaid')
+    mermaid.initialize({
+      startOnLoad: false,
+      theme: 'base',
+      themeVariables: {
+        background: '#161b22',
+        primaryColor: '#0b0f16',
+        primaryTextColor: '#e6edf3',
+        primaryBorderColor: '#30363d',
+        lineColor: '#9aa7b5',
+        clusterBkg: '#0b0f16',
+        clusterBorder: '#30363d',
+        titleColor: '#9aa7b5',
+        edgeLabelBackground: '#161b22',
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+      },
+    })
+    await mermaid.run({ nodes: Array.from(nodes) })
+  }
+
   // Detach and destroy any charts mounted by a previous render so their views
   // don't leak on the ApplicationRef across navigations.
   private destroyMountedCharts() {
@@ -528,6 +568,7 @@ export default class BlogPostComponent implements AfterViewInit, OnInit, OnDestr
     if (!isPlatformBrowser(this.platformId)) return
     const doc = this.document
     doc.querySelectorAll('pre').forEach((pre) => {
+      if (pre.matches('.mermaid') || pre.querySelector('code.language-mermaid')) return
       const wrapper = doc.createElement('div')
       wrapper.style.cssText = 'position:relative'
       pre.parentNode!.insertBefore(wrapper, pre)

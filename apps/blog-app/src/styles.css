@@ -28,6 +28,7 @@
   --accent: 129 140 248; /* #818cf8 indigo-400 — links/text, ~6:1 on bg */
   --accent-fill: 94 106 210; /* #5e6ad2 — fills/glow (matches learn pages) */
   --accent-fg: 8 17 31; /* #08111f — text on accent fill */
+  --accent-2: 34 211 238; /* #22d3ee cyan-400 — far stop of hero gradients */
 
   /* code (GitHub-dark inspired, verified on --code-bg) */
   --code-bg: 22 27 34; /* #161b22 */
@@ -65,6 +66,7 @@
   --accent: 79 70 229; /* #4f46e5 indigo-600 — AA on white */
   --accent-fill: 79 70 229;
   --accent-fg: 255 255 255;
+  --accent-2: 34 211 238; /* #22d3ee — unchanged from the dark theme */
 
   /* code — high-contrast palette tuned for the light #f6f8fa background */
   --code-bg: 246 248 250; /* #f6f8fa */
@@ -89,6 +91,210 @@
   color-scheme: light;
 }
 
+/* ============================================================================
+   Seasonal themes — a SECOND, independent axis layered on top of dark/light.
+   Set as `data-season="…"` on <html> by the pre-paint script that
+   `src/plugins/season.plugin.ts` injects; the windows live in
+   libs/portfolio/shell/ui/src/lib/season/season.data.ts.
+
+   SPECIFICITY TRAP — read before adding a season:
+   `[data-season='x']` and `.light` have the SAME specificity (0,1,0), so these
+   blocks only win because they come AFTER `.light` in this file. That means a
+   token overridden only in the bare block would also apply in light mode and
+   wreck it. Every token a season touches MUST be declared twice: once bare
+   (dark) and once as `.light[data-season='x']` (0,2,0, wins over both).
+
+   Contrast is not optional here either — every pairing below was measured to
+   meet WCAG AA (>=4.5:1) against its own background, same as the base themes.
+   ========================================================================= */
+
+/* --- Halloween: dark --------------------------------------------------- */
+[data-season='halloween'] {
+  --bg: 18 10 6; /* #120a06 */
+  --surface: 28 17 10; /* #1c110a */
+  --surface-2: 38 24 14; /* #26180e */
+  --border: 58 38 24; /* #3a2618 */
+
+  --fg: 245 230 216; /* #f5e6d8 — 16.0:1 on bg */
+  --fg-muted: 194 168 146; /* #c2a892 — 8.7:1 on bg */
+
+  --accent: 255 157 77; /* #ff9d4d — 9.5:1 on bg */
+  --accent-fill: 179 84 30; /* #b3541e — white text on it is 5.0:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 251 191 36; /* #fbbf24 — candle gold, 11.6:1 on bg */
+
+  --chart-card: #1c110a;
+  --chart-border: #3a2618;
+  --chart-fg: #f5e6d8;
+  --chart-muted: #c2a892;
+  --chart-axis: #8a6a52;
+  --chart-toggle: #150c07;
+}
+
+/* --- Halloween: light -------------------------------------------------- */
+.light[data-season='halloween'] {
+  --bg: 255 250 245; /* #fffaf5 */
+  --surface: 255 255 255;
+  --surface-2: 255 244 234; /* #fff4ea */
+  --border: 240 221 201; /* #f0ddc9 */
+
+  --fg: 43 21 8; /* #2b1508 — 16.7:1 on bg */
+  --fg-muted: 107 74 51; /* #6b4a33 — 7.6:1 on bg */
+
+  /* Darker than the dark-mode orange: #ff9d4d on white is only 2.1:1. */
+  --accent: 168 69 26; /* #a8451a — 5.7:1 on bg */
+  --accent-fill: 168 69 26; /* white text on it is 6.0:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 180 83 9; /* #b45309 — 4.8:1 on bg (gold is unreadable on cream) */
+
+  --chart-card: #ffffff;
+  --chart-border: #f0ddc9;
+  --chart-fg: #2b1508;
+  --chart-muted: #6b4a33;
+  --chart-axis: #8a6a52;
+  --chart-toggle: #fff4ea;
+}
+
+/* --- Autumn: dark ------------------------------------------------------ */
+[data-season='autumn'] {
+  --bg: 21 16 12; /* #15100c */
+  --surface: 30 23 18; /* #1e1712 */
+  --surface-2: 42 32 25; /* #2a2019 */
+  --border: 61 47 36; /* #3d2f24 */
+
+  --fg: 243 233 220; /* #f3e9dc — 15.7:1 on bg */
+  --fg-muted: 196 176 154; /* #c4b09a — 9.0:1 on bg */
+
+  --accent: 242 145 95; /* #f2915f — maple, 8.1:1 on bg */
+  --accent-fill: 165 66 31; /* #a5421f — white text on it is 6.2:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 227 180 72; /* #e3b448 — harvest gold, 9.8:1 on bg */
+
+  --chart-card: #1e1712;
+  --chart-border: #3d2f24;
+  --chart-fg: #f3e9dc;
+  --chart-muted: #c4b09a;
+  --chart-axis: #c4b09a; /* 8.4:1 on chart-card */
+  --chart-toggle: #18120e;
+}
+
+/* --- Autumn: light ----------------------------------------------------- */
+.light[data-season='autumn'] {
+  --bg: 253 248 241; /* #fdf8f1 */
+  --surface: 255 255 255;
+  --surface-2: 248 239 226; /* #f8efe2 */
+  --border: 234 217 194; /* #ead9c2 */
+
+  --fg: 42 26 14; /* #2a1a0e — 15.9:1 on bg */
+  --fg-muted: 106 80 57; /* #6a5039 — 7.0:1 on bg */
+
+  /* Darker than the dark-mode maple: #f2915f on cream is far below AA. */
+  --accent: 156 61 26; /* #9c3d1a — 6.4:1 on bg */
+  --accent-fill: 156 61 26; /* white text on it is 6.8:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 127 86 0; /* #7f5600 — 6.1:1 on bg (gold is unreadable on cream) */
+
+  --chart-card: #ffffff;
+  --chart-border: #ead9c2;
+  --chart-fg: #2a1a0e;
+  --chart-muted: #6a5039;
+  --chart-axis: #6a5039; /* 7.5:1 on chart-card */
+  --chart-toggle: #f8efe2;
+}
+
+/* --- Christmas: dark --------------------------------------------------- */
+[data-season='christmas'] {
+  --bg: 10 20 16; /* #0a1410 */
+  --surface: 17 30 24; /* #111e18 */
+  --surface-2: 26 42 34; /* #1a2a22 */
+  --border: 42 61 51; /* #2a3d33 */
+
+  --fg: 238 245 239; /* #eef5ef - 16.9:1 on bg */
+  --fg-muted: 169 194 178; /* #a9c2b2 - 9.9:1 on bg */
+
+  --accent: 255 107 107; /* #ff6b6b - berry red, 6.8:1 on bg */
+  --accent-fill: 179 38 46; /* #b3262e - white text on it is 6.5:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 242 193 78; /* #f2c14e - star gold, 11.2:1 on bg */
+
+  --chart-card: #111e18;
+  --chart-border: #2a3d33;
+  --chart-fg: #eef5ef;
+  --chart-muted: #a9c2b2;
+  --chart-axis: #a9c2b2; /* 9.0:1 on chart-card */
+  --chart-toggle: #0d1813;
+}
+
+/* --- Christmas: light -------------------------------------------------- */
+.light[data-season='christmas'] {
+  --bg: 248 251 248; /* #f8fbf8 */
+  --surface: 255 255 255;
+  --surface-2: 238 245 239; /* #eef5ef */
+  --border: 212 227 216; /* #d4e3d8 */
+
+  --fg: 15 36 25; /* #0f2419 - 15.7:1 on bg */
+  --fg-muted: 74 102 86; /* #4a6656 - 6.1:1 on bg */
+
+  --accent: 179 32 42; /* #b3202a - 6.4:1 on bg */
+  --accent-fill: 179 32 42; /* white text on it is 6.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 31 107 58; /* #1f6b3a - pine, 6.3:1 on bg (gold is unreadable on white) */
+
+  --chart-card: #ffffff;
+  --chart-border: #d4e3d8;
+  --chart-fg: #0f2419;
+  --chart-muted: #4a6656;
+  --chart-axis: #4a6656; /* 6.3:1 on chart-card */
+  --chart-toggle: #eef5ef;
+}
+
+/* --- Winter: dark ------------------------------------------------------ */
+[data-season='winter'] {
+  --bg: 12 17 24; /* #0c1118 */
+  --surface: 19 26 36; /* #131a24 */
+  --surface-2: 28 37 50; /* #1c2532 */
+  --border: 44 58 76; /* #2c3a4c */
+
+  --fg: 232 238 245; /* #e8eef5 - 16.2:1 on bg */
+  --fg-muted: 167 182 200; /* #a7b6c8 - 9.2:1 on bg */
+
+  --accent: 124 196 242; /* #7cc4f2 - ice blue, 10.0:1 on bg */
+  --accent-fill: 31 106 165; /* #1f6aa5 - white text on it is 5.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 201 214 255; /* #c9d6ff - frost, 13.1:1 on bg */
+
+  --chart-card: #131a24;
+  --chart-border: #2c3a4c;
+  --chart-fg: #e8eef5;
+  --chart-muted: #a7b6c8;
+  --chart-axis: #a7b6c8; /* 8.5:1 on chart-card */
+  --chart-toggle: #0f151d;
+}
+
+/* --- Winter: light ----------------------------------------------------- */
+.light[data-season='winter'] {
+  --bg: 246 249 252; /* #f6f9fc */
+  --surface: 255 255 255;
+  --surface-2: 235 241 247; /* #ebf1f7 */
+  --border: 211 223 235; /* #d3dfeb */
+
+  --fg: 14 26 40; /* #0e1a28 - 16.6:1 on bg */
+  --fg-muted: 75 93 114; /* #4b5d72 - 6.4:1 on bg */
+
+  /* Darker than the dark-mode ice blue: #7cc4f2 on white is far below AA. */
+  --accent: 29 95 148; /* #1d5f94 - 6.4:1 on bg */
+  --accent-fill: 29 95 148; /* white text on it is 6.7:1 */
+  --accent-fg: 255 255 255;
+  --accent-2: 75 79 168; /* #4b4fa8 - 6.7:1 on bg */
+
+  --chart-card: #ffffff;
+  --chart-border: #d3dfeb;
+  --chart-fg: #0e1a28;
+  --chart-muted: #4b5d72;
+  --chart-axis: #4b5d72; /* 6.8:1 on chart-card */
+  --chart-toggle: #ebf1f7;
+}
+
 html,
 body {
   height: 100%;
@@ -100,6 +306,19 @@ body {
   color: rgb(var(--fg));
   /* Smooth theme switch, but never animate the page on first paint. */
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Logichat widget: its iframe document picks dark/light ONCE, from `hostTheme`
+   in its src at load. If the visitor then flips the theme, the iframe element
+   inherits the new color-scheme, and a color-scheme mismatch between an iframe
+   and its document makes the browser paint an opaque backdrop (a dark square
+   around the button on a light page). Pin the element to the theme the
+   document actually loaded with, so the backdrop stays transparent. */
+#logichat-faq-widget iframe[src*='hostTheme=dark'] {
+  color-scheme: dark;
+}
+#logichat-faq-widget iframe[src*='hostTheme=light'] {
+  color-scheme: light;
 }
 
 /* Ensure the app container takes full height */
@@ -228,6 +447,13 @@ main a:not([class]) {
     padding-left: 1rem;
   }
 
+  /* Task list items ("- [ ] ...") already show a checkbox; drop the bullet
+     so they don't render a disc AND a box. */
+  li:has(> input[type='checkbox']) {
+    list-style: none;
+    margin-left: -0.5rem;
+  }
+
   ol {
     list-style-type: decimal;
     margin-left: 1rem;
@@ -252,6 +478,14 @@ main a:not([class]) {
     overflow-x: auto;
     margin: 1rem 0;
     border: 1px solid rgb(var(--code-border));
+  }
+
+  /* Mermaid diagrams keep the dark figure-card look in both themes */
+  pre.mermaid {
+    background-color: #161b22;
+    border-color: #30363d;
+    color: #e6edf3;
+    text-align: center;
   }
 
   pre code {

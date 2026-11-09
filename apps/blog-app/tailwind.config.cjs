@@ -21,6 +21,9 @@ module.exports = {
         accent: 'rgb(var(--accent) / <alpha-value>)',
         'accent-fill': 'rgb(var(--accent-fill) / <alpha-value>)',
         'accent-fg': 'rgb(var(--accent-fg) / <alpha-value>)',
+        // Second gradient stop. Base themes keep the cyan this site has always
+        // used; a season overrides it so hero gradients follow the costume.
+        'accent-2': 'rgb(var(--accent-2) / <alpha-value>)',
       },
       boxShadow: {
         glow: '0 0 0 1px rgb(var(--accent-fill) / 0.35), 0 8px 30px -8px rgb(var(--accent-fill) / 0.45)',

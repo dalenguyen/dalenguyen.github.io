@@ -64,7 +64,7 @@ import { EmailCaptureService } from './email-capture.service'
               <button
                 type="submit"
                 [disabled]="status() === 'submitting'"
-                class="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px disabled:opacity-60"
+                class="inline-flex items-center justify-center gap-2 rounded-lg bg-accent-fill px-4 py-2 text-sm font-semibold text-white transition hover:bg-accent-fill/90 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px disabled:opacity-60"
               >
                 {{ status() === 'submitting' ? 'Subscribing…' : ctaLabel }}
               </button>
