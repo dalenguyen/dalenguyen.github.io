@@ -2,7 +2,7 @@ import { Component, computed, signal, ViewEncapsulation } from '@angular/core'
 
 const PRICE = 0.0000253 // $ per instance-second, 1 vCPU + 512 MiB
 const STREAM_S = 301
-const FLOOR_S = 60 // post-fix floor: real tool calls only, ~60 instance-seconds a day
+const FLOOR_S = 112 // post-fix floor: real tool calls only, mean of Oct 9 – Nov 7
 const MONTH_DAYS = 30
 const WORST = 86_400 * MONTH_DAYS * PRICE // one instance pinned all month
 
@@ -134,10 +134,10 @@ export class CostCalcComponent {
 
   readonly note = computed(() => {
     if (this.fixed()) {
-      return 'With the fix, each GET is refused in about 3 ms. However long the client stays connected, the bill sits at the floor of real tool calls — about $0.05 a month.'
+      return 'With the fix, each GET is refused in about 3 ms. However long the client stays connected, the bill sits at the floor of real tool calls — under ten cents a month.'
     }
     if (this.hours() === 0) {
-      return 'No session connected, no stream: the floor of real tool calls, about $0.05 a month. This is what nine of September’s days looked like.'
+      return 'No session connected, no stream: the floor of real tool calls, under ten cents a month. This is what nine of September’s days looked like.'
     }
     return 'Every hour a client holds the stream is an hour of billed instance time, whether or not a single tool call happens.'
   })

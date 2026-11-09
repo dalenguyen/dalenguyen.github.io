@@ -172,10 +172,11 @@ serving traffic until the fix landed on the 3rd. The streams stopped
 client-side, on their own.
 
 The clients simply stopped opening the stream. Across 29 and 30 September the
-GETs came from `claude-code/2.1.237` and `2.1.283`; from 2 October the only GETs
-in the logs are scanner bots and my own `curl` checks. Whether that was a
-client-side change in behaviour or just a change in how the service was being
-used, the server was identical throughout.
+GETs came from `claude-code/2.1.237` and `2.1.283`; from 2 to 4 October the only
+GETs in the logs are scanner bots and my own `curl` checks. At the time I could
+not tell whether that was a client-side change in behaviour or just a change in
+how the service was being used. The server was identical throughout. Five weeks
+of logs later answered it — see the end of this post.
 
 ### Why the aggregate hid it
 
@@ -213,12 +214,12 @@ could.
 | September, quiet days (9 d) | 7,687 | 856 | $0.022/day |
 | September, whole month | 1,641,616 | 53,756 | **$41.45** |
 | Oct 2–4, after the cliff | 180 | 60 | $0.0015/day |
-| Projected forward, 30 days | 1,800 | 60 | **$0.05** |
+| Oct 9 – Nov 7, measured (30 d) | 3,366 | 112 | **$0.085** |
 
-**$41.45 → about $0.05 a month**, a factor of roughly 830. The September invoice
-still carries the full charge; the saving shows up in October.
+**$41.45 → under ten cents a month**, a factor of roughly 490. The September
+invoice still carries the full charge; the saving shows up in October.
 
-<div data-chart="cost-calc">Calculator: every hour a client holds the stream open costs one hour of billed instance time, about $0.09. A client connected 21.5 hours a day costs about $59 a month; one that never disconnects, about $66. With the 405 fix, the bill stays at the floor of real tool calls, about $0.05 a month. Enable JavaScript to try it.</div>
+<div data-chart="cost-calc">Calculator: every hour a client holds the stream open costs one hour of billed instance time, about $0.09. A client connected 21.5 hours a day costs about $59 a month; one that never disconnects, about $66. With the 405 fix, the bill stays at the floor of real tool calls, under ten cents a month. Enable JavaScript to try it.</div>
 
 The honest attribution: that drop is not mine. It happened on 1 October for
 reasons on the client side. What the fix does is make the floor permanent — if
@@ -240,6 +241,31 @@ anyone deciding to buy it. If it becomes annoying the answer is to cut Python
 startup time, where `firebase_admin` initialisation and tool-module imports run
 at module scope. The answer is *not* `min-instances=1`, which would restore the
 warmth and the entire original bill.
+
+## Five weeks later
+
+I went back to the logs on 8 November, this time with a daily series first.
+
+The fix held. `GET /mcp` still answers 405 in well under a second. No request
+since 5 October has come close to the 300-second timeout; the longest was 23
+seconds, a bot landing on a cold start. Billed time sits between 40 and 300
+instance-seconds a day, a mean of 112. That is about twice the 60 I projected
+from three quiet days, and still under ten cents a month.
+
+The more useful finding was about the client. `claude-code/2.1.283` — the same
+version that held streams open in September — still opens the GET stream. It
+did so 8 times between 17 October and 8 November, about once per session. Each
+time it got a 405, did not retry, and went on with its POSTs. So the client did
+not change its behaviour on 1 October. What changed was usage: there were no
+sessions, so there were no streams.
+
+That makes the insurance argument concrete. Without the fix, each of those 8
+sessions would have pinned an instance for as long as it stayed connected. With
+the fix, each one cost about three milliseconds.
+
+Cold starts are the cost of that. In those 30 days the service started 356
+times, with a mean startup of 8.7 seconds. Most of those starts were bots and
+scanners, not people.
 
 ## What I'd take from this
 
@@ -263,5 +289,6 @@ early, and I took the credit for it before checking.
 
 Cloud Run · Python MCP server · `cantax-fyi`, us-central1. Figures from Cloud
 Monitoring (`run.googleapis.com/container/billable_instance_time`,
-`request_latencies`) and Cloud Logging, 31 Aug – 4 Oct 2026. Pricing is
+`request_latencies`, `startup_latencies`) and Cloud Logging, 31 Aug – 8 Nov
+2026. Pricing is
 us-central1 list rate for request-based billing.
