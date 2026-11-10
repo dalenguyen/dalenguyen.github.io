@@ -92,8 +92,11 @@ type View = 'aggregate' | 'daily'
           }
 
           @for (b of bars(); track b.i) {
-            <rect class="hit" [attr.x]="b.slotX" [attr.y]="padT" [attr.width]="slot" [attr.height]="plotH"
-                  (mouseenter)="hover.set(b.i)" (mouseleave)="hover.set(null)" (click)="hover.set(b.i)" />
+            <rect class="hit" tabindex="0" role="button" [attr.aria-label]="b.label"
+                  [attr.x]="b.slotX" [attr.y]="padT" [attr.width]="slot" [attr.height]="plotH"
+                  (mouseenter)="hover.set(b.i)" (mouseleave)="hover.set(null)" (click)="hover.set(b.i)"
+                  (focus)="hover.set(b.i)" (blur)="hover.set(null)"
+                  (keydown.enter)="hover.set(b.i)" (keydown.space)="$event.preventDefault(); hover.set(b.i)" />
             <rect class="bar" [class]="'bar ' + b.cls" [class.hot]="hover() === b.i"
                   [attr.x]="b.x" [attr.y]="padT" [attr.width]="barW" [attr.height]="plotH"
                   [style.transform]="'scaleY(' + b.scale + ')'" />
@@ -149,6 +152,8 @@ type View = 'aggregate' | 'daily'
       .mlab.cliff { fill: #ffd166; text-anchor: end; }
       .mlab.fix { fill: #5ad19a; }
       .hit { fill: transparent; cursor: pointer; }
+      .hit:focus { outline: none; }
+      .hit:focus-visible { outline: 2px solid #7c9cff; outline-offset: -2px; }
       .bar { pointer-events: none; transform-box: fill-box; transform-origin: bottom;
         transition: transform 0.45s ease, fill 0.3s ease; }
       .bar.session { fill: #ff8a5c; }
@@ -206,6 +211,7 @@ export class DailySeriesComponent {
       return {
         i,
         cls,
+        label: d.label + ': ' + Math.round(shown).toLocaleString('en-US') + ' instance-seconds',
         slotX: PAD_L + i * SLOT,
         x: PAD_L + i * SLOT + (SLOT - BAR_W) / 2,
         // keep a sliver visible for tiny values so the day still reads as "measured"
