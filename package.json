@@ -106,6 +106,7 @@
     "shiki": "^1.29.2",
     "smoothscroll-polyfill": "^0.4.4",
     "sqlite3": "^5.1.6",
+    "three": "^0.170.0",
     "tslib": "^2.5.2",
     "typeorm": "^0.3.16",
     "zone.js": "0.15.0"
@@ -175,6 +176,7 @@
     "@types/react-dom": "18.3.0",
     "@types/smoothscroll-polyfill": "^0.3.1",
     "@types/sqlite3": "^3.1.8",
+    "@types/three": "^0.170.0",
     "@typescript-eslint/eslint-plugin": "7.18.0",
     "@typescript-eslint/parser": "7.18.0",
     "@typescript-eslint/utils": "^7.16.0",

@@ -1,23 +1,19 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core'
+import { ChapterLabelComponent } from '../chapters/chapter-label.component'
 
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-contact',
-  standalone: true,
+  imports: [ChapterLabelComponent],
   template: `
-    <section id="contact" class="relative isolate overflow-hidden border-t border-border bg-surface/40">
-      <!-- accent glow -->
-      <div aria-hidden="true" class="pointer-events-none absolute inset-x-0 -bottom-48 -z-10 flex justify-center blur-3xl">
-        <div
-          class="aspect-[1100/600] w-[60rem] max-w-none bg-gradient-to-tr from-accent-fill/30 via-accent/20 to-accent-2/20 opacity-40 bg-[length:200%_200%] animate-gradient-pan"
-        ></div>
-      </div>
-
+    <section id="contact" data-scene="sphere" class="flex min-h-screen items-center">
       <div class="mx-auto max-w-7xl px-6 py-20 sm:py-28 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
-          <h2 class="text-sm font-semibold uppercase tracking-wider text-accent">Contact</h2>
-          <p class="mt-2 text-3xl font-bold tracking-tight text-fg sm:text-4xl">Let's work together</p>
-          <p class="mt-4 text-lg leading-7 text-fg-muted">If you have something interesting, shoot me an email.</p>
+          <dalenguyen-chapter-label number="06" label="Say hi" />
+          <h2 class="mt-6 text-4xl font-bold tracking-tight text-fg sm:text-6xl">Got an idea for an agent?</h2>
+          <p class="mt-6 text-lg leading-8 text-fg-muted">
+            Or a problem your team keeps solving by hand. I like hearing about both - send me an email.
+          </p>
 
           <div class="mt-8 flex justify-center">
             <a
@@ -32,7 +28,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core'
           </div>
 
           <div class="mt-10">
-            <p class="mb-4 text-sm text-fg-muted">Or connect with me on social media:</p>
+            <p class="mb-4 text-sm text-fg-muted">Or find me here:</p>
             <div class="flex justify-center gap-6">
               <a
                 href="https://www.linkedin.com/in/dalenguyenblogger/"
