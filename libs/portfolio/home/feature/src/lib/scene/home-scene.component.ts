@@ -52,7 +52,11 @@ const FRAGMENT = /* glsl */ `
 @Component({
   changeDetection: ChangeDetectionStrategy.OnPush,
   selector: 'dalenguyen-home-scene',
-  template: `<canvas #canvas aria-hidden="true" class="pointer-events-none fixed inset-0 z-0 h-screen w-screen"></canvas>`,
+  template: `<canvas
+    #canvas
+    aria-hidden="true"
+    class="pointer-events-none fixed inset-0 z-0 h-screen w-screen"
+  ></canvas>`,
 })
 export class HomeSceneComponent {
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas')
@@ -166,12 +170,24 @@ export class HomeSceneComponent {
       const t = Math.min(Math.max((x - a) / (b - a), 0), 1)
       return t * t * (3 - 2 * t)
     }
+    // Section tops and heights, measured only when the layout changes (not
+    // every frame, which would force a layout on each frame).
+    let bounds: { top: number; height: number }[] = []
+    const measure = () => {
+      bounds = sections.map((el) => ({
+        top: el.getBoundingClientRect().top + scrollY,
+        height: Math.max(el.offsetHeight, 1),
+      }))
+    }
+    measure()
+    const layoutObserver = new ResizeObserver(measure)
+    layoutObserver.observe(document.body)
     const targetIndex = () => {
       const mid = scrollY + innerHeight / 2
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const top = sections[i].getBoundingClientRect().top + scrollY
+      for (let i = bounds.length - 1; i >= 0; i--) {
+        const { top, height } = bounds[i]
         if (mid >= top || i === 0) {
-          const frac = (mid - top) / Math.max(sections[i].offsetHeight, 1)
+          const frac = (mid - top) / height
           const next = Math.min(i + 1, shapes.length - 1)
           return Math.min(i, shapes.length - 1) + (next > i ? smoothstep(0.6, 1, frac) : 0)
         }
@@ -186,7 +202,9 @@ export class HomeSceneComponent {
       frame = requestAnimationFrame(tick)
       const dt = Math.min(clock.getDelta(), 0.05)
       // Ease toward the scroll target so fast scrolling still morphs smoothly.
-      index += (targetIndex() - index) * (reducedMotion ? 1 : Math.min(dt * 4, 1))
+      // Reduced motion: jump to the nearest whole shape, never a blend.
+      if (reducedMotion) index = Math.round(targetIndex())
+      else index += (targetIndex() - index) * Math.min(dt * 4, 1)
 
       const a = Math.floor(index)
       const b = Math.min(a + 1, shapes.length - 1)
@@ -201,13 +219,17 @@ export class HomeSceneComponent {
         group.rotation.y += dt * 0.08
       }
       const tilt = tilts[a] + (tilts[b] - tilts[a]) * t
-      group.rotation.x += (tilt + pointer.y * 0.15 - group.rotation.x) * 0.05
+      // Reduced motion: no pointer parallax, place the shape directly.
+      const ease = reducedMotion ? 1 : 0.05
+      const px = reducedMotion ? 0 : pointer.x
+      const py = reducedMotion ? 0 : pointer.y
+      group.rotation.x += (tilt + py * 0.15 - group.rotation.x) * ease
       const wide = innerWidth >= 768
       const side = wide ? sides[a] + (sides[b] - sides[a]) * t : 0
       const halfWidth = Math.tan((camera.fov * Math.PI) / 360) * camera.position.z * camera.aspect
       uniforms.uTextCenter.value = 0.5 - side * 0.25
       group.scale.setScalar(1 - Math.abs(side) * 0.4)
-      group.position.x += (side * halfWidth * 0.5 + pointer.x * 0.3 - group.position.x) * 0.05
+      group.position.x += (side * halfWidth * 0.5 + px * 0.3 - group.position.x) * ease
       renderer.render(scene, camera)
     }
     tick()
@@ -217,6 +239,7 @@ export class HomeSceneComponent {
       removeEventListener('resize', resize)
       removeEventListener('pointermove', onPointer)
       themeObserver.disconnect()
+      layoutObserver.disconnect()
       geometry.dispose()
       material.dispose()
       renderer.dispose()
